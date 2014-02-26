@@ -2,9 +2,10 @@
  * Created by Siarhei Hladkou (shladkou) on 2/26/14.
  */
 var util = require('util');
+var config = require('config');
 
 JiraApi = require('jira').JiraApi;
-var jira = new JiraApi('https', "jira.epam.com", 443, "siarhei_hladkou", "password", '2');
+var jira = new JiraApi('https', "jira.epam.com", 443, config.get("jiraUser"), config.get("jiraPassword"), '2');
 
 function getIssue(issueKey) {
     jira.findIssue(issueKey + "?expand=changelog", function(error, issue) {
