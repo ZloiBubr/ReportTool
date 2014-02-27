@@ -9,6 +9,10 @@
     "express": "3.4.8",
     "ejs": "*",
     "mongoose": "*",
-    "jira": "*"
+    "jira": "*",
+    "ejs-locals": "*",
+    "mongodb": "*",
+    "nconf": "*",
+    "winston": "*"
   }
 }
