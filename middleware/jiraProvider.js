@@ -4,6 +4,8 @@
 var util = require('util');
 var config = require('../config');
 var log = require('../libs/log')(module);
+var Module = require('models/module');
+var Page = require('module/page');
 
 JiraApi = require('jira').JiraApi;
 
@@ -14,8 +16,12 @@ exports.updateJiraInfo = function(jiraUser, jiraPassword){
         if(epics != null){
             for(var i=0; i<epics.issues.length; i++){
                 var epic = epics.issues[i];
-                log.info(epic.key);
-                log.info(epic.fields.summary);
+                var module = new Module();
+                module.key = epic.key;
+                module.summary = epic.fields.summary;
+                module.save(function(err, module, affected){
+                    log.info(arguments);
+                })
             }
         }
         else

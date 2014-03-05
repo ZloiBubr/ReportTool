@@ -3,5 +3,15 @@
     "appSecret": "ReportToolSecret",
     "jiraAPIProtocol": "https",
     "jiraUrl": "jira.epam.com",
-    "jiraPort": 443
+    "jiraPort": 443,
+    "mongoose": {
+        "uri": "mongodb://localhost/plex",
+        "options": {
+            "server": {
+                "socketOptions": {
+                    "keepAlive": 1
+                }
+            }
+        }
+    }
 }
