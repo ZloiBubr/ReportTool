@@ -2,10 +2,26 @@
  * Created by Siarhei Hladkou (shladkou) on 2/26/14.
  */
 var util = require('util');
-var config = require('config');
+var config = require('../config');
+var log = require('../libs/log')(module);
 
 JiraApi = require('jira').JiraApi;
-var jira = new JiraApi('https', "jira.epam.com", 443, config.get("jiraUser"), config.get("jiraPassword"), '2');
+
+exports.updateJiraInfo = function(jiraUser, jiraPassword){
+    var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), jiraUser, jiraPassword, '2');
+
+    jira.searchJira("project = PLEX-UXC AND issuetype = epic AND summary ~ Module AND NOT summary ~ automation ORDER BY key ASC", null, function(error, epics) {
+        if(epics != null){
+            for(var i=0; i<epics.issues.length; i++){
+                var epic = epics.issues[i];
+                log.info(epic.key);
+                log.info(epic.fields.summary);
+            }
+        }
+        else
+            log.error("Not Found");
+    });
+}
 
 function getIssue(issueKey) {
     jira.findIssue(issueKey + "?expand=changelog", function(error, issue) {
@@ -56,19 +72,7 @@ function getProject() {
     });
 }
 
-function searchEpics() {
-    jira.searchJira("project = PLEX-UXC AND issuetype = epic AND summary ~ Module AND NOT summary ~ automation ORDER BY key ASC", null, function(error, epics) {
-        if(epics != null){
-            //console.log('Status: ' + util.inspect(epics));
-            for(var i=0; i<epics.issues.length; i++){
-                var epic = epics.issues[i];
-                console.log(epic.key);
-                console.log(epic.fields.summary);
-            }
-        }
-        else
-            console.log("empty response: " + error);
-    });
+function searchEpics(jira) {
 }
 
 function searchStories(epicKey) {
@@ -90,7 +94,7 @@ function searchStories(epicKey) {
 
 //searchEpics();
 //searchStories("PLEXUXC-22");
-getIssue("PLEXUXC-588");
+//getIssue("PLEXUXC-588");
 //processRedis();
 
 

@@ -9,8 +9,8 @@ var user = require('./routes/user');
 var updatejira = require('./routes/updatejira');
 var http = require('http');
 var path = require('path');
-var config = require('config');
-var log = require('libs/log')(module);
+var config = require('./config');
+var log = require('./libs/log')(module);
 
 var app = express();
 
@@ -41,7 +41,8 @@ if ('development' == app.get('env')) {
 }
 
 app.get('/', routes.index);
-app.get('/updatejira', updatejira.update);
+app.get('/updatejira', updatejira.get);
+app.post('/updatejira', updatejira.post);
 
 http.createServer(app).listen(config.get('port'), function(){
   log.info('Express server listening on port ' + config.get('port'));
