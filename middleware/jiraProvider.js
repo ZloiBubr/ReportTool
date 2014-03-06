@@ -4,24 +4,36 @@
 var util = require('util');
 var config = require('../config');
 var log = require('../libs/log')(module);
-var Module = require('models/module');
-var Page = require('module/page');
+var Module = require('models/module').Module;
+var Page = require('models/page').Page;
+var DBUpdater = require('createDb');
 
 JiraApi = require('jira').JiraApi;
 
 exports.updateJiraInfo = function(jiraUser, jiraPassword){
     var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), jiraUser, jiraPassword, '2');
 
-    jira.searchJira("project = PLEX-UXC AND issuetype = epic AND summary ~ Module AND NOT summary ~ automation ORDER BY key ASC", null, function(error, epics) {
-        if(epics != null){
-            for(var i=0; i<epics.issues.length; i++){
+    //1. Clear DB
+    ClearDB();
+    //2. Load Modules
+    UpdateModules(jira);
+}
+
+function ClearDB() {
+    DBUpdater.Clear(function(err) {
+        if(err)
+            log.error("DB was not cleared successfully");
+    });
+}
+
+function UpdateModules(jira) {
+    jira.searchJira("project = PLEX-UXC AND issuetype = epic AND summary ~ Module AND NOT summary ~ automation ORDER BY key ASC", null, function (error, epics) {
+        if (epics != null) {
+            for (var i = 0; i < epics.issues.length; i++) {
                 var epic = epics.issues[i];
-                var module = new Module();
-                module.key = epic.key;
-                module.summary = epic.fields.summary;
-                module.save(function(err, module, affected){
-                    log.info(arguments);
-                })
+                SaveModule(epic);
+                //3. Load Pages
+                UpdatePages(jira, epic.key);
             }
         }
         else
@@ -29,79 +41,89 @@ exports.updateJiraInfo = function(jiraUser, jiraPassword){
     });
 }
 
-function getIssue(issueKey) {
-    jira.findIssue(issueKey + "?expand=changelog", function(error, issue) {
-        if (issue == null) {
-            console.log("empty response: " + error);
+function SaveModule(epic) {
+    Module.findOne({ key: epic.key }).exec(function (err, module) {
+        if (!err) {
+            if (!module) {
+                module = new Module();
+            }
+            module.key = epic.key;
+            module.summary = epic.fields.summary;
+            module.save(function (err, module) {
+                if (err) throw err;
+                log.info(module.key);
+            })
         }
-        else
-        {
-            console.log("Summary: " + issue.fields.summary);
-            console.log("Status: " + issue.fields.status.name);
-            //console.log(issue.fields.timeoriginalestimate);
-            //console.log(issue.fields.timespent);
-            console.log("Reporter: " + issue.fields.reporter.displayName);
-            //console.log(util.inspect(issue.fields.worklog));
-            console.log("Original estimate: " + issue.fields.timetracking.originalEstimate);
-            console.log("Time Spent: " + issue.fields.timetracking.timeSpent);
-            console.log("Labels: " + issue.fields.labels);
-            if(issue.fields.assignee != null)
-                console.log("Assignee: " + issue.fields.assignee.displayName);
-            console.log("Blockers: " + issue.fields.customfield_20501);
-            console.log("Progress: " + issue.fields.customfield_20500);
-            console.log("------------------- Changelog -----------------------");
-            for(var i=0; i<issue.changelog.total; i++)
-            {
+    });
+}
+
+function UpdatePages(jira, moduleKey) {
+    jira.searchJira(util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s)",moduleKey), null, function(error, stories) {
+        if(stories != null){
+            for(var i=0; i<stories.issues.length; i++){
+                var story = stories.issues[i];
+                UpdatePage(jira, story.key.toString());
+            }
+        }
+    });
+}
+
+function UpdatePage(jira, storyKey) {
+    jira.findIssue(storyKey + "?expand=changelog", function(error, issue) {
+        if (issue != null) {
+            SavePage(issue);
+        }
+    });
+}
+
+function SavePage(issue) {
+    Page.findOne({ key: issue.key }).exec(function (err, page) {
+        if (!err) {
+            if (!page) {
+                page = new Page();
+            }
+            page.key = issue.key;
+            page.summary = issue.fields.summary;
+            page.status = issue.fields.status.name;
+            page.reporter = issue.fields.reporter.displayName;
+            page.originalEstimate = issue.fields.timetracking.originalEstimate;
+            page.timeSpent = issue.fields.timetracking.timeSpent;
+            page.labels = issue.fields.labels;
+            if (issue.fields.assignee != null)
+                page.assignee =  issue.fields.assignee.displayName;
+            page.blockers =  issue.fields.customfield_20501;
+            page.progress =  issue.fields.customfield_20500;
+            for (var i = 0; i < issue.changelog.total; i++) {
                 var history = issue.changelog.histories[i];
                 var author = history.author.displayName;
-                //console.log(util.inspect(history.items));
-                for(var y=0; y<history.items.length; y++){
-                    if(history.items[y].fieldtype == 'custom' && history.items[y].field == 'Progress')
-                    {
-                        console.log(history.created);
-                        console.log("Author: " + author);
-                        console.log(history.items[y].fromString + '->' + history.items[y].toString);
-                        console.log("************************************");
+                for (var y = 0; y < history.items.length; y++) {
+                    if (history.items[y].fieldtype == 'custom' && history.items[y].field == 'Progress') {
+                        if(page.progressHistory == null) {
+                            page.progressHistory = [{
+                                person: author,
+                                progressValue: history.items[y].toString, //fromString
+                                dateChanged: history.created
+                            }];
+                        }
+                        else {
+                            page.progressHistory.push({
+                                person: author,
+                                progressValue: history.items[y].toString, //fromString
+                                dateChanged: history.created
+                            });
+                        }
                     }
                 }
             }
+
+            page.save(function (err, page) {
+                if (err) throw err;
+                log.info(page.key);
+            })
         }
     });
 }
 
-function getProject() {
-    jira.getProject("PLEXUXC", function(error, project) {
-        if(project != null)
-            console.log('Status: ' + project);
-        else
-            console.log("empty response: " + error);
-    });
-}
-
-function searchEpics(jira) {
-}
-
-function searchStories(epicKey) {
-    jira.searchJira(util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s)",epicKey), null, function(error, stories) {
-        if(stories != null){
-            //console.log('Status: ' + util.inspect(stories));
-            //console.log("Story: " + util.inspect(stories.issues[0]));
-            for(var i=0; i<stories.issues.length; i++){
-                var story = stories.issues[i];
-                console.log(story.key);
-                console.log(story.fields.summary);
-                getIssue(story.key.toString());
-            }
-        }
-        else
-            console.log("empty response: " + error);
-    });
-}
-
-//searchEpics();
-//searchStories("PLEXUXC-22");
-//getIssue("PLEXUXC-588");
-//processRedis();
 
 
 
