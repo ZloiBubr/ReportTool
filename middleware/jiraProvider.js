@@ -4,9 +4,9 @@
 var util = require('util');
 var config = require('../config');
 var log = require('../libs/log')(module);
-var Module = require('models/module').Module;
-var Page = require('models/page').Page;
-var DBUpdater = require('createDb');
+var Module = require('../models/module').Module;
+var Page = require('../models/page').Page;
+var DBUpdater = require('../createDb');
 
 JiraApi = require('jira').JiraApi;
 

@@ -1,7 +1,7 @@
 /**
  * Created by Siarhei Hladkou (shladkou) on 3/6/14.
  */
-var mongoose = require('libs/mongoose');
+var mongoose = require('./libs/mongoose');
 var async = require('async');
 
 exports.Clear = function (callback) {

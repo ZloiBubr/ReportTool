@@ -1,7 +1,7 @@
 /**
  * Created by Siarhei Hladkou (shladkou) on 3/5/14.
  */
-var mongoose = require('libs/mongoose');
+var mongoose = require('../libs/mongoose');
 var Schema = mongoose.Schema;
 
 var schema = new Schema({
