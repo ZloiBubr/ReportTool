@@ -13,6 +13,7 @@
     "ejs-locals": "*",
     "mongodb": "*",
     "nconf": "*",
-    "winston": "*"
+    "winston": "*",
+    "async": "*"
   }
 }
