@@ -6,11 +6,13 @@
  * To change this template use File | Settings | File Templates.
  */
 function velocityChartController($scope, $resource, $window) {
-    var chartsResource = $resource('https://jira.epam.com/jira/rest/api/2/search');
+    var jiraApiResource = $resource('https://jira.epam.com/jira/rest/api/2/search');
+    var chartSeriesResource = $resource('/velocitydata');
 
     /* ------------------------------------------------------ Init/Reinit -------------------------------*/
     $scope.init = function () {
         $scope.common = {};
+        $scope.common.IsJiraMode = false;
         $scope.common.currentJQL = "project = PLEX-UXC AND Labels in (TeamNova, TeamRenaissance, TeamInspiration) AND Type = Story and Status = Resolved ORDER BY resolutiondate";
 
         $scope.dataLoad();
@@ -38,7 +40,7 @@ function velocityChartController($scope, $resource, $window) {
                     zoomType: 'x'
                 }
             },
-            series: $scope.getSeries(),
+            series:$scope.common.IsJiraMode ? $scope.getSeries() : $scope.chartsData.data,
             title: {
                 text: 'Hello'
             },
@@ -104,13 +106,18 @@ function velocityChartController($scope, $resource, $window) {
             loadingDfrd.reject(err);
         };
 
-        chartsResource.get({
+        if($scope.common.isJiraMode === true)
+        {
+        jiraApiResource.get({
                 jql: $scope.common.currentJQL
             },
             getChartSuccess,
             getChartFail);
+        }
+        else{
+            chartSeriesResource.get(getChartSuccess, getChartFail)
+        }
 
-        //getChartSuccess($window.chatsData);
         return loadingDfrd.promise();
     }
     /* ------------------------------------------- DOM/Angular events --------------------------------------*/
