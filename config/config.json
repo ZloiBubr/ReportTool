@@ -1,5 +1,5 @@
 {
-    "port": 5220,
+    "port": 3000,
     "appSecret": "ReportToolSecret",
     "jiraAPIProtocol": "https",
     "jiraUrl": "jira.epam.com",

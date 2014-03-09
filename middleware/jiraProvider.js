@@ -4,9 +4,9 @@
 var util = require('util');
 var config = require('../config');
 var log = require('../libs/log')(module);
-var Module = require('../models/module').Module;
-var Page = require('../models/page').Page;
-var DBUpdater = require('../createDb');
+var Module = require('models/module').Module;
+var Page = require('models/page').Page;
+var DBUpdater = require('createDb');
 
 JiraApi = require('jira').JiraApi;
 
@@ -91,6 +91,7 @@ function SavePage(issue) {
             page.labels = issue.fields.labels;
             if (issue.fields.assignee != null)
                 page.assignee =  issue.fields.assignee.displayName;
+            page.storyPoints = issue.fields.customfield_10004;
             page.blockers =  issue.fields.customfield_20501;
             page.progress =  issue.fields.customfield_20500;
             for (var i = 0; i < issue.changelog.total; i++) {

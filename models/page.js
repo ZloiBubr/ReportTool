@@ -12,6 +12,7 @@ var schema = new Schema({
     , assignee          :   { type: String }
     , blockers          :   { type: String }
     , progress          :   { type: String }
+    , storyPoints       :   { type: String }
     , progressHistory   :   [{
         person          :   { type: String }
       , progressValue   :   { type: String }
