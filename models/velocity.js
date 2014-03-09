@@ -1,15 +1,15 @@
 exports.data = function(){
     this.data = [
         {
-            data: [[Date.UTC(2014,1,1),0], [Date.UTC(2014,1,2),0], [Date.UTC(2014,1,3),0]],
+            data: [],
             name: "TeamNova"
         },
         {
-            data: [[Date.UTC(2014,1,1),0], [Date.UTC(2014,1,2),0], [Date.UTC(2014,1,3),0]],
+            data: [],
             name: "TeamRenaissance"
         },
         {
-            data: [[Date.UTC(2014,1,1),0], [Date.UTC(2014,1,2),0], [Date.UTC(2014,1,3),0]],
+            data: [],
             name: "TeamInspiration"
         }];
 }

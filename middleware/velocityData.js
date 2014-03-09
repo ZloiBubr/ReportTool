@@ -33,7 +33,7 @@ function parsePages(data) {
             team.data.sort(function(a, b) {
             a = new Date(a[0]);
             b = new Date(b[0]);
-            return a>b ? -1 : a<b ? 1 : 0;
+            return a>b ? 1 : a<b ? -1 : 0;
             });
         }
         //3. summ
