@@ -8,6 +8,7 @@ var routes = require('./routes');
 var user = require('./routes/user');
 var updatejira = require('./routes/updatejira');
 var calcvelocitydata = require('./routes/calcvelocitydata');
+var calcprogress = require('./routes/calcprogress');
 var http = require('http');
 var path = require('path');
 var config = require('./config');
@@ -45,6 +46,7 @@ app.get('/', routes.index);
 app.get('/updatejira', updatejira.get);
 app.post('/updatejira', updatejira.post);
 app.get('/velocitydata', calcvelocitydata.get);
+app.get('/progressdata', calcprogress.get);
 
 http.createServer(app).listen(config.get('port'), function(){
   log.info('Express server listening on port ' + config.get('port'));
