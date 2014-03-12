@@ -4,17 +4,17 @@
 var mongoose = require('./libs/mongoose');
 var async = require('async');
 
-exports.Clear = function (callback) {
+//exports.Clear = function (callback) {
     async.series([
         open,
         dropDatabase,
         requireModels
     ], function(err) {
-        callback(err);
-//    mongoose.disconnect();
-//    process.exit(err ? 255 : 0);
+//        callback(err);
+        mongoose.disconnect();
+        process.exit(err ? 255 : 0);
     });
-}
+//}
 
 function open(callback) {
     mongoose.connection.on('open', callback);

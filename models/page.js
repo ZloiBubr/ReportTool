@@ -15,7 +15,8 @@ var schema = new Schema({
     , storyPoints       :   { type: String }
     , progressHistory   :   [{
         person          :   { type: String }
-      , progressValue   :   { type: String }
+      , progressFrom    :   { type: String }
+      , progressTo      :   { type: String }
       , dateChanged     :   { type: String }
     }]
     , created   :   { type: Date, default: Date.now() }

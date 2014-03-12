@@ -4,6 +4,7 @@ var Module = require('../models/module').Module;
 var Page = require('../models/page').Page;
 var async = require('async');
 var data = new velocity();
+var log = require('../libs/log')(module);
 
 parsePages(data);
 
@@ -16,12 +17,16 @@ function parsePages(data) {
     Page.find({}).exec(function (err, pages) {
         for (var i = 0; i < pages.length; i++) {
             var page = pages[i];
-            var storyPoints = parseInt(page.storyPoints);
+            var storyPoints = parseInt(page.storyPoints) == null ? 0 : parseInt(page.storyPoints);
             var teamName = getTeamName(page.labels);
             for (var j = 0; j < page.progressHistory.length; j++) {
                 var history = page.progressHistory[j];
-                var date = Date.parse(history.dateChanged);
-                var progress = parseInt(history.progressValue);
+                var date = new Date(Date.parse(history.dateChanged));
+                date.setHours(12,0,0,0);
+                date = date.getTime();
+                var from = parseInt(history.progressFrom);
+                var to = history.progressTo == null || history.progressTo == '' ? 0 : parseInt(history.progressTo);
+                var progress = to - from;
                 var calcStoryPoints = storyPoints * progress / 100;
                 putDataPoint(data, teamName, date, calcStoryPoints);
             }
@@ -46,6 +51,7 @@ function parsePages(data) {
                 var teamData2 = team.data[l+1];
                 var teamDataDate2 = teamData2[0];
                 var teamDataPoints2 = teamData2[1];
+
                 teamData2[1] = teamDataPoints + teamDataPoints2;
             }
         }
@@ -70,13 +76,15 @@ function putDataPoint(data, teamName, date, calcStoryPoints){
                 var teamData = team.data[l];
                 var teamDataDate = teamData[0];
                 var teamDataPoints = teamData[1];
-                if(teamDataDate == date) {
+                if((teamDataDate - date) == 0) {
                     found = true;
                     teamData[1] = teamDataPoints + calcStoryPoints;
+                    return;
                 }
             }
             if(!found) {
                 team.data.push([date, calcStoryPoints]);
+                return;
             }
         }
     }

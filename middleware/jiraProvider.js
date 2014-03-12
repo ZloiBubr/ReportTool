@@ -6,24 +6,13 @@ var config = require('../config');
 var log = require('../libs/log')(module);
 var Module = require('models/module').Module;
 var Page = require('models/page').Page;
-var DBUpdater = require('createDb');
 
 JiraApi = require('jira').JiraApi;
 
 exports.updateJiraInfo = function(jiraUser, jiraPassword){
     var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), jiraUser, jiraPassword, '2');
 
-    //1. Clear DB
-    ClearDB();
-    //2. Load Modules
     UpdateModules(jira);
-}
-
-function ClearDB() {
-    DBUpdater.Clear(function(err) {
-        if(err)
-            log.error("DB was not cleared successfully");
-    });
 }
 
 function UpdateModules(jira) {
@@ -65,6 +54,7 @@ function UpdatePages(jira, moduleKey) {
                 UpdatePage(jira, story.key.toString());
             }
         }
+        log.info('Finished Pages processing...')
     });
 }
 
@@ -99,17 +89,35 @@ function SavePage(issue) {
                 var author = history.author.displayName;
                 for (var y = 0; y < history.items.length; y++) {
                     if (history.items[y].fieldtype == 'custom' && history.items[y].field == 'Progress') {
+                        var from = history.items[y].fromString == null ||
+                            history.items[y].fromString == undefined ||
+                            history.items[y].fromString == ''
+                            ?
+                            '0' : history.items[y].fromString;
+                        var to = history.items[y].toString;
+
+                        if(parseInt(to)<parseInt(from)) {
+                            log.info('Negative progress!');
+                            log.info(issue.key);
+                            log.info(history.created);
+                            log.info(from);
+                            log.info(to);
+                            log.info('------------------');
+                        }
+
                         if(page.progressHistory == null) {
                             page.progressHistory = [{
                                 person: author,
-                                progressValue: history.items[y].toString, //fromString
+                                progressFrom:from,
+                                progressTo: to,
                                 dateChanged: history.created
                             }];
                         }
                         else {
                             page.progressHistory.push({
                                 person: author,
-                                progressValue: history.items[y].toString, //fromString
+                                progressFrom:from,
+                                progressTo: to,
                                 dateChanged: history.created
                             });
                         }
