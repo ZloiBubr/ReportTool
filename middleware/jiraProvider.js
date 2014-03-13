@@ -55,8 +55,8 @@ function UpdatePages(jira, moduleKey) {
             }
         }
         log.info('Finished Pages processing...');
-        progressData.parsePages(progressData.getData());
-        velocityData.parsePages(velocityData.getData());
+        //progressData.parsePages(progressData.getData());
+        //velocityData.parsePages(velocityData.getData());
     });
 }
 
