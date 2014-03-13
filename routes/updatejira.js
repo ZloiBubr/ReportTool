@@ -12,7 +12,7 @@ exports.post = function(req, res, next) {
     var username = req.body.username;
     var password = req.body.password;
 
-    jiraProvider.updateJiraInfo(username, password);
-
-    res.send({});
+    jiraProvider.updateJiraInfo(username, password, function() {
+        res.send({});
+    });
 };

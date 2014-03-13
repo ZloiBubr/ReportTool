@@ -9,129 +9,155 @@ var Page = require('../models/page').Page;
 
 JiraApi = require('jira').JiraApi;
 
-exports.updateJiraInfo = function(jiraUser, jiraPassword){
+exports.updateJiraInfo = function(jiraUser, jiraPassword, callback){
     var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), jiraUser, jiraPassword, '2');
 
-    UpdateModules(jira);
+    UpdateModules(jira, function() {
+        log.info('Finished processing...');
+    });
+    callback();
 }
 
-function UpdateModules(jira) {
+function UpdateModules(jira, callback) {
     jira.searchJira("project = PLEX-UXC AND issuetype = epic AND summary ~ Module AND NOT summary ~ automation ORDER BY key ASC", null, function (error, epics) {
         if (epics != null) {
+            var numRunningQueries = 0;
             for (var i = 0; i < epics.issues.length; i++) {
+                ++numRunningQueries;
                 var epic = epics.issues[i];
-                SaveModule(epic);
-                //3. Load Pages
-                UpdatePages(jira, epic.key);
+                SaveModule(jira, epic, function() {
+                    --numRunningQueries;
+                    if(numRunningQueries === 0) {
+                        log.info(epic.key + " : Modules counter zero: " + numRunningQueries);
+                        log.info('Finished Modules loop');
+                        callback();
+                    }
+                });
             }
         }
-        else
-            console.log(new Error("Not Found").stack)
-    });
-}
-
-function SaveModule(epic) {
-    Module.findOne({ key: epic.key }).exec(function (err, module) {
-        if (!err) {
-            if (!module) {
-                module = new Module();
-            }
-            module.key = epic.key;
-            module.summary = epic.fields.summary;
-            module.save(function (err, module) {
-                if (err) throw err;
-                log.info(module.key);
-            })
+        else {
+            callback();
         }
     });
 }
 
-function UpdatePages(jira, moduleKey) {
+function SaveModule(jira, epic, callback) {
+    Module.findOne({ key: epic.key },function (err, module) {
+        if (err) throw err;
+
+        if (!module) {
+            module = new Module();
+        }
+        module.key = epic.key;
+        module.summary = epic.fields.summary;
+        module.save(function (err, module) {
+            if (err) throw err;
+            log.info('Module saved : ' + module.key);
+            UpdatePages(jira, epic.key, function() {
+                callback();
+            });
+        })
+    });
+}
+
+function UpdatePages(jira, moduleKey, callback) {
+
+    if(moduleKey == 'PLEXUXC-725')
+    {
+        return callback();
+    }
+
     jira.searchJira(util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s)",moduleKey), null, function(error, stories) {
         if(stories != null){
-            for(var i=0; i<stories.issues.length; i++){
+            var numRunningQueries = 0;
+            for(var i=0; i<stories.issues.length; i++) {
+                ++numRunningQueries;
                 var story = stories.issues[i];
-                UpdatePage(jira, story.key.toString());
+                UpdatePage(jira, moduleKey, story.key.toString(), function() {
+                    --numRunningQueries;
+                    if(numRunningQueries === 0) {
+                        log.info(moduleKey + " : Pages counter zero : " + numRunningQueries);
+//                        log.info('Finished Pages loop');
+                        callback();
+                    }
+                });
             }
         }
-        log.info('Finished Pages processing...');
-        progressData.parsePages(progressData.getData());
-        velocityData.parsePages(velocityData.getData());
+        else {
+            callback();
+        }
     });
 }
 
-function UpdatePage(jira, storyKey) {
+function UpdatePage(jira, moduleKey, storyKey, callback) {
     jira.findIssue(storyKey + "?expand=changelog", function(error, issue) {
         if (issue != null) {
-            SavePage(issue);
+            SavePage(moduleKey, issue, function() {
+                callback();
+            });
+        }
+        else {
+            callback();
         }
     });
 }
 
-function SavePage(issue) {
+function SavePage(moduleKey, issue, callback) {
     Page.findOne({ key: issue.key }).exec(function (err, page) {
-        if (!err) {
-            if (!page) {
-                page = new Page();
-            }
-            page.key = issue.key;
-            page.summary = issue.fields.summary;
-            page.status = issue.fields.status.name;
-            page.reporter = issue.fields.reporter.displayName;
-            page.originalEstimate = issue.fields.timetracking.originalEstimate;
-            page.timeSpent = issue.fields.timetracking.timeSpent;
-            page.labels = issue.fields.labels;
-            if (issue.fields.assignee != null)
-                page.assignee =  issue.fields.assignee.displayName;
-            page.storyPoints = issue.fields.customfield_10004;
-            page.blockers =  issue.fields.customfield_20501;
-            page.progress =  issue.fields.customfield_20500;
-            for (var i = 0; i < issue.changelog.total; i++) {
-                var history = issue.changelog.histories[i];
-                var author = history.author.displayName;
-                for (var y = 0; y < history.items.length; y++) {
-                    if (history.items[y].fieldtype == 'custom' && history.items[y].field == 'Progress') {
-                        var from = history.items[y].fromString == null ||
-                            history.items[y].fromString == undefined ||
-                            history.items[y].fromString == ''
-                            ?
-                            '0' : history.items[y].fromString;
-                        var to = history.items[y].toString;
+        if (err) throw err;
 
-                        if(parseInt(to)<parseInt(from)) {
-                            log.info('Negative progress!');
-                            log.info(issue.key);
-                            log.info(history.created);
-                            log.info(from);
-                            log.info(to);
-                            log.info('------------------');
-                        }
+        if (!page) {
+            page = new Page();
+        }
+        page.key = issue.key;
+        page.summary = issue.fields.summary;
+        page.status = issue.fields.status.name;
+        page.reporter = issue.fields.reporter.displayName;
+        page.originalEstimate = issue.fields.timetracking.originalEstimate;
+        page.timeSpent = issue.fields.timetracking.timeSpent;
+        page.labels = issue.fields.labels;
+        if (issue.fields.assignee != null)
+            page.assignee =  issue.fields.assignee.displayName;
+        page.storyPoints = issue.fields.customfield_10004;
+        page.blockers =  issue.fields.customfield_20501;
+        page.progress =  issue.fields.customfield_20500;
+        for (var i = 0; i < issue.changelog.total; i++) {
+            var history = issue.changelog.histories[i];
+            var author = history.author.displayName;
+            for (var y = 0; y < history.items.length; y++) {
+                if (history.items[y].fieldtype == 'custom' && history.items[y].field == 'Progress') {
+                    var from = history.items[y].fromString == null ||
+                        history.items[y].fromString == undefined ||
+                        history.items[y].fromString == ''
+                        ?
+                        '0' : history.items[y].fromString;
+                    var to = history.items[y].toString;
 
-                        if(page.progressHistory == null) {
-                            page.progressHistory = [{
-                                person: author,
-                                progressFrom:from,
-                                progressTo: to,
-                                dateChanged: history.created
-                            }];
-                        }
-                        else {
-                            page.progressHistory.push({
-                                person: author,
-                                progressFrom:from,
-                                progressTo: to,
-                                dateChanged: history.created
-                            });
-                        }
+                    if(page.progressHistory == null) {
+                        page.progressHistory = [{
+                            person: author,
+                            progressFrom:from,
+                            progressTo: to,
+                            dateChanged: history.created
+                        }];
+                    }
+                    else {
+                        page.progressHistory.push({
+                            person: author,
+                            progressFrom:from,
+                            progressTo: to,
+                            dateChanged: history.created
+                        });
                     }
                 }
             }
-
-            page.save(function (err, page) {
-                if (err) throw err;
-                log.info(page.key);
-            })
         }
+
+        page.save(function (err, page) {
+            if (err) throw err;
+ //           log.info('Page saved : Module : ' + moduleKey + ' : Page : ' + page.key);
+            callback();
+        })
     });
 }
 
