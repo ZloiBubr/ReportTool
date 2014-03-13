@@ -77,7 +77,7 @@ function UpdatePages(jira, moduleKey, callback) {
                     --numRunningQueries;
                     if(numRunningQueries === 0) {
                         log.info(moduleKey + " : Pages counter zero : " + numRunningQueries);
-//                        log.info('Finished Pages loop');
+                        log.info('Finished Pages loop');
                         callback();
                     }
                 });
@@ -155,7 +155,7 @@ function SavePage(moduleKey, issue, callback) {
 
         page.save(function (err, page) {
             if (err) throw err;
- //           log.info('Page saved : Module : ' + moduleKey + ' : Page : ' + page.key);
+            log.info('Page saved : Module : ' + moduleKey + ' : Page : ' + page.key);
             callback();
         })
     });
