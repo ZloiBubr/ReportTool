@@ -4,8 +4,8 @@
 var util = require('util');
 var config = require('../config');
 var log = require('../libs/log')(module);
-var Module = require('models/module').Module;
-var Page = require('models/page').Page;
+var Module = require('../models/module').Module;
+var Page = require('../models/page').Page;
 
 JiraApi = require('jira').JiraApi;
 
@@ -26,7 +26,7 @@ function UpdateModules(jira) {
             }
         }
         else
-            log.error("Not Found");
+            console.log(new Error("Not Found").stack)
     });
 }
 
@@ -54,7 +54,9 @@ function UpdatePages(jira, moduleKey) {
                 UpdatePage(jira, story.key.toString());
             }
         }
-        log.info('Finished Pages processing...')
+        log.info('Finished Pages processing...');
+        progressData.parsePages(progressData.getData());
+        velocityData.parsePages(velocityData.getData());
     });
 }
 

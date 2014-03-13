@@ -27,24 +27,7 @@
         </div>
     </div>
 
-    <div cass="row">
-        <div class="container">
-            <div class="row">
-                <h2>Settings</h2>
-                <div class="col-sm-12">
-                    <label>JQL</label>
-                    <div class="input-group">
-                        <input class="form-control" type="text" ng-model="common.currentJQL" placeholder="JQL"/>
-                          <span class="input-group-btn">
-                            <button class="btn btn-default" type="button" ng-click="searchIssues()">Search!</button>
-                          </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
+        <div class="row">
         <div class="col-sm-2" ng-repeat="ser in chartConfig.series">
             <label class="col-sm-2 control-label">{{ser.name}}</label>
             <select class="form-control" ng-model="ser.type" ng-options="c.id as c.title for c in chartTypes"></select>
