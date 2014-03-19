@@ -5,7 +5,7 @@ exports.progress = function () {
             teams: [
                 {
                     name: "teamRenaissancePages",
-                    values: [
+                    pages: [
                         {
                             key: "",
                             progress: 0,
