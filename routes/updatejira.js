@@ -5,7 +5,7 @@
 var jiraProvider = require('../middleware/jiraProvider');
 
 exports.get = function(req, res){
-    res.render('updatejira');
+    res.render('jira');
 };
 
 exports.post = function(req, res, next) {

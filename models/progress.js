@@ -1,27 +1,19 @@
-exports.data = function(){
-    this.data = [
-        {
-            data: [{
-                date: Date.now(),
-                key: "",
-                progress: 0
-            }],
-            name: "TeamNova"
-        },
-        {
-            data: [{
-                date: Date.now(),
-                key: "",
-                progress: 0
-            }],
-            name: "TeamRenaissance"
-        },
-        {
-            data: [{
-                date: Date.now(),
-                key: "",
-                progress: 0
-            }],
-            name: "TeamInspiration"
+exports.progress = function(){
+    this.dates = [{
+            date: Date.now(),
+            values: [{
+                teamRenaissancePages: [{
+                        key: "",
+                        progress: 0
+                }],
+                teamInspirationPages: [{
+                        key: "",
+                        progress: 0
+                }],
+                teamNovaPages: [{
+                        key: "",
+                        progress: 0
+                }]
+            }]
         }];
 }

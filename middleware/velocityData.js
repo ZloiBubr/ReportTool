@@ -1,19 +1,29 @@
 var mongoose = require('../libs/mongoose');
-var velocity = require('../models/velocity').data;
+var velocityModel = require('../models/velocity').data;
 var Module = require('../models/module').Module;
 var Page = require('../models/page').Page;
 var async = require('async');
-var data = new velocity();
 var log = require('../libs/log')(module);
-
-parsePages(data);
+var velocity = new velocityModel();
 
 exports.getData = function() {
-    return data;
+    if(velocity.data[0].data.length == 0) {
+        parsePages(function(err) {
+            if(err) throw err;
+            return velocity;
+        });
+    }
+    else {
+        return velocity;
+    }
 }
 
-function parsePages(data) {
-//1. grab all pages
+function parsePages(callback) {
+    for(var k=0; k<velocity.data.length; k++) {
+        var team = velocity.data[k];
+        team.data = [];
+    }
+    //1. grab all pages
     Page.find({}).exec(function (err, pages) {
         for (var i = 0; i < pages.length; i++) {
             var page = pages[i];
@@ -28,13 +38,13 @@ function parsePages(data) {
                 var to = history.progressTo == null || history.progressTo == '' ? 0 : parseInt(history.progressTo);
                 var progress = to - from;
                 var calcStoryPoints = storyPoints * progress / 100;
-                putDataPoint(data, teamName, date, calcStoryPoints);
+                putDataPoint(velocity, teamName, date, calcStoryPoints);
             }
         }
 
         //2. sort
-        for(var k=0; k<data.data.length; k++) {
-            var team = data.data[k];
+        for(var k=0; k<velocity.data.length; k++) {
+            var team = velocity.data[k];
             team.data.sort(function(a, b) {
             a = new Date(a[0]);
             b = new Date(b[0]);
@@ -42,19 +52,18 @@ function parsePages(data) {
             });
         }
         //3. summ
-        for(var k=0; k<data.data.length; k++) {
-            var team = data.data[k];
+        for(var k=0; k<velocity.data.length; k++) {
+            var team = velocity.data[k];
             for(var l=0; l<team.data.length-1; l++) {
                 var teamData1 = team.data[l];
-                var teamDataDate = teamData1[0];
                 var teamDataPoints = teamData1[1];
                 var teamData2 = team.data[l+1];
-                var teamDataDate2 = teamData2[0];
                 var teamDataPoints2 = teamData2[1];
 
                 teamData2[1] = teamDataPoints + teamDataPoints2;
             }
         }
+        callback(err);
     })
 }
 
@@ -67,9 +76,9 @@ function getTeamName(labels) {
         return "TeamNova";
 }
 
-function putDataPoint(data, teamName, date, calcStoryPoints){
-    for(var k=0; k<data.data.length; k++) {
-        var team = data.data[k];
+function putDataPoint(velocity, teamName, date, calcStoryPoints){
+    for(var k=0; k<velocity.data.length; k++) {
+        var team = velocity.data[k];
         if(team.name == teamName) {
             var found = false;
             for(var l=0; l<team.data.length; l++) {

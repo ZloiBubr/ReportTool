@@ -6,9 +6,9 @@
 var express = require('express');
 var routes = require('./routes');
 var user = require('./routes/user');
-var updatejira = require('./routes/updatejira');
-var calcvelocitydata = require('./routes/calcvelocitydata');
-var calcprogress = require('./routes/calcprogress');
+var jira = require('./routes/updatejira');
+var velocity = require('./routes/calcvelocitydata');
+var progress = require('./routes/calcprogress');
 var http = require('http');
 var path = require('path');
 var config = require('./config');
@@ -43,10 +43,10 @@ if ('development' == app.get('env')) {
 }
 
 app.get('/', routes.index);
-app.get('/updatejira', updatejira.get);
-app.post('/updatejira', updatejira.post);
-app.get('/velocitydata', calcvelocitydata.get);
-app.get('/progressdata', calcprogress.get);
+app.get('/updatejira', jira.get);
+app.post('/updatejira', jira.post);
+app.get('/velocitydata', velocity.get);
+app.get('/progressdata', progress.get);
 
 http.createServer(app).listen(config.get('port'), function(){
   log.info('Express server listening on port ' + config.get('port'));

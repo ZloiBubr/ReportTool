@@ -77,7 +77,7 @@ function velocityChartController($scope, $resource, $window) {
             case $scope.viewTypes[0].id: // progress
                 progressSeriesResource.get(getProgressSuccess, getChartFail)
                 break;
-            case $scope.viewTypes[1].id: // velocity
+            case $scope.viewTypes[1].id: // velocityModel
                 velocitySeriesResource.get(getChartSuccess, getChartFail)
                 return loadingDfrd.promise();
         }
