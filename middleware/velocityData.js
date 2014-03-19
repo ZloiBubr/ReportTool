@@ -4,21 +4,16 @@ var Module = require('../models/module').Module;
 var Page = require('../models/page').Page;
 var async = require('async');
 var log = require('../libs/log')(module);
-var velocity = new velocityModel();
 
 exports.getData = function(req,res) {
-    if(velocity.data[0].data.length == 0) {
-        parsePages(function(err) {
-            if(err) throw err;
-            res.json(velocity);
-        });
-    }
-    else {
-        return velocity;
-    }
+    parsePages(function(err, velocity) {
+        if(err) throw err;
+        res.json(velocity);
+    });
 }
 
 function parsePages(callback) {
+    var velocity = new velocityModel();
     for(var k=0; k<velocity.data.length; k++) {
         var team = velocity.data[k];
         team.data = [];
@@ -63,7 +58,7 @@ function parsePages(callback) {
                 teamData2[1] = teamDataPoints + teamDataPoints2;
             }
         }
-        callback(err);
+        callback(err, velocity);
     })
 }
 

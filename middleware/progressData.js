@@ -4,18 +4,12 @@ var Module = require('../models/module').Module;
 var Page = require('../models/page').Page;
 var async = require('async');
 var log = require('../libs/log')(module);
-var progress = new progressModel();
 
 exports.getData = function(req, res) {
-    if(progress.dates.length == 1) {
-        parsePages(function(err) {
-            if(err) throw err;
-            res.json(progress);
-        });
-    }
-    else {
-        return progress;
-    }
+    parsePages(function(err, progress) {
+        if(err) throw err;
+        res.json(progress);
+    });
 }
 
 function sortData(progress) {
@@ -27,6 +21,7 @@ function sortData(progress) {
 }
 
 function parsePages(callback) {
+    var progress = new progressModel();
     //1. grab all pages
     Page.find({}).exec(function (err, pages) {
         progress.dates = [];
@@ -53,7 +48,7 @@ function parsePages(callback) {
         //2. sort
         sortData(progress);
 
-        callback(err);
+        callback(err, progress);
     })
 }
 
