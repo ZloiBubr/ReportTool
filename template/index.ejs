@@ -2,23 +2,11 @@
 <% block('title', 'Velocity Report') -%>
 
 <div id="container" class="container" ng-controller="velocityChartController">
-    <div class="row" ng-if="common.IsJiraMode == true">
-        <div class="col-sm-12">
-            <label>JQL</label>
-
-            <div class="input-group">
-                <input class="form-control" type="text" ng-model="common.currentJQL" placeholder="JQL"/>
-                          <span class="input-group-btn">
-                            <button class="btn btn-default" type="button" ng-click="searchIssues()">Search!</button>
-                          </span>
-            </div>
-        </div>
-    </div>
-    </br>
     <div class="row">
         <div class="col-sm-2">
-            <label class="col-sm-2 control-label">View Type</label>
-            <select class="form-control" ng-model="common.viewType" ng-options="c.id as c.title for c in viewTypes" ng-change="reInit()"></select>
+            <label class="control-label">View Type</label>
+            <select class="form-control" ng-model="common.viewType" ng-options="c.id as c.title for c in viewTypes"
+                    ng-change="reInit()"></select>
         </div>
     </div>
     </br>
@@ -30,34 +18,47 @@
             <div class="row">
                 <div class="col-sm-2" ng-repeat="ser in chartConfig.series">
                     <label class="col-sm-2 control-label">{{ser.name}}</label>
-                    <select class="form-control" ng-model="ser.type" ng-options="c.id as c.title for c in chartTypes"></select>
+                    <select class="form-control" ng-model="ser.type"
+                            ng-options="c.id as c.title for c in chartTypes"></select>
                 </div>
             </div>
             <div class="row">
-                <highchart id="chart1" class="col-sm-12" config="chartConfig" ></highchart>
+                <highchart id="chart1" class="col-sm-12" config="chartConfig"></highchart>
             </div>
         </div>
+
         <div ng-switch-when="Progress">
-            <div ng-repeat="team in progressData.data">
-                <h2>{{team.name}}</h2>
+            <div>
                 <table class="table table-striped">
                     <thead>
                     <tr>
                         <th>Date</th>
+                        <th>Team</th>
+                        <th>User</th>
                         <th>Key</th>
                         <th>Progress</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr ng-repeat="item in team.data">
-                        <td>{{item.date}}</td>
-                        <td>{{item.key}}</td>
-                        <td>{{item.progress}}</td>
+                    <tr ng-repeat="dateGroup in progressData.dates">
+                        <td>{{dateGroup.date}}</td>
+                        <td colspan="4">
+                            <table class="table table-striped" ng-repeat="team in dateGroup.teams">
+                                <tbody>
+                                <tr ng-repeat="page in team.pages">
+                                    <td>{{team.name}}</td>
+                                    <td><a href={{value.uri}}>{{page.key}}</a></td>
+                                    <td>{{page.person}}</td>
+                                    <td>{{page.progress}}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </td>
                     </tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-
 </div>
+
