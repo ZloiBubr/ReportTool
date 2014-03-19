@@ -95,13 +95,14 @@ function UpdatePage(jira, moduleKey, storyKey, callback) {
 }
 
 function SavePage(moduleKey, issue, callback) {
-    Page.findOne({ key: issue.key }).exec(function (err, page) {
+    Page.findOne({ key: issue.key }, function (err, page) {
         if (err) throw err;
 
         if (!page) {
             page = new Page();
         }
         page.key = issue.key;
+        page.uri = "https://jira.epam.com/jira/browse/" + issue.key;
         page.summary = issue.fields.summary;
         page.status = issue.fields.status.name;
         page.reporter = issue.fields.reporter.displayName;

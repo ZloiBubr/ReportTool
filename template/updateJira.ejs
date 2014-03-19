@@ -34,7 +34,7 @@
         $(":submit", form).button("loading");
 
         $.ajax({
-            url: "/jira",
+            url: "/updatejira",
             data: form.serialize(),
             method: "POST",
             complete: function() {

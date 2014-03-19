@@ -3,6 +3,7 @@ var Schema = mongoose.Schema;
 
 var schema = new Schema({
       key               :   { type: String, unique: true, index:true }
+    , uri               :   { type: String }
     , summary           :   { type: String }
     , status            :   { type: String }
     , reporter          :   { type: String }

@@ -5,17 +5,20 @@ exports.progress = function(){
                 teamRenaissancePages: [{
                         key: "",
                         progress: 0,
-                        person: ""
+                        person: "",
+                        uri: ""
                 }],
                 teamInspirationPages: [{
                         key: "",
                         progress: 0,
-                        person: ""
+                        person: "",
+                        uri: ""
                 }],
                 teamNovaPages: [{
                         key: "",
                         progress: 0,
-                        person: ""
+                        person: "",
+                        uri: ""
                 }]
             }]
         }];
