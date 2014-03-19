@@ -4,5 +4,5 @@
 var velocitydata = require('../middleware/velocitydata');
 
 exports.get = function(req, res){
-    res.json(velocitydata.getData());
+    velocitydata.getData(req,res);
 };

@@ -6,11 +6,11 @@ var async = require('async');
 var log = require('../libs/log')(module);
 var progress = new progressModel();
 
-exports.getData = function() {
+exports.getData = function(req, res) {
     if(progress.dates.length == 1) {
         parsePages(function(err) {
             if(err) throw err;
-            return progress;
+            res.json(progress);
         });
     }
     else {

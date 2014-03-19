@@ -6,11 +6,11 @@ var async = require('async');
 var log = require('../libs/log')(module);
 var velocity = new velocityModel();
 
-exports.getData = function() {
+exports.getData = function(req,res) {
     if(velocity.data[0].data.length == 0) {
         parsePages(function(err) {
             if(err) throw err;
-            return velocity;
+            res.json(velocity);
         });
     }
     else {
