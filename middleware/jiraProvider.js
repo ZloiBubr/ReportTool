@@ -28,7 +28,6 @@ function UpdateModules(jira, callback) {
                 SaveModule(jira, epic, function() {
                     --numRunningQueries;
                     if(numRunningQueries === 0) {
-                        log.info(epic.key + " : Modules counter zero: " + numRunningQueries);
                         log.info('Finished Modules loop');
                         callback();
                     }
@@ -61,12 +60,6 @@ function SaveModule(jira, epic, callback) {
 }
 
 function UpdatePages(jira, moduleKey, callback) {
-
-    if(moduleKey == 'PLEXUXC-725')
-    {
-        return callback();
-    }
-
     jira.searchJira(util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s)",moduleKey), null, function(error, stories) {
         if(stories != null){
             var numRunningQueries = 0;
@@ -76,7 +69,6 @@ function UpdatePages(jira, moduleKey, callback) {
                 UpdatePage(jira, moduleKey, story.key.toString(), function() {
                     --numRunningQueries;
                     if(numRunningQueries === 0) {
-                        log.info(moduleKey + " : Pages counter zero : " + numRunningQueries);
                         log.info('Finished Pages loop');
                         callback();
                     }
