@@ -62,6 +62,10 @@ function getTeamName(labels) {
 }
 
 function putDataPoint(key, progress, teamName, date, calcStoryPoints, person, uri){
+    if(key == 'PLEXUXC-779') {
+        var newkey = key;
+    }
+
     for(var k=0; k<progress.dates.length; k++) {
         var pdate = progress.dates[k];
         if((pdate.date - date) == 0) {
@@ -76,7 +80,7 @@ function putDataPoint(key, progress, teamName, date, calcStoryPoints, person, ur
                                     return;
                                 }
                             }
-                            pages.push([{key: key, progress: calcStoryPoints, person: person, uri: uri}]);
+                            pages.push({key: key, progress: calcStoryPoints, person: person, uri: uri});
                         }
                         else {
                             pdate.values.teamRenaissancePages = [{key: key, progress: calcStoryPoints, person: person, uri: uri}];
@@ -93,7 +97,7 @@ function putDataPoint(key, progress, teamName, date, calcStoryPoints, person, ur
                                     return;
                                 }
                             }
-                            pages.push([{key: key, progress: calcStoryPoints, person: person, uri: uri}]);
+                            pages.push({key: key, progress: calcStoryPoints, person: person, uri: uri});
                         }
                         else {
                             pdate.values.teamInspirationPages = [{key: key, progress: calcStoryPoints, person: person, uri: uri}];
@@ -110,7 +114,7 @@ function putDataPoint(key, progress, teamName, date, calcStoryPoints, person, ur
                                     return;
                                 }
                             }
-                            pages.push([{key: key, progress: calcStoryPoints, person: person, uri: uri}]);
+                            pages.push({key: key, progress: calcStoryPoints, person: person, uri: uri});
                         }
                         else {
                             pdate.values.teamNovaPages = [{key: key, progress: calcStoryPoints, person: person, uri: uri}];
