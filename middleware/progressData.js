@@ -40,11 +40,12 @@ function parsePages(callback) {
                 var date = new Date(Date.parse(history.dateChanged));
                 date.setHours(12,0,0,0);
                 //date = date.getTime();
+                var person = history.person;
                 var from = parseInt(history.progressFrom);
                 var to = history.progressTo == null || history.progressTo == '' ? 0 : parseInt(history.progressTo);
                 var progressDiff = to - from;
                 var calcStoryPoints = storyPoints * progressDiff / 100;
-                putDataPoint(key, progress, teamName, date, calcStoryPoints);
+                putDataPoint(key, progress, teamName, date, calcStoryPoints, person);
             }
         }
 
@@ -64,7 +65,7 @@ function getTeamName(labels) {
         return "TeamNova";
 }
 
-function putDataPoint(key, progress, teamName, date, calcStoryPoints){
+function putDataPoint(key, progress, teamName, date, calcStoryPoints, person){
     for(var k=0; k<progress.dates.length; k++) {
         var pdate = progress.dates[k];
         if((pdate.date - date) == 0) {
@@ -79,10 +80,10 @@ function putDataPoint(key, progress, teamName, date, calcStoryPoints){
                                     return;
                                 }
                             }
-                            pages.push([{key: key, progress: calcStoryPoints}]);
+                            pages.push([{key: key, progress: calcStoryPoints, person: person}]);
                         }
                         else {
-                            pdate.values.teamRenaissancePages = [{key: key, progress: calcStoryPoints}];
+                            pdate.values.teamRenaissancePages = [{key: key, progress: calcStoryPoints, person: person}];
                         }
                         return;
                     }
@@ -96,10 +97,10 @@ function putDataPoint(key, progress, teamName, date, calcStoryPoints){
                                     return;
                                 }
                             }
-                            pages.push([{key: key, progress: calcStoryPoints}]);
+                            pages.push([{key: key, progress: calcStoryPoints, person: person}]);
                         }
                         else {
-                            pdate.values.teamInspirationPages = [{key: key, progress: calcStoryPoints}];
+                            pdate.values.teamInspirationPages = [{key: key, progress: calcStoryPoints, person: person}];
                         }
                         return;
                     }
@@ -113,10 +114,10 @@ function putDataPoint(key, progress, teamName, date, calcStoryPoints){
                                     return;
                                 }
                             }
-                            pages.push([{key: key, progress: calcStoryPoints}]);
+                            pages.push([{key: key, progress: calcStoryPoints, person: person}]);
                         }
                         else {
-                            pdate.values.teamNovaPages = [{key: key, progress: calcStoryPoints}];
+                            pdate.values.teamNovaPages = [{key: key, progress: calcStoryPoints, person: person}];
                         }
                         return;
                     }
@@ -125,15 +126,15 @@ function putDataPoint(key, progress, teamName, date, calcStoryPoints){
     }
     switch (teamName) {
         case "TeamRenaissance": {
-            progress.dates.push( {date: date, values: {teamRenaissancePages: [{key: key, progress: calcStoryPoints}]}} );
+            progress.dates.push( {date: date, values: {teamRenaissancePages: [{key: key, progress: calcStoryPoints, person: person}]}} );
             break;
         }
         case "TeamInspiration": {
-            progress.dates.push( {date: date, values: {teamInspirationPages: [{key: key, progress: calcStoryPoints}]}} );
+            progress.dates.push( {date: date, values: {teamInspirationPages: [{key: key, progress: calcStoryPoints, person: person}]}} );
             break;
         }
         case "TeamNova": {
-            progress.dates.push( {date: date, values: {teamNovaPages: [{key: key, progress: calcStoryPoints}]}} );
+            progress.dates.push( {date: date, values: {teamNovaPages: [{key: key, progress: calcStoryPoints, person: person}]}} );
             break;
         }
     }
