@@ -66,43 +66,6 @@ function velocityChartController($scope, $resource, $window) {
 
         var getProgressSuccess = function (data) {
             $scope.progressData = data;
-//            $scope.progressData ={dates:[
-//                {
-//                    date: Date.now(),
-//                    teams: [
-//                        {
-//                            name: "teamRenaissancePages",
-//                            values: [
-//                                {
-//                                    key: "asd",
-//                                    progress: 0,
-//                                    person: "",
-//                                    uri: "http://tut.by"
-//                                }
-//                            ]
-//                        },
-//
-//                        {
-//                            name: "teamRenaissancePages",
-//                            values: [
-//                                {
-//                                    key: "asd",
-//                                    progress: 0,
-//                                    person: "",
-//                                    uri: "http://tut.by"
-//                                },
-//                                {
-//                                    key: "asd",
-//                                    progress: 0,
-//                                    person: "",
-//                                    uri: "http://tut.by"
-//                                }
-//                            ]
-//                        }
-//
-//
-//                    ]}
-//            ]};
         };
 
         var getChartFail = function (err) {
@@ -125,6 +88,7 @@ function velocityChartController($scope, $resource, $window) {
         $scope.reInit();
     }
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
+
     $scope.dashStyles = [
         {"id": "Solid", "title": "Solid"},
         {"id": "ShortDash", "title": "ShortDash"},

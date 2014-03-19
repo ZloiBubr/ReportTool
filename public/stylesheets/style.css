@@ -6,3 +6,12 @@ body {
 a {
   color: #00B7FF;
 }
+
+.progress_no_top_line > td
+{
+    border-top: none !important;
+}
+
+.vcenter {
+    vertical-align: middle !important;
+}
