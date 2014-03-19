@@ -62,10 +62,6 @@ function getTeamName(labels) {
 }
 
 function putDataPoint(key, progress, teamName, date, calcStoryPoints, person, uri){
-    if(key == 'PLEXUXC-779') {
-        var newkey = key;
-    }
-
     for(var k=0; k<progress.dates.length; k++) {
         var pdate = progress.dates[k];
         if((pdate.date - date) == 0) {
