@@ -15,3 +15,14 @@ a {
 .vcenter {
     vertical-align: middle !important;
 }
+
+.progress_fixed_width,
+.progress_fixed_width > td
+{
+    width: 150px;
+}
+
+.progress_table_no_end_line > table:last-child
+{
+    margin-bottom: 0px;
+}
