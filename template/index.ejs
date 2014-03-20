@@ -16,13 +16,6 @@
     <div class="row" ng-switch on="common.viewType">
         <div class="container" ng-switch-when="Velocity">
             <div class="row">
-                <div class="col-sm-2" ng-repeat="ser in chartConfig.series">
-                    <label class="col-sm-2 control-label">{{ser.name}}</label>
-                    <select class="form-control" ng-model="ser.type"
-                            ng-options="c.id as c.title for c in chartTypes"></select>
-                </div>
-            </div>
-            <div class="row">
                 <highchart id="chart1" class="col-sm-12" config="chartConfig"></highchart>
             </div>
         </div>

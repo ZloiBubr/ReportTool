@@ -77,23 +77,53 @@ function putDataPoint(key, progress, teamName, date, calcStoryPoints, person, ur
                         for(var l=0; l< pages.length; l++) {
                             var page = pages[l];
                             if(page.key == key) {
-                                page.progress += calcStoryPoints;
+                                page.person = person;
+                                page.progress = page.progress + calcStoryPoints;
                                 return;
                             }
                         }
-                        pages.push({key: key, progress: calcStoryPoints, person: person, uri: uri});
+                        pages.push({
+                              key: key
+                            , progress: calcStoryPoints
+                            , person: person
+                            , uri: uri
+                        });
                     }
                     else {
-                        team.pages = [{key: key, progress: calcStoryPoints, person: person, uri: uri}];
+                        team.pages = [{
+                              key: key
+                            , progress: calcStoryPoints
+                            , person: person
+                            , uri: uri
+                        }];
                     }
                 }
             }
             if(!teamFound) {
-                pdate.teams.push( {name: teamName, pages: [{key: key, progress: calcStoryPoints, person: person, uri: uri}]});
+                pdate.teams.push({
+                      name: teamName
+                    , pages: [{
+                          key: key
+                        , progress: calcStoryPoints
+                        , person: person
+                        , uri: uri
+                    }]
+                });
             }
         }
     }
     if(!dateFound) {
-        progress.dates.push( {date: date, teams: [{name: teamName, pages: [{key: key, progress: calcStoryPoints, person: person, uri: uri}]}]} );
+        progress.dates.push({
+              date: date
+            , teams: [{
+                  name: teamName
+                , pages: [{
+                      key: key
+                    , progress: calcStoryPoints
+                    , person: person
+                    , uri: uri
+                }]
+            }]
+        });
     }
 }

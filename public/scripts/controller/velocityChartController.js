@@ -46,7 +46,7 @@ function velocityChartController($scope, $resource, $window) {
             },
             series: $scope.chartsData.data,
             title: {
-                text: 'Hello'
+                text: 'Cumulative Velocity'
             },
             xAxis: {
                 type: 'datetime'
