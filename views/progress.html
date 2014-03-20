@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="App" ng-controller="appController">
+<head>
+    <meta charset="utf-8">
+    <title>PLEX-UXC enchanced reporting tool</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="This tool created to improve JIRA reporting">
+    <meta name="author" content="Siarhei Hladkou">
+
+    <!-- Le styles -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/style.css"/>
+
+    <style>
+        body {
+            padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+        }
+    </style>
+    <link href="/css/bootstrap-responsive.css" rel="stylesheet">
+
+    <!-- Libs -->
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/js/underscore.js"></script>
+    <script type="text/javascript" src="/js/angular.min.js"></script>
+    <script type="text/javascript" src="/js/angular-resource.min.js"></script>
+    <script type="text/javascript" src="/js/highcharts.js"></script>
+    <script type="text/javascript" src="/js/exporting.js"></script>
+
+    <script type="text/javascript" src="/js/highcharts-ng.js"></script>
+    <script type="text/javascript" src="/js/router.js"></script>
+
+    <!-- Controllers -->
+    <script type="text/javascript" src="/jsc/appController.js"></script>
+    <script type="text/javascript" src="/jsc/progressTableController.js"></script>
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+    <script src="/js/html5shiv.js"></script>
+    <![endif]-->
+
+    <!-- Fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/ico/ios/apple-touch-icon-144x144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/ico/ios/apple-touch-icon-114x114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/ico/ios/apple-touch-icon-72x72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="/ico/ios/apple-touch-icon-precomposed.png">
+    <link rel="shortcut icon" href="/ico/favicon.png">
+</head>
+
+<body>
+
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="brand" href="#">PLEX-UXC</a>
+            <div class="nav-collapse collapse">
+                <ul class="nav">
+                    <li><a href="/">Velocity Chart</a></li>
+                    <li class="active"><a href="/progress">Progress Table</a></li>
+                    <li><a href="/updatejira">Update from JIRA</a></li>
+                </ul>
+            </div><!--/.nav-collapse -->
+        </div>
+    </div>
+</div>
+
+<div id="container" class="container" ng-controller="progressTableController">
+    <div class="row"">
+       <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th style="width: 157px">Team</th>
+                    <th>User</th>
+                    <th>Key</th>
+                    <th>Progress</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="dateGroup in progressData.dates">
+                    <td class="vcenter" style="padding-bottom: 28px;"><strong>{{dateGroup.date | date:'yyyy-MM-dd'}}</strong></td>
+                    <td colspan="4" class="progress_table_no_end_line">
+                        <table class="table" ng-repeat="team in dateGroup.teams">
+                            <tbody>
+                            <tr class="progress_no_top_line">
+                                <td class="progress_fixed_width vcenter">{{team.name}}</td>
+                                <td class="progress_table_no_end_line">
+                                    <table class="table table-striped">
+                                        <tbody>
+                                        <tr class="progress_fixed_width" ng-repeat="page in team.pages">
+                                            <td>{{page.person}}</td>
+                                            <td><a href={{page.uri}}>{{page.key}}</a></td>
+                                            <td>{{page.progress | number : 2}}</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div> <!-- /container -->
+
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="App" ng-controller="appController">
+<head>
+    <meta charset="utf-8">
+    <title>PLEX-UXC enchanced reporting tool</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="This tool created to improve JIRA reporting">
+    <meta name="author" content="Siarhei Hladkou">
+
+    <!-- Le styles -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/style.css"/>
+
+    <style>
+        body {
+            padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+        }
+    </style>
+    <link href="/css/bootstrap-responsive.css" rel="stylesheet">
+
+    <!-- Libs -->
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/js/underscore.js"></script>
+    <script type="text/javascript" src="/js/angular.min.js"></script>
+    <script type="text/javascript" src="/js/angular-resource.min.js"></script>
+    <script type="text/javascript" src="/js/highcharts.js"></script>
+    <script type="text/javascript" src="/js/exporting.js"></script>
+
+    <script type="text/javascript" src="/js/highcharts-ng.js"></script>
+    <script type="text/javascript" src="/js/router.js"></script>
+
+    <!-- Controllers -->
+    <script type="text/javascript" src="/jsc/appController.js"></script>
+    <script type="text/javascript" src="/jsc/velocityChartController.js"></script>
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+    <script src="/js/html5shiv.js"></script>
+    <![endif]-->
+
+    <!-- Fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/ico/ios/apple-touch-icon-144x144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/ico/ios/apple-touch-icon-114x114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/ico/ios/apple-touch-icon-72x72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="/ico/ios/apple-touch-icon-precomposed.png">
+    <link rel="shortcut icon" href="/ico/favicon.png">
+</head>
+
+<body>
+
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="brand" href="#">PLEX-UXC</a>
+            <div class="nav-collapse collapse">
+                <ul class="nav">
+                    <li><a href="/">Velocity Chart</a></li>
+                    <li><a href="/progress">Progress Table</a></li>
+                    <li class="active"><a href="/updatejira">Update from JIRA</a></li>
+                </ul>
+            </div><!--/.nav-collapse -->
+        </div>
+    </div>
+</div>
+
+<p>Input JIRA user name and password</p>
+
+<form class="form-horizontal login-form" action="/auth/login" method="POST" name="login-form">
+    <div class="form-group">
+        <label for="input-username" class="col-lg-2 control-label">Имя</label>
+
+        <div class="col-lg-10">
+            <input name="username" value="name" type="text" class="form-control" id="input-username" placeholder="Name">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="input-password" class="col-lg-2 control-label">Пароль</label>
+
+        <div class="col-lg-10">
+            <input name="password" value="pass" type="password" class="form-control" id="input-password" placeholder="Password">
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-lg-offset-2 col-lg-10">
+            <button type="submit" class="btn btn-primary" data-loading-text="Updating...">Update</button>
+            <span class="help-block error"></span>
+        </div>
+    </div>
+</form>
+
+<script>
+    $(document.forms['login-form']).on('submit', function() {
+        var form = $(this);
+
+        $('.error', form).html('');
+        $(":submit", form).button("loading");
+
+        $.ajax({
+            url: "/updatejira",
+            data: form.serialize(),
+            method: "POST",
+            complete: function() {
+                $(":submit", form).button("reset");
+            },
+            statusCode: {
+                200: function() {
+                    form.html("Succeed").addClass('alert-success');
+                    window.location.href = "/";
+                },
+                403: function(jqXHR) {
+                    var error = JSON.parse(jqXHR.responseText);
+                    $('.error', form).html(error.message);
+                }
+            }
+        });
+        return false;
+    });
+</script>
+</body>
+</html>
