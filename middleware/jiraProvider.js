@@ -6,16 +6,21 @@ var config = require('../config');
 var log = require('../libs/log')(module);
 var Module = require('../models/module').Module;
 var Page = require('../models/page').Page;
+var ClearDB = require('./createDb').Clear;
 
-JiraApi = require('jira').JiraApi;
+var JiraApi = require('jira').JiraApi;
 
 exports.updateJiraInfo = function(jiraUser, jiraPassword, callback){
-    var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), jiraUser, jiraPassword, '2');
+    ClearDB(function(err) {
+        if(err) throw err;
 
-    UpdateModules(jira, function() {
-        log.info('Finished processing...');
-    });
-    callback();
+        var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), jiraUser, jiraPassword, '2');
+
+        UpdateModules(jira, function() {
+            log.info('Finished processing...');
+        });
+        callback();
+    })
 }
 
 function UpdateModules(jira, callback) {

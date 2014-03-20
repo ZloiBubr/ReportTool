@@ -4,8 +4,6 @@
  */
 
 var express = require('express');
-var routes = require('./routes');
-var user = require('./routes/user');
 var jira = require('./routes/updatejira');
 var velocity = require('./routes/calcvelocitydata');
 var progress = require('./routes/calcprogress');
@@ -17,9 +15,11 @@ var log = require('./libs/log')(module);
 var app = express();
 
 // all environments
-app.engine('ejs', require('ejs-locals'));
-app.set('views', path.join(__dirname, 'template'));
-app.set('view engine', 'ejs');
+//app.engine('ejs', require('ejs-locals'));
+//app.set('views', path.join(__dirname, 'template'));
+//app.set('view engine', 'ejs');
+app.set('views', __dirname + '/views');
+app.engine('html', require('ejs').renderFile);
 app.use(express.favicon());
 
 if(app.get('env') == 'development'){
@@ -42,9 +42,22 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-app.get('/', routes.index);
-app.get('/updatejira', jira.get);
+
+//pages
+app.get('/', function(req, res) {
+    res.render('index.html');
+});
+app.get('/progress', function(req, res) {
+    res.render('progress.html');
+});
+app.get('/updatejira', function(req, res) {
+    res.render('updatejira.html');
+});
+
+//handlers
 app.post('/updatejira', jira.post);
+
+//json
 app.get('/velocitydata', velocity.get);
 app.get('/progressdata', progress.get);
 
