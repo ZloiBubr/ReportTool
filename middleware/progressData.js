@@ -5,9 +5,9 @@ var Page = require('../models/page').Page;
 var async = require('async');
 var log = require('../libs/log')(module);
 
-exports.getData = function(req, res) {
-    parsePages(function(err, progress) {
-        if(err) throw err;
+exports.getData = function (req, res) {
+    parsePages(function (err, progress) {
+        if (err) throw err;
         res.json(progress);
     });
 }
@@ -33,7 +33,7 @@ function parsePages(callback) {
             for (var j = 0; j < page.progressHistory.length; j++) {
                 var history = page.progressHistory[j];
                 var date = new Date(Date.parse(history.dateChanged));
-                date.setHours(12,0,0,0);
+                date.setHours(12, 0, 0, 0);
                 //date = date.getTime();
                 var person = history.person;
                 var from = parseInt(history.progressFrom);
@@ -53,77 +53,70 @@ function parsePages(callback) {
 }
 
 function getTeamName(labels) {
-    if(labels.indexOf("TeamRenaissance") > -1)
+    if (labels.indexOf("TeamRenaissance") > -1)
         return "TeamRenaissance";
-    if(labels.indexOf("TeamInspiration") > -1)
+    if (labels.indexOf("TeamInspiration") > -1)
         return "TeamInspiration";
-    if(labels.indexOf("TeamNova") > -1)
+    if (labels.indexOf("TeamNova") > -1)
         return "TeamNova";
 }
 
-function putDataPoint(key, progress, teamName, date, calcStoryPoints, person, uri){
+function putDataPoint(key, progress, teamName, date, calcStoryPoints, person, uri) {
     var dateFound = false;
-    for(var k=0; k<progress.dates.length; k++) {
+    for (var k = 0; k < progress.dates.length; k++) {
         var pdate = progress.dates[k];
-        if((pdate.date - date) == 0) {
+        if ((pdate.date - date) == 0) {
             dateFound = true;
             var teamFound = false;
-            for(var b=0; b<pdate.teams.length; b++) {
+            for (var b = 0; b < pdate.teams.length; b++) {
                 var team = pdate.teams[b];
-                if(team.name == teamName) {
+                if (team.name == teamName) {
                     teamFound = true;
                     var pages = team.pages;
-                    if(pages) {
-                        for(var l=0; l< pages.length; l++) {
+                    if (pages) {
+                        for (var l = 0; l < pages.length; l++) {
                             var page = pages[l];
-                            if(page.key == key) {
+                            if (page.key == key) {
                                 page.person = person;
                                 page.progress = page.progress + calcStoryPoints;
                                 return;
                             }
                         }
                         pages.push({
-                              key: key
-                            , progress: calcStoryPoints
-                            , person: person
-                            , uri: uri
+                            key: key, progress: calcStoryPoints, person: person, uri: uri
                         });
                     }
                     else {
-                        team.pages = [{
-                              key: key
-                            , progress: calcStoryPoints
-                            , person: person
-                            , uri: uri
-                        }];
+                        team.pages = [
+                            {
+                                key: key, progress: calcStoryPoints, person: person, uri: uri
+                            }
+                        ];
                     }
                 }
             }
-            if(!teamFound) {
+            if (!teamFound) {
                 pdate.teams.push({
-                      name: teamName
-                    , pages: [{
-                          key: key
-                        , progress: calcStoryPoints
-                        , person: person
-                        , uri: uri
-                    }]
+                    name: teamName, pages: [
+                        {
+                            key: key, progress: calcStoryPoints, person: person, uri: uri
+                        }
+                    ]
                 });
             }
         }
     }
-    if(!dateFound) {
+    if (!dateFound) {
         progress.dates.push({
-              date: date
-            , teams: [{
-                  name: teamName
-                , pages: [{
-                      key: key
-                    , progress: calcStoryPoints
-                    , person: person
-                    , uri: uri
-                }]
-            }]
+            date: date, teams: [
+                {
+                    name: teamName, pages: [
+                    {
+                        key: key, progress: calcStoryPoints, person: person, uri: uri
+                    }
+                ]
+                }
+            ]
         });
     }
 }

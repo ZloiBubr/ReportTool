@@ -1,20 +1,22 @@
 {
-  "name": "ReportTool",
-  "version": "0.0.1",
-  "private": true,
-  "scripts": {
-    "start": "node app.js"
-  },
-  "dependencies": {
-    "express": "3.4.8",
-    "ejs": "*",
-    "mongoose": "*",
-    "jira": "*",
-    "ejs-locals": "*",
-    "mongodb": "*",
-    "nconf": "*",
-    "winston": "*",
-    "async": "*",
-    "underscore": "*"
-  }
+    "name": "ReportTool",
+    "version": "0.0.1",
+    "private": true,
+    "scripts": {
+        "start": "node app.js"
+    },
+    "dependencies": {
+        "express": "3.4.8",
+        "ejs": "*",
+        "mongoose": "*",
+        "jira": "*",
+        "ejs-locals": "*",
+        "mongodb": "*",
+        "nconf": "*",
+        "winston": "*",
+        "async": "*",
+        "underscore": "*",
+        "connect": "*",
+        "cookie": "*"
+    }
 }

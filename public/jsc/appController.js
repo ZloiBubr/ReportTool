@@ -21,11 +21,11 @@ function appController($scope, $resource, $window) {
         return _.isString(item);
     };
 
-    $scope.isInt = function(n) {
+    $scope.isInt = function (n) {
         return typeof n === 'number' && parseFloat(n) == parseInt(n, 10) && !isNaN(n);
     };
 }
 
-myApp.run(function($rootScope, $location) {
+myApp.run(function ($rootScope, $location) {
 
 })

@@ -1,4 +1,3 @@
-
 /**
  * Module dependencies.
  */
@@ -22,10 +21,10 @@ app.set('views', __dirname + '/views');
 app.engine('html', require('ejs').renderFile);
 app.use(express.favicon());
 
-if(app.get('env') == 'development'){
+if (app.get('env') == 'development') {
     app.use(express.logger('dev'));
 }
-else{
+else {
     app.use(express.logger('default'));
 }
 
@@ -39,18 +38,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // development only
 if ('development' == app.get('env')) {
-  app.use(express.errorHandler());
+    app.use(express.errorHandler());
 }
 
 
 //pages
-app.get('/', function(req, res) {
+app.get('/', function (req, res) {
     res.render('index.html');
 });
-app.get('/progress', function(req, res) {
+app.get('/progress', function (req, res) {
     res.render('progress.html');
 });
-app.get('/updatejira', function(req, res) {
+app.get('/updatejira', function (req, res) {
     res.render('updatejira.html');
 });
 
@@ -61,6 +60,7 @@ app.post('/updatejira', jira.post);
 app.get('/velocitydata', velocity.get);
 app.get('/progressdata', progress.get);
 
-http.createServer(app).listen(config.get('port'), function(){
-  log.info('Express server listening on port ' + config.get('port'));
+
+http.createServer(app).listen(config.get('port'), function () {
+    log.info('Express server listening on port ' + config.get('port'));
 });

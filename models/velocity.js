@@ -1,4 +1,4 @@
-exports.data = function(){
+exports.data = function () {
     this.data = [
         {
             data: [],
@@ -11,5 +11,6 @@ exports.data = function(){
         {
             data: [],
             name: "TeamInspiration"
-        }];
+        }
+    ];
 }

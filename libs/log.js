@@ -9,11 +9,11 @@ function getLogger(module) {
 
     return new winston.Logger({
         transports: [
-        new winston.transports.Console({
-            colorize: true,
-            level: ENV == 'development' ? 'debug' : 'error',
-            label: path
-        })
+            new winston.transports.Console({
+                colorize: true,
+                level: ENV == 'development' ? 'debug' : 'error',
+                label: path
+            })
         ]
     });
 }

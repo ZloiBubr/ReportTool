@@ -58,13 +58,15 @@
                 <span class="icon-bar"></span>
             </button>
             <a class="brand" href="#">PLEX-UXC</a>
+
             <div class="nav-collapse collapse">
                 <ul class="nav">
                     <li><a href="/">Velocity Chart</a></li>
                     <li><a href="/progress">Progress Table</a></li>
                     <li class="active"><a href="/updatejira">Update from JIRA</a></li>
                 </ul>
-            </div><!--/.nav-collapse -->
+            </div>
+            <!--/.nav-collapse -->
         </div>
     </div>
 </div>
@@ -83,7 +85,8 @@
         <label for="input-password" class="col-lg-2 control-label">Пароль</label>
 
         <div class="col-lg-10">
-            <input name="password" value="pass" type="password" class="form-control" id="input-password" placeholder="Password">
+            <input name="password" value="pass" type="password" class="form-control" id="input-password"
+                   placeholder="Password">
         </div>
     </div>
     <div class="form-group">
@@ -95,7 +98,7 @@
 </form>
 
 <script>
-    $(document.forms['login-form']).on('submit', function() {
+    $(document.forms['login-form']).on('submit', function () {
         var form = $(this);
 
         $('.error', form).html('');
@@ -105,15 +108,15 @@
             url: "/updatejira",
             data: form.serialize(),
             method: "POST",
-            complete: function() {
+            complete: function () {
                 $(":submit", form).button("reset");
             },
             statusCode: {
-                200: function() {
+                200: function () {
                     form.html("Succeed").addClass('alert-success');
                     window.location.href = "/";
                 },
-                403: function(jqXHR) {
+                403: function (jqXHR) {
                     var error = JSON.parse(jqXHR.responseText);
                     $('.error', form).html(error.message);
                 }

@@ -1,14 +1,13 @@
 body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+    padding: 50px;
+    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 a {
-  color: #00B7FF;
+    color: #00B7FF;
 }
 
-.progress_no_top_line > td
-{
+.progress_no_top_line > td {
     border-top: none !important;
 }
 
@@ -17,12 +16,10 @@ a {
 }
 
 .progress_fixed_width,
-.progress_fixed_width > td
-{
+.progress_fixed_width > td {
     width: 150px;
 }
 
-.progress_table_no_end_line > table:last-child
-{
+.progress_table_no_end_line > table:last-child {
     margin-bottom: 0px;
 }

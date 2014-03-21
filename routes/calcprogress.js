@@ -3,6 +3,6 @@
  */
 var progressdata = require('../middleware/progressdata');
 
-exports.get = function(req, res){
-    progressdata.getData(req,res);
+exports.get = function (req, res) {
+    progressdata.getData(req, res);
 };

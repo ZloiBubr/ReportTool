@@ -10,14 +10,16 @@ var ClearDB = require('./createDb').Clear;
 
 var JiraApi = require('jira').JiraApi;
 
-exports.updateJiraInfo = function(jiraUser, jiraPassword, callback){
-    ClearDB(function(err) {
-        if(err) throw err;
+exports.updateJiraInfo = function (jiraUser, jiraPassword, callback) {
+    ClearDB(function (err) {
+        if (err) throw err;
 
         var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), jiraUser, jiraPassword, '2');
 
-        UpdateModules(jira, function() {
+        UpdateModules(jira, function () {
+            log.info('**********************');
             log.info('Finished processing...');
+            log.info('**********************');
         });
         callback();
     })
@@ -30,10 +32,10 @@ function UpdateModules(jira, callback) {
             for (var i = 0; i < epics.issues.length; i++) {
                 ++numRunningQueries;
                 var epic = epics.issues[i];
-                SaveModule(jira, epic, function() {
+                SaveModule(jira, epic, function () {
                     --numRunningQueries;
-                    if(numRunningQueries === 0) {
-                        log.info('Finished Modules loop');
+                    if (numRunningQueries === 0) {
+                        log.info('****** Finished Modules loop ******');
                         callback();
                     }
                 });
@@ -46,7 +48,7 @@ function UpdateModules(jira, callback) {
 }
 
 function SaveModule(jira, epic, callback) {
-    Module.findOne({ key: epic.key },function (err, module) {
+    Module.findOne({ key: epic.key }, function (err, module) {
         if (err) throw err;
 
         if (!module) {
@@ -56,8 +58,8 @@ function SaveModule(jira, epic, callback) {
         module.summary = epic.fields.summary;
         module.save(function (err, module) {
             if (err) throw err;
-            log.info('Module saved : ' + module.key);
-            UpdatePages(jira, epic.key, function() {
+            UpdatePages(jira, epic.key, function () {
+                log.info(module.key + ' : Module saved');
                 callback();
             });
         })
@@ -65,16 +67,16 @@ function SaveModule(jira, epic, callback) {
 }
 
 function UpdatePages(jira, moduleKey, callback) {
-    jira.searchJira(util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s)",moduleKey), null, function(error, stories) {
-        if(stories != null){
+    jira.searchJira(util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s)", moduleKey), null, function (error, stories) {
+        if (stories != null) {
             var numRunningQueries = 0;
-            for(var i=0; i<stories.issues.length; i++) {
+            for (var i = 0; i < stories.issues.length; i++) {
                 ++numRunningQueries;
                 var story = stories.issues[i];
-                UpdatePage(jira, moduleKey, story.key.toString(), function() {
+                UpdatePage(jira, moduleKey, story.key.toString(), function () {
                     --numRunningQueries;
-                    if(numRunningQueries === 0) {
-                        log.info('Finished Pages loop');
+                    if (numRunningQueries === 0) {
+                        log.info(moduleKey + ' : Finished Pages loop');
                         callback();
                     }
                 });
@@ -87,9 +89,9 @@ function UpdatePages(jira, moduleKey, callback) {
 }
 
 function UpdatePage(jira, moduleKey, storyKey, callback) {
-    jira.findIssue(storyKey + "?expand=changelog", function(error, issue) {
+    jira.findIssue(storyKey + "?expand=changelog", function (error, issue) {
         if (issue != null) {
-            SavePage(moduleKey, issue, function() {
+            SavePage(jira, moduleKey, issue, function () {
                 callback();
             });
         }
@@ -99,7 +101,95 @@ function UpdatePage(jira, moduleKey, storyKey, callback) {
     });
 }
 
-function SavePage(moduleKey, issue, callback) {
+function parseHistory(issue, page) {
+    for (var i = 0; i < issue.changelog.total; i++) {
+        var history = issue.changelog.histories[i];
+        var author = history.author.displayName;
+        for (var y = 0; y < history.items.length; y++) {
+            if (history.items[y].fieldtype == 'custom' && history.items[y].field == 'Progress') {
+                var from = history.items[y].fromString == null ||
+                    history.items[y].fromString == undefined ||
+                    history.items[y].fromString == ''
+                    ?
+                    '0' : history.items[y].fromString;
+                var to = history.items[y].toString;
+
+                if (page.progressHistory == null) {
+                    page.progressHistory = [
+                        {
+                            person: author,
+                            progressFrom: from,
+                            progressTo: to,
+                            dateChanged: history.created
+                        }
+                    ];
+                }
+                else {
+                    page.progressHistory.push({
+                        person: author,
+                        progressFrom: from,
+                        progressTo: to,
+                        dateChanged: history.created
+                    });
+                }
+            }
+        }
+    }
+}
+
+function calcWorklogFromIssue(issue, page) {
+    if (issue.fields.worklog) {
+        for (var i = 0; i < issue.fields.worklog.total; i++) {
+            var worklog = issue.fields.worklog.worklogs[i];
+            var author = worklog.author.displayName;
+            var timeSpent = worklog.timeSpentSeconds / 3600;
+
+            if (page.worklogHistory == null) {
+                page.worklogHistory = [
+                    {
+                        person: author,
+                        timeSpent: timeSpent,
+                        dateChanged: worklog.created
+                    }
+                ];
+            }
+            else {
+                page.worklogHistory.push({
+                    person: author,
+                    timeSpent: timeSpent,
+                    dateChanged: worklog.created
+                });
+            }
+        }
+    }
+}
+
+function parseWorklogs(jira, moduleKey, issue, page, callback) {
+    var numRunningQueries = 0;
+    calcWorklogFromIssue(issue, page);
+    if (issue.fields.subtasks && issue.fields.subtasks.length > 0) {
+        for (var i = 0; i < issue.fields.subtasks.length; i++) {
+            var subtask = issue.fields.subtasks[i];
+            ++numRunningQueries;
+            jira.findIssue(subtask.key + "?expand=changelog", function (error, subtask) {
+                if (error) throw error;
+                if (subtask != null) {
+                    calcWorklogFromIssue(subtask, page);
+                }
+                --numRunningQueries;
+                if (numRunningQueries === 0) {
+                    log.info(moduleKey + " : " + issue.key + ' : Finished Subtasks loop');
+                    callback();
+                }
+            });
+        }
+    }
+    else {
+        callback();
+    }
+}
+
+function SavePage(jira, moduleKey, issue, callback) {
     Page.findOne({ key: issue.key }, function (err, page) {
         if (err) throw err;
 
@@ -115,47 +205,19 @@ function SavePage(moduleKey, issue, callback) {
         page.timeSpent = issue.fields.timetracking.timeSpent;
         page.labels = issue.fields.labels;
         if (issue.fields.assignee != null)
-            page.assignee =  issue.fields.assignee.displayName;
+            page.assignee = issue.fields.assignee.displayName;
         page.storyPoints = issue.fields.customfield_10004;
-        page.blockers =  issue.fields.customfield_20501;
-        page.progress =  issue.fields.customfield_20500;
-        for (var i = 0; i < issue.changelog.total; i++) {
-            var history = issue.changelog.histories[i];
-            var author = history.author.displayName;
-            for (var y = 0; y < history.items.length; y++) {
-                if (history.items[y].fieldtype == 'custom' && history.items[y].field == 'Progress') {
-                    var from = history.items[y].fromString == null ||
-                        history.items[y].fromString == undefined ||
-                        history.items[y].fromString == ''
-                        ?
-                        '0' : history.items[y].fromString;
-                    var to = history.items[y].toString;
-
-                    if(page.progressHistory == null) {
-                        page.progressHistory = [{
-                            person: author,
-                            progressFrom:from,
-                            progressTo: to,
-                            dateChanged: history.created
-                        }];
-                    }
-                    else {
-                        page.progressHistory.push({
-                            person: author,
-                            progressFrom:from,
-                            progressTo: to,
-                            dateChanged: history.created
-                        });
-                    }
-                }
-            }
-        }
-
-        page.save(function (err, page) {
-            if (err) throw err;
-            log.info('Page saved : Module : ' + moduleKey + ' : Page : ' + page.key);
-            callback();
-        })
+        page.blockers = issue.fields.customfield_20501;
+        page.progress = issue.fields.customfield_20500;
+        page.epicKey = moduleKey;
+        parseHistory(issue, page);
+        parseWorklogs(jira, moduleKey, issue, page, function () {
+            page.save(function (err, page) {
+                if (err) throw err;
+                log.info(moduleKey + " : " + page.key + ' : Page saved');
+                callback();
+            })
+        });
     });
 }
 
