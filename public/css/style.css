@@ -23,3 +23,18 @@ a {
 .progress_table_no_end_line > table:last-child {
     margin-bottom: 0px;
 }
+
+#progress {
+    width: 218px;
+    background: #666;
+    color: #FF0000;
+    border: 1px solid #ccc;
+    height: 28px;
+}
+
+#progress .bar {
+    display: inline-block;
+    background: #3d3;
+    width: 0%;
+    height: 28px;
+}

@@ -9,6 +9,23 @@ var Page = require('../models/page').Page;
 var ClearDB = require('./createDb').Clear;
 
 var JiraApi = require('jira').JiraApi;
+var response = null;
+var currentProgress = 0;
+
+exports.rememberResponse = function(res) {
+    response = res;
+    currentProgress = 0;
+    UpdateProgress(0);
+}
+
+var UpdateProgress = function(progress) {
+    response.write("event: progress\n");
+    response.write("data: " + progress.toString() + "\n\n");
+    currentProgress = progress;
+    if(progress == 100) {
+        response.end();
+    }
+}
 
 exports.updateJiraInfo = function (jiraUser, jiraPassword, callback) {
     ClearDB(function (err) {
@@ -29,12 +46,15 @@ function UpdateModules(jira, callback) {
     jira.searchJira("project = PLEX-UXC AND issuetype = epic AND summary ~ Module AND NOT summary ~ automation ORDER BY key ASC", null, function (error, epics) {
         if (epics != null) {
             var numRunningQueries = 0;
+            currentProgress = epics.issues.length;
             for (var i = 0; i < epics.issues.length; i++) {
                 ++numRunningQueries;
                 var epic = epics.issues[i];
                 SaveModule(jira, epic, function () {
                     --numRunningQueries;
+                    UpdateProgress(Math.floor((currentProgress - numRunningQueries)*100/currentProgress));
                     if (numRunningQueries === 0) {
+                        UpdateProgress(100);
                         log.info('****** Finished Modules loop ******');
                         callback();
                     }

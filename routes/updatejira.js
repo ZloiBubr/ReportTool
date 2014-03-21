@@ -9,6 +9,10 @@ exports.post = function (req, res, next) {
     var password = req.body.password;
 
     jiraProvider.updateJiraInfo(username, password, function () {
-        res.send({});
     });
+    res.send({});
 };
+
+exports.rememberResponse = function(res) {
+    jiraProvider.rememberResponse(res);
+}
