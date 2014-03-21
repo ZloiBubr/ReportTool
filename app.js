@@ -5,6 +5,7 @@
 var express = require('express');
 var jira = require('./routes/updatejira');
 var velocity = require('./routes/calcvelocitydata');
+var weekly = require('./routes/calcweeklyprogress');
 var progress = require('./routes/calcprogress');
 var http = require('http');
 var path = require('path');
@@ -49,6 +50,9 @@ app.get('/', function (req, res) {
 app.get('/progress', function (req, res) {
     res.render('progress.html');
 });
+app.get('/weekly', function (req, res) {
+    res.render('weekly.html');
+});
 app.get('/updatejira', function (req, res) {
     req.socket.setTimeout(1000 * 60 * 10);
     res.render('updatejira.html');
@@ -66,6 +70,7 @@ app.post('/updatejira', jira.post);
 //json
 app.get('/velocitydata', velocity.get);
 app.get('/progressdata', progress.get);
+app.get('/weeklydata', weekly.get);
 
 
 http.createServer(app).listen(config.get('port'), function () {

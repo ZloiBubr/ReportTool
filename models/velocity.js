@@ -11,6 +11,10 @@ exports.data = function () {
         {
             data: [],
             name: "TeamInspiration"
+        },
+        {
+            data: [],
+            name: "Total"
         }
     ];
 }

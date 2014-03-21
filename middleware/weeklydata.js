@@ -11,6 +11,28 @@ exports.getData = function (req, res) {
     });
 }
 
+function RoundDateToSunday(date) {
+    var daysMonth = [31,30,28,31,30,31,30,31,31,30,31,30,31];
+    var day = date.getDay();
+    var diff = day == 0 ? 0 : 7 - day;
+    var newDate = date.getDate() + diff;
+
+    var month = date.getMonth();
+    var days = daysMonth[month];
+    if(newDate > days) {
+        if(month < 12) {
+            date.setMonth(month + 1);
+        }
+        else {
+            date.setMonth(0);
+            date.setYear(date.getYear() + 1);
+        }
+        newDate = newDate - days;
+    }
+
+    date.setDate(newDate);
+}
+
 function parsePages(callback) {
     var velocity = new velocityModel();
     for (var k = 0; k < velocity.data.length; k++) {
@@ -27,12 +49,14 @@ function parsePages(callback) {
                 var history = page.progressHistory[j];
                 var date = new Date(Date.parse(history.dateChanged));
                 date.setHours(12, 0, 0, 0);
+                RoundDateToSunday(date);
                 date = date.getTime();
                 var from = parseInt(history.progressFrom);
                 var to = history.progressTo == null || history.progressTo == '' ? 0 : parseInt(history.progressTo);
                 var progress = to - from;
                 var calcStoryPoints = storyPoints * progress / 100;
                 putDataPoint(velocity, teamName, date, calcStoryPoints);
+                putDataPoint(velocity, "Total", date, calcStoryPoints);
             }
         }
 
@@ -44,18 +68,6 @@ function parsePages(callback) {
                 b = new Date(b[0]);
                 return a > b ? 1 : a < b ? -1 : 0;
             });
-        }
-        //3. summ
-        for (var k = 0; k < velocity.data.length; k++) {
-            var team = velocity.data[k];
-            for (var l = 0; l < team.data.length - 1; l++) {
-                var teamData1 = team.data[l];
-                var teamDataPoints = teamData1[1];
-                var teamData2 = team.data[l + 1];
-                var teamDataPoints2 = teamData2[1];
-
-                teamData2[1] = teamDataPoints + teamDataPoints2;
-            }
         }
         callback(err, velocity);
     })

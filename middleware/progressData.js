@@ -2,7 +2,6 @@ var mongoose = require('../libs/mongoose');
 var progressModel = require('../models/progress').progress;
 var Module = require('../models/module').Module;
 var Page = require('../models/page').Page;
-var async = require('async');
 var log = require('../libs/log')(module);
 
 exports.getData = function (req, res) {
