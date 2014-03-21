@@ -1,0 +1,11 @@
+<% layout('index') -%>
+<% block('title', "cumulative") -%>
+<div id="container" class="container" ng-controller="velocityChartController">
+    <div class="row">
+        <div class="container">
+            <div class="row">
+                <highchart id="chart1" class="col-sm-12" config="chartConfig"></highchart>
+            </div>
+        </div>
+    </div>
+</div>

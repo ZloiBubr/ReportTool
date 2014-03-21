@@ -15,9 +15,8 @@ var log = require('./libs/log')(module);
 var app = express();
 
 // all environments
-//app.engine('ejs', require('ejs-locals'));
-//app.set('views', path.join(__dirname, 'template'));
-//app.set('view engine', 'ejs');
+app.engine('ejs', require('ejs-locals'));
+app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
 app.engine('html', require('ejs').renderFile);
 app.use(express.favicon());
@@ -35,6 +34,7 @@ app.use(express.methodOverride());
 app.use(express.cookieParser(config.get('appSecret')));
 app.use(express.session());
 app.use(app.router);
+require('routes')(app);
 app.use(express.static(path.join(__dirname, 'public')));
 
 // development only
@@ -44,19 +44,19 @@ if ('development' == app.get('env')) {
 
 
 //pages
-app.get('/', function (req, res) {
-    res.render('index.html');
-});
-app.get('/progress', function (req, res) {
-    res.render('progress.html');
-});
-app.get('/weekly', function (req, res) {
-    res.render('weekly.html');
-});
-app.get('/updatejira', function (req, res) {
-    req.socket.setTimeout(1000 * 60 * 10);
-    res.render('updatejira.html');
-});
+//app.get('/', function (req, res) {
+//    res.render('index.html');
+//});
+//app.get('/progress', function (req, res) {
+//    res.render('progress.html');
+//});
+//app.get('/weekly', function (req, res) {
+//    res.render('weekly.html');
+//});
+//app.get('/updatejira', function (req, res) {
+//    req.socket.setTimeout(1000 * 60 * 10);
+//    res.render('updatejira.html');
+//});
 
 app.get('/update_progress', function (req, res) {
     req.socket.setTimeout(1000 * 60 * 10);
