@@ -23,9 +23,9 @@ function parsePages(callback) {
         for (var i = 0; i < pages.length; i++) {
             var page = pages[i];
 
-            if(page.devFinished == undefined) {
-                continue;
-            }
+//            if(page.devFinished == undefined) {
+//                continue;
+//            }
             var dateDevFinished = page.devFinished == undefined ? new Date(Date.parse(page.updated)).getTime() : new Date(Date.parse(page.devFinished)).getTime();
 //            var dateQaFinished = new Date(Date.parse(page.qaFinished)).getTime();
             var pageSize = getPageSize(page.labels);

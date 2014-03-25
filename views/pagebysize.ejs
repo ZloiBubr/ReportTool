@@ -1,11 +1,5 @@
 <% layout('index') -%>
 <% block('title', "weekly") -%>
 <div id="container" class="container" ng-controller="pagebysizeChartController">
-    <div class="row">
-        <div class="container">
-            <div class="row">
-                <highchart id="chart1" class="col-sm-12" config="chartConfig"></highchart>
-            </div>
-        </div>
-    </div>
+    <highchart id="chart1" config="chartConfig"></highchart>
 </div>

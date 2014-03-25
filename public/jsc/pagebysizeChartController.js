@@ -31,13 +31,13 @@ function pagebysizeChartController($scope, $resource, $window) {
         $scope.chartConfig = {
             options: {
                 chart: {
-                    type: 'line',
+                    type: 'areaspline',
                     zoomType: 'x'
                 }
             },
             series: $scope.chartsData.data,
             title: {
-                text: 'Time Spent by Story Size'
+                text: 'Development Time Spent by Story Size'
             },
             xAxis: {
                 type: 'datetime'
