@@ -10,30 +10,31 @@ var ClearDB = require('./createDb').Clear;
 
 var JiraApi = require('jira').JiraApi;
 var response = null;
-var currentProgress = 0;
+var totalModules = 0;
 
 exports.rememberResponse = function(res) {
     response = res;
-    currentProgress = 0;
+    totalModules = 0;
     UpdateProgress(0);
 }
 
 var UpdateProgress = function(progress) {
     response.write("event: progress\n");
     response.write("data: " + progress.toString() + "\n\n");
-    currentProgress = progress;
+    totalModules = progress;
+    log.info("********** Progress ********** " + progress.toString());
     if(progress == 100) {
         response.end();
     }
 }
 
-exports.updateJiraInfo = function (jiraUser, jiraPassword, callback) {
-    ClearDB(function (err) {
+exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
+    ClearDB(full, function (err) {
         if (err) throw err;
 
         var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), jiraUser, jiraPassword, '2');
 
-        UpdateModules(jira, function () {
+        UpdateModules(full, jira, function () {
             log.info('**********************');
             log.info('Finished processing...');
             log.info('**********************');
@@ -42,17 +43,23 @@ exports.updateJiraInfo = function (jiraUser, jiraPassword, callback) {
     })
 }
 
-function UpdateModules(jira, callback) {
-    jira.searchJira("project = PLEX-UXC AND issuetype = epic AND summary ~ Module AND NOT summary ~ automation ORDER BY key ASC", null, function (error, epics) {
+function UpdateModules(full, jira, callback) {
+    var requestString = "project = PLEX-UXC AND issuetype = epic AND summary ~ Module AND NOT summary ~ automation ORDER BY key ASC";
+
+    UpdateProgress(2);
+    jira.searchJira(requestString, null, function (error, epics) {
         if (epics != null) {
             var numRunningQueries = 0;
-            currentProgress = epics.issues.length;
-            for (var i = 0; i < epics.issues.length; i++) {
+            var totalModules = epics.issues.length;
+            for (var i = 0; i < totalModules; i++) {
                 ++numRunningQueries;
                 var epic = epics.issues[i];
-                SaveModule(jira, epic, function () {
+                log.info("********** Module #" + numRunningQueries.toString() + " of " + totalModules);
+                SaveModule(full, jira, epic, function () {
+                    log.info("********** Module #" + numRunningQueries.toString() + " of " + totalModules + " finished processing");
                     --numRunningQueries;
-                    UpdateProgress(Math.floor((currentProgress - numRunningQueries)*100/currentProgress));
+                    var progress = Math.floor((totalModules - numRunningQueries)*100/totalModules);
+                    UpdateProgress(progress);
                     if (numRunningQueries === 0) {
                         UpdateProgress(100);
                         log.info('****** Finished Modules loop ******');
@@ -67,7 +74,7 @@ function UpdateModules(jira, callback) {
     });
 }
 
-function SaveModule(jira, epic, callback) {
+function SaveModule(full, jira, epic, callback) {
     Module.findOne({ key: epic.key }, function (err, module) {
         if (err) throw err;
 
@@ -78,7 +85,7 @@ function SaveModule(jira, epic, callback) {
         module.summary = epic.fields.summary;
         module.save(function (err, module) {
             if (err) throw err;
-            UpdatePages(jira, epic.key, function () {
+            UpdatePages(full, jira, epic.key, function () {
                 log.info(module.key + ' : Module saved');
                 callback();
             });
@@ -86,17 +93,20 @@ function SaveModule(jira, epic, callback) {
     });
 }
 
-function UpdatePages(jira, moduleKey, callback) {
-    jira.searchJira(util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s)", moduleKey), null, function (error, stories) {
+function UpdatePages(full, jira, moduleKey, callback) {
+    var queryString = full ?
+        util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s)", moduleKey) :
+        util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s) AND updated > -7d", moduleKey);
+    jira.searchJira(queryString, null, function (error, stories) {
         if (stories != null) {
             var numRunningQueries = 0;
             for (var i = 0; i < stories.issues.length; i++) {
                 ++numRunningQueries;
                 var story = stories.issues[i];
                 UpdatePage(jira, moduleKey, story.key.toString(), function () {
+                    log.info(moduleKey + ' : Page updated');
                     --numRunningQueries;
                     if (numRunningQueries === 0) {
-                        log.info(moduleKey + ' : Finished Pages loop');
                         callback();
                     }
                 });
@@ -145,12 +155,26 @@ function parseHistory(issue, page) {
                     ];
                 }
                 else {
-                    page.progressHistory.push({
-                        person: author,
-                        progressFrom: from,
-                        progressTo: to,
-                        dateChanged: history.created
-                    });
+                    //look if already exists
+                    var recordFound = false;
+                    for(var o = 0; o<page.progressHistory.length; o++) {
+                        var record = page.progressHistory[o];
+                        if( record.person == author &&
+                            record.progressFrom == from &&
+                            record.progressTo == to &&
+                            record.dateChanged == history.created) {
+                            recordFound = true;
+                            break;
+                        }
+                    }
+                    if(!recordFound) {
+                        page.progressHistory.push({
+                            person: author,
+                            progressFrom: from,
+                            progressTo: to,
+                            dateChanged: history.created
+                        });
+                    }
                 }
             }
         }
@@ -174,11 +198,24 @@ function calcWorklogFromIssue(issue, page) {
                 ];
             }
             else {
-                page.worklogHistory.push({
-                    person: author,
-                    timeSpent: timeSpent,
-                    dateChanged: worklog.created
-                });
+                //look if already exists
+                var recordFound = false;
+                for(var o = 0; o<page.worklogHistory.length; o++) {
+                    var record = page.worklogHistory[o];
+                    if( record.person == author &&
+                        record.timeSpent == timeSpent &&
+                        record.dateChanged == worklog.created) {
+                        recordFound = true;
+                        break;
+                    }
+                }
+                if(!recordFound) {
+                    page.worklogHistory.push({
+                        person: author,
+                        timeSpent: timeSpent,
+                        dateChanged: worklog.created
+                    });
+                }
             }
         }
     }
@@ -198,7 +235,7 @@ function parseWorklogs(jira, moduleKey, issue, page, callback) {
                 }
                 --numRunningQueries;
                 if (numRunningQueries === 0) {
-                    log.info(moduleKey + " : " + issue.key + ' : Finished Subtasks loop');
+//                    log.info(moduleKey + " : " + issue.key + ' : Finished Subtasks loop');
                     callback();
                 }
             });
@@ -234,7 +271,7 @@ function SavePage(jira, moduleKey, issue, callback) {
         parseWorklogs(jira, moduleKey, issue, page, function () {
             page.save(function (err, page) {
                 if (err) throw err;
-                log.info(moduleKey + " : " + page.key + ' : Page saved');
+//                log.info(moduleKey + " : " + page.key + ' : Page saved');
                 callback();
             })
         });

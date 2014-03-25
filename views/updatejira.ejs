@@ -1,38 +1,48 @@
 <% layout('index') -%>
 <% block('title', "updatejira") -%>
 
-<p>Input JIRA user name and password</p>
-
 <form class="form-horizontal login-form" action="/auth/login" method="POST" name="login-form">
-    <div class="form-group">
-        <label for="input-username" class="col-lg-2">Name:</label>
+    <fieldset>
+        <legend>Please enter JIRA login information and supplemental parameters</legend>
 
-        <div class="col-lg-10">
-            <input name="username" value="name" type="text" class="form-control" id="input-username" placeholder="Name">
-        </div>
-    </div>
-    <div class="form-group">
-        <label for="input-password" class="col-lg-2">Password:</label>
 
-        <div class="col-lg-10">
-            <input name="password" value="pass" type="password" class="form-control" id="input-password"
-                   placeholder="Password">
-        </div>
-    </div>
-    <div class="form-group">
-        <label  for="progress" class="col-lg-2">Progress:</label>
+        <div class="control-group">
+            <label for="input-username" class="control-label">Name:</label>
 
-        <div class="col-lg-10">
-            <div id="progress"><span class="bar"></span></div>
+            <div class="controls">
+                <input name="username" value="name" type="text" class="input-xlarge" id="input-username" placeholder="Name">
+                <p class="help-block">Please enter your JIRA login</p>
+            </div>
         </div>
-    </div>
-    <div class="form-group">
-        <label class="col-lg-2">Press button when ready:</label>
-        <div class="col-lg-offset-2 col-lg-10">
+
+        <div class="control-group">
+            <label for="input-password" class="control-label">Password:</label>
+
+            <div class="controls">
+                <input name="password" value="pass" type="password" class="input-xlarge" id="input-password" placeholder="Password">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="input-check-full">Full Update:</label>
+            <div class="controls">
+                <label class="checkbox">
+                    <input name="full" type="checkbox" id="input-check-full" value="true" placeholder="Full">
+                    Check for full update
+                </label>
+                </div>
+        </div>
+        <div class="control-group">
+            <label  for="progress" class="control-label">Progress:</label>
+
+            <div class="controls">
+                <div id="progress"><span class="bar"></span></div>
+            </div>
+        </div>
+        <div class="form-actions">
             <button type="submit" class="btn btn-primary" data-loading-text="Updating...">Update</button>
             <span class="help-block error"></span>
         </div>
-    </div>
+    </fieldset>
 </form>
 
 <script>

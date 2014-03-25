@@ -12,7 +12,7 @@ exports.getData = function (req, res) {
 }
 
 function RoundDateToSunday(date) {
-    var daysMonth = [31,30,28,31,30,31,30,31,31,30,31,30,31];
+    var daysMonth = [31,28,31,30,31,30,31,31,30,31,30,31];
     var day = date.getDay();
     var diff = day == 0 ? 0 : 7 - day;
     var newDate = date.getDate() + diff;
@@ -50,6 +50,9 @@ function parsePages(callback) {
                 var date = new Date(Date.parse(history.dateChanged));
                 date.setHours(12, 0, 0, 0);
                 RoundDateToSunday(date);
+                if(date > Date.now()) {
+                    continue;
+                }
                 date = date.getTime();
                 var from = parseInt(history.progressFrom);
                 var to = history.progressTo == null || history.progressTo == '' ? 0 : parseInt(history.progressTo);

@@ -43,21 +43,6 @@ if ('development' == app.get('env')) {
 }
 
 
-//pages
-//app.get('/', function (req, res) {
-//    res.render('index.html');
-//});
-//app.get('/progress', function (req, res) {
-//    res.render('progress.html');
-//});
-//app.get('/weekly', function (req, res) {
-//    res.render('weekly.html');
-//});
-//app.get('/updatejira', function (req, res) {
-//    req.socket.setTimeout(1000 * 60 * 10);
-//    res.render('updatejira.html');
-//});
-
 app.get('/update_progress', function (req, res) {
     req.socket.setTimeout(1000 * 60 * 10);
     res.writeHead(200, {'Content-Type': 'text/event-stream'});

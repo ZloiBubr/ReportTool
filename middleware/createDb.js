@@ -3,9 +3,14 @@
  */
 var mongoose = require('./../libs/mongoose');
 
-exports.Clear = function (callback) {
-    var db = mongoose.connection.db;
-    db.dropDatabase(function (err) {
-        callback(err);
-    })
+exports.Clear = function (full, callback) {
+    if(full) {
+        var db = mongoose.connection.db;
+        db.dropDatabase(function (err) {
+            callback(err);
+        })
+    }
+    else {
+        callback();
+    }
 }
