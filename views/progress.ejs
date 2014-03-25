@@ -8,9 +8,7 @@
         <tr>
             <th>Date</th>
             <th style="width: 157px">Team</th>
-            <th>User</th>
-            <th>Key</th>
-            <th>Progress</th>
+            <th>Data</th>
         </tr>
         </thead>
         <tbody>
@@ -25,10 +23,25 @@
                         <td class="progress_table_no_end_line">
                             <table class="table table-striped">
                                 <tbody>
+                                    <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Key</th>
+                                        <th>Progress</th>
+                                        <th>Sum Progress</th>
+                                        <th>Story Points</th>
+                                        <th>Dev Spent</th>
+                                        <th>QA Spent</th>
+                                    </tr>
+                                    </thead>
                                 <tr class="progress_fixed_width" ng-repeat="page in team.pages">
                                     <td>{{page.person}}</td>
                                     <td><a href={{page.uri}}>{{page.key}}</a></td>
                                     <td>{{page.progress | number : 2}}</td>
+                                    <td>{{page.sumprogress}}</td>
+                                    <td>{{page.storypoints}}</td>
+                                    <td>{{page.devspent}}</td>
+                                    <td>{{page.qaspent}}</td>
                                 </tr>
                                 </tbody>
                             </table>

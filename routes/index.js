@@ -9,6 +9,9 @@ module.exports = function(app) {
     app.get('/weekly', function(req, res) {
         res.render('weekly');
     });
+    app.get('/pagebysize', function(req, res) {
+       res.render('pagebysize');
+    });
     app.get('/updatejira', function(req, res) {
         req.socket.setTimeout(1000 * 60 * 10);
         res.render('updatejira');

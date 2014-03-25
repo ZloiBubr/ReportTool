@@ -50,9 +50,9 @@ function parsePages(callback) {
                 var date = new Date(Date.parse(history.dateChanged));
                 date.setHours(12, 0, 0, 0);
                 RoundDateToSunday(date);
-                if(date > Date.now()) {
-                    continue;
-                }
+//                if(date > Date.now()) {
+//                    continue;
+//                }
                 date = date.getTime();
                 var from = parseInt(history.progressFrom);
                 var to = history.progressTo == null || history.progressTo == '' ? 0 : parseInt(history.progressTo);

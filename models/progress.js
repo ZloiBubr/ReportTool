@@ -10,7 +10,11 @@ exports.progress = function () {
                             key: "",
                             progress: 0,
                             person: "",
-                            uri: ""
+                            uri: "",
+                            sumprogress: 0,
+                            storypoints: 0,
+                            devspent: 0,
+                            qaspent: 0
                         }
                     ]}
             ]}

@@ -104,7 +104,7 @@ function UpdatePages(full, jira, moduleKey, callback) {
                 ++numRunningQueries;
                 var story = stories.issues[i];
                 UpdatePage(jira, moduleKey, story.key.toString(), function () {
-                    log.info(moduleKey + ' : Page updated');
+                    log.info(moduleKey + ' : ' + story.key.toString() + ' Page updated');
                     --numRunningQueries;
                     if (numRunningQueries === 0) {
                         callback();
@@ -131,52 +131,72 @@ function UpdatePage(jira, moduleKey, storyKey, callback) {
     });
 }
 
+function ParseProgress(item, page, author, created) {
+    if (item.fieldtype == 'custom' && item.field == 'Progress') {
+        var from = item.fromString == null ||
+            item.fromString == undefined ||
+            item.fromString == ''
+            ?
+            '0' : item.fromString;
+        var to = item.toString;
+
+        if (page.progressHistory == null) {
+            page.progressHistory = [
+                {
+                    person: author,
+                    progressFrom: from,
+                    progressTo: to,
+                    dateChanged: created
+                }
+            ];
+        }
+        else {
+            //look if already exists
+            var recordFound = false;
+            for (var o = 0; o < page.progressHistory.length; o++) {
+                var record = page.progressHistory[o];
+                if (record.person == author &&
+                    record.progressFrom == from &&
+                    record.progressTo == to &&
+                    record.dateChanged == created) {
+                    recordFound = true;
+                    break;
+                }
+            }
+            if (!recordFound) {
+                page.progressHistory.push({
+                    person: author,
+                    progressFrom: from,
+                    progressTo: to,
+                    dateChanged: created
+                });
+            }
+        }
+    }
+}
+
+function ParseFinishDates(item, page, created) {
+    if (item.fieldtype == 'jira' && item.field == 'status') {
+        var from = item.fromString;
+        var to = item.toString;
+
+        if(from == "In Progress" && to =="Ready for QA") {
+            page.devFinished = created;
+        }
+        if(from == "Testing in Progress" && to =="Resolved") {
+            page.qaFinished = created;
+        }
+    }
+}
+
 function parseHistory(issue, page) {
     for (var i = 0; i < issue.changelog.total; i++) {
         var history = issue.changelog.histories[i];
         var author = history.author.displayName;
         for (var y = 0; y < history.items.length; y++) {
-            if (history.items[y].fieldtype == 'custom' && history.items[y].field == 'Progress') {
-                var from = history.items[y].fromString == null ||
-                    history.items[y].fromString == undefined ||
-                    history.items[y].fromString == ''
-                    ?
-                    '0' : history.items[y].fromString;
-                var to = history.items[y].toString;
-
-                if (page.progressHistory == null) {
-                    page.progressHistory = [
-                        {
-                            person: author,
-                            progressFrom: from,
-                            progressTo: to,
-                            dateChanged: history.created
-                        }
-                    ];
-                }
-                else {
-                    //look if already exists
-                    var recordFound = false;
-                    for(var o = 0; o<page.progressHistory.length; o++) {
-                        var record = page.progressHistory[o];
-                        if( record.person == author &&
-                            record.progressFrom == from &&
-                            record.progressTo == to &&
-                            record.dateChanged == history.created) {
-                            recordFound = true;
-                            break;
-                        }
-                    }
-                    if(!recordFound) {
-                        page.progressHistory.push({
-                            person: author,
-                            progressFrom: from,
-                            progressTo: to,
-                            dateChanged: history.created
-                        });
-                    }
-                }
-            }
+            var item = history.items[y];
+            ParseProgress(item, page, author, history.created);
+            ParseFinishDates(item, page, history.created);
         }
     }
 }
@@ -266,7 +286,9 @@ function SavePage(jira, moduleKey, issue, callback) {
         page.storyPoints = issue.fields.customfield_10004;
         page.blockers = issue.fields.customfield_20501;
         page.progress = issue.fields.customfield_20500;
-        page.epicKey = moduleKey;
+        page.epicKey = moduleKey
+        page.created = issue.fields.created;
+        page.updated = issue.fields.updated;
         parseHistory(issue, page);
         parseWorklogs(jira, moduleKey, issue, page, function () {
             page.save(function (err, page) {

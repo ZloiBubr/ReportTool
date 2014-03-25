@@ -3,6 +3,7 @@ var progressModel = require('../models/progress').progress;
 var Module = require('../models/module').Module;
 var Page = require('../models/page').Page;
 var log = require('../libs/log')(module);
+var persons = require('./persons');
 
 exports.getData = function (req, res) {
     parsePages(function (err, progress) {
@@ -27,8 +28,24 @@ function parsePages(callback) {
         for (var i = 0; i < pages.length; i++) {
             var page = pages[i];
             var storyPoints = parseInt(page.storyPoints) == null ? 0 : parseInt(page.storyPoints);
+            var pageProgress = parseInt(page.progress) == null ? 0 : parseInt(page.progress) * storyPoints / 100;
             var teamName = getTeamName(page.labels);
             var key = page.key;
+
+            //time spent
+            var devTimeSpent = 0;
+            var qaTimeSpent = 0;
+            for (var j = 0; j < page.worklogHistory.length; j++) {
+                var worklog = page.worklogHistory[j];
+                var isDeveloper = persons.isDeveloper(worklog.person)=="Developer";
+                if(isDeveloper) {
+                    devTimeSpent += parseInt(worklog.timeSpent);
+                }
+                else {
+                    qaTimeSpent += parseInt(worklog.timeSpent);
+                }
+            }
+
             for (var j = 0; j < page.progressHistory.length; j++) {
                 var history = page.progressHistory[j];
                 var date = new Date(Date.parse(history.dateChanged));
@@ -40,7 +57,7 @@ function parsePages(callback) {
                 var progressDiff = to - from;
                 var calcStoryPoints = storyPoints * progressDiff / 100;
                 var uri = page.uri;
-                putDataPoint(key, progress, teamName, date, calcStoryPoints, person, uri);
+                putDataPoint(key, progress, teamName, date, calcStoryPoints, person, uri, devTimeSpent, qaTimeSpent, storyPoints, pageProgress);
             }
         }
 
@@ -60,7 +77,7 @@ function getTeamName(labels) {
         return "TeamNova";
 }
 
-function putDataPoint(key, progress, teamName, date, calcStoryPoints, person, uri) {
+function putDataPoint(key, progress, teamName, date, calcStoryPoints, person, uri, devTimeSpent, qaTimeSpent, storyPoints, pageProgress) {
     var dateFound = false;
     for (var k = 0; k < progress.dates.length; k++) {
         var pdate = progress.dates[k];
@@ -78,44 +95,68 @@ function putDataPoint(key, progress, teamName, date, calcStoryPoints, person, ur
                             if (page.key == key) {
                                 page.person = person;
                                 page.progress = page.progress + calcStoryPoints;
+                                page.devspent = devTimeSpent;
+                                page.qaspent = qaTimeSpent;
+                                page.sumprogress = pageProgress;
+                                page.storypoints = storyPoints;
                                 return;
                             }
                         }
                         pages.push({
-                            key: key, progress: calcStoryPoints, person: person, uri: uri
-                        });
+                            key: key,
+                            progress: calcStoryPoints,
+                            person: person,
+                            uri: uri,
+                            devspent: devTimeSpent,
+                            qaspent: qaTimeSpent,
+                            sumprogress: pageProgress,
+                            storypoints: storyPoints
+                    });
                     }
                     else {
-                        team.pages = [
-                            {
-                                key: key, progress: calcStoryPoints, person: person, uri: uri
-                            }
-                        ];
+                        team.pages = [{
+                                key: key,
+                                progress: calcStoryPoints,
+                                person: person,
+                                uri: uri,
+                                devspent: devTimeSpent,
+                                qaspent: qaTimeSpent,
+                                sumprogress: pageProgress,
+                                storypoints: storyPoints
+                            }];
                     }
                 }
             }
             if (!teamFound) {
                 pdate.teams.push({
-                    name: teamName, pages: [
-                        {
-                            key: key, progress: calcStoryPoints, person: person, uri: uri
-                        }
-                    ]
+                    name: teamName, pages: [{
+                            key: key,
+                            progress: calcStoryPoints,
+                            person: person,
+                            uri: uri,
+                            devspent: devTimeSpent,
+                            qaspent: qaTimeSpent,
+                            sumprogress: pageProgress,
+                            storypoints: storyPoints
+                        }]
                 });
             }
         }
     }
     if (!dateFound) {
         progress.dates.push({
-            date: date, teams: [
-                {
-                    name: teamName, pages: [
-                    {
-                        key: key, progress: calcStoryPoints, person: person, uri: uri
-                    }
-                ]
-                }
-            ]
+            date: date, teams: [{
+                    name: teamName, pages: [{
+                        key: key,
+                        progress: calcStoryPoints,
+                        person: person,
+                        uri: uri,
+                        devspent: devTimeSpent,
+                        qaspent: qaTimeSpent,
+                        sumprogress: pageProgress,
+                        storypoints: storyPoints
+                    }]
+                }]
         });
     }
 }

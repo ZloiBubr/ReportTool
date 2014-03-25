@@ -14,6 +14,8 @@ var schema = new Schema({
     blockers:               { type: String },
     progress:               { type: String },
     storyPoints:            { type: String },
+    devFinished:            { type: String },
+    qaFinished:             { type: String },
     progressHistory: [{
             person:         { type: String },
             progressFrom:   { type: String },
@@ -26,7 +28,8 @@ var schema = new Schema({
             timeSpent:      { type: String },
             dateChanged:    { type: String }
         }],
-    created:                { type: Date, default: Date.now() }
+    created:                { type: String },
+    updated:                { type: String }
 });
 
 exports.Page = mongoose.model('Page', schema);
