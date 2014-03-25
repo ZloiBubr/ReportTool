@@ -27,11 +27,11 @@
                                     <tr>
                                         <th>User</th>
                                         <th>Key</th>
-                                        <th>Progress</th>
-                                        <th>Sum Progress</th>
+                                        <th>Progress SP</th>
+                                        <th>Sum Progress SP</th>
                                         <th>Story Points</th>
-                                        <th>Dev Spent</th>
-                                        <th>QA Spent</th>
+                                        <th>Sum Dev Spent</th>
+                                        <th>Sum QA Spent</th>
                                     </tr>
                                     </thead>
                                 <tr class="progress_fixed_width" ng-repeat="page in team.pages">
@@ -40,8 +40,8 @@
                                     <td>{{page.progress | number : 2}}</td>
                                     <td>{{page.sumprogress}}</td>
                                     <td>{{page.storypoints}}</td>
-                                    <td>{{page.devspent}}</td>
-                                    <td>{{page.qaspent}}</td>
+                                    <td>{{page.devspent}}h</td>
+                                    <td>{{page.qaspent}}h</td>
                                 </tr>
                                 </tbody>
                             </table>

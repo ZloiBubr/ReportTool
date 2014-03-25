@@ -104,7 +104,7 @@ function UpdatePages(full, jira, moduleKey, callback) {
                 ++numRunningQueries;
                 var story = stories.issues[i];
                 UpdatePage(jira, moduleKey, story.key.toString(), function () {
-                    log.info(moduleKey + ' : ' + story.key.toString() + ' Page updated');
+//                    log.info(moduleKey + ' : ' + story.key.toString() + ' Page updated');
                     --numRunningQueries;
                     if (numRunningQueries === 0) {
                         callback();
