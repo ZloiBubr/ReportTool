@@ -41,15 +41,15 @@ a {
 
 .red
 {
-    background-color: #da4f49;
+    background-color: #da4f49 !important;
 }
 
 .yellow
 {
-    background-color: #fbb450;
+    background-color: #fbb450 !important;
 }
 
 .green
 {
-    background-color: #219161;
+    background-color: #219161 !important;
 }
