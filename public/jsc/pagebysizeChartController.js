@@ -55,7 +55,7 @@ function pagebysizeChartController($scope, $resource, $window) {
             var avarageSeries = [];
             _.each($scope.chartsData.data, function(itemSeries){
                 avarageSeries.push({
-                    name: itemSeries.name + ':trend_line',
+                    name: itemSeries.name + ':trend',
                     type: 'line',
                     marker: { enabled: false },
                     /* function returns data for trend-line */
