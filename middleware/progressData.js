@@ -46,6 +46,15 @@ function parsePages(callback) {
                 }
             }
 
+            //dev estimated time
+            var totalhours =
+                storyPoints == 3 ? 8 :
+                storyPoints == 5 ? 16 :
+                storyPoints == 13 ? 40 :
+                storyPoints == 21 ? 80 : 0;
+            var estimated = parseInt(page.progress) > 0 ? devTimeSpent*100/parseInt(page.progress) : totalhours;
+            var strestimated = Math.floor(estimated).toString() + 'h/' + totalhours.toString();
+
             for (var j = 0; j < page.progressHistory.length; j++) {
                 var history = page.progressHistory[j];
                 var date = new Date(Date.parse(history.dateChanged));
@@ -57,7 +66,8 @@ function parsePages(callback) {
                 var progressDiff = to - from;
                 var calcStoryPoints = storyPoints * progressDiff / 100;
                 var uri = page.uri;
-                putDataPoint(key, progress, teamName, date, calcStoryPoints, person, uri, devTimeSpent, qaTimeSpent, storyPoints, pageProgress);
+
+                putDataPoint(key, progress, teamName, date, calcStoryPoints, person, uri, devTimeSpent, qaTimeSpent, storyPoints, pageProgress, strestimated);
             }
         }
 
@@ -77,7 +87,7 @@ function getTeamName(labels) {
         return "TeamNova";
 }
 
-function putDataPoint(key, progress, teamName, date, calcStoryPoints, person, uri, devTimeSpent, qaTimeSpent, storyPoints, pageProgress) {
+function putDataPoint(key, progress, teamName, date, calcStoryPoints, person, uri, devTimeSpent, qaTimeSpent, storyPoints, pageProgress, estimated) {
     var dateFound = false;
     for (var k = 0; k < progress.dates.length; k++) {
         var pdate = progress.dates[k];
@@ -99,6 +109,7 @@ function putDataPoint(key, progress, teamName, date, calcStoryPoints, person, ur
                                 page.qaspent = qaTimeSpent;
                                 page.sumprogress = pageProgress;
                                 page.storypoints = storyPoints;
+                                page.estimated = estimated;
                                 return;
                             }
                         }
@@ -110,7 +121,8 @@ function putDataPoint(key, progress, teamName, date, calcStoryPoints, person, ur
                             devspent: devTimeSpent,
                             qaspent: qaTimeSpent,
                             sumprogress: pageProgress,
-                            storypoints: storyPoints
+                            storypoints: storyPoints,
+                            estimated: estimated
                     });
                     }
                     else {
@@ -122,7 +134,8 @@ function putDataPoint(key, progress, teamName, date, calcStoryPoints, person, ur
                                 devspent: devTimeSpent,
                                 qaspent: qaTimeSpent,
                                 sumprogress: pageProgress,
-                                storypoints: storyPoints
+                                storypoints: storyPoints,
+                                estimated: estimated
                             }];
                     }
                 }
@@ -137,7 +150,8 @@ function putDataPoint(key, progress, teamName, date, calcStoryPoints, person, ur
                             devspent: devTimeSpent,
                             qaspent: qaTimeSpent,
                             sumprogress: pageProgress,
-                            storypoints: storyPoints
+                            storypoints: storyPoints,
+                            estimated: estimated
                         }]
                 });
             }
@@ -154,7 +168,8 @@ function putDataPoint(key, progress, teamName, date, calcStoryPoints, person, ur
                         devspent: devTimeSpent,
                         qaspent: qaTimeSpent,
                         sumprogress: pageProgress,
-                        storypoints: storyPoints
+                        storypoints: storyPoints,
+                        estimated: estimated
                     }]
                 }]
         });

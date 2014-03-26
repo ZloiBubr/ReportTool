@@ -31,6 +31,7 @@
                                         <th>Story Points</th>
                                         <th>Sum Dev Spent</th>
                                         <th>Sum QA Spent</th>
+                                        <th>Prognosed Dev Time/Estimated Time</th>
                                     </tr>
                                     </thead>
                                 <tr class="progress_fixed_width" ng-repeat="page in team.pages">
@@ -41,6 +42,7 @@
                                     <td>{{page.storypoints}}</td>
                                     <td>{{page.devspent}}h</td>
                                     <td>{{page.qaspent}}h</td>
+                                    <td>{{page.estimated}}h</td>
                                 </tr>
                                 </tbody>
                             </table>

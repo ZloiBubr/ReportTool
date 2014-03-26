@@ -14,7 +14,8 @@ exports.progress = function () {
                             sumprogress: 0,
                             storypoints: 0,
                             devspent: 0,
-                            qaspent: 0
+                            qaspent: 0,
+                            estimated: ""
                         }
                     ]}
             ]}
