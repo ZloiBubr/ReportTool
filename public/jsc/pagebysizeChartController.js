@@ -52,6 +52,20 @@ function pagebysizeChartController($scope, $resource, $window) {
         var loadingDfrd = $.Deferred();
         var getChartSuccess = function (data) {
             $scope.chartsData = data;
+            var avarageSeries = [];
+            _.each($scope.chartsData.data, function(itemSeries){
+                avarageSeries.push({
+                    name: itemSeries.name + ':trend_line',
+                    type: 'line',
+                    marker: { enabled: false },
+                    /* function returns data for trend-line */
+                    data: (function() {
+                        return fitData(itemSeries.data).data;
+                    })()
+                });
+            })
+
+            $scope.chartsData.data = _.union($scope.chartsData.data, avarageSeries);
             loadingDfrd.resolve();
         };
 
