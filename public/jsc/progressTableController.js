@@ -29,6 +29,26 @@ function progressTableController($scope, $resource, $window) {
         var loadingDfrd = $.Deferred();
 
         var getProgressSuccess = function (data) {
+            _.each(data.dates, function(itemDate){
+                _.each(itemDate.teams, function(itemTeam){
+                    _.each(itemTeam.pages, function(itemPage){
+                        var prognoseEstimateCollection = itemPage.estimated.split("h/");
+                        var koef = prognoseEstimateCollection[0]/prognoseEstimateCollection[1];
+                        if(koef>=2)
+                        {
+                            itemPage.isRed = true;
+                        }
+                        else if(koef>=1.5)
+                        {
+                            itemPage.isYellow = true;
+                        }
+                        else if(koef<=0.5)
+                        {
+                            itemPage.isGreen = true;
+                        }
+                    })
+                })
+            })
             $scope.progressData = data;
             loadingDfrd.resolve();
         };

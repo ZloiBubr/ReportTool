@@ -34,7 +34,7 @@
                                         <th>Prognosed Dev Time/Estimated Time</th>
                                     </tr>
                                     </thead>
-                                <tr class="progress_fixed_width" ng-repeat="page in team.pages">
+                                <tr class="progress_fixed_width" ng-repeat="page in team.pages" ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen }">
                                     <td>{{page.person}}</td>
                                     <td><a href={{page.uri}}>{{page.key}}</a></td>
                                     <td>{{page.progress | number : 2}}</td>

@@ -35,7 +35,7 @@ app.use(express.methodOverride());
 app.use(express.cookieParser(config.get('appSecret')));
 app.use(express.session());
 app.use(app.router);
-require('routes')(app);
+require('./routes')(app);
 app.use(express.static(path.join(__dirname, 'public')));
 
 // development only

@@ -38,3 +38,18 @@ a {
     width: 0%;
     height: 28px;
 }
+
+.red
+{
+    background-color: #da4f49;
+}
+
+.yellow
+{
+    background-color: #fbb450;
+}
+
+.green
+{
+    background-color: #219161;
+}
