@@ -54,7 +54,7 @@ function UpdateModules(full, jira, callback) {
             for (var i = 0; i < totalModules; i++) {
                 ++numRunningQueries;
                 var epic = epics.issues[i];
-                log.info("********** Module #" + numRunningQueries.toString() + " of " + totalModules);
+                log.info("********** Module #" + numRunningQueries.toString() + " of " + totalModules + " : " + epic.key);
                 SaveModule(full, jira, epic, function () {
                     log.info("********** Module #" + numRunningQueries.toString() + " of " + totalModules + " finished processing");
                     --numRunningQueries;
@@ -103,13 +103,16 @@ function UpdatePages(full, jira, moduleKey, callback) {
             for (var i = 0; i < stories.issues.length; i++) {
                 ++numRunningQueries;
                 var story = stories.issues[i];
-                UpdatePage(jira, moduleKey, story.key.toString(), function () {
-//                    log.info(moduleKey + ' : ' + story.key.toString() + ' Page updated');
+                UpdatePage(jira, moduleKey, story.key.toString(), function (storykey) {
+                    log.info(moduleKey + ' : ' + storykey + ' Page updated');
                     --numRunningQueries;
                     if (numRunningQueries === 0) {
                         callback();
                     }
                 });
+            }
+            if(stories.issues.length == 0) {
+                callback();
             }
         }
         else {
@@ -122,11 +125,11 @@ function UpdatePage(jira, moduleKey, storyKey, callback) {
     jira.findIssue(storyKey + "?expand=changelog", function (error, issue) {
         if (issue != null) {
             SavePage(jira, moduleKey, issue, function () {
-                callback();
+                callback(storyKey);
             });
         }
         else {
-            callback();
+            callback(storyKey);
         }
     });
 }
