@@ -7,6 +7,7 @@ var jira = require('./routes/updatejira');
 var velocity = require('./routes/calcvelocitydata');
 var weekly = require('./routes/calcweeklyprogress');
 var pagebysize = require('./routes/calcpagebysize');
+var pagedata = require('./routes/getpagedata');
 var progress = require('./routes/calcprogress');
 var http = require('http');
 var path = require('path');
@@ -58,6 +59,7 @@ app.get('/velocitydata', velocity.get);
 app.get('/progressdata', progress.get);
 app.get('/weeklydata', weekly.get);
 app.get('/pagebysizedata', pagebysize.get);
+app.get('/pagedata/:id', pagedata.get);
 
 
 http.createServer(app).listen(config.get('port'), function () {

@@ -1,7 +1,7 @@
 module.exports = function(app) {
 
     app.get('/', function(req, res) {
-        res.render('cumulative');
+        res.render('index');
     });
     app.get('/progress', function(req, res) {
         res.render('progress');
@@ -15,5 +15,8 @@ module.exports = function(app) {
     app.get('/updatejira', function(req, res) {
         req.socket.setTimeout(1000 * 60 * 10);
         res.render('updatejira');
+    });
+    app.get('/getpagedata', function(req, res) {
+        res.render('page');
     });
 };

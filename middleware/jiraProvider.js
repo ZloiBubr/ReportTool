@@ -277,7 +277,7 @@ function SavePage(jira, moduleKey, issue, callback) {
             page = new Page();
         }
         page.key = issue.key;
-        page.uri = "https://jira.epam.com/jira/browse/" + issue.key;
+        page.uri = "/getpagedata?id=" + issue.key;
         page.summary = issue.fields.summary;
         page.status = issue.fields.status.name;
         page.reporter = issue.fields.reporter.displayName;

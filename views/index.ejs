@@ -24,19 +24,21 @@
     <script type="text/javascript" src="/js/underscore.js"></script>
     <script type="text/javascript" src="/js/angular.min.js"></script>
     <script type="text/javascript" src="/js/angular-resource.min.js"></script>
+    <script type="text/javascript" src="/js/angular-ui-router.js"></script>
     <script type="text/javascript" src="/js/highcharts.js"></script>
     <script type="text/javascript" src="/js/regression.js"></script>
     <script type="text/javascript" src="/js/exporting.js"></script>
-
     <script type="text/javascript" src="/js/highcharts-ng.js"></script>
-    <script type="text/javascript" src="/js/router.js"></script>
 
-    <!-- Controllers -->
+    <!-- Main Controllers/Routers -->
     <script type="text/javascript" src="/jsc/appController.js"></script>
+    <script type="text/javascript" src="/jsc/router.js"></script>
+    <!-- Controllers -->
     <script type="text/javascript" src="/jsc/velocityChartController.js"></script>
     <script type="text/javascript" src="/jsc/progressTableController.js"></script>
     <script type="text/javascript" src="/jsc/weeklyChartController.js"></script>
     <script type="text/javascript" src="/jsc/pagebysizeChartController.js"></script>
+    <script type="text/javascript" src="/jsc/pageController.js"></script>
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -51,17 +53,13 @@
     <link rel="shortcut icon" href="/ico/favicon.png">
 </head>
 <body>
-<header>
-    <%-blocks.header%>
+<header ng-include="'pages/shared/mainMenu.html'">
 </header>
-<section class="container">
-Test for TeamCity auto deploy
-    <%-partial('navigation')%>
-
-    <%-body -%>
+<section ui-view class="container">
 </section>
 <footer>
-    <!-- %-blocks.footer% -->
+
 </footer>
+
 </body>
 </html>
