@@ -1,0 +1,63 @@
+<% layout('index') -%>
+<% block('title', "progress") -%>
+<div id="container" class="container" ng-controller="pageController">
+    <div class="row">
+        <label class="my-input">Epic Key:</label>
+        <input ng-model="epicKey" class="my-input"></input>
+    </div>
+
+    <div class="row">
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th style="width: 157px">Team</th>
+                <th>Data</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="dateGroup in progressData.dates">
+                <td class="vcenter" style="padding-bottom: 28px;"><strong>{{dateGroup.date | date:'yyyy-MM-dd'}}</strong>
+                </td>
+                <td colspan="4" class="progress_table_no_end_line">
+                    <table class="table" ng-repeat="team in dateGroup.teams">
+                        <tbody>
+                        <tr class="progress_no_top_line">
+                            <td class="progress_fixed_width vcenter">{{team.name}}</td>
+                            <td class="progress_table_no_end_line">
+                                <table class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Key</th>
+                                        <th>Progress SP</th>
+                                        <th>Sum Progress SP</th>
+                                        <th>Story Points</th>
+                                        <th>Sum Dev Spent</th>
+                                        <th>Sum QA Spent</th>
+                                        <th>Prognosed Dev Time/Estimated Time</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr class="progress_fixed_width" ng-repeat="page in team.pages">
+                                        <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen }">{{page.person}}</td>
+                                        <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen }"><a href={{page.uri}}>{{page.key}}</a></td>
+                                        <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen }">{{page.progress | number : 2}}</td>
+                                        <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen }">{{page.sumprogress}}</td>
+                                        <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen }">{{page.storypoints}}</td>
+                                        <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen }">{{page.devspent}}h</td>
+                                        <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen }">{{page.qaspent}}h</td>
+                                        <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen }">{{page.estimated}}h</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div> <!-- /container -->

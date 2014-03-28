@@ -16,4 +16,7 @@ module.exports = function(app) {
         req.socket.setTimeout(1000 * 60 * 10);
         res.render('updatejira');
     });
+    app.get('/getpagedata', function(req, res) {
+        res.render('page');
+    });
 };
