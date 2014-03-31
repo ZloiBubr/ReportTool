@@ -12,23 +12,9 @@ exports.getData = function (req, res) {
 }
 
 function RoundDateToSunday(date) {
-    var daysMonth = [31,28,31,30,31,30,31,31,30,31,30,31];
     var day = date.getDay();
     var diff = day == 0 ? 0 : 7 - day;
     var newDate = date.getDate() + diff;
-
-    var month = date.getMonth();
-    var days = daysMonth[month];
-    if(newDate > days) {
-        if(month < 12) {
-            date.setMonth(month + 1);
-        }
-        else {
-            date.setMonth(0);
-            date.setYear(date.getYear() + 1);
-        }
-        newDate = newDate - days;
-    }
 
     date.setDate(newDate);
 }
