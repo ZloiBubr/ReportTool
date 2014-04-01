@@ -66,8 +66,8 @@ function parsePages(callback) {
                 var progressDiff = to - from;
                 var calcStoryPoints = storyPoints * progressDiff / 100;
                 var uri = page.uri;
-                var blockers = page.blockers != null ? page.blockers.split(",") : [];
-                var blockersnum = blockers.length;
+                var blockers = page.blockers != null ? page.blockers.split("PLEXUXC") : [];
+                var blockersnum = blockers.length > 0 ? blockers.length-1 : 0;
 
                 putDataPoint(key, progress, teamName, date, calcStoryPoints, person, uri, devTimeSpent, qaTimeSpent, storyPoints, pageProgress, strestimated, blockersnum);
             }
