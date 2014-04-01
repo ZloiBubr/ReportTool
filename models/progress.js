@@ -15,7 +15,8 @@ exports.progress = function () {
                             storypoints: 0,
                             devspent: 0,
                             qaspent: 0,
-                            estimated: ""
+                            estimated: "",
+                            blockersnum: 0
                         }
                     ]}
             ]}

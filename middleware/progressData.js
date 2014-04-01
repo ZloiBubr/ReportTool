@@ -66,8 +66,10 @@ function parsePages(callback) {
                 var progressDiff = to - from;
                 var calcStoryPoints = storyPoints * progressDiff / 100;
                 var uri = page.uri;
+                var blockers = page.blockers != null ? page.blockers.split(",") : [];
+                var blockersnum = blockers.length;
 
-                putDataPoint(key, progress, teamName, date, calcStoryPoints, person, uri, devTimeSpent, qaTimeSpent, storyPoints, pageProgress, strestimated);
+                putDataPoint(key, progress, teamName, date, calcStoryPoints, person, uri, devTimeSpent, qaTimeSpent, storyPoints, pageProgress, strestimated, blockersnum);
             }
         }
 
@@ -87,7 +89,7 @@ function getTeamName(labels) {
         return "TeamNova";
 }
 
-function putDataPoint(key, progress, teamName, date, calcStoryPoints, person, uri, devTimeSpent, qaTimeSpent, storyPoints, pageProgress, estimated) {
+function putDataPoint(key, progress, teamName, date, calcStoryPoints, person, uri, devTimeSpent, qaTimeSpent, storyPoints, pageProgress, estimated, blockersnum) {
     var dateFound = false;
     for (var k = 0; k < progress.dates.length; k++) {
         var pdate = progress.dates[k];
@@ -110,6 +112,7 @@ function putDataPoint(key, progress, teamName, date, calcStoryPoints, person, ur
                                 page.sumprogress = pageProgress;
                                 page.storypoints = storyPoints;
                                 page.estimated = estimated;
+                                page.blockersnum = blockersnum;
                                 return;
                             }
                         }
@@ -122,7 +125,8 @@ function putDataPoint(key, progress, teamName, date, calcStoryPoints, person, ur
                             qaspent: qaTimeSpent,
                             sumprogress: pageProgress,
                             storypoints: storyPoints,
-                            estimated: estimated
+                            estimated: estimated,
+                            blockersnum: blockersnum
                     });
                     }
                     else {
@@ -135,7 +139,8 @@ function putDataPoint(key, progress, teamName, date, calcStoryPoints, person, ur
                                 qaspent: qaTimeSpent,
                                 sumprogress: pageProgress,
                                 storypoints: storyPoints,
-                                estimated: estimated
+                                estimated: estimated,
+                                blockersnum: blockersnum
                             }];
                     }
                 }
@@ -151,8 +156,9 @@ function putDataPoint(key, progress, teamName, date, calcStoryPoints, person, ur
                             qaspent: qaTimeSpent,
                             sumprogress: pageProgress,
                             storypoints: storyPoints,
-                            estimated: estimated
-                        }]
+                            estimated: estimated,
+                            blockersnum: blockersnum
+                    }]
                 });
             }
         }
@@ -169,7 +175,8 @@ function putDataPoint(key, progress, teamName, date, calcStoryPoints, person, ur
                         qaspent: qaTimeSpent,
                         sumprogress: pageProgress,
                         storypoints: storyPoints,
-                        estimated: estimated
+                        estimated: estimated,
+                        blockersnum: blockersnum
                     }]
                 }]
         });

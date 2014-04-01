@@ -29,18 +29,20 @@
                                         <th>Sum Dev Spent</th>
                                         <th>Sum QA Spent</th>
                                         <th>Prognosed Dev Time/Estimated Time</th>
+                                        <th>Blockers</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     <tr class="progress_fixed_width" ng-repeat="page in team.pages">
-                                        <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen }">{{page.person}}</td>
-                                        <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen }"><a href={{page.uri}}>{{page.key}}</a></td>
-                                        <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen }">{{page.progress | number : 2}}</td>
-                                        <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen }">{{page.sumprogress}}</td>
-                                        <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen }">{{page.storypoints}}</td>
-                                        <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen }">{{page.devspent}}h</td>
-                                        <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen }">{{page.qaspent}}h</td>
-                                        <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen }">{{page.estimated}}h</td>
+                                        <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen, done: page.isDone }">{{page.person}}</td>
+                                        <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen, done: page.isDone }"><a href={{page.uri}}>{{page.key}}</a></td>
+                                        <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen, done: page.isDone }">{{page.progress | number : 2}}</td>
+                                        <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen, done: page.isDone }">{{page.sumprogress}}</td>
+                                        <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen, done: page.isDone }">{{page.storypoints}}</td>
+                                        <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen, done: page.isDone }">{{page.devspent}}h</td>
+                                        <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen, done: page.isDone }">{{page.qaspent}}h</td>
+                                        <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen, done: page.isDone }">{{page.estimated}}h</td>
+                                        <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen, done: page.isDone }">{{page.blockersnum}}</td>
                                     </tr>
                                     </tbody>
                                 </table>

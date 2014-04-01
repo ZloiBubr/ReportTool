@@ -46,6 +46,10 @@ function progressTableController($scope, $resource, $window) {
                         {
                             itemPage.isGreen = true;
                         }
+                        itemPage.isDone = false;
+                        if(itemPage.sumprogress == itemPage.storypoints) {
+                            itemPage.isDone = true;
+                        }
                     })
                 })
             })

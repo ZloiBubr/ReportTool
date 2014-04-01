@@ -53,3 +53,7 @@ a {
 {
     background-color: #219161 !important;
 }
+
+.done {
+    text-decoration: line-through !important;
+}
