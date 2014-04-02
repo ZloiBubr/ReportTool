@@ -15,6 +15,16 @@ a {
     vertical-align: middle !important;
 }
 
+.progressTableMainHeader>tr>th
+{
+    vertical-align: top;
+}
+
+.headerSelectWidth
+{
+    width: auto;
+}
+
 .progress_fixed_width,
 .progress_fixed_width > td {
     width: 150px;

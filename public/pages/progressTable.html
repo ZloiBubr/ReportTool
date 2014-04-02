@@ -1,11 +1,15 @@
 <div id="container" class="container" ng-controller="progressTableController">
     <div class="row">
         <table class="table table-bordered">
-            <thead>
+            <thead class="progressTableMainHeader">
             <tr>
                 <th>Date</th>
-                <th style="width: 157px">Team</th>
-                <th>Data</th>
+                <th style="width: 157px">Team:<select ng-model="filteredTeam" class="headerSelectWidth" ng-options="team.id as team.title for team in allTeams"></select></th>
+                <th>Data: <div class="checkbox">
+                    <label>
+                        <input ng-model="showOnlyTotal" type="checkbox"> Display Only Total
+                    </label>
+                </div></th>
             </tr>
             </thead>
             <tbody>
@@ -13,7 +17,7 @@
                 <td class="vcenter" style="padding-bottom: 28px;"><strong>{{dateGroup.date | date:'yyyy-MM-dd'}}</strong>
                 </td>
                 <td colspan="4" class="progress_table_no_end_line">
-                    <table class="table" ng-repeat="team in dateGroup.teams">
+                    <table class="table" ng-repeat="team in dateGroup.teams | filter: teamFilter">
                         <tbody>
                         <tr class="progress_no_top_line">
                             <td class="progress_fixed_width vcenter">{{team.name}}</td>
@@ -33,7 +37,7 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr class="progress_fixed_width" ng-repeat="page in team.pages">
+                                    <tr class="progress_fixed_width" ng-repeat="page in team.pages" ng-if="!showOnlyTotal">
                                         <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen, done: page.isDone }">{{page.person}}</td>
                                         <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen, done: page.isDone }"><a href={{page.uri}}>{{page.key}}</a></td>
                                         <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen, done: page.isDone }">{{page.progress | number : 2}}</td>

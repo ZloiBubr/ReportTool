@@ -20,6 +20,8 @@ function progressTableController($scope, $resource, $window) {
     }
 
     $scope.dataLoad = function () {
+        $scope.filteredTeam = $scope.allTeams[0].id;
+        $scope.showOnlyTotal = false;
         $scope.getReportData();
     }
 
@@ -72,15 +74,30 @@ function progressTableController($scope, $resource, $window) {
 
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
 
+    $scope.teamFilter = function(dataItem){
+        if($scope.filteredTeam == $scope.allTeams[0].id)
+        {
+            return true;
+        }
+
+        return dataItem.name == $scope.filteredTeam;
+    };
+
     $scope.getSumProgress = function(pages){
         return _.reduce(pages, function(memo, page){ return memo + page.progress; }, 0);
-    }
+    };
 
     $scope.jiraLabelsTeams = [
         {"id": "TeamNova", "title": "TeamNova"},
         {"id": "TeamRenaissance", "title": "TeamRenaissance"},
         {"id": "TeamInspiration", "title": "TeamInspiration"}
     ];
+
+    $scope.allTeams = function () {
+        var allTeamsArray = [{"id": "All", "title": "All"}];
+        allTeamsArray.push.apply(allTeamsArray,$scope.jiraLabelsTeams);
+        return allTeamsArray;
+    }()
 
 
     $scope.init();
