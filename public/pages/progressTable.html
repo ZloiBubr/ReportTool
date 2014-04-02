@@ -4,7 +4,7 @@
             <thead class="progressTableMainHeader">
             <tr>
                 <th>Date</th>
-                <th style="width: 157px">Team:<select ng-model="filteredTeam" class="headerSelectWidth" ng-options="team.id as team.title for team in allTeams"></select></th>
+                <th style="width: 157px">Team:<select class="form-control headerSelectWidth" ng-model="filteredTeam" class="headerSelectWidth" ng-options="team.id as team.title for team in allTeams"></select></th>
                 <th>Data: <div class="checkbox">
                     <label>
                         <input ng-model="showOnlyTotal" type="checkbox"> Display Only Total

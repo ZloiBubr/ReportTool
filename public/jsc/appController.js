@@ -9,6 +9,7 @@ var myApp = angular.module('App', ["ngResource", "highcharts-ng", "ui.router"]);
 
 
 function appController($scope, $resource, $window) {
+    $scope.common = {};
     $scope.log = function (value) {
         $window.console.log(value);
     };

@@ -1,13 +1,11 @@
-<form class="form-horizontal login-form" action="/auth/login" method="POST" name="login-form">
+<form class="form-horizontal loginForm" action="/auth/login" method="POST" name="loginForm" role="form">
     <fieldset>
         <legend>Please enter JIRA login information and supplemental parameters</legend>
-
-
         <div class="control-group">
             <label for="input-username" class="control-label">Name:</label>
 
             <div class="controls">
-                <input name="username" value="name" type="text" class="input-xlarge" id="input-username" placeholder="Name">
+                <input name="username" ng-model="username" type="text" class="input-xlarge" id="input-username" placeholder="Name" required>
                 <p class="help-block">Please enter your JIRA login</p>
             </div>
         </div>
@@ -16,7 +14,7 @@
             <label for="input-password" class="control-label">Password:</label>
 
             <div class="controls">
-                <input name="password" value="pass" type="password" class="input-xlarge" id="input-password" placeholder="Password">
+                <input name="password" ng-model="password" type="password"  class="input-xlarge" id="input-password" placeholder="Password" required>
             </div>
         </div>
         <div class="control-group">
@@ -36,7 +34,7 @@
             </div>
         </div>
         <div class="form-actions">
-            <button type="submit" class="btn btn-primary" data-loading-text="Updating...">Update</button>
+            <button type="submit" class="btn btn-primary" ng-disabled="loginForm.$invalid" data-loading-text="Updating...">Update</button>
             <span class="help-block error"></span>
         </div>
     </fieldset>
@@ -55,7 +53,7 @@
         }, false);
     }
 
-    $(document.forms['login-form']).on('submit', function () {
+    $(document.forms['loginForm']).on('submit', function () {
         var form = $(this);
 
         $('.error', form).html('');
