@@ -71,6 +71,11 @@ function progressTableController($scope, $resource, $window) {
     }
 
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
+
+    $scope.getSumProgress = function(pages){
+        return _.reduce(pages, function(memo, page){ return memo + page.progress; }, 0);
+    }
+
     $scope.jiraLabelsTeams = [
         {"id": "TeamNova", "title": "TeamNova"},
         {"id": "TeamRenaissance", "title": "TeamRenaissance"},
