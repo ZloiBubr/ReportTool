@@ -62,6 +62,10 @@ function parsePages(callback) {
                 var history = page.progressHistory[j];
                 var date = new Date(Date.parse(history.dateChanged));
                 date.setHours(12, 0, 0, 0);
+                var lastWeek = new Date(Date.now()-1000*60*60*24*7);
+                if(date < lastWeek) {
+                    continue;
+                }
                 //date = date.getTime();
                 var person = history.person;
                 var from = parseInt(history.progressFrom);

@@ -258,7 +258,7 @@ function parseWorklogs(jira, moduleKey, issue, page, callback) {
                 }
                 --numRunningQueries;
                 if (numRunningQueries === 0) {
-//                    log.info(moduleKey + " : " + issue.key + ' : Finished Subtasks loop');
+                    log.info(moduleKey + " : " + issue.key + ' : Finished Subtasks loop');
                     callback();
                 }
             });
@@ -296,7 +296,7 @@ function SavePage(jira, moduleKey, issue, callback) {
         parseWorklogs(jira, moduleKey, issue, page, function () {
             page.save(function (err, page) {
                 if (err) throw err;
-//                log.info(moduleKey + " : " + page.key + ' : Page saved');
+                log.info(moduleKey + " : " + page.key + ' : Page saved');
                 callback();
             })
         });
