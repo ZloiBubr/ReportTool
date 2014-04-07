@@ -11,12 +11,11 @@ exports.getData = function (req, res) {
     });
 }
 
-function RoundDateToSunday(date) {
-    var day = date.getDay();
-    var diff = day == 0 ? 0 : 7 - day;
-    var newDate = date.getDate() + diff;
-
-    date.setDate(newDate);
+function getSunday(d) {
+    d = new Date(d);
+    var day = d.getDay(),
+        diff = d.getDate() - day + (day == 0 ? 0:7); // adjust when day is sunday
+    return new Date(d.setDate(diff));
 }
 
 function parsePages(callback) {
@@ -35,11 +34,7 @@ function parsePages(callback) {
                 var history = page.progressHistory[j];
                 var date = new Date(Date.parse(history.dateChanged));
                 date.setHours(12, 0, 0, 0);
-                RoundDateToSunday(date);
-//                if(date > Date.now()) {
-//                    continue;
-//                }
-                date = date.getTime();
+                date = getSunday(date.getTime()).getTime();
                 var from = parseInt(history.progressFrom);
                 var to = history.progressTo == null || history.progressTo == '' ? 0 : parseInt(history.progressTo);
                 var progress = to - from;

@@ -85,7 +85,10 @@ function pagebysizeChartController($scope, $resource, $window) {
 
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
     $scope.jiraLabelsTeams = [
+        {"id": "XXXL", "title": "XXXL"},
+        {"id": "XXL", "title": "XXL"},
         {"id": "ExtraLarge", "title": "ExtraLarge"},
+        {"id": "Large+", "title": "Large+"},
         {"id": "Large", "title": "Large"},
         {"id": "Medium", "title": "Medium"},
         {"id": "Small", "title": "Small"},

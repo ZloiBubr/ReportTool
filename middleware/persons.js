@@ -6,14 +6,22 @@ exports.isDeveloper = function(name) {
         case "Kseniya Kavalchuk":
         case "Yuliya Tukaila":
         case "Aliaksandra Kutynka":
+
         case "Mila Botnar":
         case "Yuri Timchenko":
         case "Anastasia Kotenyova":
         case "Pavlo Golovashchenko":
         case "Svitlana Peleshenko":
         case "Denys Pugachov":
+
         case "Yuliya Kalasouskaya":
+        case "YViktar Mikalayenka":
+        case "Viktoryia Darashenka":
         case "Valiantsina Krautsevich":
+
+        case "Iryna Shuliak":
+        case "Maryia Kireyeva":
+        case "Katsiaryna Kuchko":
             return "QA";
         case "Aliaksandr Basau":
         case "Julia Zhavnerchik":

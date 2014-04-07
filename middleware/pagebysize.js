@@ -65,8 +65,14 @@ function getPageSize(labels) {
         return "Medium";
     if (labels.indexOf("PageSizeLarge") > -1)
         return "Large";
+    if (labels.indexOf("PageSizeLarge+") > -1)
+        return "Large+";
     if (labels.indexOf("PageSizeExtraLarge") > -1)
         return "ExtraLarge";
+    if (labels.indexOf("PageSizeXXL") > -1)
+        return "XXL";
+    if (labels.indexOf("PageSizeXXXL") > -1)
+        return "XXXL";
 }
 
 function putDataPoint(model, pageSize, dateDevFinished, timeSpent) {
