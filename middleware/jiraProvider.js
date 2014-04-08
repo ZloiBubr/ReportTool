@@ -66,7 +66,6 @@ function UpdateModules(full, jira, callback) {
                     var progress = Math.floor((totalModules - numRunningQueries)*100/totalModules);
                     UpdateProgress(progress);
                     if (numRunningQueries === 0) {
-                        UpdateProgress(100);
                         LogProgress('****** Finished Modules loop ******');
                         callback();
                     }
