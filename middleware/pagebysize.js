@@ -63,10 +63,10 @@ function getPageSize(labels) {
         return "Small";
     if (labels.indexOf("PageSizeMedium") > -1)
         return "Medium";
-    if (labels.indexOf("PageSizeLarge") > -1)
-        return "Large";
     if (labels.indexOf("PageSizeLargePlus") > -1)
         return "LargePlus";
+    if (labels.indexOf("PageSizeLarge") > -1)
+        return "Large";
     if (labels.indexOf("PageSizeExtraLarge") > -1)
         return "ExtraLarge";
     if (labels.indexOf("PageSizeXXL") > -1)
