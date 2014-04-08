@@ -1,6 +1,6 @@
-function pageController($scope, $resource, $window, $location) {
+function pageController($scope, $resource, $window, $location,$stateParams) {
     var pageResource = $resource('/pagedata/:pageid',{ pageid : "@pageid" });
-
+$scope.jiraId = $stateParams.id;
 
     /* ------------------------------------------------------ Init/Reinit -------------------------------*/
     $scope.init = function () {
@@ -33,7 +33,7 @@ function pageController($scope, $resource, $window, $location) {
         };
 
         var id = location.search.replace("?id=",'');
-        pageResource.query({pageid: id }, getPageSuccess, getPageFail)
+        pageResource.get({pageid: $scope.jiraId }, getPageSuccess, getPageFail)
     }
 
     /* ------------------------------------------- DOM/Angular events --------------------------------------*/

@@ -29,4 +29,8 @@ myApp.config(function($stateProvider, $urlRouterProvider) {
             url: "/updateFromJira",
             templateUrl: "pages/updateFromJira.html"
         })
+        .state('page' , {
+            url: "/page/:id",
+            templateUrl: "pages/page.html"
+        })
 });

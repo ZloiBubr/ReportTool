@@ -37,22 +37,14 @@
             <button type="submit" class="btn btn-primary" ng-disabled="loginForm.$invalid" data-loading-text="Updating...">Update</button>
             <span class="help-block error"></span>
         </div>
+        <div id="serverlog" style="word-wrap: break-word">
+        </div>
     </fieldset>
 </form>
 
-<script>
-    if (!!window.EventSource) {
-        var source = new EventSource('/update_progress');
-        source.addEventListener('progress', function(e) {
-            var percentage = JSON.parse(e.data);
-            //update progress bar in client
-            $("#progress .bar").css({ width: percentage + '%' });
-            if(percentage == '100') {
-                window.location.href = "/";
-            }
-        }, false);
-    }
+<script type="text/javascript" src="/jsc/serverEvents.js"></script>
 
+<script>
     $(document.forms['loginForm']).on('submit', function () {
         var form = $(this);
 

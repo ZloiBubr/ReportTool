@@ -39,7 +39,7 @@
                                     <tbody>
                                     <tr class="progress_fixed_width" ng-repeat="page in team.pages" ng-if="!showOnlyTotal">
                                         <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen, done: page.isDone }">{{page.person}}</td>
-                                        <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen, done: page.isDone }"><a href={{page.uri}}>{{page.key}}</a></td>
+                                        <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen, done: page.isDone }"><a ui-sref="page({id: page.key})">{{page.key}}</a></td>
                                         <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen, done: page.isDone }">{{page.progress | number : 2}}</td>
                                         <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen, done: page.isDone }">{{page.sumprogress}}</td>
                                         <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen, done: page.isDone }">{{page.storypoints}}</td>

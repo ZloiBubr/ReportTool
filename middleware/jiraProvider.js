@@ -10,22 +10,27 @@ var ClearDB = require('./createDb').Clear;
 
 var JiraApi = require('jira').JiraApi;
 var response = null;
-var totalModules = 0;
 
 exports.rememberResponse = function(res) {
     response = res;
-    totalModules = 0;
     UpdateProgress(0);
 }
 
 var UpdateProgress = function(progress) {
     response.write("event: progress\n");
     response.write("data: " + progress.toString() + "\n\n");
-    totalModules = progress;
-    log.info("********** Progress ********** " + progress.toString());
+    LogProgress("********** Progress ********** " + progress.toString());
     if(progress == 100) {
         response.end();
     }
+}
+
+var LogProgress = function(text) {
+    if(response) {
+        response.write("event: logmessage\n");
+        response.write("data: " + text + "\n\n");
+    }
+    log.info(text);
 }
 
 exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
@@ -35,9 +40,9 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
         var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), jiraUser, jiraPassword, '2');
 
         UpdateModules(full, jira, function () {
-            log.info('**********************');
-            log.info('Finished processing...');
-            log.info('**********************');
+            LogProgress('**********************');
+            LogProgress('Finished processing...');
+            LogProgress('**********************');
         });
         callback();
     })
@@ -54,15 +59,15 @@ function UpdateModules(full, jira, callback) {
             for (var i = 0; i < totalModules; i++) {
                 ++numRunningQueries;
                 var epic = epics.issues[i];
-                log.info("********** Module #" + numRunningQueries.toString() + " of " + totalModules + " : " + epic.key);
+                LogProgress("********** Module #" + numRunningQueries.toString() + " of " + totalModules + " : " + epic.key);
                 SaveModule(full, jira, epic, function () {
-                    log.info("********** Module #" + numRunningQueries.toString() + " of " + totalModules + " finished processing");
+                    LogProgress("********** Module #" + numRunningQueries.toString() + " of " + totalModules + " finished processing");
                     --numRunningQueries;
                     var progress = Math.floor((totalModules - numRunningQueries)*100/totalModules);
                     UpdateProgress(progress);
                     if (numRunningQueries === 0) {
                         UpdateProgress(100);
-                        log.info('****** Finished Modules loop ******');
+                        LogProgress('****** Finished Modules loop ******');
                         callback();
                     }
                 });
@@ -86,7 +91,7 @@ function SaveModule(full, jira, epic, callback) {
         module.save(function (err, module) {
             if (err) throw err;
             UpdatePages(full, jira, epic.key, function () {
-                log.info(module.key + ' : Module saved');
+                LogProgress(module.key + ' : Module saved');
                 callback();
             });
         })
@@ -104,7 +109,7 @@ function UpdatePages(full, jira, moduleKey, callback) {
                 ++numRunningQueries;
                 var story = stories.issues[i];
                 UpdatePage(jira, moduleKey, story.key.toString(), function (storykey) {
-                    log.info(moduleKey + ' : ' + storykey + ' Page updated');
+                    LogProgress(moduleKey + ' : ' + storykey + ' Page updated');
                     --numRunningQueries;
                     if (numRunningQueries === 0) {
                         callback();
@@ -258,7 +263,7 @@ function parseWorklogs(jira, moduleKey, issue, page, callback) {
                 }
                 --numRunningQueries;
                 if (numRunningQueries === 0) {
-                    log.info(moduleKey + " : " + issue.key + ' : Finished Subtasks loop');
+                    LogProgress(moduleKey + " : " + issue.key + ' : Finished Subtasks loop');
                     callback();
                 }
             });
@@ -277,7 +282,7 @@ function SavePage(jira, moduleKey, issue, callback) {
             page = new Page();
         }
         page.key = issue.key;
-        page.uri = "/getpagedata?id=" + issue.key;
+        page.uri = "https://jira.epam.com/jira/browse/" + issue.key;
         page.summary = issue.fields.summary;
         page.status = issue.fields.status.name;
         page.reporter = issue.fields.reporter.displayName;
@@ -296,7 +301,7 @@ function SavePage(jira, moduleKey, issue, callback) {
         parseWorklogs(jira, moduleKey, issue, page, function () {
             page.save(function (err, page) {
                 if (err) throw err;
-                log.info(moduleKey + " : " + page.key + ' : Page saved');
+                LogProgress(moduleKey + " : " + page.key + ' : Page saved');
                 callback();
             })
         });
