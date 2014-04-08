@@ -88,7 +88,7 @@ function pagebysizeChartController($scope, $resource, $window) {
         {"id": "XXXL", "title": "XXXL"},
         {"id": "XXL", "title": "XXL"},
         {"id": "ExtraLarge", "title": "ExtraLarge"},
-        {"id": "Large+", "title": "Large+"},
+        {"id": "LargePlus", "title": "LargePlus"},
         {"id": "Large", "title": "Large"},
         {"id": "Medium", "title": "Medium"},
         {"id": "Small", "title": "Small"},

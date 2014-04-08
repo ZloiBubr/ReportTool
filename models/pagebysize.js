@@ -18,7 +18,7 @@ exports.data = function () {
         },
         {
             data: [],
-            name: "Large+"
+            name: "LargePlus"
         },
         {
             data: [],
