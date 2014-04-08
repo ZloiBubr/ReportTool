@@ -4,9 +4,9 @@ if (!!window.EventSource) {
         var percentage = e.data;
         //update progress bar in client
         $("#progress .bar").css({ width: percentage + '%' });
-        if(percentage == '100') {
-            window.location.href = "/";
-        }
+//        if(percentage == '100') {
+//            window.location.href = "/";
+//        }
     }, false);
     source.addEventListener('logmessage', function(e) {
         var text = e.data;
