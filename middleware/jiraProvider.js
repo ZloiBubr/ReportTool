@@ -19,9 +19,8 @@ exports.rememberResponse = function(res) {
 var UpdateProgress = function(progress) {
     response.write("event: progress\n");
     response.write("data: " + progress.toString() + "\n\n");
-    LogProgress("********** Progress ********** " + progress.toString());
-    if(progress == 100) {
-        response.end();
+    if(progress > 0) {
+        LogProgress("********** Progress ********** " + progress.toString());
     }
 }
 
@@ -43,6 +42,7 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
             LogProgress('**********************');
             LogProgress('Finished processing...');
             LogProgress('**********************');
+            response.end();
         });
         callback();
     })
