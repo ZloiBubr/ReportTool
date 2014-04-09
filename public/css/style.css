@@ -67,3 +67,11 @@ a {
 .done {
     text-decoration: line-through !important;
 }
+
+.key {
+    font: 25px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+.summary {
+    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}

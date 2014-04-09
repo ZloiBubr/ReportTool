@@ -1,6 +1,37 @@
 <div id="container" class="container" ng-controller="pageController">
-    <div class="row">
-        <span class="my-input">Module Key:{{pageData.epicKey}}</span>
-        <span class="my-input">Page Key:{{pageData.key}}</span>
+    <div>
+        <span class="key">{{pageData.epicKey}}</span><br/>
+        <span class="summary">{{pageData.moduleSummary}}</span><br/>
+        <span class="key">{{pageData.key}}</span><br/>
+        <span class="summary">{{pageData.summary}}</span><br/>
+        <span class="key">{{pageData.progress}} %</span><br/>
+        <span class="key">{{pageData.storyPoints}} SP</span><br/>
+        <br/>
+        <a class="summary" href="{{pageData.uri}}">{{pageData.uri}}</a><br/>
+        <br/>
+        <span class="summary">Status: {{pageData.status}}</span><br/>
+        <span class="summary">Assignee: {{pageData.assignee}}</span><br/>
+        <span class="summary">Reporter: {{pageData.reporter}}</span><br/>
+        <span class="summary">Development finished: {{pageData.devFinished}}</span><br/>
+        <span class="summary">QA finished: {{pageData.qaFinished}}</span><br/>
+        <br/>
+        <span class="summary">Labels: {{pageData.labels}}</span><br/>
+        <br/>
+        <span class="summary">Blockers: {{pageData.blockers}}</span><br/>
+        <br/>
+        <table class="table table-striped table-condensed table-hover">
+            <thead>
+                <tr>
+                    <th>Person</th>
+                    <th>Spent, hours</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="personW in pageData.worklogPersons">
+                    <td>{{personW.person}}</td>
+                    <td>{{personW.spent}}</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div> <!-- /container -->

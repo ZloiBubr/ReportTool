@@ -21,7 +21,7 @@ function parsePages(callback) {
     Page.find({}).exec(function (err, pages) {
         for (var i = 0; i < pages.length; i++) {
             var page = pages[i];
-            var storyPoints = parseInt(page.storyPoints) == null ? 0 : parseInt(page.storyPoints);
+            var storyPoints = parseFloat(page.storyPoints) == null ? 0 : parseFloat(page.storyPoints);
             var teamName = getTeamName(page.labels);
             for (var j = 0; j < page.progressHistory.length; j++) {
                 var history = page.progressHistory[j];

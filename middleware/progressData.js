@@ -39,10 +39,10 @@ function parsePages(callback) {
                 var worklog = page.worklogHistory[j];
                 var isDeveloper = persons.isDeveloper(worklog.person)=="Developer";
                 if(isDeveloper) {
-                    devTimeSpent += parseInt(worklog.timeSpent);
+                    devTimeSpent += parseFloat(worklog.timeSpent);
                 }
                 else {
-                    qaTimeSpent += parseInt(worklog.timeSpent);
+                    qaTimeSpent += parseFloat(worklog.timeSpent);
                 }
             }
 

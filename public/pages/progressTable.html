@@ -43,8 +43,8 @@
                                         <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen, done: page.isDone }">{{page.progress | number : 2}}</td>
                                         <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen, done: page.isDone }">{{page.sumprogress}}</td>
                                         <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen, done: page.isDone }">{{page.storypoints}}</td>
-                                        <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen, done: page.isDone }">{{page.devspent}}h</td>
-                                        <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen, done: page.isDone }">{{page.qaspent}}h</td>
+                                        <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen, done: page.isDone }">{{page.devspent | number : 2}}h</td>
+                                        <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen, done: page.isDone }">{{page.qaspent | number : 2}}h</td>
                                         <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen, done: page.isDone }">{{page.estimated}}h</td>
                                         <td ng-class="{red: page.isRed, yellow: page.isYellow, green: page.isGreen, done: page.isDone }">{{page.blockersnum}}</td>
                                     </tr>

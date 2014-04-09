@@ -37,7 +37,7 @@ function parsePages(callback) {
                     continue;
                 }
 
-                timeSpent += parseInt(worklog.timeSpent);
+                timeSpent += parseFloat(worklog.timeSpent);
             }
             if(timeSpent == 0) {
                 continue;
