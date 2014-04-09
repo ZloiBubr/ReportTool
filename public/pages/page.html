@@ -29,7 +29,7 @@
             <tbody>
                 <tr ng-repeat="personW in pageData.worklogPersons">
                     <td>{{personW.person}}</td>
-                    <td>{{personW.spent}}</td>
+                    <td>{{personW.spent | number : 2}}</td>
                 </tr>
             </tbody>
         </table>
