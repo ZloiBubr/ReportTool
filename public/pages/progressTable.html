@@ -20,7 +20,7 @@
                     <table class="table" ng-repeat="team in dateGroup.teams | filter: teamFilter">
                         <tbody>
                         <tr class="progress_no_top_line">
-                            <td class="progress_fixed_width vcenter">{{team.name}}</td>
+                            <td class="progress_fixed_width vcenter" tooltip-placement="left"  tooltip-html-unsafe="{{getReportMembersMissing(team)}}">{{team.name}}</td>
                             <td class="progress_table_no_end_line">
                                 <table class="table table-striped">
                                     <thead>

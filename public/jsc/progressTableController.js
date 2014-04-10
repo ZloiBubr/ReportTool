@@ -87,18 +87,62 @@ function progressTableController($scope, $resource, $window) {
         return _.reduce(pages, function(memo, page){ return memo + page.progress; }, 0);
     };
 
+    $scope.getReportMembersMissing = function(team){
+        var teamMembers = _.find($scope.TeamDevMembers, function(teamDevMembersItem){
+            return teamDevMembersItem.name === team.name
+        });
+
+        if(_.isUndefined(teamMembers)){
+            return "";
+        }
+        var missedMembers = "<strong>Work logs missed for:</strong> <br/>";
+
+        _.each(teamMembers.members, function(memberItem){
+           var isWorkLogged = _.some(team.pages, function(pageItem){
+                return pageItem.person === memberItem.name;
+            });
+
+            if(!isWorkLogged){
+                missedMembers += memberItem.name + "<br/>"
+            }
+        });
+
+        return missedMembers;
+    };
+
+   $scope.allTeams = function () {
+        var allTeamsArray = [{"id": "All", "title": "All"}];
+        allTeamsArray.push.apply(allTeamsArray,$scope.jiraLabelsTeams);
+        return allTeamsArray;
+    }();
+
     $scope.jiraLabelsTeams = [
         {"id": "TeamNova", "title": "TeamNova"},
         {"id": "TeamRenaissance", "title": "TeamRenaissance"},
         {"id": "TeamInspiration", "title": "TeamInspiration"}
     ];
 
-    $scope.allTeams = function () {
-        var allTeamsArray = [{"id": "All", "title": "All"}];
-        allTeamsArray.push.apply(allTeamsArray,$scope.jiraLabelsTeams);
-        return allTeamsArray;
-    }()
-
+    $scope.TeamDevMembers = [
+        {
+            name:"TeamNova",
+            members:
+                [
+                    {name:"Ilya Kazlou1"},
+                    {name:"Katsiaryna Kaliukhovich"},
+                    {name:"Aliaksandr Nikulin"},
+                    {name:"Valentine Zhuck"},
+                    {name:"Maryna Furman"},
+                    {name:"Vadzim Vysotski"},
+                    {name:"Andrei Kandybovich"},
+                    {name:"Raman Prakofyeu"},
+                    {name:"Aliaksei Labachou"},
+                    {name:"Mikita Stalpinski"},
+                    {name:"Dzmitry Siamchonak"},
+                    {name:"Siarhei Zhalezka"},
+                    {name:"Edhar Liashok"},
+                    {name:"Ruslan Khilmanovich"},
+                ]}
+    ];
 
     $scope.init();
 }
