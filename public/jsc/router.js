@@ -25,6 +25,10 @@ myApp.config(function($stateProvider, $urlRouterProvider) {
             url: "/progressTable",
             templateUrl: "pages/progressTable.html"
         })
+        .state('timeSheet', {
+            url: "/timeSheet",
+            templateUrl: "pages/timeSheet.html"
+        })
         .state('updateFromJira', {
             url: "/updateFromJira",
             templateUrl: "pages/updateFromJira.html"

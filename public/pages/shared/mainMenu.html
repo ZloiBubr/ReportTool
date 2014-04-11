@@ -1,23 +1,25 @@
-<div class="navbar navbar-inverse navbar-fixed-top">
-    <div class="navbar-inner">
-        <div class="container">
-            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="brand" href="#">PLEX-UXC</a>
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">PLEX-UXC</a>
+            </div>
 
-            <div class="nav-collapse collapse">
-                <ul class="nav">
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav" style="padding-left: 5%">
                     <li><a ui-sref="home">Cumulative Velocity</a></li>  <!--  class="active" -->
                     <li><a ui-sref="weeklyVelocity">Weekly Velocity</a></li>
                     <li><a ui-sref="pagesBySize">Pages by size</a></li>
                     <li><a ui-sref="progressTable">Progress Table</a></li>
+                    <li><a ui-sref="timeSheet">Time Sheet</a></li>
                     <li><a ui-sref="updateFromJira">Update from JIRA</a></li>
                 </ul>
             </div>
             <!--/.nav-collapse -->
         </div>
-    </div>
-</div>
+</nav>
