@@ -124,6 +124,24 @@ function progressTableController($scope, $resource, $window) {
 
     $scope.TeamDevMembers = [
         {
+            name:"TeamRenaissance",
+            members:
+                [
+                    {name:"Dzianis Arlouski"},
+                    {name:"Hanna Kastsian"},
+                    {name:"Iryna Kucharenka1"},
+                    {name:"Ivan Izmer"},
+                    {name:"Mark Varabyou"},
+                    {name:"Raman But-Husaim"},
+                    {name:"Siarhei Abrazhevich"},
+                    {name:"Yauheni Lohinau"},
+                    {name:"Alena Charnova"},
+                    {name:"Aliaksandr Koush"},
+                    {name:"Aliaksandr Rykau"},
+                    {name:"Aliaksei Astashkin"},
+                    {name:"Nicolay Kostroma"},
+                ]},
+        {
             name:"TeamNova",
             members:
                 [
@@ -141,7 +159,26 @@ function progressTableController($scope, $resource, $window) {
                     {name:"Siarhei Zhalezka"},
                     {name:"Edhar Liashok"},
                     {name:"Ruslan Khilmanovich"},
-                ]}
+                ]},
+        {
+            name:"TeamInspiration",
+            members:
+                [
+                    {name:"Borys Roshal"},
+                    {name:"Denys Poliakov"},
+                    {name:"Dmytro Komar"},
+                    {name:"Kostiantyn Lazurenko"},
+                    {name:"Oleksandr Stukalov"},
+                    {name:"Oleksii Bespalko"},
+                    {name:"Yevhenii Havryliuk"},
+                    {name:"Yuriy Shestyora"},
+                    {name:"Ihor Bershov"},
+                    {name:"Oleksandr Zhyltsov"},
+                    {name:"Oleksii Suriadnyi"},
+                    {name:"Roman Golovchenko"},
+                    {name:"Serhiy Haponenko"},
+                    {name:"Yevhenii Lomov"},
+                ]},
     ];
 
     $scope.init();
