@@ -110,17 +110,17 @@ function progressTableController($scope, $resource, $window) {
         return missedMembers;
     };
 
-   $scope.allTeams = function () {
-        var allTeamsArray = [{"id": "All", "title": "All"}];
-        allTeamsArray.push.apply(allTeamsArray,$scope.jiraLabelsTeams);
-        return allTeamsArray;
-    }();
-
     $scope.jiraLabelsTeams = [
         {"id": "TeamNova", "title": "TeamNova"},
         {"id": "TeamRenaissance", "title": "TeamRenaissance"},
         {"id": "TeamInspiration", "title": "TeamInspiration"}
     ];
+
+    $scope.allTeams = function () {
+        var allTeamsArray = [{"id": "All", "title": "All"}];
+        allTeamsArray.push.apply(allTeamsArray,$scope.jiraLabelsTeams);
+        return allTeamsArray;
+    }();
 
     $scope.TeamDevMembers = [
         {
