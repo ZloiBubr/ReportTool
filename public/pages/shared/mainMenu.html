@@ -12,12 +12,12 @@
 
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav" style="padding-left: 5%">
-                    <li><a ui-sref="home">Cumulative Velocity</a></li>  <!--  class="active" -->
-                    <li><a ui-sref="weeklyVelocity">Weekly Velocity</a></li>
-                    <li><a ui-sref="pagesBySize">Pages by size</a></li>
-                    <li><a ui-sref="progressTable">Progress Table</a></li>
-                    <li><a ui-sref="timeSheet">Time Sheet</a></li>
-                    <li><a ui-sref="updateFromJira">Update from JIRA</a></li>
+                    <li ui-route="/cumulative" ng-class="{active: $uiRoute}"><a  ui-sref="home">Cumulative Velocity</a></li>
+                    <li ui-route="/weeklyVelocity" ng-class="{active: $uiRoute}"><a ui-sref="weeklyVelocity">Weekly Velocity</a></li>
+                    <li ui-route="/pagesBySize" ng-class="{active: $uiRoute}"><a ui-sref="pagesBySize">Pages by size</a></li>
+                    <li ui-route="/progressTable" ng-class="{active: $uiRoute}"><a ui-sref="progressTable">Progress Table</a></li>
+                    <li ui-route="/timeSheet" ng-class="{active: $uiRoute}"><a ui-sref="timeSheet">Time Sheet</a></li>
+                    <li ui-route="/updateFromJira" ng-class="{active: $uiRoute}"><a ui-sref="updateFromJira">Update from JIRA</a></li>
                 </ul>
             </div>
             <!--/.nav-collapse -->

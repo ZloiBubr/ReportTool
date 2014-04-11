@@ -16,8 +16,6 @@
             padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
         }
     </style>
-    <link href="/css/bootstrap-responsive.css" rel="stylesheet">
-
     <!-- Libs -->
     <script type="text/javascript" src="/js/jquery.min.js"></script>
     <script type="text/javascript" src="/js/bootstrap.min.js"></script>
@@ -26,6 +24,7 @@
     <script type="text/javascript" src="/js/angular-resource.min.js"></script>
     <script type="text/javascript" src="/js/angular-ui-router.js"></script>
     <script type="text/javascript" src="/js/ui-bootstrap-tpls-0.10.0.min.js"></script>
+    <script type="text/javascript" src="/js/ui-utils.min.js"></script>
     <script type="text/javascript" src="/js/highcharts.js"></script>
     <script type="text/javascript" src="/js/regression.js"></script>
     <script type="text/javascript" src="/js/exporting.js"></script>
@@ -57,7 +56,7 @@
 <body>
 <header ng-include="'pages/shared/mainMenu.html'">
 </header>
-<section ui-view class="container">
+<section ui-view>
 </section>
 <footer>
 
