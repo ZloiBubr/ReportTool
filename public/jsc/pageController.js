@@ -14,7 +14,28 @@ $scope.jiraId = $stateParams.id;
     }
 
     $scope.dataLoad = function () {
-        $scope.getPageData();
+        $.when($scope.getPageData())
+            .done($scope.initCharts);
+    }
+
+    $scope.initCharts = function () {
+
+        $scope.chartConfig = {
+            options: {
+                chart: {
+                    type: 'line',
+                    zoomType: 'x'
+                }
+            },
+            series: $scope.pageData.pData.series,
+            title: {
+                text: 'Progress & Time'
+            },
+            xAxis: {
+                type: 'datetime'
+            },
+            loading: false
+        }
     }
 
     /* -------------------------------------------------------Event handlers ------------------------ */
@@ -34,6 +55,7 @@ $scope.jiraId = $stateParams.id;
 
         var id = location.search.replace("?id=",'');
         pageResource.get({pageid: $scope.jiraId }, getPageSuccess, getPageFail)
+        return loadingDfrd.promise();
     }
 
     /* ------------------------------------------- DOM/Angular events --------------------------------------*/
