@@ -76,8 +76,8 @@ function getPage(id, callback) {
             //sort history by dates
             var historyData = page[0]._doc.worklogHistory;
             historyData.sort(function (a, b) {
-                a = new Date(Date.parse(a._doc.dateChanged));
-                b = new Date(Date.parse(b._doc.dateChanged));
+                a = new Date(Date.parse(a._doc.dateStarted));
+                b = new Date(Date.parse(b._doc.dateStarted));
                 return a > b ? 1 : a < b ? -1 : 0;
             });
 
@@ -101,7 +101,7 @@ function getPage(id, callback) {
                     persons.push(personW);
                 }
 
-                var dateC = Date.parse(worklog.dateChanged);
+                var dateC = Date.parse(worklog.dateStarted);
                 var pName = person + " hours"
 
                 PutSeriesPoint(pData, pName, dateC, progress);

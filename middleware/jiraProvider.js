@@ -220,7 +220,8 @@ function calcWorklogFromIssue(issue, page) {
                     {
                         person: author,
                         timeSpent: timeSpent,
-                        dateChanged: worklog.created
+                        dateChanged: worklog.created,
+                        dateStarted: worklog.started
                     }
                 ];
             }
@@ -231,7 +232,8 @@ function calcWorklogFromIssue(issue, page) {
                     var record = page.worklogHistory[o];
                     if( record.person == author &&
                         record.timeSpent == timeSpent &&
-                        record.dateChanged == worklog.created) {
+                        record.dateChanged == worklog.created &&
+                        record.dateStarted == worklog.started) {
                         recordFound = true;
                         break;
                     }
@@ -240,7 +242,8 @@ function calcWorklogFromIssue(issue, page) {
                     page.worklogHistory.push({
                         person: author,
                         timeSpent: timeSpent,
-                        dateChanged: worklog.created
+                        dateChanged: worklog.created,
+                        dateStarted: worklog.started
                     });
                 }
             }

@@ -29,6 +29,9 @@ function parsePages(callback) {
         for (var i = 0; i < pages.length; i++) {
             var page = pages[i];
             var storyPoints = parseFloat(page.storyPoints) == null ? 0 : parseFloat(page.storyPoints);
+            if(!storyPoints) {
+                continue;
+            }
             var teamName = getTeamName(page.labels);
             for (var j = 0; j < page.progressHistory.length; j++) {
                 var history = page.progressHistory[j];

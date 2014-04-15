@@ -26,7 +26,8 @@ var schema = new Schema({
     worklogHistory: [{
             person:         { type: String },
             timeSpent:      { type: String },
-            dateChanged:    { type: String }
+            dateChanged:    { type: String },
+            dateStarted:    { type: String }
         }],
     created:                { type: String },
     updated:                { type: String }
