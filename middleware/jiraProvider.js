@@ -38,10 +38,18 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
 
         var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), jiraUser, jiraPassword, '2');
 
-        UpdateModules(full, jira, function () {
-            LogProgress('**********************');
-            LogProgress('Finished processing...');
-            LogProgress('**********************');
+        UpdateModules(full, jira, function (err) {
+            if(err) {
+                LogProgress('**************************');
+                LogProgress('Error during processing...');
+                LogProgress('Please restart Update!!!!!');
+                LogProgress('**************************');
+            }
+            else {
+                LogProgress('**********************');
+                LogProgress('Finished processing...');
+                LogProgress('**********************');
+            }
             response.end();
         });
         callback();
@@ -60,7 +68,10 @@ function UpdateModules(full, jira, callback) {
                 ++numRunningQueries;
                 var epic = epics.issues[i];
                 LogProgress("********** Module #" + numRunningQueries.toString() + " of " + totalModules + " : " + epic.key);
-                SaveModule(full, jira, epic, function () {
+                SaveModule(full, jira, epic, function (err) {
+                    if(err) {
+                        callback(err);
+                    }
                     LogProgress("********** Module #" + numRunningQueries.toString() + " of " + totalModules + " finished processing");
                     --numRunningQueries;
                     var progress = Math.floor((totalModules - numRunningQueries)*100/totalModules);
@@ -89,7 +100,10 @@ function SaveModule(full, jira, epic, callback) {
         module.summary = epic.fields.summary;
         module.save(function (err, module) {
             if (err) throw err;
-            UpdatePages(full, jira, epic.key, function () {
+            UpdatePages(full, jira, epic.key, function (err) {
+                if(err) {
+                    callback(err);
+                }
                 LogProgress(module.key + ' : Module saved');
                 callback();
             });
@@ -107,7 +121,10 @@ function UpdatePages(full, jira, moduleKey, callback) {
             for (var i = 0; i < stories.issues.length; i++) {
                 ++numRunningQueries;
                 var story = stories.issues[i];
-                UpdatePage(jira, moduleKey, story.key.toString(), function (storykey) {
+                UpdatePage(jira, moduleKey, story.key.toString(), function (err, storykey) {
+                    if(err) {
+                        callback(err);
+                    }
                     LogProgress(moduleKey + ' : ' + storykey + ' Page updated');
                     --numRunningQueries;
                     if (numRunningQueries === 0) {
@@ -128,8 +145,8 @@ function UpdatePages(full, jira, moduleKey, callback) {
 function UpdatePage(jira, moduleKey, storyKey, callback) {
     jira.findIssue(storyKey + "?expand=changelog", function (error, issue) {
         if (issue != null) {
-            SavePage(jira, moduleKey, issue, function () {
-                callback(storyKey);
+            SavePage(jira, moduleKey, issue, function (err) {
+                callback(err, storyKey);
             });
         }
         else {
@@ -278,7 +295,10 @@ function parseWorklogs(jira, moduleKey, issue, page, callback) {
 
 function SavePage(jira, moduleKey, issue, callback) {
     Page.findOne({ key: issue.key }, function (err, page) {
-        if (err) throw err;
+        if (err) {
+            LogProgress(moduleKey + " : " + page.key + ' : Error from JIRA, please restart Update');
+            callback(err);
+        }
 
         if (!page) {
             page = new Page();
@@ -302,9 +322,9 @@ function SavePage(jira, moduleKey, issue, callback) {
         parseHistory(issue, page);
         parseWorklogs(jira, moduleKey, issue, page, function () {
             page.save(function (err, page) {
-                if (err) throw err;
+                //if (err) throw err;
                 //LogProgress(moduleKey + " : " + page.key + ' : Page saved');
-                callback();
+                callback(err);
             })
         });
     });
