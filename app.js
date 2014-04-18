@@ -9,6 +9,7 @@ var weekly = require('./routes/calcweeklyprogress');
 var pagebysize = require('./routes/calcpagebysize');
 var pagedata = require('./routes/getpagedata');
 var progress = require('./routes/calcprogress');
+var wave = require('./routes/calcwave');
 var http = require('http');
 var path = require('path');
 var config = require('./config');
@@ -60,6 +61,7 @@ app.get('/progressdata', progress.get);
 app.get('/weeklydata', weekly.get);
 app.get('/pagebysizedata', pagebysize.get);
 app.get('/pagedata/:id', pagedata.get);
+app.get('/wavedata', wave.get);
 
 
 http.createServer(app).listen(config.get('port'), function () {
