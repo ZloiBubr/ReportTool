@@ -16,6 +16,14 @@
                     <li ui-route="/weeklyVelocity" ng-class="{active: $uiRoute}"><a ui-sref="weeklyVelocity">Weekly Velocity</a></li>
                     <li ui-route="/pagesBySize" ng-class="{active: $uiRoute}"><a ui-sref="pagesBySize">Pages by size</a></li>
                     <li ui-route="/progressTable" ng-class="{active: $uiRoute}"><a ui-sref="progressTable">Progress Table</a></li>
+                    <li ui-route="/waveProgress" ng-class="{active: $uiRoute}"><a ui-sref="waveProgress">Wave Progress</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">TimeSheet<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li ui-route="/timeSheet2week" ng-class="{active: $uiRoute}"><a ui-sref="timeSheet2week">2 weeks timeSheet</a></li>
+                            <li ui-route="/timeSheet" ng-class="{active: $uiRoute}"><a ui-sref="timeSheet">Custom timeSheet</a></li>
+                        </ul>
+                    </li>
                     <li ui-route="/timeSheet" ng-class="{active: $uiRoute}"><a ui-sref="timeSheet">Time Sheet</a></li>
                     <li ui-route="/updateFromJira" ng-class="{active: $uiRoute}"><a ui-sref="updateFromJira">Update from JIRA</a></li>
                 </ul>

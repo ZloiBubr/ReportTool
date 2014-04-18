@@ -29,6 +29,14 @@ myApp.config(function($stateProvider, $urlRouterProvider) {
             url: "/timeSheet",
             templateUrl: "pages/timeSheet.html"
         })
+        .state('timeSheet2week', {
+            url: "/timeSheet2week",
+            templateUrl: "pages/timeSheet2week.html"
+        })
+        .state('waveProgress' , {
+            url: "/waveProgress",
+            templateUrl: "pages/waveProgress.html"
+        })
         .state('updateFromJira', {
             url: "/updateFromJira",
             templateUrl: "pages/updateFromJira.html"
@@ -37,4 +45,5 @@ myApp.config(function($stateProvider, $urlRouterProvider) {
             url: "/page/:id",
             templateUrl: "pages/page.html"
         })
+
 });

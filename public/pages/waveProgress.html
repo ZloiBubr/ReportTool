@@ -1,0 +1,47 @@
+<div id="container" class="container" ng-controller="waveProgressController">
+    <div class="row">
+
+        <div class="col-lg-12">
+            <table class="table-bordered">
+                <thead>
+                <tr>
+                    <td>Wave</td>
+                    <td>ModuleGroup</td>
+                    <td>Module</td>
+                    <td>AppItem</td>
+                </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat = "item in invertedWaveProgressData">
+                        <td rowspan="{{item.wave.rowSpan}}" ng-if="isExist(item.wave)">{{item.wave.name}}<br/>progress:{{item.wave.progress}}<br/>reportedSP:{{item.wave.reportedSP}}</td>
+                        <td rowspan="{{item.moduleGroup.rowSpan}}" ng-if="isExist(item.moduleGroup)">{{item.moduleGroup.name}}<br/>progress:{{item.moduleGroup.progress}}<br/>reportedSP:{{item.moduleGroup.reportedSP}}</td>
+                        <td rowspan="{{item.module.rowSpan}}" ng-if="isExist(item.module)">{{item.module.name}}<br/>progress:{{item.module.progress}}<br/>reportedSP:{{item.module.reportedSP}}</td>
+                        <td ng-if="isExist(item.appItem)">{{item.appItem.name}}<br/>progress:{{item.appItem.progress}}<br/>reportedSP:{{item.appItem.reportedSP}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+
+        <!--<div class="col-sm-4">-->
+            <!--<label for="dateFrom">From</label>-->
+            <!--<input class="form-control" id="dateFrom" type="date" ng-model="from" ng-change="onDateChange()"/>-->
+        <!--</div>-->
+        <!--<div class="col-sm-4">-->
+            <!--<label for="dateTo">To</label>-->
+            <!--<input class="form-control" id="dateTo" type="date" ng-model="to" ng-change="onDateChange()"/>-->
+        <!--</div>-->
+    </div>
+
+    <!--<div class="row">-->
+    <!--<table class="table" >-->
+    <!--<th>-->
+    <!--<tr></tr>-->
+    <!--</th>-->
+    <!--<tr ng-repeat="member in timeSheetData.members">-->
+    <!--<td>{{}}</td>-->
+    <!--</tr>-->
+    <!--</table>-->
+    <!--</div>-->
+</div>
