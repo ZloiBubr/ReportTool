@@ -217,7 +217,7 @@ function putDataPoint(wavedata, wave, moduleGroup, moduleName, cloudApp, calcSto
     moduled.reportedSP += calcStoryPoints;
     moduled.summarySP += storyPoints;
     moduled.progress = moduled.reportedSP*100/moduled.summarySP;
-    moduled.uri = initUri + "PageModule_" + moduleName + ",PageModuleGroup_" + moduleGroup+ ")";
+    moduled.uri = initUri + "PageModule_" + moduleName + ") AND labels in(PageModuleGroup_" + moduleGroup+ ")";
 
     //Cloud App
     var cloudAppd;
@@ -235,5 +235,5 @@ function putDataPoint(wavedata, wave, moduleGroup, moduleName, cloudApp, calcSto
     cloudAppd.reportedSP += calcStoryPoints;
     cloudAppd.summarySP += storyPoints;
     cloudAppd.progress = cloudAppd.reportedSP*100/cloudAppd.summarySP;
-    cloudAppd.uri = initUri + "CloudApp_" + cloudApp + ",PageModuleGroup_" + moduleGroup + ",PageModule_" + moduleName + ")";
+    cloudAppd.uri = initUri + "CloudApp_" + cloudApp + ") AND labels in(PageModuleGroup_" + moduleGroup + ") AND labels in(PageModule_" + moduleName + ")";
 }
