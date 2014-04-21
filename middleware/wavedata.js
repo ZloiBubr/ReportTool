@@ -22,25 +22,29 @@ function waveData() {
                                     progress: 0,
                                     reportedSP: 0,
                                     summarySP: 0,
-                                    name: ""
+                                    name: "",
+                                    uri: ""
                                 }
                             ],
                             reportedSP: 0,
                             summarySP: 0,
                             progress: 0,
-                            name: ""
+                            name: "",
+                            uri: ""
                         }
                     ],
                     reportedSP: 0,
                     summarySP: 0,
                     progress: 0,
-                    name: ""
+                    name: "",
+                    uri: ""
                 }
             ],
             reportedSP: 0,
             summarySP: 0,
             progress: 0,
-            name: ""
+            name: "",
+            uri: ""
         }
     ];
 }
@@ -97,6 +101,35 @@ function getWaveName(labels) {
     return labels.substring(index,index2);
 }
 
+function SortData(wavedata) {
+    wavedata.waves.sort(function (a, b) {
+        a = a.name;
+        b = b.name;
+        return a > b ? 1 : a < b ? -1 : 0;
+    });
+
+    for (var i = 0; i < wavedata.waves.length; i++) {
+        wavedata.waves[i].moduleGroup.sort(function (a, b) {
+            a = a.name;
+            b = b.name;
+            return a > b ? 1 : a < b ? -1 : 0;
+        });
+        for (var j = 0; j < wavedata.waves[i].moduleGroup.length; j++) {
+            wavedata.waves[i].moduleGroup[j].module.sort(function (a, b) {
+                a = a.name;
+                b = b.name;
+                return a > b ? 1 : a < b ? -1 : 0;
+            });
+            for (var k = 0; k < wavedata.waves[i].moduleGroup[j].module.length; k++) {
+                wavedata.waves[i].moduleGroup[j].module[k].cloudApp.sort(function (a, b) {
+                    a = a.name;
+                    b = b.name;
+                    return a > b ? 1 : a < b ? -1 : 0;
+                });
+            }
+        }
+    }
+}
 function parsePages(callback) {
     var wavedata = new waveData();
     wavedata.waves = [];
@@ -121,39 +154,13 @@ function parsePages(callback) {
 
             putDataPoint(wavedata, wave, moduleGroup, moduleName, cloudApp, calcStoryPoints, storyPoints);
         }
-
-        wavedata.waves.sort(function (a, b) {
-            a = a.name;
-            b = b.name;
-            return a > b ? 1 : a < b ? -1 : 0;
-        });
-
-        for(var i=0; i<wavedata.waves.length; i++) {
-            wavedata.waves[i].moduleGroup.sort(function (a, b) {
-                a = a.name;
-                b = b.name;
-                return a > b ? 1 : a < b ? -1 : 0;
-            });
-            for(var j=0; j<wavedata.waves[i].moduleGroup.length; j++) {
-                wavedata.waves[i].moduleGroup[j].module.sort(function (a, b) {
-                    a = a.name;
-                    b = b.name;
-                    return a > b ? 1 : a < b ? -1 : 0;
-                });
-                for(var k=0; k<wavedata.waves[i].moduleGroup[j].module.length; k++) {
-                    wavedata.waves[i].moduleGroup[j].module[k].cloudApp.sort(function (a, b) {
-                        a = a.name;
-                        b = b.name;
-                        return a > b ? 1 : a < b ? -1 : 0;
-                    });
-                }
-            }
-        }
+        SortData(wavedata);
         callback(err, wavedata);
     })
 }
 
 function putDataPoint(wavedata, wave, moduleGroup, moduleName, cloudApp, calcStoryPoints, storyPoints) {
+    var initUri = "https://jira.epam.com/jira/issues/?jql=project%20%3D%20PLEX-UXC%20and%20issuetype%3DStory%20AND%20%22Story%20Points%22%20%3E%200%20and%20labels%20in%20(";
     //wave
     var waved;
     for (var k = 0; k < wavedata.waves.length; k++) {
@@ -170,6 +177,7 @@ function putDataPoint(wavedata, wave, moduleGroup, moduleName, cloudApp, calcSto
     waved.reportedSP += calcStoryPoints;
     waved.summarySP += storyPoints;
     waved.progress = waved.reportedSP*100/waved.summarySP;
+    waved.uri = initUri + wave + ")";
 
     //module group
     var moduleGroupd;
@@ -187,6 +195,7 @@ function putDataPoint(wavedata, wave, moduleGroup, moduleName, cloudApp, calcSto
     moduleGroupd.reportedSP += calcStoryPoints;
     moduleGroupd.summarySP += storyPoints;
     moduleGroupd.progress = moduleGroupd.reportedSP*100/moduleGroupd.summarySP;
+    moduleGroupd.uri = initUri + "PageModuleGroup_" + moduleGroup + ")";
 
     //module
     var moduled;
@@ -204,6 +213,7 @@ function putDataPoint(wavedata, wave, moduleGroup, moduleName, cloudApp, calcSto
     moduled.reportedSP += calcStoryPoints;
     moduled.summarySP += storyPoints;
     moduled.progress = moduled.reportedSP*100/moduled.summarySP;
+    moduled.uri = initUri + "PageModule_" + moduleName + ")";
 
     //Cloud App
     var cloudAppd;
@@ -221,4 +231,5 @@ function putDataPoint(wavedata, wave, moduleGroup, moduleName, cloudApp, calcSto
     cloudAppd.reportedSP += calcStoryPoints;
     cloudAppd.summarySP += storyPoints;
     cloudAppd.progress = cloudAppd.reportedSP*100/cloudAppd.summarySP;
+    cloudAppd.uri = initUri + "CloudApp_" + cloudApp + ")";
 }

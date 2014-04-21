@@ -2,21 +2,21 @@
     <div class="row">
 
         <div class="col-lg-12">
-            <table class="table-bordered">
+            <table class="table">
                 <thead>
                 <tr>
-                    <td>Wave</td>
-                    <td>ModuleGroup</td>
-                    <td>Module</td>
-                    <td>AppItem</td>
+                    <th>Wave</th>
+                    <th>ModuleGroup</th>
+                    <th>Module</th>
+                    <th>AppItem</th>
                 </tr>
                 </thead>
                 <tbody>
                     <tr ng-repeat = "item in invertedWaveProgressData">
-                        <td rowspan="{{item.wave.rowSpan}}" ng-if="isExist(item.wave)">{{item.wave.name}}:{{item.wave.progress | number : 0}}%</td>
-                        <td rowspan="{{item.moduleGroup.rowSpan}}" ng-if="isExist(item.moduleGroup)" ng-class="{red: isUnknownExist(item.moduleGroup.name)}">{{item.moduleGroup.name}}:{{item.moduleGroup.progress | number : 0}}%</td>
-                        <td rowspan="{{item.module.rowSpan}}" ng-if="isExist(item.module)" ng-class="{red: isUnknownExist(item.module.name)}">{{item.module.name}}:{{item.module.progress | number : 0}}%</td>
-                        <td ng-if="isExist(item.appItem)" ng-class="{red: isUnknownExist(item.appItem.name)}">{{item.appItem.name}}:{{item.appItem.progress | number : 0}}%</td>
+                        <td class="table_cell_border" rowspan="{{item.wave.rowSpan}}" ng-if="isExist(item.wave)"><a href="{{item.wave.uri}}">{{item.wave.name}}</a>:{{item.wave.progress | number : 0}}%</td>
+                        <td class="table_cell_border" rowspan="{{item.moduleGroup.rowSpan}}" ng-if="isExist(item.moduleGroup)" ng-class="{red: isUnknownExist(item.moduleGroup.name)}"><a href="{{item.moduleGroup.uri}}">{{item.moduleGroup.name}}</a>:{{item.moduleGroup.progress | number : 0}}%</td>
+                        <td class="table_cell_border" rowspan="{{item.module.rowSpan}}" ng-if="isExist(item.module)" ng-class="{red: isUnknownExist(item.module.name)}"><a href="{{item.module.uri}}">{{item.module.name}}</a>:{{item.module.progress | number : 0}}%</td>
+                        <td class="table_cell_border" ng-if="isExist(item.appItem)" ng-class="{red: isUnknownExist(item.appItem.name)}"><a href="{{item.appItem.uri}}">{{item.appItem.name}}</a>:{{item.appItem.progress | number : 0}}%</td>
                     </tr>
                 </tbody>
             </table>

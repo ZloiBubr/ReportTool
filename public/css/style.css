@@ -70,7 +70,7 @@ a {
 
 .green
 {
-    background-color: #6b9167 !important;
+    background-color: #7fc48c !important;
 }
 
 .done {
@@ -83,4 +83,36 @@ a {
 
 .summary {
     font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+table {
+    border-collapse: separate;
+    border-spacing: 0 5px;
+}
+
+thead th {
+    background-color: #73c0ff;
+    color: white;
+    height: 35px;
+}
+
+tr {
+    height: 35px;
+}
+
+tr td:first-child,
+tr th:first-child {
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+
+tr td:last-child,
+tr th:last-child {
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+.table_cell_border{
+    border-color: #0028c1 !important;
+    border-width: 1px !important;
 }
