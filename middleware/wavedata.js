@@ -76,7 +76,11 @@ function getModuleName(labels) {
 }
 
 function getCloudAppName(labels) {
+    var indexpp = labels.indexOf("CloudApp_ParentPage");
     var index = labels.indexOf("CloudApp_");
+    if(indexpp > -1 && indexpp == index) {
+        index = labels.indexOf("CloudApp_", indexpp+1);
+    }
     if(index < 0) {
         return "UnknownCloudApp";
     }
