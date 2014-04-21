@@ -122,6 +122,33 @@ function parsePages(callback) {
             putDataPoint(wavedata, wave, moduleGroup, moduleName, cloudApp, calcStoryPoints, storyPoints);
         }
 
+        wavedata.waves.sort(function (a, b) {
+            a = a.name;
+            b = b.name;
+            return a > b ? 1 : a < b ? -1 : 0;
+        });
+
+        for(var i=0; i<wavedata.waves.length; i++) {
+            wavedata.waves[i].moduleGroup.sort(function (a, b) {
+                a = a.name;
+                b = b.name;
+                return a > b ? 1 : a < b ? -1 : 0;
+            });
+            for(var j=0; j<wavedata.waves[i].moduleGroup.length; j++) {
+                wavedata.waves[i].moduleGroup[j].module.sort(function (a, b) {
+                    a = a.name;
+                    b = b.name;
+                    return a > b ? 1 : a < b ? -1 : 0;
+                });
+                for(var k=0; k<wavedata.waves[i].moduleGroup[j].module.length; k++) {
+                    wavedata.waves[i].moduleGroup[j].module[k].cloudApp.sort(function (a, b) {
+                        a = a.name;
+                        b = b.name;
+                        return a > b ? 1 : a < b ? -1 : 0;
+                    });
+                }
+            }
+        }
         callback(err, wavedata);
     })
 }
