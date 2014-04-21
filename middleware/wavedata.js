@@ -113,8 +113,9 @@ function parsePages(callback) {
 
             for (var j = 0; j < page.progressHistory.length; j++) {
                 var history = page.progressHistory[j];
+                var from = history.progressFrom == null || history.progressFrom == '' ? 0 : parseInt(history.progressFrom);
                 var to = history.progressTo == null || history.progressTo == '' ? 0 : parseInt(history.progressTo);
-                progress = to > progress ? to : progress;
+                progress += to - from;
             }
             var calcStoryPoints = storyPoints * progress / 100;
 
