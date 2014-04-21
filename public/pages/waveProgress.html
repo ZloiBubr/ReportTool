@@ -13,10 +13,10 @@
                 </thead>
                 <tbody>
                     <tr ng-repeat = "item in invertedWaveProgressData">
-                        <td rowspan="{{item.wave.rowSpan}}" ng-if="isExist(item.wave)">{{item.wave.name}}<br/>{{item.wave.progress | number : 0}}<br/></td>
-                        <td rowspan="{{item.moduleGroup.rowSpan}}" ng-if="isExist(item.moduleGroup)">{{item.moduleGroup.name}}<br/>{{item.moduleGroup.progress | number : 0}}<br/></td>
-                        <td rowspan="{{item.module.rowSpan}}" ng-if="isExist(item.module)">{{item.module.name}}<br/>{{item.module.progress | number : 0}}<br/></td>
-                        <td ng-if="isExist(item.appItem)">{{item.appItem.name}}<br/>{{item.appItem.progress | number : 0}}<br/></td>
+                        <td rowspan="{{item.wave.rowSpan}}" ng-if="isExist(item.wave)">{{item.wave.name}}:{{item.wave.progress | number : 0}}%</td>
+                        <td rowspan="{{item.moduleGroup.rowSpan}}" ng-if="isExist(item.moduleGroup)">{{item.moduleGroup.name}}:{{item.moduleGroup.progress | number : 0}}%</td>
+                        <td rowspan="{{item.module.rowSpan}}" ng-if="isExist(item.module)">{{item.module.name}}:{{item.module.progress | number : 0}}%</td>
+                        <td ng-if="isExist(item.appItem)">{{item.appItem.name}}:{{item.appItem.progress | number : 0}}%</td>
                     </tr>
                 </tbody>
             </table>
