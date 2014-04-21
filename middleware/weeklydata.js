@@ -11,7 +11,7 @@ exports.getData = function (req, res) {
     });
 }
 
-function getSunday(d) {
+function getNextSunday(d) {
     d = new Date(d);
     var day = d.getDay(),
         diff = d.getDate() - day + (day == 0 ? 0:7); // adjust when day is sunday
@@ -34,7 +34,7 @@ function parsePages(callback) {
                 var history = page.progressHistory[j];
                 var date = new Date(Date.parse(history.dateChanged));
                 date.setHours(12, 0, 0, 0);
-                date = getSunday(date.getTime()).getTime();
+                date = getNextSunday(date.getTime()).getTime();
                 var from = parseInt(history.progressFrom);
                 var to = history.progressTo == null || history.progressTo == '' ? 0 : parseInt(history.progressTo);
                 var progress = to - from;

@@ -20,6 +20,13 @@ function sortData(progress) {
     });
 }
 
+function getPrevMonday(d) {
+    d = new Date(d);
+    var day = d.getDay(),
+        diff = d.getDate() - day + (day == 0 ? -6:1); // adjust when day is sunday
+    return new Date(d.setDate(diff));
+}
+
 function parsePages(callback) {
     var progress = new progressModel();
     //1. grab all pages
@@ -58,15 +65,18 @@ function parsePages(callback) {
             var estimated = parseInt(page.progress) > 0 ? devTimeSpent*100/parseInt(page.progress) : totalhours;
             var strestimated = Math.floor(estimated).toString() + 'h/' + totalhours.toString();
 
+            var lastTwoWeeks = new Date(Date.now());
+            lastTwoWeeks.setHours(0, 0, 0, 0);
+            lastTwoWeeks.setDate(lastTwoWeeks.getDate()-7);
+            lastTwoWeeks = getPrevMonday(lastTwoWeeks);
+
             for (var j = 0; j < page.progressHistory.length; j++) {
                 var history = page.progressHistory[j];
                 var date = new Date(Date.parse(history.dateChanged));
                 date.setHours(12, 0, 0, 0);
-                var lastWeek = new Date(Date.now()-1000*60*60*24*7);
-                if(date < lastWeek) {
+                if(date < lastTwoWeeks) {
                     continue;
                 }
-                //date = date.getTime();
                 var person = history.person;
                 var from = parseInt(history.progressFrom);
                 var to = history.progressTo == null || history.progressTo == '' ? 0 : parseInt(history.progressTo);
