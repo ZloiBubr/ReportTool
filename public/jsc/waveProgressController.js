@@ -90,6 +90,12 @@ $scope.invertedWaveProgressData=[];
 
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
 
+
+    $scope.isUnknownExist = function(item)
+    {
+        return item.indexOf("Unknown") == 0;
+    }
+
     $scope.init();
 }
 
