@@ -114,7 +114,7 @@ function SaveModule(full, jira, epic, callback) {
 function UpdatePages(full, jira, moduleKey, callback) {
     var queryString = full ?
         util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s)", moduleKey) :
-        util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s) AND updated > -7d", moduleKey);
+        util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s) AND updated > -2d", moduleKey);
     jira.searchJira(queryString, null, function (error, stories) {
         if (stories != null) {
             var numRunningQueries = 0;
