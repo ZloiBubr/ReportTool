@@ -36,6 +36,13 @@ function parsePages(callback) {
                 date.setHours(12, 0, 0, 0);
                 date = getNextSunday(date.getTime()).getTime();
                 var from = parseInt(history.progressFrom);
+                if(from > 1) {
+                    if(history.progressTo == '0' ||
+                        history.progressTo == '1' ||
+                        history.progressTo == '' ||
+                        history.progressTo == null)
+                        continue;
+                }
                 var to = history.progressTo == null || history.progressTo == '' ? 0 : parseInt(history.progressTo);
                 var progress = to - from;
                 var calcStoryPoints = storyPoints * progress / 100;

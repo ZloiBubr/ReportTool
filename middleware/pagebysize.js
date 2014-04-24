@@ -33,7 +33,7 @@ function parsePages(callback) {
             //calc time spent
             for (var j = 0; j < page.worklogHistory.length; j++) {
                 var worklog = page.worklogHistory[j];
-                if(persons.isDeveloper(worklog.person)!="Developer") {
+                if(!persons.isDeveloper(worklog.person)) {
                     continue;
                 }
 

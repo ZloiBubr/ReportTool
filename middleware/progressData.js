@@ -44,7 +44,7 @@ function parsePages(callback) {
             var qaTimeSpent = 0;
             for (var j = 0; j < page.worklogHistory.length; j++) {
                 var worklog = page.worklogHistory[j];
-                var isDeveloper = persons.isDeveloper(worklog.person)=="Developer";
+                var isDeveloper = persons.isDeveloper(worklog.person);
                 if(isDeveloper) {
                     devTimeSpent += parseFloat(worklog.timeSpent);
                 }
@@ -79,6 +79,13 @@ function parsePages(callback) {
                 }
                 var person = history.person;
                 var from = parseInt(history.progressFrom);
+                if(from > 1) {
+                    if(history.progressTo == '0' ||
+                        history.progressTo == '1' ||
+                        history.progressTo == '' ||
+                        history.progressTo == null)
+                    continue;
+                }
                 var to = history.progressTo == null || history.progressTo == '' ? 0 : parseInt(history.progressTo);
                 var progressDiff = to - from;
                 var calcStoryPoints = storyPoints * progressDiff / 100;
