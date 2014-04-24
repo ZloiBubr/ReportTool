@@ -1,4 +1,4 @@
-var AllTeams = require ('public/jsc/allteams').AllTeams;
+var AllTeams = require ('../public/jsc/allteams').AllTeams;
 
 exports.isDeveloper = function(name) {;
     for(var i=0; i<AllTeams.teams.length-1; i++) {

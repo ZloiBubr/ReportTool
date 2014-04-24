@@ -2,7 +2,7 @@ var mongoose = require('../libs/mongoose');
 var Module = require('../models/module').Module;
 var Page = require('../models/page').Page;
 var log = require('../libs/log')(module);
-var AllTeams = require ('public/jsc/allteams').AllTeams;
+var AllTeams = require ('../public/jsc/allteams').AllTeams;
 
 exports.getData = function (req, res) {
     parsePages(function (err, personaldata) {
