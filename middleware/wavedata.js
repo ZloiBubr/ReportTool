@@ -239,12 +239,16 @@ function putDataPoint(wavedata, wave, moduleGroup, moduleName, cloudApp, calcSto
         moduled.cloudApp.push(cloudAppd);
     }
 
+    if(cloudApp =="FinancialClose") {
+        var stop = "here";
+    }
     cloudAppd.reportedSP += calcStoryPoints;
     cloudAppd.summarySP += storyPoints;
     cloudAppd.progress = cloudAppd.reportedSP*100/cloudAppd.summarySP;
     cloudAppd.uri = initUri + "CloudApp_" + cloudApp + ") AND labels in(PageModuleGroup_" + moduleGroup + ") AND labels in(PageModule_" + moduleName + ")";
     if(status != cloudAppd.status) {
-        if((cloudAppd.status == "Ready for QA" || cloudAppd.status == "Testing in Progress") && status == "Resolved") {
+        if((cloudAppd.status == "Ready for QA" || cloudAppd.status == "Testing in Progress") && (status == "Resolved" || status == "Testing in Progress")) {
+            cloudAppd.status = "Testing in Progress";
         }
         else if(cloudAppd.status == "Resolved" && (status == "Ready for QA" || status == "Testing in Progress")) {
             cloudAppd.status = "Ready for QA";
