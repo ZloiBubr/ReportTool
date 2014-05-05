@@ -74,6 +74,8 @@ function weeklyChartController($scope, $resource, $window) {
         {"id": "TeamNova", "title": "TeamNova"},
         {"id": "TeamRenaissance", "title": "TeamRenaissance"},
         {"id": "TeamInspiration", "title": "TeamInspiration"},
+        {"id": "TeamLiberty", "title": "TeamLiberty"},
+        {"id": "TeamViva", "title": "TeamViva"},
         {"id": "Total", "title": "Total"},
     ];
 

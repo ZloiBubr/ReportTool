@@ -73,7 +73,9 @@ function velocityChartController($scope, $resource, $window) {
     $scope.jiraLabelsTeams = [
         {"id": "TeamNova", "title": "TeamNova"},
         {"id": "TeamRenaissance", "title": "TeamRenaissance"},
-        {"id": "TeamInspiration", "title": "TeamInspiration"}
+        {"id": "TeamInspiration", "title": "TeamInspiration"},
+        {"id": "TeamLiberty", "title": "TeamLiberty"},
+        {"id": "TeamViva", "title": "TeamViva"}
     ];
 
     $scope.init();

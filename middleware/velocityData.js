@@ -78,6 +78,10 @@ function getTeamName(labels) {
         return "TeamInspiration";
     if (labels.indexOf("TeamNova") > -1)
         return "TeamNova";
+    if (labels.indexOf("TeamLiberty") > -1)
+        return "TeamLiberty";
+    if (labels.indexOf("TeamViva") > -1)
+        return "TeamViva";
 }
 
 function putDataPoint(velocity, teamName, date, calcStoryPoints) {

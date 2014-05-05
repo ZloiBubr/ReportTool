@@ -23,7 +23,12 @@ function waveData() {
                                     reportedSP: 0,
                                     summarySP: 0,
                                     name: "",
-                                    uri: ""
+                                    uri: "",
+                                    status: "",
+                                    blocked: false,
+                                    accepted: false,
+                                    readyForAcceptance: false,
+                                    readyForQA: false
                                 }
                             ],
                             reportedSP: 0,
@@ -147,6 +152,7 @@ function parsePages(callback) {
             var cloudApp = getCloudAppName(page.labels);
             var wave = getWaveName(page.labels);
             var progress = 0;
+            var status = page.status;
 
             for (var j = 0; j < page.progressHistory.length; j++) {
                 var history = page.progressHistory[j];
@@ -157,14 +163,14 @@ function parsePages(callback) {
             }
             var calcStoryPoints = storyPoints * progress / 100;
 
-            putDataPoint(wavedata, wave, moduleGroup, moduleName, cloudApp, calcStoryPoints, storyPoints);
+            putDataPoint(wavedata, wave, moduleGroup, moduleName, cloudApp, calcStoryPoints, storyPoints, status);
         }
         SortData(wavedata);
         callback(err, wavedata);
     })
 }
 
-function putDataPoint(wavedata, wave, moduleGroup, moduleName, cloudApp, calcStoryPoints, storyPoints) {
+function putDataPoint(wavedata, wave, moduleGroup, moduleName, cloudApp, calcStoryPoints, storyPoints, status) {
     var initUri = "https://jira.epam.com/jira/issues/?jql=project%20%3D%20PLEX-UXC%20and%20issuetype%3DStory%20AND%20%22Story%20Points%22%20%3E%200%20and%20labels%20in%20(";
     //wave
 
@@ -176,7 +182,7 @@ function putDataPoint(wavedata, wave, moduleGroup, moduleName, cloudApp, calcSto
         }
     }
     if(!waved) {
-        waved = { moduleGroup: [], progress: 0, reportedSP: 0, summarySP: 0, name: wave};
+        waved = { moduleGroup: [], progress: 0, reportedSP: 0, summarySP: 0, name: wave };
         wavedata.waves.push(waved);
     }
 
@@ -230,7 +236,13 @@ function putDataPoint(wavedata, wave, moduleGroup, moduleName, cloudApp, calcSto
         }
     }
     if(!cloudAppd) {
-        cloudAppd = { progress: 0, reportedSP: 0, summarySP: 0, name: cloudApp};
+        cloudAppd = { progress: 0, reportedSP: 0, summarySP: 0, name: cloudApp,
+            status: status == 'Closed' ? "Accepted" : status,
+            accepted: status == 'Closed',
+            readyForAcceptance: status == 'Resolved',
+            readyForQA: status == 'Ready for QA' || status == "Testing in Progress",
+            blocked: status == 'Blocked'
+        };
         moduled.cloudApp.push(cloudAppd);
     }
 
@@ -238,4 +250,11 @@ function putDataPoint(wavedata, wave, moduleGroup, moduleName, cloudApp, calcSto
     cloudAppd.summarySP += storyPoints;
     cloudAppd.progress = cloudAppd.reportedSP*100/cloudAppd.summarySP;
     cloudAppd.uri = initUri + "CloudApp_" + cloudApp + ") AND labels in(PageModuleGroup_" + moduleGroup + ") AND labels in(PageModule_" + moduleName + ")";
+    if(!(status == "Closed" && cloudAppd.status == "Accepted") && status != cloudAppd.status) {
+        cloudAppd.accepted = false;
+        cloudAppd.readyForAcceptance = false;
+        cloudAppd.readyForQA = false;
+        cloudAppd.blocked = cloudAppd.blocked || status == "Blocked";
+        cloudAppd.status = cloudAppd.blocked ? "Blocked" : "";
+    }
 }

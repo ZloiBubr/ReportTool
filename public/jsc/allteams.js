@@ -84,7 +84,7 @@ function Teams() {
             ]
         },
         {
-            name: "D",
+            name: "Liberty",
             teamLead: "Dzmitry Tabolich",
             qaTeamLead: "Iryna Kutsko",
             developers: [
@@ -96,7 +96,7 @@ function Teams() {
             ]
         },
         {
-            name: "E",
+            name: "Viva",
             teamLead: "Valentine Zhuck",
             qaTeamLead: "Katsiaryna Kuchko",
             developers: [

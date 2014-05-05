@@ -73,6 +73,26 @@ a {
     background-color: #7fc48c !important;
 }
 
+.blocked
+{
+    background-color: #ffbec9 !important;
+}
+
+.accepted
+{
+    background-color: #ede8ed !important;
+}
+
+.readyForAcceptance
+{
+    background-color: #7fc48c !important;
+}
+
+.readyForQA
+{
+    background-color: #fafabf !important;
+}
+
 .done {
     text-decoration: line-through !important;
 }
