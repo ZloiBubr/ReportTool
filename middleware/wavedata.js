@@ -235,10 +235,11 @@ function putDataPoint(wavedata, wave, moduleGroup, moduleName, cloudApp, calcSto
             break;
         }
     }
+    status = status == 'Closed' ? "Accepted" : status;
     if(!cloudAppd) {
         cloudAppd = { progress: 0, reportedSP: 0, summarySP: 0, name: cloudApp,
-            status: status == 'Closed' ? "Accepted" : status,
-            accepted: status == 'Closed',
+            status: status,
+            accepted: status == 'Accepted',
             readyForAcceptance: status == 'Resolved',
             readyForQA: status == 'Ready for QA' || status == "Testing in Progress",
             blocked: status == 'Blocked'
@@ -250,11 +251,21 @@ function putDataPoint(wavedata, wave, moduleGroup, moduleName, cloudApp, calcSto
     cloudAppd.summarySP += storyPoints;
     cloudAppd.progress = cloudAppd.reportedSP*100/cloudAppd.summarySP;
     cloudAppd.uri = initUri + "CloudApp_" + cloudApp + ") AND labels in(PageModuleGroup_" + moduleGroup + ") AND labels in(PageModule_" + moduleName + ")";
-    if(!(status == "Closed" && cloudAppd.status == "Accepted") && status != cloudAppd.status) {
-        cloudAppd.accepted = false;
-        cloudAppd.readyForAcceptance = false;
-        cloudAppd.readyForQA = false;
-        cloudAppd.blocked = cloudAppd.blocked || status == "Blocked";
-        cloudAppd.status = cloudAppd.blocked ? "Blocked" : "";
+    if(status != cloudAppd.status) {
+        if((cloudAppd.status == "Ready for QA" || cloudAppd.status == "Testing in Progress") && status == "Resolved") {
+        }
+        else if(cloudAppd.status == "Resolved" && (status == "Ready for QA" || status == "Testing in Progress")) {
+            cloudAppd.status = "Ready for QA";
+            cloudAppd.readyForQA = true;
+            cloudAppd.accepted = false;
+            cloudAppd.readyForAcceptance = false;
+        }
+        else {
+            cloudAppd.accepted = false;
+            cloudAppd.readyForAcceptance = false;
+            cloudAppd.readyForQA = false;
+            cloudAppd.blocked = cloudAppd.blocked || status == "Blocked";
+            cloudAppd.status = cloudAppd.blocked ? "Blocked" : "";
+        }
     }
 }
