@@ -3,6 +3,7 @@ var Module = require('../models/module').Module;
 var Page = require('../models/page').Page;
 var log = require('../libs/log')(module);
 var AllTeams = require ('../public/jsc/allteams').AllTeams;
+var _ = require('underscore');
 
 exports.getData = function (req, res) {
     parsePages(function (err, personaldata) {
@@ -11,17 +12,30 @@ exports.getData = function (req, res) {
     });
 }
 
+function fillPersonalData(personaldata) {
+    _.each(AllTeams.teams, function(team) {
+        personaldata.teams.push({name: team.name});
+        var index = _.indexOf(personaldata.teams, team.name);
+        var pteam = personaldata.teams[index];
+        pteam.developers = [];
+        _.each(team, function(developer) {
+            pteam.developers.push({name: developer});
+        })
+    })
+}
+
+function personalData() {
+    this.teams = [];
+}
+
 function parsePages(callback) {
-    var personaldata = AllTeams;
+    var personaldata = new personalData();
+    fillPersonalData(personaldata);
 
     Page.find({}).exec(function (err, pages) {
         for (var i = 0; i < pages.length; i++) {
             var page = pages[i];
             var storyPoints = page.storyPoints == null ? 0 : parseFloat(page.storyPoints);
-            var moduleGroup = getModuleGroupName(page.labels);
-            var moduleName = getModuleName(page.labels);
-            var cloudApp = getCloudAppName(page.labels);
-            var wave = getWaveName(page.labels);
             var progress = 0;
 
             for (var j = 0; j < page.progressHistory.length; j++) {
@@ -32,10 +46,9 @@ function parsePages(callback) {
             }
             var calcStoryPoints = storyPoints * progress / 100;
 
-            putDataPoint(wavedata, wave, moduleGroup, moduleName, cloudApp, calcStoryPoints, storyPoints);
+            //putDataPoint(wavedata, wave, moduleGroup, moduleName, cloudApp, calcStoryPoints, storyPoints);
         }
-        SortData(wavedata);
-        callback(err, wavedata);
+        callback(err, personaldata);
     })
 }
 

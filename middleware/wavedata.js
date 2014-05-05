@@ -150,9 +150,10 @@ function parsePages(callback) {
 
             for (var j = 0; j < page.progressHistory.length; j++) {
                 var history = page.progressHistory[j];
-                var from = history.progressFrom == null || history.progressFrom == '' ? 0 : parseInt(history.progressFrom);
                 var to = history.progressTo == null || history.progressTo == '' ? 0 : parseInt(history.progressTo);
-                progress += to - from;
+                if(to > progress) {
+                    progress = to;
+                }
             }
             var calcStoryPoints = storyPoints * progress / 100;
 
@@ -166,6 +167,7 @@ function parsePages(callback) {
 function putDataPoint(wavedata, wave, moduleGroup, moduleName, cloudApp, calcStoryPoints, storyPoints) {
     var initUri = "https://jira.epam.com/jira/issues/?jql=project%20%3D%20PLEX-UXC%20and%20issuetype%3DStory%20AND%20%22Story%20Points%22%20%3E%200%20and%20labels%20in%20(";
     //wave
+
     var waved;
     for (var k = 0; k < wavedata.waves.length; k++) {
         if (wavedata.waves[k].name == wave) {
