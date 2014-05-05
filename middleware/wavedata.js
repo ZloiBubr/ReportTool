@@ -151,16 +151,8 @@ function parsePages(callback) {
             var moduleName = getModuleName(page.labels);
             var cloudApp = getCloudAppName(page.labels);
             var wave = getWaveName(page.labels);
-            var progress = 0;
+            var progress = page.progress;
             var status = page.status;
-
-            for (var j = 0; j < page.progressHistory.length; j++) {
-                var history = page.progressHistory[j];
-                var to = history.progressTo == null || history.progressTo == '' ? 0 : parseInt(history.progressTo);
-                if(to > progress) {
-                    progress = to;
-                }
-            }
             var calcStoryPoints = storyPoints * progress / 100;
 
             putDataPoint(wavedata, wave, moduleGroup, moduleName, cloudApp, calcStoryPoints, storyPoints, status);
