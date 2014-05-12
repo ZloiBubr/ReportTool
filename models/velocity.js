@@ -14,6 +14,14 @@ exports.data = function () {
         },
         {
             data: [],
+            name: "TeamLiberty"
+        },
+        {
+            data: [],
+            name: "TeamViva"
+        },
+        {
+            data: [],
             name: "Total"
         }
     ];
