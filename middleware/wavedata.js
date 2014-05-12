@@ -155,6 +155,9 @@ function parsePages(callback) {
             var status = page.status;
             var calcStoryPoints = storyPoints * progress / 100;
 
+            if(cloudApp =="JournalEntries") {
+                var stop = "here";
+            }
             putDataPoint(wavedata, wave, moduleGroup, moduleName, cloudApp, calcStoryPoints, storyPoints, status);
         }
         SortData(wavedata);
@@ -239,9 +242,6 @@ function putDataPoint(wavedata, wave, moduleGroup, moduleName, cloudApp, calcSto
         moduled.cloudApp.push(cloudAppd);
     }
 
-    if(cloudApp =="FinancialClose") {
-        var stop = "here";
-    }
     cloudAppd.reportedSP += calcStoryPoints;
     cloudAppd.summarySP += storyPoints;
     cloudAppd.progress = cloudAppd.reportedSP*100/cloudAppd.summarySP;
