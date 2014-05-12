@@ -155,7 +155,7 @@ function parsePages(callback) {
             var status = page.status;
             var calcStoryPoints = storyPoints * progress / 100;
 
-            if(cloudApp =="JournalEntries") {
+            if(cloudApp =="CustomerInvoices") {
                 var stop = "here";
             }
             putDataPoint(wavedata, wave, moduleGroup, moduleName, cloudApp, calcStoryPoints, storyPoints, status);
@@ -247,7 +247,7 @@ function putDataPoint(wavedata, wave, moduleGroup, moduleName, cloudApp, calcSto
     cloudAppd.progress = cloudAppd.reportedSP*100/cloudAppd.summarySP;
     cloudAppd.uri = initUri + "CloudApp_" + cloudApp + ") AND labels in(PageModuleGroup_" + moduleGroup + ") AND labels in(PageModule_" + moduleName + ")";
     if(status != cloudAppd.status) {
-        if((cloudAppd.status == "Ready for QA" || cloudAppd.status == "Testing in Progress") && (status == "Resolved" || status == "Testing in Progress")) {
+        if((cloudAppd.status == "Ready for QA" || cloudAppd.status == "Testing in Progress") && (status == "Resolved" || status == "Testing in Progress" || status =="Ready for QA")) {
             cloudAppd.status = "Testing in Progress";
         }
         else if(cloudAppd.status == "Resolved" && (status == "Ready for QA" || status == "Testing in Progress")) {
