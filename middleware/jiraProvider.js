@@ -24,12 +24,17 @@ var UpdateProgress = function(progress) {
     }
 }
 
-var LogProgress = function(text) {
+var LogProgress = function(text, error) {
     if(response) {
         response.write("event: logmessage\n");
         response.write("data: " + text + "\n\n");
     }
-    log.info(text);
+    if(error) {
+        log.error(text);
+    }
+    else {
+        log.info(text);
+    }
 }
 
 exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
@@ -276,7 +281,11 @@ function parseWorklogs(jira, moduleKey, issue, page, callback) {
             var subtask = issue.fields.subtasks[i];
             ++numRunningQueries;
             jira.findIssue(subtask.key + "?expand=changelog", function (error, subtask) {
-                if (error) throw error;
+                if (error) {
+                    LogProgress('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+                    LogProgress(moduleKey + " : " + issue.key + ' : Finished with errors, please restart update');
+                    LogProgress('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+                }
                 if (subtask != null) {
                     calcWorklogFromIssue(subtask, page);
                 }
