@@ -77,7 +77,7 @@ function UpdateModules(full, jira, callback) {
                     if(err) {
                         callback(err);
                     }
-                    LogProgress("********** Module #" + (totalModules - numRunningQueries) + " of " + totalModules + " finished processing");
+                    LogProgress("********** Module #" + (totalModules - numRunningQueries + 1) + " of " + totalModules + " finished processing");
                     --numRunningQueries;
                     var progress = Math.floor((totalModules - numRunningQueries)*100/totalModules);
                     UpdateProgress(progress);
