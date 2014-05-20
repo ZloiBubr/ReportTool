@@ -64,7 +64,7 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
 function UpdateModules(full, jira, callback) {
     var requestString = "project = PLEX-UXC AND issuetype = epic AND summary ~ Module AND NOT summary ~ automation ORDER BY key ASC";
 
-    UpdateProgress(2);
+    UpdateProgress(1);
     jira.searchJira(requestString, null, function (error, epics) {
         if (epics != null) {
             var numRunningQueries = 0;
