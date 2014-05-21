@@ -21,7 +21,7 @@
                             readyForAcceptance: item.appItem.readyForAcceptance,
                             readyForQA: item.appItem.readyForQA,
                             accepted: item.appItem.accepted,
-                            blocked: item.appItem.blocked}"><a href="{{item.appItem.uri}}">{{item.appItem.name}}</a> : {{item.appItem.progress | number : 0}}% - {{item.appItem.reportedSP | number : 0}} of {{item.appItem.summarySP | number : 0}} SP {{item.appItem.status}}</td>
+                            blocked: item.appItem.blocked}"><a href="{{item.appItem.uri}}">{{item.appItem.name}}</a> : {{item.appItem.progress | number : 0}}% - {{item.appItem.reportedSP | number : 0}} of {{item.appItem.summarySP | number : 0}} SP {{item.appItem.status}} {{item.appItem.teamName}}</td>
                     </tr>
                 </tbody>
             </table>
