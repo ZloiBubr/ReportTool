@@ -58,6 +58,12 @@ a {
     height: 28px;
 }
 
+.help-icon
+{
+    cursor: help;
+}
+
+
 .red
 {
     background-color: #ff8082 !important;

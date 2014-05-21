@@ -4,7 +4,7 @@
             <thead class="progressTableMainHeader">
             <tr>
                 <th>Date</th>
-                <th style="width: 157px">Team:<select class="form-control headerSelectWidth" ng-model="filteredTeam" class="headerSelectWidth" ng-options="team.id as team.title for team in allTeams"></select></th>
+                <th style="width: 157px">Team:<select class="form-control headerSelectWidth" ng-model="filteredTeam" class="headerSelectWidth" ng-options="team.id as team.name for team in allTeams"></select></th>
                 <th>Data: <div class="checkbox">
                     <label>
                         <input ng-model="showOnlyTotal" type="checkbox"> Display Only Total
@@ -20,7 +20,7 @@
                     <table class="table" ng-repeat="team in dateGroup.teams | filter: teamFilter">
                         <tbody>
                         <tr class="progress_no_top_line">
-                            <td class="progress_fixed_width vcenter" tooltip-placement="left"  tooltip-html-unsafe="{{getReportMembersMissing(team)}}">{{team.name}}</td>
+                            <td class="progress_fixed_width vcenter help-icon" tooltip-placement="left"  tooltip-html-unsafe="{{getReportMembersMissing(team)}}">{{team.name}}</td>
                             <td class="progress_table_no_end_line">
                                 <table class="table table-striped">
                                     <thead>

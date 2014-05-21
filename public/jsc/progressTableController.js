@@ -88,8 +88,8 @@ function progressTableController($scope, $resource, $window) {
     };
 
     $scope.getReportMembersMissing = function(team){
-        var teamMembers = _.find($scope.TeamDevMembers, function(teamDevMembersItem){
-            return teamDevMembersItem.name === team.name
+        var teamMembers = _.find($scope.TeamDevMembers.teams, function(teamDevMembersItem){
+            return teamDevMembersItem.id === team.name
         });
 
         if(_.isUndefined(teamMembers)){
@@ -97,13 +97,13 @@ function progressTableController($scope, $resource, $window) {
         }
         var missedMembers = "<strong>Work logs missed for:</strong> <br/>";
 
-        _.each(teamMembers.members, function(memberItem){
+        _.each(teamMembers.developers, function(memberItem){
            var isWorkLogged = _.some(team.pages, function(pageItem){
-                return pageItem.person === memberItem.name;
+                return pageItem.person === memberItem;
             });
 
             if(!isWorkLogged){
-                missedMembers += memberItem.name + "<br/>"
+                missedMembers += memberItem + "<br/>"
             }
         });
 
@@ -117,69 +117,10 @@ function progressTableController($scope, $resource, $window) {
     ];
 
     $scope.allTeams = function () {
-        var allTeamsArray = [{"id": "All", "title": "All"}];
-        allTeamsArray.push.apply(allTeamsArray,$scope.jiraLabelsTeams);
+        var allTeamsArray = [{"id": "All", "name": "All"}];
+        allTeamsArray.push.apply(allTeamsArray,$scope.TeamDevMembers.teams);
         return allTeamsArray;
     }();
-
-    $scope.TeamDevMembers = [
-        {
-            name:"TeamRenaissance",
-            members:
-                [
-                    {name:"Dzianis Arlouski"},
-                    {name:"Hanna Kastsian"},
-                    {name:"Iryna Kucharenka1"},
-                    {name:"Ivan Izmer"},
-                    {name:"Mark Varabyou"},
-                    {name:"Raman But-Husaim"},
-                    {name:"Siarhei Abrazhevich"},
-                    {name:"Yauheni Lohinau"},
-                    {name:"Alena Charnova"},
-                    {name:"Aliaksandr Koush"},
-                    {name:"Aliaksandr Rykau"},
-                    {name:"Aliaksei Astashkin"},
-                    {name:"Nicolay Kostroma"},
-                ]},
-        {
-            name:"TeamNova",
-            members:
-                [
-                    {name:"Ilya Kazlou1"},
-                    {name:"Katsiaryna Kaliukhovich"},
-                    {name:"Aliaksandr Nikulin"},
-                    {name:"Valentine Zhuck"},
-                    {name:"Maryna Furman"},
-                    {name:"Vadzim Vysotski"},
-                    {name:"Andrei Kandybovich"},
-                    {name:"Raman Prakofyeu"},
-                    {name:"Aliaksei Labachou"},
-                    {name:"Mikita Stalpinski"},
-                    {name:"Dzmitry Siamchonak"},
-                    {name:"Siarhei Zhalezka"},
-                    {name:"Edhar Liashok"},
-                    {name:"Ruslan Khilmanovich"},
-                ]},
-        {
-            name:"TeamInspiration",
-            members:
-                [
-                    {name:"Borys Roshal"},
-                    {name:"Denys Poliakov"},
-                    {name:"Dmytro Komar"},
-                    {name:"Kostiantyn Lazurenko"},
-                    {name:"Oleksandr Stukalov"},
-                    {name:"Oleksii Bespalko"},
-                    {name:"Yevhenii Havryliuk"},
-                    {name:"Yuriy Shestyora"},
-                    {name:"Ihor Bershov"},
-                    {name:"Oleksandr Zhyltsov"},
-                    {name:"Oleksii Suriadnyi"},
-                    {name:"Roman Golovchenko"},
-                    {name:"Serhiy Haponenko"},
-                    {name:"Yevhenii Lomov"},
-                ]},
-    ];
 
     $scope.init();
 }

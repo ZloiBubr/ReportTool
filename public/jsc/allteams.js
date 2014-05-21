@@ -1,6 +1,7 @@
 function Teams() {
     this.teams = [
         {
+            id: "TeamRenaissance",
             name: "Renaissance",
             teamLead: "Anton Valadzko",
             qaTeamLead: "Aliaksandra Kutynka",
@@ -13,6 +14,7 @@ function Teams() {
                 "Raman But-Husaim",
                 "Siarhei Abrazhevich",
                 "Yauheni Lohinau",
+
                 "Artsiom Rusak",
                 "Aliaksei Astashkin",
                 "Aliaksandr Koush",
@@ -29,6 +31,7 @@ function Teams() {
             ]
         },
         {
+            id: "TeamInspiration",
             name: "Inspiration",
             teamLead: "Sergey Tischenko",
             qaTeamLead: "Denys Pugachov",
@@ -58,6 +61,7 @@ function Teams() {
             ]
         },
         {
+            id: "TeamNova",
             name: "Nova",
             teamLead: "Heorhi Vilkitski",
             qaTeamLead: "Valiantsina Krautsevich",
@@ -65,6 +69,7 @@ function Teams() {
                 "Andrei Kandybovich",
                 "Dzmitry Siamchonak",
                 "Mikita Stalpinski",
+                "Uladzimir Harabtsou",
                 "Aliaksandr Nikulin",
                 "Ilya Kazlou1",
                 "Katsiaryna Kaliukhovich",
@@ -73,7 +78,6 @@ function Teams() {
                 "Edhar Liashok",
                 "Raman Prakofyeu",
                 "Ruslan Khilmanovich",
-                "Valentine Zhuck"
             ],
             testers: [
                 "Aliaksei Burnosenka",
@@ -84,23 +88,27 @@ function Teams() {
             ]
         },
         {
+            id: "TeamLiberty",
             name: "Liberty",
             teamLead: "Dzmitry Tabolich",
             qaTeamLead: "Iryna Kutsko",
             developers: [
+                "Mariya Babich",
+                "Volha Shandrokha",
                 "Andrei Krasnou",
-                "Volha Shandrokha"
+                "Aliaksandr Rusak",
+                "Katsiaryna Tsalabanava"
             ],
             testers: [
                 "Iryna Kutsko"
             ]
         },
         {
+            id: "TeamViva",
             name: "Viva",
             teamLead: "Valentine Zhuck",
             qaTeamLead: "Katsiaryna Kuchko",
             developers: [
-                "Aliaksandr Bialinski",
                 "Maryna Furman",
                 "Siarhei Zhalezka",
                 "Yury Yamoryk",
@@ -109,7 +117,8 @@ function Teams() {
                 "Petr Falitarchyk",
                 "Aliaksandr Rykau",
                 "Ivan Dziameshka",
-                "Siarhei Bahdanovich"
+                "Siarhei Bahdanovich",
+                "Iryna Shuliak"
             ],
             testers: [
                 "Iryna Shuliak",
@@ -119,6 +128,7 @@ function Teams() {
             ]
         },
         {
+            id: "TeamAutomation",
             name: "Automation",
             teamLead: "Aliaksandr Basau",
             developers: [
