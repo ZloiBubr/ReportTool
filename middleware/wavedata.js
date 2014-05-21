@@ -94,6 +94,10 @@ function getModuleName(labels) {
     return labels.substring(index+11,index2);
 }
 
+function isParentApp(labels) {
+    return labels.indexOf("CloudApp_ParentPage") > -1;
+}
+
 function getCloudAppName(labels) {
     var indexpp = labels.indexOf("CloudApp_ParentPage");
     var index = labels.indexOf("CloudApp_");
@@ -169,18 +173,16 @@ function parsePages(callback) {
             var progress = page.progress;
             var status = page.status;
             var calcStoryPoints = storyPoints * progress / 100;
+            var isParent = isParentApp(page.labels);
 
-            if(cloudApp =="CustomerInvoices") {
-                var stop = "here";
-            }
-            putDataPoint(wavedata, wave, moduleGroup, moduleName, teamName, cloudApp, calcStoryPoints, storyPoints, status);
+            putDataPoint(wavedata, wave, moduleGroup, moduleName, teamName, cloudApp, calcStoryPoints, storyPoints, status, isParent);
         }
         SortData(wavedata);
         callback(err, wavedata);
     })
 }
 
-function putDataPoint(wavedata, wave, moduleGroup, moduleName, teamName, cloudApp, calcStoryPoints, storyPoints, status) {
+function putDataPoint(wavedata, wave, moduleGroup, moduleName, teamName, cloudApp, calcStoryPoints, storyPoints, status, isParent) {
     var initUri = "https://jira.epam.com/jira/issues/?jql=project%20%3D%20PLEX-UXC%20and%20issuetype%3DStory%20AND%20%22Story%20Points%22%20%3E%200%20and%20labels%20in%20(";
     //wave
 
@@ -258,6 +260,9 @@ function putDataPoint(wavedata, wave, moduleGroup, moduleName, teamName, cloudAp
         moduled.cloudApp.push(cloudAppd);
     }
 
+    if(isParent) {
+        cloudApp.teamName = teamName;
+    }
     cloudAppd.reportedSP += calcStoryPoints;
     cloudAppd.summarySP += storyPoints;
     cloudAppd.progress = cloudAppd.reportedSP*100/cloudAppd.summarySP;
