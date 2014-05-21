@@ -281,8 +281,8 @@ function putDataPoint(wavedata,
     }
 
     if(isParent) {
-        cloudApp.teamName = teamName;
-        cloudApp.smeName = smeName;
+        cloudAppd.teamName = teamName;
+        cloudAppd.smeName = smeName;
     }
     cloudAppd.reportedSP += calcStoryPoints;
     cloudAppd.summarySP += storyPoints;
