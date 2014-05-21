@@ -29,7 +29,8 @@ function waveData() {
                                     accepted: false,
                                     readyForAcceptance: false,
                                     readyForQA: false,
-                                    teamName: ""
+                                    teamName: "",
+                                    smeName: ""
                                 }
                             ],
                             reportedSP: 0,
@@ -57,6 +58,19 @@ function waveData() {
 
 function getTeamName(labels) {
     var index = labels.indexOf("Team");
+    if(index < 0) {
+        return "";
+    }
+    var index2 = labels.indexOf(',', index);
+    if(index2 < 0) {
+        index2 = labels.length;
+    }
+
+    return labels.substring(index+4,index2);
+}
+
+function getSMEName(labels) {
+    var index = labels.indexOf("SME_");
     if(index < 0) {
         return "";
     }
@@ -174,15 +188,20 @@ function parsePages(callback) {
             var status = page.status;
             var calcStoryPoints = storyPoints * progress / 100;
             var isParent = isParentApp(page.labels);
+            var smeName = getSMEName(page.labels);
 
-            putDataPoint(wavedata, wave, moduleGroup, moduleName, teamName, cloudApp, calcStoryPoints, storyPoints, status, isParent);
+            putDataPoint(wavedata,
+                wave, moduleGroup, moduleName, teamName, cloudApp, smeName,
+                calcStoryPoints, storyPoints, status, isParent);
         }
         SortData(wavedata);
         callback(err, wavedata);
     })
 }
 
-function putDataPoint(wavedata, wave, moduleGroup, moduleName, teamName, cloudApp, calcStoryPoints, storyPoints, status, isParent) {
+function putDataPoint(wavedata,
+                      wave, moduleGroup, moduleName, teamName, cloudApp, smeName,
+                      calcStoryPoints, storyPoints, status, isParent) {
     var initUri = "https://jira.epam.com/jira/issues/?jql=project%20%3D%20PLEX-UXC%20and%20issuetype%3DStory%20AND%20%22Story%20Points%22%20%3E%200%20and%20labels%20in%20(";
     //wave
 
@@ -255,13 +274,15 @@ function putDataPoint(wavedata, wave, moduleGroup, moduleName, teamName, cloudAp
             readyForAcceptance: status == 'Resolved',
             readyForQA: status == 'Ready for QA' || status == "Testing in Progress",
             blocked: status == 'Blocked',
-            teamName: teamName
+            teamName: teamName,
+            smeName: smeName
         };
         moduled.cloudApp.push(cloudAppd);
     }
 
     if(isParent) {
         cloudApp.teamName = teamName;
+        cloudApp.smeName = smeName;
     }
     cloudAppd.reportedSP += calcStoryPoints;
     cloudAppd.summarySP += storyPoints;
