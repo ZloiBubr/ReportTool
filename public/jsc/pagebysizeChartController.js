@@ -27,23 +27,26 @@ function pagebysizeChartController($scope, $resource, $window) {
     // Original link to use setup chart directive
     // https://github.com/pablojim/highcharts-ng
     $scope.initCharts = function () {
-
-        $scope.chartConfig = {
-            options: {
-                chart: {
-                    type: 'areaspline',
-                    zoomType: 'x'
-                }
+        var chart = new Highcharts.Chart({
+            chart: {
+                renderTo: 'container',
+                type: 'areaspline',
+                zoomType: 'x'
             },
-            series: $scope.chartsData.data,
             title: {
                 text: 'Development Time Spent by Story Size'
             },
             xAxis: {
                 type: 'datetime'
             },
-            loading: false
-        }
+            tooltip: {
+                formatter: function () {
+                    return this.point.tooltip;
+                }
+            },
+
+            series: $scope.chartsData.data
+        });
     }
 
     /* -------------------------------------------------------Event handlers ------------------------ */
@@ -52,13 +55,12 @@ function pagebysizeChartController($scope, $resource, $window) {
         var loadingDfrd = $.Deferred();
         var getChartSuccess = function (data) {
             $scope.chartsData = data;
-            var avarageSeries = [];
+/*            var avarageSeries = [];
             _.each($scope.chartsData.data, function(itemSeries){
                 avarageSeries.push({
                     name: itemSeries.name + ':trend',
                     type: 'line',
                     marker: { enabled: false },
-                    /* function returns data for trend-line */
                     data: (function() {
                         return fitData(itemSeries.data).data;
                     })()
@@ -66,7 +68,7 @@ function pagebysizeChartController($scope, $resource, $window) {
             })
 
             $scope.chartsData.data = _.union($scope.chartsData.data, avarageSeries);
-            loadingDfrd.resolve();
+*/            loadingDfrd.resolve();
         };
 
         var getChartFail = function (err) {

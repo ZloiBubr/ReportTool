@@ -12,6 +12,19 @@ exports.getData = function (req, res) {
     });
 }
 
+function isDeveloper(name) {
+    if (persons.isDeveloper(name)) {
+            return true;
+    }
+    if(name == 'Valentine Zhuck' ||
+        name == 'Dzmitry Tabolich' ||
+        name == 'Heorhi Vilkitski') {
+        return true;
+    }
+//    log.info("---###---" + name);
+    return false;
+}
+
 function parsePages(callback) {
     var model = new pagebysizeModel();
     for (var k = 0; k < model.data.length; k++) {
@@ -33,24 +46,26 @@ function parsePages(callback) {
             //calc time spent
             for (var j = 0; j < page.worklogHistory.length; j++) {
                 var worklog = page.worklogHistory[j];
-                if(!persons.isDeveloper(worklog.person)) {
-                    continue;
+                if(isDeveloper(worklog.person)) {
+                    timeSpent += parseFloat(worklog.timeSpent);
                 }
-
-                timeSpent += parseFloat(worklog.timeSpent);
             }
-            if(timeSpent == 0) {
-                continue;
+            if(timeSpent > 0 ||
+                page.status == 'Ready for QA' ||
+                page.status == "Testing in Progress" ||
+                page.status == "Resolved" ||
+                page.status == "Closed"
+                ) {
+                putDataPoint(model, pageSize, dateDevFinished, timeSpent, page.key);
             }
-            putDataPoint(model, pageSize, dateDevFinished, timeSpent);
         }
 
         //2. sort
         for (var k = 0; k < model.data.length; k++) {
             var team = model.data[k];
             team.data.sort(function (a, b) {
-                a = new Date(a[0]);
-                b = new Date(b[0]);
+                a = new Date(a.x);
+                b = new Date(b.x);
                 return a > b ? 1 : a < b ? -1 : 0;
             });
         }
@@ -75,11 +90,14 @@ function getPageSize(labels) {
         return "XXXL";
 }
 
-function putDataPoint(model, pageSize, dateDevFinished, timeSpent) {
+function putDataPoint(model, pageSize, dateDevFinished, timeSpent, key) {
     for (var k = 0; k < model.data.length; k++) {
         var size = model.data[k];
         if (size.name == pageSize) {
-            size.data.push([dateDevFinished, timeSpent]);
+            size.data.push({
+                x: dateDevFinished,
+                y: timeSpent,
+                tooltip: key + ' - ' + timeSpent.toFixed(2) + 'h' });
             return;
         }
     }
