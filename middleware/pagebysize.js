@@ -56,7 +56,7 @@ function parsePages(callback) {
                 page.status == "Resolved" ||
                 page.status == "Closed"
                 ) {
-                putDataPoint(model, pageSize, dateDevFinished, timeSpent, page.key);
+                putDataPoint(model, pageSize, dateDevFinished, timeSpent, page);
             }
         }
 
@@ -71,6 +71,19 @@ function parsePages(callback) {
         }
         callback(err, model);
     })
+}
+
+function getTeamName(labels) {
+    var index = labels.indexOf("Team");
+    if(index < 0) {
+        return "";
+    }
+    var index2 = labels.indexOf(',', index);
+    if(index2 < 0) {
+        index2 = labels.length;
+    }
+
+    return labels.substring(index+4,index2);
 }
 
 function getPageSize(labels) {
@@ -90,14 +103,14 @@ function getPageSize(labels) {
         return "XXXL";
 }
 
-function putDataPoint(model, pageSize, dateDevFinished, timeSpent, key) {
+function putDataPoint(model, pageSize, dateDevFinished, timeSpent, page) {
     for (var k = 0; k < model.data.length; k++) {
         var size = model.data[k];
         if (size.name == pageSize) {
             size.data.push({
                 x: dateDevFinished,
                 y: timeSpent,
-                tooltip: key + ' - ' + timeSpent.toFixed(2) + 'h' });
+                tooltip: page.key + ' - ' + timeSpent.toFixed(2) + 'h - ' + getTeamName(page.labels) });
             return;
         }
     }
