@@ -55,7 +55,7 @@ function pagebysizeChartController($scope, $resource, $window) {
         var loadingDfrd = $.Deferred();
         var getChartSuccess = function (data) {
             $scope.chartsData = data;
-/*            var avarageSeries = [];
+            var avarageSeries = [];
             _.each($scope.chartsData.data, function(itemSeries){
                 avarageSeries.push({
                     name: itemSeries.name + ':trend',
@@ -65,10 +65,10 @@ function pagebysizeChartController($scope, $resource, $window) {
                         return fitData(itemSeries.data).data;
                     })()
                 });
-            })
+            });
 
             $scope.chartsData.data = _.union($scope.chartsData.data, avarageSeries);
-*/            loadingDfrd.resolve();
+            loadingDfrd.resolve();
         };
 
         var getChartFail = function (err) {

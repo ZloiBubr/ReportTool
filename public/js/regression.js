@@ -107,7 +107,7 @@ function fitData(data, typ) {
     ret = linearRegression(x, y);
     for (var i = 0; i < x.length; i++) {
       res = ret[0] * x[i] + ret[1];
-      ypred.push([x[i], res]);
+      ypred.push({x: x[i], y: res, tooltip: res.toFixed(2)});
     }
 
     return {
