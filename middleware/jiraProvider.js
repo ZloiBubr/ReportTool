@@ -121,6 +121,9 @@ function UpdatePages(full, jira, moduleKey, callback) {
         util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s)", moduleKey) :
         util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s) AND updated > -2d", moduleKey);
     jira.searchJira(queryString, null, function (error, stories) {
+        if(error) {
+            LogProgress(moduleKey + ' : Error Finding module pages from JIRA, please restart Update', error);
+        }
         if (stories != null) {
             var numRunningQueries = 0;
             for (var i = 0; i < stories.issues.length; i++) {
@@ -132,7 +135,7 @@ function UpdatePages(full, jira, moduleKey, callback) {
                     }
                     LogProgress(moduleKey + ' : ' + storykey + ' Page updated');
                     --numRunningQueries;
-                    if (numRunningQueries === 0) {
+                    if (1 > numRunningQueries) {
                         callback();
                     }
                 });
@@ -149,6 +152,9 @@ function UpdatePages(full, jira, moduleKey, callback) {
 
 function UpdatePage(jira, moduleKey, storyKey, callback) {
     jira.findIssue(storyKey + "?expand=changelog", function (error, issue) {
+        if(error) {
+            LogProgress(moduleKey + " : " + storyKey + ' : Error find issue details at JIRA, please restart Update', error);
+        }
         if (issue != null) {
             SavePage(jira, moduleKey, issue, function (err) {
                 callback(err, storyKey);
@@ -199,6 +205,7 @@ function ParseProgress(item, page, author, created) {
                     progressTo: to,
                     dateChanged: created
                 });
+                //log.info("PAGE PROGRESS HISTORY WAS ADDED : " + page._doc.key + " : " + page._doc.progressHistory.length);
             }
         }
     }
@@ -284,7 +291,7 @@ function parseWorklogs(jira, moduleKey, issue, page, callback) {
             jira.findIssue(subtask.key + "?expand=changelog", function (error, subtask) {
                 if (error) {
                     LogProgress('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-                    LogProgress(moduleKey + " : " + issue.key + ' : Finished with errors, please restart update');
+                    LogProgress(moduleKey + " : " + issue.key + ' : Finished with errors, please restart update', error);
                     LogProgress('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
                 }
                 if (subtask != null) {
@@ -292,7 +299,6 @@ function parseWorklogs(jira, moduleKey, issue, page, callback) {
                 }
                 --numRunningQueries;
                 if (numRunningQueries === 0) {
-                    //LogProgress(moduleKey + " : " + issue.key + ' : Finished Subtasks loop');
                     callback();
                 }
             });
@@ -306,7 +312,7 @@ function parseWorklogs(jira, moduleKey, issue, page, callback) {
 function SavePage(jira, moduleKey, issue, callback) {
     Page.findOne({ key: issue.key }, function (err, page) {
         if (err) {
-            LogProgress(moduleKey + " : " + page.key + ' : Error from JIRA, please restart Update');
+            LogProgress(moduleKey + " : " + page.key + ' : Error finding page at Mongo db, please restart Update', err);
             callback(err);
         }
 
@@ -332,8 +338,9 @@ function SavePage(jira, moduleKey, issue, callback) {
         parseHistory(issue, page);
         parseWorklogs(jira, moduleKey, issue, page, function () {
             page.save(function (err, page) {
-                //if (err) throw err;
-                //LogProgress(moduleKey + " : " + page.key + ' : Page saved');
+                if (err) {
+                    LogProgress(moduleKey + " : " + page.key + ' : Error saving page to Mongo db, please restart Update', err);
+                }
                 callback(err);
             })
         });
