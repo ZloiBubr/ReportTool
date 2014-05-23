@@ -209,7 +209,8 @@ function ParseFinishDates(item, page, created) {
         var from = item.fromString;
         var to = item.toString;
 
-        if(from == "In Progress" && to =="Ready for QA") {
+        if(from == "In Progress" && to =="Ready for QA" &&
+            page.devFinished == null) {
             page.devFinished = created;
         }
         if(from == "Testing in Progress" && to =="Resolved") {
