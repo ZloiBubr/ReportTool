@@ -117,14 +117,14 @@ function Teams() {
                 "Petr Falitarchyk",
                 "Aliaksandr Rykau",
                 "Ivan Dziameshka",
-                "Siarhei Bahdanovich",
-                "Iryna Shuliak"
+                "Siarhei Bahdanovich"
             ],
             testers: [
                 "Iryna Shuliak",
                 "Iryna Koush",
                 "Maryia Kireyeva",
-                "Katsiaryna Kuchko"
+                "Katsiaryna Kuchko",
+                "Iryna Razorionova"
             ]
         },
         {
