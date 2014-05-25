@@ -77,7 +77,7 @@ function Teams() {
                 "Aliaksei Labachou",
                 "Edhar Liashok",
                 "Raman Prakofyeu",
-                "Ruslan Khilmanovich",
+                "Ruslan Khilmanovich"
             ],
             testers: [
                 "Aliaksei Burnosenka",

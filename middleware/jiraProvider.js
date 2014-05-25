@@ -181,7 +181,7 @@ function ParseProgress(item, page, author, created) {
                     person: author,
                     progressFrom: from,
                     progressTo: to,
-                    dateChanged: created
+                    dateChanged: new Date(created)
                 }
             ];
         }
@@ -193,7 +193,7 @@ function ParseProgress(item, page, author, created) {
                 if (record.person == author &&
                     record.progressFrom == from &&
                     record.progressTo == to &&
-                    record.dateChanged == created) {
+                    record.dateChanged.getTime() == new Date(created).getTime()) {
                     recordFound = true;
                     break;
                 }
@@ -203,7 +203,7 @@ function ParseProgress(item, page, author, created) {
                     person: author,
                     progressFrom: from,
                     progressTo: to,
-                    dateChanged: created
+                    dateChanged: new Date(created)
                 });
                 //log.info("PAGE PROGRESS HISTORY WAS ADDED : " + page._doc.key + " : " + page._doc.progressHistory.length);
             }
@@ -250,8 +250,8 @@ function calcWorklogFromIssue(issue, page) {
                     {
                         person: author,
                         timeSpent: timeSpent,
-                        dateChanged: worklog.created,
-                        dateStarted: worklog.started
+                        dateChanged: new Date(worklog.created),
+                        dateStarted: new Date(worklog.started)
                     }
                 ];
             }
@@ -262,8 +262,9 @@ function calcWorklogFromIssue(issue, page) {
                     var record = page.worklogHistory[o];
                     if( record.person == author &&
                         record.timeSpent == timeSpent &&
-                        record.dateChanged == worklog.created &&
-                        record.dateStarted == worklog.started) {
+                        record.dateChanged.getTime() == new Date(worklog.created).getTime() &&
+                        record.dateStarted.getTime() == new Date(worklog.started).getTime())
+                    {
                         recordFound = true;
                         break;
                     }
@@ -272,8 +273,8 @@ function calcWorklogFromIssue(issue, page) {
                     page.worklogHistory.push({
                         person: author,
                         timeSpent: timeSpent,
-                        dateChanged: worklog.created,
-                        dateStarted: worklog.started
+                        dateChanged: new Date(worklog.created),
+                        dateStarted: new Date(worklog.started)
                     });
                 }
             }

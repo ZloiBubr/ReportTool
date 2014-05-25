@@ -2,8 +2,9 @@
  * Created by Heorhi_Vilkitski on 4/11/14.
  */
 
-function timeSheetController($scope, $resource, $window, $filter) {
-    var timeSheetDataResource = $resource('/timeSheetData/:from/:to',{from: "@from", to: "@to"});
+function timeSheetController($scope, $resource, $window, $filter, $modal) {
+    //var timeSheetDataResource = $resource('/personalData/:from/:to',{from: "@from", to: "@to"});
+    var timeSheetDataResource = $resource('/personalData');
 
     /* ------------------------------------------------------ Init/Reinit -------------------------------*/
     $scope.init = function () {
@@ -33,7 +34,7 @@ function timeSheetController($scope, $resource, $window, $filter) {
         var loadingDfrd = $.Deferred();
 
         var getTimeSheetSuccess = function (data) {
-            $scope.timeSheetData = data;
+            $scope.personalData = data;
             loadingDfrd.resolve();
         };
 
@@ -42,7 +43,8 @@ function timeSheetController($scope, $resource, $window, $filter) {
             loadingDfrd.reject(err);
         };
 
-        timeSheetDataResource.get($scope.common, getTimeSheetSuccess, getTimeSheetFail);
+        //timeSheetDataResource.get($scope.common, getTimeSheetSuccess, getTimeSheetFail);
+        timeSheetDataResource.get(getTimeSheetSuccess, getTimeSheetFail);
     };
 
 
@@ -53,8 +55,34 @@ function timeSheetController($scope, $resource, $window, $filter) {
         $scope.reInit();
     }
 
+    $scope.onCellClick = function(item) {
+
+        var modalInstance = $modal.open({
+            templateUrl: '/pages/modal/timeSheetPageModal.html',
+            controller: timeSheetPageModalController,
+            size: "sm",
+            resolve: {
+                item: function () {
+                    return item;
+                }
+            }
+        });
+    }
+
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
 
+    $scope.toFloat = function(item){
+        return parseFloat(item);
+    };
+
     $scope.init();
+}
+
+function timeSheetPageModalController($scope,$modalInstance, item ) {
+    $scope.selectedProgressDetail = item;
+
+    $scope.onOkClick = function (){
+        $modalInstance.close($scope.selectedProgressDetail);
+    }
 }
 

@@ -1,0 +1,17 @@
+<div class="modal-header">
+<h3 class="modal-title">Date: <b>{{ selectedProgressDetail.date | date:'dd-MM-yyyy' }}:</b></h3>
+</div>
+<div class="modal-body">
+    <strong>Pages:</strong>
+    <ul>
+        <li ng-repeat="pageItem in selectedProgressDetail.pages">
+            <span>Name: {{pageItem.pageId}}</span><br/>
+            <span>Spent hours: {{pageItem.HR}}</span>
+            <span>Story points: ---- </span><br/>
+        </li>
+    </ul>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" ng-click="onOkClick()">close</button>
+    <!--<button class="btn btn-warning" ng-click="cancel()">Cancel</button>-->
+</div>

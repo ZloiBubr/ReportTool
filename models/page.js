@@ -20,14 +20,14 @@ var schema = new Schema({
             person:         { type: String },
             progressFrom:   { type: String },
             progressTo:     { type: String },
-            dateChanged:    { type: String }
+            dateChanged:    { type: Date }
         }],
     epicKey:                { type: String },
     worklogHistory: [{
             person:         { type: String },
             timeSpent:      { type: String },
-            dateChanged:    { type: String },
-            dateStarted:    { type: String }
+            dateChanged:    { type: Date },
+            dateStarted:    { type: Date }
         }],
     created:                { type: String },
     updated:                { type: String }
