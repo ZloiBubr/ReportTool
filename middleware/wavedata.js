@@ -287,7 +287,7 @@ function putDataPoint(wavedata,
     cloudAppd.reportedSP += calcStoryPoints;
     cloudAppd.summarySP += storyPoints;
     cloudAppd.progress = cloudAppd.reportedSP*100/cloudAppd.summarySP;
-    cloudAppd.uri = initUri + "CloudApp_" + cloudApp + ") AND labels in(PageModuleGroup_" + moduleGroup + ") AND labels in(PageModule_" + moduleName + ")";
+    cloudAppd.uri = initUri + "CloudApp_" + cloudApp + ") AND labels in(PageModuleGroup_" + moduleGroup + ") AND labels in(PageModule_" + moduleName + ") AND labels in(" + wave + ")";
     if(status != cloudAppd.status) {
         if((cloudAppd.status == "Ready for QA" || cloudAppd.status == "Testing in Progress") && (status == "Resolved" || status == "Testing in Progress" || status =="Ready for QA")) {
             cloudAppd.status = "Testing in Progress";
