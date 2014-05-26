@@ -5,7 +5,7 @@
     <strong>Pages:</strong>
     <ul>
         <li ng-repeat="pageItem in selectedProgressDetail.pages">
-            <span>Name: <strong>{{pageItem.pageId}}</strong></span><br/>
+            <span>Name: <strong><a href="https://jira.epam.com/jira/browse/{{pageItem.pageId}}">{{pageItem.pageId}}</a></strong></span><br/>
             <span>Spent hours: {{pageItem.HR}}</span><br/>
             <span>Story points: {{pageItem.SP}} </span>
         </li>
