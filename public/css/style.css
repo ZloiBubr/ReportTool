@@ -34,6 +34,21 @@ a {
     margin-bottom: 0px;
 }
 
+.no-padding td,
+.no-padding a
+{
+ padding: 0 !important;
+}
+
+.table-timesheet-hover > tbody > tr:hover > td,
+.table-timesheet-hover > tbody > tr:hover > th {
+    background-color: #d9edf7;
+}
+
+.hour-timesheet-color{
+    color: #CC6633;
+}
+
 .form-actions
 {
     padding: 19px 0 20px;
