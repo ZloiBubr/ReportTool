@@ -34,6 +34,7 @@ function parsePages(callback) {
 
     async.each(teamsModel.teams, function (team, teamCallback) {
         async.each(team.developers, function (developer, developerCallback) {
+
             Page.find({worklogHistory: {$elemMatch: {person: developer.name, dateChanged: {$gte: teamsModel.startDate, $lte: teamsModel.endDate}}}},
                 function (err, pages) {
                     for (var d = new Date(teamsModel.startDate.getTime()); d <= teamsModel.endDate; d.setDate(d.getDate() + 1)) {
@@ -51,8 +52,6 @@ function parsePages(callback) {
                             _.each(pageItem.worklogHistory, function (worklogItem) {
                                 if (worklogItem.person == developer.name && datesCompareHelper(worklogItem.dateStarted, d)) {
 
-
-
                                     var page = _.find(progressDetail.pages, function (tpageItem) {
                                         return tpageItem.pageId == pageItem.key
                                     });
@@ -68,25 +67,30 @@ function parsePages(callback) {
                                 }
                             });
 
-//                    _.each(pageItem.progressHistory, function (progresHistoryItem) {
-//                        if (datesCompareHelper(progresHistoryItem.dateChanged, d)) {
-//                            var page = _.find(progressDetail.pages, function (tpageItem) {
-//                                return tpageItem.pageId == pageItem.key
-//                            });
-//                            if (_.isUndefined(page)) {
-//                                page = new teamsModels.Page(pageItem.key);
-//                                progressDetail.pages.push(page);
-//                            }
-//
-//                            var from = _.isNumber(progresHistoryItem.progressFrom) ? parseInt(progresHistoryItem.progressFrom) : 0;
-//                            var to = _.isNumber(progresHistoryItem.progressTo) ? parseInt(progresHistoryItem.progressTo) : 0;
-//                            var progress = (to - from) * pageItem.storyPoints / 100;
-//
-//                            page.SP += progress;
-//                            progressDetail.totalSP += progress;
-//                            developer.totalSP += progress;
-//                        }
-//                    });
+                    _.each(pageItem.progressHistory, function (progresHistoryItem) {
+                        if (progresHistoryItem.person == developer.name && datesCompareHelper(progresHistoryItem.dateChanged, d)) {
+
+                            var page = _.find(progressDetail.pages, function (tpageItem) {
+                                return tpageItem.pageId == pageItem.key
+                            });
+
+                            if (_.isUndefined(page)) {
+                                page = new teamsModels.Page(pageItem.key);
+                                progressDetail.pages.push(page);
+                            }
+
+                            var from = parseInt(progresHistoryItem.progressFrom);
+                            var to =  parseInt(progresHistoryItem.progressTo);
+                            from = isNaN(from) ? 0 : from;
+                            to = isNaN(to) ? 0 : to;
+
+                            var progress = (to - from) * pageItem.storyPoints / 100;
+
+                            page.SP += progress;
+                            progressDetail.totalSP += progress;
+                            developer.totalSP += progress;
+                        }
+                    });
 
                         })
                     }
