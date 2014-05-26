@@ -20,7 +20,7 @@ var UpdateProgress = function(progress) {
     response.write("event: progress\n");
     response.write("data: " + progress.toString() + "\n\n");
     if(progress > 0) {
-        LogProgress("********** Progress " + + progress.toString() + "% **********");
+        LogProgress("********** Progress " + progress.toString() + "% **********");
     }
 }
 
