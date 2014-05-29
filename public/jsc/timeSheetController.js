@@ -88,11 +88,19 @@ function timeSheetController($scope, $resource, $window, $filter, $modal,  $sce)
 
         }
         return 0;
-    }
+    };
+
+    $scope.filterExcludeAutomation  = function() {
+        return function(item)
+        {
+            return item.name !== "Automation";
+
+        }
+    };
 
     $scope.getCellHrSpString = function(progressDetail){
         var totalSP =  $filter('number')(parseFloat(progressDetail.totalSP), 2);
-        var totalHR = progressDetail.totalHR
+        var totalHR = $filter('number')(parseFloat(progressDetail.totalHR), 2);
 
         if(totalSP == 0 && totalHR == 0){
            return $sce.trustAsHtml("-");
