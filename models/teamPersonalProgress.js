@@ -11,6 +11,9 @@ exports.TeamPersonalProgress = function () {
                     name: "Heorhi vilkitsi",
                     totalSP: 20,
                     totalHR: 40,
+                    avgSP: 0,
+                    avgSPinHour: 0,
+                    avgSPOnAllDays: 0,
                     progressDetails: [
                         {
                             date: new Date(2014, 5, 11),
@@ -50,6 +53,9 @@ exports.Developer =  function(name){
     this.name = name;
     this.totalSP = 0;
     this.totalHR = 0;
+    this.avgSP = 0;
+    this.avgSPinHour = 0;
+    this.avgSPOnAllDays = 0;
     this.progressDetails = [];
 };
 
