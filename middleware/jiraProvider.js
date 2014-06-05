@@ -7,9 +7,12 @@ var log = require('../libs/log')(module);
 var Module = require('../models/module').Module;
 var Page = require('../models/page').Page;
 var ClearDB = require('./createDb').Clear;
+var _ = require('underscore');
 
 var JiraApi = require('jira').JiraApi;
 var response = null;
+
+var brokenModules = [];
 
 exports.rememberResponse = function(res) {
     response = res;
@@ -40,20 +43,37 @@ var LogProgress = function(text, error) {
 exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
     ClearDB(full, function (err) {
         if (err) throw err;
+        brokenModules = [];
 
         var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), jiraUser, jiraPassword, '2');
 
         UpdateModules(full, jira, function (err) {
-            if(err) {
+            if(err || brokenModules.length > 0) {
                 LogProgress('**************************');
-                LogProgress('Error during processing...');
-                LogProgress('Please restart Update!!!!!');
+                LogProgress('Error happened, read above if we fixed it ...');
                 LogProgress('**************************');
             }
             else {
                 LogProgress('**********************');
-                LogProgress('Finished processing...');
+                LogProgress('Finished processing successfully ...');
                 LogProgress('**********************');
+            }
+            if(brokenModules.length > 0) {
+                _.each(brokenModules, function(module) {
+                    LogProgress("Reprocessing failed Module :" + module);
+                    jira.findIssue(module, function (error, epic) {
+                        if (error) {
+                            LogProgress("Module failed again, restart update! Module :" + module);
+                        }
+                        SaveModule(full, jira, epic, function (err) {
+                                if (err) {
+                                    LogProgress("Module failed again, restart update! Module :" + module);
+                                }
+                        })
+                        LogProgress("Reprocessing finished successfully! Module :" + module);
+                    })
+                })
+                brokenModules = [];
             }
             response.end();
         });
@@ -75,6 +95,7 @@ function UpdateModules(full, jira, callback) {
                 LogProgress("********** Module #" + numRunningQueries.toString() + " of " + totalModules + " : " + epic.key);
                 SaveModule(full, jira, epic, function (err) {
                     if(err) {
+                        brokenModules.push(epic);
                         callback(err);
                     }
                     LogProgress("********** Module #" + (totalModules - numRunningQueries + 1) + " of " + totalModules + " finished processing");
@@ -96,17 +117,15 @@ function UpdateModules(full, jira, callback) {
 
 function SaveModule(full, jira, epic, callback) {
     Module.findOne({ key: epic.key }, function (err, module) {
-        if (err) throw err;
-
         if (!module) {
             module = new Module();
         }
         module.key = epic.key;
         module.summary = epic.fields.summary;
         module.save(function (err, module) {
-            if (err) throw err;
             UpdatePages(full, jira, epic.key, function (err) {
                 if(err) {
+                    brokenModules.push(epic);
                     callback(err);
                 }
                 LogProgress(module.key + ' : Module saved');
@@ -119,7 +138,7 @@ function SaveModule(full, jira, epic, callback) {
 function UpdatePages(full, jira, moduleKey, callback) {
     var queryString = full ?
         util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s)", moduleKey) :
-        util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s) AND updated > -2d", moduleKey);
+        util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s) AND updated > -3d", moduleKey);
     jira.searchJira(queryString, null, function (error, stories) {
         if(error) {
             LogProgress(moduleKey + ' : Error Finding module pages from JIRA, please restart Update', error);
@@ -131,6 +150,7 @@ function UpdatePages(full, jira, moduleKey, callback) {
                 var story = stories.issues[i];
                 UpdatePage(jira, moduleKey, story.key.toString(), function (err, storykey) {
                     if(err) {
+                        brokenModules.push(moduleKey);
                         callback(err);
                     }
                     LogProgress(moduleKey + ' : ' + storykey + ' Page updated');
@@ -153,7 +173,9 @@ function UpdatePages(full, jira, moduleKey, callback) {
 function UpdatePage(jira, moduleKey, storyKey, callback) {
     jira.findIssue(storyKey + "?expand=changelog", function (error, issue) {
         if(error) {
+            brokenModules.push(moduleKey);
             LogProgress(moduleKey + " : " + storyKey + ' : Error find issue details at JIRA, please restart Update', error);
+            callback(err, storyKey);
         }
         if (issue != null) {
             SavePage(jira, moduleKey, issue, function (err) {
@@ -291,6 +313,7 @@ function parseWorklogs(jira, moduleKey, issue, page, callback) {
             ++numRunningQueries;
             jira.findIssue(subtask.key + "?expand=changelog", function (error, subtask) {
                 if (error) {
+                    brokenModules.push(moduleKey);
                     LogProgress('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
                     LogProgress(moduleKey + " : " + issue.key + ' : Finished with errors, please restart update', error);
                     LogProgress('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
