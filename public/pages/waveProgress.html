@@ -1,4 +1,25 @@
-<div id="container" class="container" ng-controller="waveProgressController">
+<div id="container" class="container" ng-controller="waveProgressController" style="padding-left: 150px">
+    <div class="visible-md visible-lg visible-sm" style="position:fixed; left: 10px; top:150px; font-size: 12pt ">
+        <ul class="list-unstyled">
+            <li>Team:<select class="form-control headerSelectWidth" ng-model="filteredTeam" class="headerSelectWidth" ng-options="team.name as team.name for team in allTeams" ng-change="processWithRowSpans()"></select></li>
+            <li><input type="checkbox" ng-model="total.readyForQA.isChecked" ng-change="processWithRowSpans()"> <span class="glyphicon glyphicon-th-list"></span><strong> {{total.readyForQA.count}}</strong>:Ready for QA</li>
+            <li><input type="checkbox" ng-model="total.resolved.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-check"></span><strong> {{total.resolved.count}}</strong>:Resolved</li>
+            <li><input type="checkbox" ng-model="total.accepted.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-star"></span><strong> {{total.accepted.count}}</strong>:Accepted</li>
+            <li><br/></li>
+            <li><input type="checkbox" ng-model="total.open.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-inbox"></span><strong> {{total.open.count}}</strong>:Open</li>
+            <li><input type="checkbox" ng-model="total.assigned.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-user"></span><strong> {{total.assigned.count}}</strong>:Assigned</li>
+            <li><input type="checkbox" ng-model="total.inProgress.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-play"></span><strong> {{total.inProgress.count}}</strong>:In Progress</li>
+            <li><input type="checkbox" ng-model="total.blocked.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-remove"></span><strong> {{total.blocked.count}}</strong>:Blocked</li>
+            <li><input type="checkbox" ng-model="total.reopened.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-share-alt"></span><strong> {{total.reopened.count}}</strong>:Reopened</li>
+            <li><input type="checkbox" ng-model="total.codeReview.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-eye-open"></span><strong> {{total.codeReview.count}}</strong>:Code Review</li>
+            <li><input type="checkbox" ng-model="total.testingInProgress.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-road"></span><strong> {{total.testingInProgress.count}}</strong>:Testing In Progress</li>
+            <li><input type="checkbox" ng-model="total.deferred.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-time"></span><strong> {{total.deferred.count}}</strong>:Deferred</li>
+            <li><input type="checkbox" ng-model="total.unspecified.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-eye-close"></span><strong> {{total.unspecified.count}}</strong>:Unspecified</li>
+            <li><br/></li>
+            <li><input type="checkbox" ng-model="total.all.isChecked" ng-change="onSelectDeselectAll()"><span class="glyphicon glyphicon-shopping-cart"></span><strong> {{total.total}}</strong>:Total</li>
+            <li><br/></li>
+        </ul>
+    </div>
     <div class="row">
 
         <div class="col-lg-12">

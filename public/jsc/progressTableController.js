@@ -116,11 +116,7 @@ function progressTableController($scope, $resource, $window) {
         {"id": "TeamInspiration", "title": "TeamInspiration"}
     ];
 
-    $scope.allTeams = function () {
-        var allTeamsArray = [{"id": "All", "name": "All"}];
-        allTeamsArray.push.apply(allTeamsArray,$scope.TeamDevMembers.teams);
-        return allTeamsArray;
-    }();
+
 
     $scope.init();
 }

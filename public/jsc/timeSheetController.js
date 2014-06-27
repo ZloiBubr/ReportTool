@@ -105,14 +105,6 @@ function timeSheetController($scope, $resource, $window, $filter, $modal,  $sce)
         if(totalSP == 0 && totalHR == 0){
            return $sce.trustAsHtml("-");
         }
-//
-//        if(totalSP > 0 && totalHR == 0) {
-//            return  "-(" + totalSP + "sp)";
-//        }
-//
-//        if(totalSP == 0 && totalHR > 0) {
-//            return  totalHR + "h(-sp)";
-//        }
 
         return $sce.trustAsHtml("<span class='hour-timesheet-color'>" +  totalHR + "</span>" + "<sup style='color:black'>" + totalSP + "</sup>");
     }

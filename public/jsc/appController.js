@@ -27,6 +27,12 @@ function appController($scope, $resource, $window) {
     $scope.isInt = function (n) {
         return typeof n === 'number' && parseFloat(n) == parseInt(n, 10) && !isNaN(n);
     };
+
+    $scope.allTeams = function () {
+        var allTeamsArray = [{"id": "All", "name": "All"}];
+        allTeamsArray.push.apply(allTeamsArray,$scope.TeamDevMembers.teams);
+        return allTeamsArray;
+    }();
 }
 
 myApp.run(function ($rootScope, $location) {
