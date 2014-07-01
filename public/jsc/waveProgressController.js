@@ -18,12 +18,15 @@ function waveProgressController($scope, $resource, $window, $filter) {
     $scope.dataLoad = function () {
         $scope.filteredTeam = $scope.allTeams[0].id;
         $scope.isTotalWasCalculated = false;
+        $scope.reInitTotal();
+        $scope.getTimeSheetData().done($scope.processWithRowSpans);
+    };
 
+    $scope.reInitTotal = function(){
         $scope.total = new $scope.statuses();
         $scope.total.all = {isChecked :true};
         $scope.total.total = 0;
-        $scope.getTimeSheetData().done($scope.processWithRowSpans);
-    };
+    }
 
     $scope.processWithRowSpans = function () {
         $scope.invertedWaveProgressData=[];
@@ -36,12 +39,13 @@ function waveProgressController($scope, $resource, $window, $filter) {
                         var firstCloudAppIndex = $scope.invertedWaveProgressData.length;
                         moduleItem.rowSpan = _.reduce(moduleItem.cloudApp, function(cloudAppMemo, cloudAppItem){
                             var statusEntity = $scope.total.getStatusByName(cloudAppItem.status);
-                            $scope.isTotalWasCalculated ? void(0) : statusEntity.count++;
-                            $scope.isTotalWasCalculated ? void(0) : $scope.total.total++;
 
                             if($scope.filteredTeam != $scope.allTeams[0].id && cloudAppItem.teamName != $scope.filteredTeam){
                                 return cloudAppMemo;
                             }
+
+                            $scope.isTotalWasCalculated ? void(0) : statusEntity.count++;
+                            $scope.isTotalWasCalculated ? void(0) : $scope.total.total++;
 
                             if(statusEntity.isChecked)
                             {
@@ -122,6 +126,13 @@ function waveProgressController($scope, $resource, $window, $filter) {
 
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
 
+
+    $scope.filterCloudAppByTeam = function()
+    {
+        $scope.reInitTotal();
+        $scope.isTotalWasCalculated = false;
+        $scope.processWithRowSpans();
+    }
 
     $scope.filterCloudAppByStatus = function(item)
     {

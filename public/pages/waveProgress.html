@@ -1,7 +1,7 @@
 <div id="container" class="container" ng-controller="waveProgressController" style="padding-left: 150px">
     <div class="visible-md visible-lg visible-sm" style="position:fixed; left: 10px; top:150px; font-size: 12pt ">
         <ul class="list-unstyled">
-            <li>Team:<select class="form-control headerSelectWidth" ng-model="filteredTeam" class="headerSelectWidth" ng-options="team.name as team.name for team in allTeams" ng-change="processWithRowSpans()"></select></li>
+            <li>Team:<select class="form-control headerSelectWidth" ng-model="filteredTeam" class="headerSelectWidth" ng-options="team.name as team.name for team in allTeams" ng-change="filterCloudAppByTeam()"></select></li>
             <li><input type="checkbox" ng-model="total.blocked.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-remove"></span><strong> {{total.blocked.count}}</strong>:Blocked</li>
             <li><input type="checkbox" ng-model="total.open.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-inbox"></span><strong> {{total.open.count}}</strong>:Open</li>
             <li><input type="checkbox" ng-model="total.deferred.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-time"></span><strong> {{total.deferred.count}}</strong>:Deferred</li>
