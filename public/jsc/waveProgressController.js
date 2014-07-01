@@ -18,22 +18,10 @@ function waveProgressController($scope, $resource, $window, $filter) {
     $scope.dataLoad = function () {
         $scope.filteredTeam = $scope.allTeams[0].id;
         $scope.isTotalWasCalculated = false;
-        $scope.total = {
-            open:{count:0, isChecked:true},
-            assigned:{count:0, isChecked:true},
-            inProgress:{count:0, isChecked:true},
-            codeReview:{count:0, isChecked:true},
-            accepted:{count:0, isChecked:true},
-            readyForQA:{count:0, isChecked:true},
-            testingInProgress:{count:0, isChecked:true},
-            resolved:{count:0, isChecked:true},
-            blocked:{count:0, isChecked:true},
-            reopened:{count:0, isChecked:true},
-            deferred:{count:0, isChecked:true},
-            unspecified:{count:0, isChecked:true},
-            all:{isChecked :true},
-            total:0
-        };
+
+        $scope.total = new $scope.statuses();
+        $scope.total.all = {isChecked :true};
+        $scope.total.total = 0;
         $scope.getTimeSheetData().done($scope.processWithRowSpans);
     };
 
@@ -47,7 +35,7 @@ function waveProgressController($scope, $resource, $window, $filter) {
                 moduleGroupItem.rowSpan = _.reduce(moduleGroupItem.module, function(moduleMemo, moduleItem){
                         var firstCloudAppIndex = $scope.invertedWaveProgressData.length;
                         moduleItem.rowSpan = _.reduce(moduleItem.cloudApp, function(cloudAppMemo, cloudAppItem){
-                            var statusEntity = $scope.getStatusEntity(cloudAppItem.status);
+                            var statusEntity = $scope.total.getStatusByName(cloudAppItem.status);
                             $scope.isTotalWasCalculated ? void(0) : statusEntity.count++;
                             $scope.isTotalWasCalculated ? void(0) : $scope.total.total++;
 
@@ -87,68 +75,6 @@ function waveProgressController($scope, $resource, $window, $filter) {
             }
         });
         $scope.isTotalWasCalculated = true;
-//
-//
-//        _.each($scope.waveProgressData, function(waveProgressItem){
-//            $scope.waveProgressData.rowSpan = _.reduce(waveProgressItem.moduleGroup, function(moduleGroupMemo, moduleGroupItem){
-//                item.moduleGroup.rowSpan = _.reduce(moduleGroupItem.module, function(moduleMemo, moduleItem){
-//
-//                    item.module.rowSpan = _.reduce(moduleItem.cloudApp, function(cloudAppMemo, cloudAppItem){
-//                            return cloudAppMemo + 1;
-//                    },0);
-//                    return moduleMemo + item.module.rowSpan;
-//
-//                },0);
-//                return moduleMemo + item.moduleGroup.rowSpan;
-//
-//                }, 0);
-//        });
-    };
-
-    $scope.getStatusEntity = function(item)
-    {
-        var resultEntity;
-
-        switch(item)
-        {
-            case "Open":
-                resultEntity = $scope.total.open;
-                break;
-            case "Deferred":
-                resultEntity = $scope.total.deferred;
-                break;
-            case "Assigned":
-                resultEntity = $scope.total.assigned;
-                break;
-            case "In Progress":
-                resultEntity = $scope.total.inProgress;
-                break;
-            case "Code Review":
-                resultEntity = $scope.total.codeReview;
-                break;
-            case "Accepted":
-                resultEntity = $scope.total.accepted;
-                break;
-            case "Ready for QA":
-                resultEntity = $scope.total.readyForQA;
-                break;
-            case "Testing in Progress":
-                resultEntity = $scope.total.testingInProgress;
-                break;
-            case "Resolved":
-                resultEntity = $scope.total.resolved;
-                break;
-            case "Blocked":
-                resultEntity = $scope.total.blocked;
-                break;
-            case "Reopened":
-                resultEntity = $scope.total.reopened;
-                break;
-            case "":
-                resultEntity = $scope.total.unspecified;
-                break;
-        }
-        return resultEntity;
     };
 
     /* -------------------------------------------------------Event handlers ------------------------ */
@@ -189,9 +115,7 @@ function waveProgressController($scope, $resource, $window, $filter) {
         $scope.total.testingInProgress.isChecked = $scope.total.all.isChecked;
         $scope.total.resolved.isChecked = $scope.total.all.isChecked;
         $scope.total.blocked.isChecked = $scope.total.all.isChecked;
-        $scope.total.reopened.isChecked = $scope.total.all.isChecked;
         $scope.total.deferred.isChecked = $scope.total.all.isChecked;
-        $scope.total.unspecified.isChecked = $scope.total.all.isChecked;
 
         $scope.processWithRowSpans();
     }

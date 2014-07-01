@@ -1,7 +1,11 @@
 var mongoose = require('../libs/mongoose');
+
 var Module = require('../models/module').Module;
 var Page = require('../models/page').Page;
 var log = require('../libs/log')(module);
+
+var statusExport = require('../public/jsc/statusList');
+var statusList = new statusExport.statuses();
 
 exports.getData = function (req, res) {
     parsePages(function (err, wavedata) {
@@ -267,6 +271,8 @@ function putDataPoint(wavedata,
         }
     }
     status = status == 'Closed' ? "Accepted" : status;
+    status = status == 'Reopened' ? "Assigned" : status;
+
     if(!cloudAppd) {
         cloudAppd = { progress: 0, reportedSP: 0, summarySP: 0, name: cloudApp,
             status: status,
@@ -288,22 +294,31 @@ function putDataPoint(wavedata,
     cloudAppd.summarySP += storyPoints;
     cloudAppd.progress = cloudAppd.reportedSP*100/cloudAppd.summarySP;
     cloudAppd.uri = initUri + "CloudApp_" + cloudApp + ") AND labels in(PageModuleGroup_" + moduleGroup + ") AND labels in(PageModule_" + moduleName + ") AND labels in(" + wave + ")";
-    if(status != cloudAppd.status) {
-        if((cloudAppd.status == "Ready for QA" || cloudAppd.status == "Testing in Progress") && (status == "Resolved" || status == "Testing in Progress" || status =="Ready for QA")) {
-            cloudAppd.status = "Testing in Progress";
-        }
-        else if(cloudAppd.status == "Resolved" && (status == "Ready for QA" || status == "Testing in Progress")) {
-            cloudAppd.status = "Ready for QA";
-            cloudAppd.readyForQA = true;
-            cloudAppd.accepted = false;
-            cloudAppd.readyForAcceptance = false;
-        }
-        else {
-            cloudAppd.accepted = false;
-            cloudAppd.readyForAcceptance = false;
-            cloudAppd.readyForQA = false;
-            cloudAppd.blocked = cloudAppd.blocked || status == "Blocked";
-            cloudAppd.status = cloudAppd.blocked ? "Blocked" : "";
-        }
+
+
+    var cloudAppStatus = statusList.getStatusByName(cloudAppd.status);
+    var pageStatus = statusList.getStatusByName(status);
+
+    if(pageStatus.weight < cloudAppStatus.weight){
+        cloudAppd.status = status;
     }
+
+//    if(status != cloudAppd.status) {
+//        if((cloudAppd.status == "Ready for QA" || cloudAppd.status == "Testing in Progress") && (status == "Resolved" || status == "Testing in Progress" || status =="Ready for QA")) {
+//            cloudAppd.status = "Testing in Progress";
+//        }
+//        else if(cloudAppd.status == "Resolved" && (status == "Ready for QA" || status == "Testing in Progress")) {
+//            cloudAppd.status = "Ready for QA";
+//            cloudAppd.readyForQA = true;
+//            cloudAppd.accepted = false;
+//            cloudAppd.readyForAcceptance = false;
+//        }
+//        else {
+//            cloudAppd.accepted = false;
+//            cloudAppd.readyForAcceptance = false;
+//            cloudAppd.readyForQA = false;
+//            cloudAppd.blocked = cloudAppd.blocked || status == "Blocked";
+//            cloudAppd.status = cloudAppd.blocked ? "Blocked" : "";
+//        }
+//    }
 }

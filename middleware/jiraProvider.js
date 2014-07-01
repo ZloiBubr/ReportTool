@@ -175,7 +175,7 @@ function UpdatePage(jira, moduleKey, storyKey, callback) {
         if(error) {
             brokenModules.push(moduleKey);
             LogProgress(moduleKey + " : " + storyKey + ' : Error find issue details at JIRA, please restart Update', error);
-            callback(err, storyKey);
+            callback(error, storyKey);
         }
         if (issue != null) {
             SavePage(jira, moduleKey, issue, function (err) {
