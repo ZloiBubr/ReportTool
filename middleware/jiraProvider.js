@@ -141,9 +141,9 @@ function CollectModules(jira, callback) {
 }
 
 function CollectPages(full, jira, moduleKey, callback) {
-    var queryString = /* full ? */
-        util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s)", moduleKey) /*  :
-        util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s) AND updated > -3d", moduleKey) */;
+    var queryString = full ?
+        util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s)", moduleKey) :
+        util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s) AND updated > -3d", moduleKey);
     jira.searchJira(queryString, { fields: ["summary"] }, function (error, stories) {
         if (error) {
             callback(error);
