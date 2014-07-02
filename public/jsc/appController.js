@@ -33,6 +33,8 @@ function appController($scope, $resource, $window) {
         allTeamsArray.push.apply(allTeamsArray,$scope.TeamDevMembers.teams);
         return allTeamsArray;
     }();
+
+    $scope.statuses = $window.exports.statuses;
 }
 
 myApp.run(function ($rootScope, $location) {
