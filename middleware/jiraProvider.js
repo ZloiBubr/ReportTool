@@ -37,6 +37,7 @@ var LogProgress = function (text, error) {
     }
     if (error) {
         log.error(text);
+        log.error(error);
     }
     else {
         log.info(text);
@@ -55,6 +56,7 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
 
         var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), jiraUser, jiraPassword, '2');
         var counter = 0;
+        var lastProgress = 0;
 
         LogProgress("**** async");
         async.series([
@@ -65,7 +67,7 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
                 },
                 function (callback) {
                     //grab pages list
-                    async.forEachSeries(epicsList, function (epic, callback2) {
+                    async.forEachLimit(epicsList, 10, function (epic, callback2) {
                             LogProgress("**** async collect pages for module: " + epic);
                             CollectPages(full, jira, epic, callback2);
                         },
@@ -81,8 +83,12 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
                 function (callback) {
                     //process pages
                     LogProgress("**** async process pages");
-                    async.forEachSeries(issuesList, function (issue, callback2) {
-                            UpdateProgress(Math.floor((++counter*100)/issuesList.length));
+                    async.forEachLimit(issuesList, 5, function (issue, callback2) {
+                            var currentProgress = Math.floor((++counter*100)/issuesList.length);
+                            if(lastProgress != currentProgress) {
+                                lastProgress = currentProgress;
+                                UpdateProgress(currentProgress);
+                            }
                             LogProgress("**** async process page: " + issue);
                             ProcessPage(jira, issue, callback2);
                         },
@@ -99,6 +105,9 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
             function (err) {
                 if (err) {
                     LogProgress("!!!!!!!!!!!!!!!!!!!! Update failed!", err);
+                }
+                else {
+                    LogProgress("Update finished successfully!", err);
                 }
                 response.end();
             });
@@ -211,7 +220,7 @@ function SavePage(jira, issue, callback) {
         async.forEachSeries(issue.fields.subtasks, function(subtask, callback2) {
             jira.findIssue(subtask.key + "?expand=changelog", function (error, subtask) {
                 if (error) {
-                    return next(error);
+                    callback(error);
                 }
                 if (subtask != null) {
                     calcWorklogFromIssue(subtask, page);
