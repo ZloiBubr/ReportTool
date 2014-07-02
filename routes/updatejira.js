@@ -9,7 +9,9 @@ exports.post = function (req, res, next) {
     var password = req.body.password;
     var full = req.body.full == "true" ? true : false;
 
-    jiraProvider.updateJiraInfo(full, username, password, function () {
+    jiraProvider.updateJiraInfo(full, username, password, function (err) {
+        if (err) {
+        }
     });
     res.send({});
 };

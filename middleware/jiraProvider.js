@@ -8,31 +8,34 @@ var Module = require('../models/module').Module;
 var Page = require('../models/page').Page;
 var ClearDB = require('./createDb').Clear;
 var _ = require('underscore');
+var async = require('async');
 
 var JiraApi = require('jira').JiraApi;
 var response = null;
 
-var brokenModules = [];
+var epicsList = [];
+var issuesList = [];
+var epicIssueMap = {};
 
-exports.rememberResponse = function(res) {
+exports.rememberResponse = function (res) {
     response = res;
     UpdateProgress(0);
 }
 
-var UpdateProgress = function(progress) {
+var UpdateProgress = function (progress) {
     response.write("event: progress\n");
     response.write("data: " + progress.toString() + "\n\n");
-    if(progress > 0) {
+    if (progress > 0) {
         LogProgress("********** Progress " + progress.toString() + "% **********");
     }
 }
 
-var LogProgress = function(text, error) {
-    if(response) {
+var LogProgress = function (text, error) {
+    if (response) {
         response.write("event: logmessage\n");
         response.write("data: " + text + "\n\n");
     }
-    if(error) {
+    if (error) {
         log.error(text);
     }
     else {
@@ -42,149 +45,191 @@ var LogProgress = function(text, error) {
 
 exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
     ClearDB(full, function (err) {
-        if (err) throw err;
-        brokenModules = [];
+        if (err) {
+            LogProgress("!!!!!!!!!!!!!!!!!!!! DB Cleanup error happened!", err);
+            callback(err);
+        }
+        issuesList = [];
+        epicsList = [];
+        epicIssueMap = {};
 
         var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), jiraUser, jiraPassword, '2');
+        var counter = 0;
 
-        UpdateModules(full, jira, function (err) {
-            if(err || brokenModules.length > 0) {
-                LogProgress('**************************');
-                LogProgress('Error happened, read above if we fixed it ...');
-                LogProgress('**************************');
-            }
-            else {
-                LogProgress('**********************');
-                LogProgress('Finished processing successfully ...');
-                LogProgress('**********************');
-            }
-            if(brokenModules.length > 0) {
-                _.each(brokenModules, function(module) {
-                    LogProgress("Reprocessing failed Module :" + module);
-                    jira.findIssue(module, function (error, epic) {
-                        if (error) {
-                            LogProgress("Module failed again, restart update! Module :" + module);
+        LogProgress("**** async");
+        async.series([
+                function (callback) {
+                    //grab all modules
+                    LogProgress("**** async collect modules");
+                    CollectModules(jira, callback);
+                },
+                function (callback) {
+                    //grab pages list
+                    async.forEachSeries(epicsList, function (epic, callback2) {
+                            LogProgress("**** async collect pages for module: " + epic);
+                            CollectPages(full, jira, epic, callback2);
+                        },
+                        function (err) {
+                            if (err) {
+                                LogProgress("!!!!!!!!!!!!!!!!!!!! Collecting pages error happened!", err);
+                                callback(err);
+                            }
+                            callback();
                         }
-                        SaveModule(full, jira, epic, function (err) {
-                                if (err) {
-                                    LogProgress("Module failed again, restart update! Module :" + module);
-                                }
-                        })
-                        LogProgress("Reprocessing finished successfully! Module :" + module);
-                    })
-                })
-                brokenModules = [];
-            }
-            response.end();
-        });
+                    )
+                },
+                function (callback) {
+                    //process pages
+                    LogProgress("**** async process pages");
+                    async.forEachSeries(issuesList, function (issue, callback2) {
+                            UpdateProgress(Math.floor((++counter*100)/issuesList.length));
+                            LogProgress("**** async process page: " + issue);
+                            ProcessPage(jira, issue, callback2);
+                        },
+                        function (err) {
+                            if (err) {
+                                LogProgress("!!!!!!!!!!!!!!!!!!!! Processing pages error happened!", err);
+                                callback(err);
+                            }
+                            callback();
+                        }
+                    )
+                }
+            ],
+            function (err) {
+                if (err) {
+                    LogProgress("!!!!!!!!!!!!!!!!!!!! Update failed!", err);
+                }
+                response.end();
+            });
         callback();
     })
 }
 
-function UpdateModules(full, jira, callback) {
+function CollectModules(jira, callback) {
     var requestString = "project = PLEX-UXC AND issuetype = epic AND summary ~ Module AND NOT summary ~ automation ORDER BY key ASC";
 
     UpdateProgress(1);
+
     jira.searchJira(requestString, null, function (error, epics) {
-        if (epics != null) {
-            var numRunningQueries = 0;
-            var totalModules = epics.issues.length;
-            for (var i = 0; i < totalModules; i++) {
-                ++numRunningQueries;
-                var epic = epics.issues[i];
-                LogProgress("********** Module #" + numRunningQueries.toString() + " of " + totalModules + " : " + epic.key);
-                SaveModule(full, jira, epic, function (err) {
-                    if(err) {
-                        brokenModules.push(epic);
-                        callback(err);
+        if (error) {
+            callback(error);
+        }
+        if(epics != null) {
+            async.forEachSeries(epics.issues, function (epic, callback2) {
+                    Module.findOne({ key: epic.key }, function (err, module) {
+                        if (!module) {
+                            module = new Module();
+                        }
+                        module.key = epic.key;
+                        module.summary = epic.fields.summary;
+                        module.save(function (module) {
+                            epicsList.push(epic.key);
+                            LogProgress(epic.key + " : " + epic.fields.summary + " Collected");
+                            callback2();
+                        })
+                    });
+                },
+                function (err) {
+                    if (err) {
+                        LogProgress("!!!!!!!!!!!!!!!!!!!! Collect modules error happened!", err);
                     }
-                    LogProgress("********** Module #" + (totalModules - numRunningQueries + 1) + " of " + totalModules + " finished processing");
-                    --numRunningQueries;
-                    var progress = Math.floor((totalModules - numRunningQueries)*100/totalModules);
-                    UpdateProgress(progress);
-                    if (numRunningQueries === 0) {
-                        LogProgress('****** Finished Modules loop ******');
-                        callback();
-                    }
-                });
-            }
-        }
-        else {
-            callback();
-        }
-    });
-}
-
-function SaveModule(full, jira, epic, callback) {
-    Module.findOne({ key: epic.key }, function (err, module) {
-        if (!module) {
-            module = new Module();
-        }
-        module.key = epic.key;
-        module.summary = epic.fields.summary;
-        module.save(function (err, module) {
-            UpdatePages(full, jira, epic.key, function (err) {
-                if(err) {
-                    brokenModules.push(epic);
                     callback(err);
-                }
-                LogProgress(module.key + ' : Module saved');
-                callback();
-            });
-        })
-    });
-}
-
-function UpdatePages(full, jira, moduleKey, callback) {
-    var queryString = full ?
-        util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s)", moduleKey) :
-        util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s) AND updated > -3d", moduleKey);
-    jira.searchJira(queryString, null, function (error, stories) {
-        if(error) {
-            LogProgress(moduleKey + ' : Error Finding module pages from JIRA, please restart Update', error);
-        }
-        if (stories != null) {
-            var numRunningQueries = 0;
-            for (var i = 0; i < stories.issues.length; i++) {
-                ++numRunningQueries;
-                var story = stories.issues[i];
-                UpdatePage(jira, moduleKey, story.key.toString(), function (err, storykey) {
-                    if(err) {
-                        brokenModules.push(moduleKey);
-                        callback(err);
-                    }
-                    LogProgress(moduleKey + ' : ' + storykey + ' Page updated');
-                    --numRunningQueries;
-                    if (1 > numRunningQueries) {
-                        callback();
-                    }
                 });
-            }
-            if(stories.issues.length == 0) {
-                callback();
-            }
-        }
-        else {
-            callback();
         }
     });
 }
 
-function UpdatePage(jira, moduleKey, storyKey, callback) {
+function CollectPages(full, jira, moduleKey, callback) {
+    var queryString = /* full ? */
+        util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s)", moduleKey) /*  :
+        util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s) AND updated > -3d", moduleKey) */;
+    jira.searchJira(queryString, { fields: ["summary"] }, function (error, stories) {
+        if (error) {
+            callback(error);
+        }
+        if(stories != null) {
+            async.forEachSeries(stories.issues, function (story, callback2) {
+                    issuesList.push(story.key);
+                    epicIssueMap[story.key] = moduleKey;
+                    LogProgress(story.key + " : " + story.fields.summary + " : Page Collected");
+                    callback2();
+                },
+                function (err) {
+                    if (err) {
+                        LogProgress("!!!!!!!!!!!!!!!!!!!! Collect pages error happened!", err);
+                    }
+                    callback(err);
+                });
+        }
+    });
+}
+
+function ProcessPage(jira, storyKey, callback) {
     jira.findIssue(storyKey + "?expand=changelog", function (error, issue) {
-        if(error) {
-            brokenModules.push(moduleKey);
-            LogProgress(moduleKey + " : " + storyKey + ' : Error find issue details at JIRA, please restart Update', error);
-            callback(err, storyKey);
+        if (error) {
+            LogProgress("!!!!!!!!!!!!!!!!!!!! " + storyKey + ' : Story was not found at JIRA!', error);
+            callback(error);
         }
-        if (issue != null) {
-            SavePage(jira, moduleKey, issue, function (err) {
-                callback(err, storyKey);
+        SavePage(jira, issue, function (error) {
+            if(error) {
+                LogProgress("!!!!!!!!!!!!!!!!!!!! " + storyKey + ' : Story was not saved!', error);
+            }
+            callback(error);
+        });
+    });
+}
+
+function SavePage(jira, issue, callback) {
+    Page.findOne({ key: issue.key }, function (err, page) {
+        if (err) {
+            LogProgress("!!!!!!!!!!!!!!!!!!!! " + page.key + ' : Error with Mongo db connection!', err);
+            callback(err);
+        }
+
+        if (!page) {
+            page = new Page();
+        }
+        page.key = issue.key;
+        page.uri = "https://jira.epam.com/jira/browse/" + issue.key;
+        page.summary = issue.fields.summary;
+        page.status = issue.fields.status.name;
+        page.reporter = issue.fields.reporter.displayName;
+        page.originalEstimate = issue.fields.timetracking.originalEstimate;
+        page.timeSpent = issue.fields.timetracking.timeSpent;
+        page.labels = issue.fields.labels;
+        if (issue.fields.assignee != null)
+            page.assignee = issue.fields.assignee.displayName;
+        page.storyPoints = issue.fields.customfield_10004;
+        page.blockers = issue.fields.customfield_20501;
+        page.progress = issue.fields.customfield_20500;
+        page.epicKey = epicIssueMap[issue.key];
+        page.created = issue.fields.created;
+        page.updated = issue.fields.updated;
+        parseHistory(issue, page);
+        calcWorklogFromIssue(issue, page);
+        async.forEachSeries(issue.fields.subtasks, function(subtask, callback2) {
+            jira.findIssue(subtask.key + "?expand=changelog", function (error, subtask) {
+                if (error) {
+                    return next(error);
+                }
+                if (subtask != null) {
+                    calcWorklogFromIssue(subtask, page);
+                }
+                callback2();
             });
-        }
-        else {
-            callback(storyKey);
-        }
+        },
+        function (err) {
+            if (err) {
+                LogProgress("!!!!!!!!!!!!!!!!!!!! " + page.key + ' : Error processing worklogs from subtasks!', err);
+            }
+            page.save(function (err, page) {
+                if (err) {
+                    LogProgress("!!!!!!!!!!!!!!!!!!!! " + page.key + ' : Was not saved to Mongo db due to error!', err);
+                }
+                callback(err);
+            })
+        });
     });
 }
 
@@ -227,7 +272,6 @@ function ParseProgress(item, page, author, created) {
                     progressTo: to,
                     dateChanged: new Date(created)
                 });
-                //log.info("PAGE PROGRESS HISTORY WAS ADDED : " + page._doc.key + " : " + page._doc.progressHistory.length);
             }
         }
     }
@@ -238,11 +282,11 @@ function ParseFinishDates(item, page, created) {
         var from = item.fromString;
         var to = item.toString;
 
-        if(from == "In Progress" && to =="Ready for QA" &&
+        if (from == "In Progress" && to == "Ready for QA" &&
             page.devFinished == null) {
             page.devFinished = created;
         }
-        if(from == "Testing in Progress" && to =="Resolved") {
+        if (from == "Testing in Progress" && to == "Resolved") {
             page.qaFinished = created;
         }
     }
@@ -280,18 +324,17 @@ function calcWorklogFromIssue(issue, page) {
             else {
                 //look if already exists
                 var recordFound = false;
-                for(var o = 0; o<page.worklogHistory.length; o++) {
+                for (var o = 0; o < page.worklogHistory.length; o++) {
                     var record = page.worklogHistory[o];
-                    if( record.person == author &&
+                    if (record.person == author &&
                         record.timeSpent == timeSpent &&
                         record.dateChanged.getTime() == new Date(worklog.created).getTime() &&
-                        record.dateStarted.getTime() == new Date(worklog.started).getTime())
-                    {
+                        record.dateStarted.getTime() == new Date(worklog.started).getTime()) {
                         recordFound = true;
                         break;
                     }
                 }
-                if(!recordFound) {
+                if (!recordFound) {
                     page.worklogHistory.push({
                         person: author,
                         timeSpent: timeSpent,
@@ -304,72 +347,7 @@ function calcWorklogFromIssue(issue, page) {
     }
 }
 
-function parseWorklogs(jira, moduleKey, issue, page, callback) {
-    var numRunningQueries = 0;
-    calcWorklogFromIssue(issue, page);
-    if (issue.fields.subtasks && issue.fields.subtasks.length > 0) {
-        for (var i = 0; i < issue.fields.subtasks.length; i++) {
-            var subtask = issue.fields.subtasks[i];
-            ++numRunningQueries;
-            jira.findIssue(subtask.key + "?expand=changelog", function (error, subtask) {
-                if (error) {
-                    brokenModules.push(moduleKey);
-                    LogProgress('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-                    LogProgress(moduleKey + " : " + issue.key + ' : Finished with errors, please restart update', error);
-                    LogProgress('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-                }
-                if (subtask != null) {
-                    calcWorklogFromIssue(subtask, page);
-                }
-                --numRunningQueries;
-                if (numRunningQueries === 0) {
-                    callback();
-                }
-            });
-        }
-    }
-    else {
-        callback();
-    }
-}
 
-function SavePage(jira, moduleKey, issue, callback) {
-    Page.findOne({ key: issue.key }, function (err, page) {
-        if (err) {
-            LogProgress(moduleKey + " : " + page.key + ' : Error finding page at Mongo db, please restart Update', err);
-            callback(err);
-        }
-
-        if (!page) {
-            page = new Page();
-        }
-        page.key = issue.key;
-        page.uri = "https://jira.epam.com/jira/browse/" + issue.key;
-        page.summary = issue.fields.summary;
-        page.status = issue.fields.status.name;
-        page.reporter = issue.fields.reporter.displayName;
-        page.originalEstimate = issue.fields.timetracking.originalEstimate;
-        page.timeSpent = issue.fields.timetracking.timeSpent;
-        page.labels = issue.fields.labels;
-        if (issue.fields.assignee != null)
-            page.assignee = issue.fields.assignee.displayName;
-        page.storyPoints = issue.fields.customfield_10004;
-        page.blockers = issue.fields.customfield_20501;
-        page.progress = issue.fields.customfield_20500;
-        page.epicKey = moduleKey
-        page.created = issue.fields.created;
-        page.updated = issue.fields.updated;
-        parseHistory(issue, page);
-        parseWorklogs(jira, moduleKey, issue, page, function () {
-            page.save(function (err, page) {
-                if (err) {
-                    LogProgress(moduleKey + " : " + page.key + ' : Error saving page to Mongo db, please restart Update', err);
-                }
-                callback(err);
-            })
-        });
-    });
-}
 
 
 
