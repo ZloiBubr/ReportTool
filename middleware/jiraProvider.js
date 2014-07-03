@@ -235,8 +235,11 @@ function SavePage(jira, issue, callback) {
             page.save(function (err, page) {
                 if (err) {
                     LogProgress("!!!!!!!!!!!!!!!!!!!! " + page.key + ' : Was not saved to Mongo db due to error!', err);
+                    callback(err);
                 }
-                callback(err);
+                else {
+                    callback();
+                }
             })
         });
     });
