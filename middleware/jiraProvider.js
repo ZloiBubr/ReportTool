@@ -16,6 +16,7 @@ var response = null;
 var epicsList = [];
 var issuesList = [];
 var epicIssueMap = {};
+var updateSucceed = true;
 
 exports.rememberResponse = function (res) {
     response = res;
@@ -52,7 +53,8 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
         }
         issuesList = [];
         epicsList = [];
-        epicIssueMap = {};
+        epicIssueMap = {}
+        updateSucceed = true;
 
         var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), jiraUser, jiraPassword, '2');
         var counter = 0;
@@ -95,7 +97,7 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
                         function (err) {
                             if (err) {
                                 LogProgress("!!!!!!!!!!!!!!!!!!!! Processing pages error happened!", err);
-                                callback(err);
+                                updateSucceed = false;
                             }
                             callback();
                         }
@@ -103,7 +105,7 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
                 }
             ],
             function (err) {
-                if (err) {
+                if (err || !updateSucceed) {
                     LogProgress("!!!!!!!!!!!!!!!!!!!! Update failed!", err);
                 }
                 else {
