@@ -110,8 +110,8 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
                 }
                 else {
                     LogProgress("Update finished successfully!", err);
+                    response.end();
                 }
-                response.end();
             });
         callback();
     })
