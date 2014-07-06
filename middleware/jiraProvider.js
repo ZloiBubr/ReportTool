@@ -69,7 +69,7 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
                 },
                 function (callback) {
                     //grab pages list
-                    async.forEachLimit(epicsList, 10, function (epic, callback2) {
+                    async.eachLimit(epicsList, 5, function (epic, callback2) {
                             LogProgress("**** async collect pages for module: " + epic);
                             CollectPages(full, jira, epic, callback2);
                         },
@@ -85,7 +85,7 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
                 function (callback) {
                     //process pages
                     LogProgress("**** async process pages");
-                    async.forEachLimit(issuesList, 5, function (issue, callback2) {
+                    async.eachLimit(issuesList, 5, function (issue, callback2) {
                             var currentProgress = Math.floor((++counter*100)/issuesList.length);
                             if(lastProgress != currentProgress) {
                                 lastProgress = currentProgress;
@@ -127,7 +127,7 @@ function CollectModules(jira, callback) {
             callback(error);
         }
         if(epics != null) {
-            async.forEachSeries(epics.issues, function (epic, callback2) {
+            async.eachSeries(epics.issues, function (epic, callback2) {
                     Module.findOne({ key: epic.key }, function (err, module) {
                         if (!module) {
                             module = new Module();
@@ -160,7 +160,7 @@ function CollectPages(full, jira, moduleKey, callback) {
             callback(error);
         }
         if(stories != null) {
-            async.forEachSeries(stories.issues, function (story, callback2) {
+            async.eachSeries(stories.issues, function (story, callback2) {
                     issuesList.push(story.key);
                     epicIssueMap[story.key] = moduleKey;
                     LogProgress(story.key + " : " + story.fields.summary + " : Page Collected");
@@ -219,7 +219,7 @@ function SavePage(jira, issue, callback) {
         page.updated = issue.fields.updated;
         parseHistory(issue, page);
         calcWorklogFromIssue(issue, page);
-        async.forEachSeries(issue.fields.subtasks, function(subtask, callback2) {
+        async.eachSeries(issue.fields.subtasks, function(subtask, callback2) {
             jira.findIssue(subtask.key + "?expand=changelog", function (error, subtask) {
                 if (error) {
                     callback(error);
