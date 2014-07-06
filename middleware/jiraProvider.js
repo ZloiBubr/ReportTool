@@ -16,12 +16,11 @@ var response = null;
 var epicsList = [];
 var issuesList = [];
 var epicIssueMap = {};
-var updateSucceed = true;
 
 exports.rememberResponse = function (res) {
     response = res;
     UpdateProgress(0);
-}
+};
 
 var UpdateProgress = function (progress) {
     response.write("event: progress\n");
@@ -29,7 +28,7 @@ var UpdateProgress = function (progress) {
     if (progress > 0) {
         LogProgress("********** Progress " + progress.toString() + "% **********");
     }
-}
+};
 
 var LogProgress = function (text, error) {
     if (response) {
@@ -43,7 +42,7 @@ var LogProgress = function (text, error) {
     else {
         log.info(text);
     }
-}
+};
 
 exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
     ClearDB(full, function (err) {
@@ -53,8 +52,7 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
         }
         issuesList = [];
         epicsList = [];
-        epicIssueMap = {}
-        updateSucceed = true;
+        epicIssueMap = {};
 
         var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), jiraUser, jiraPassword, '2');
         var counter = 0;
@@ -97,7 +95,6 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
                         function (err) {
                             if (err) {
                                 LogProgress("!!!!!!!!!!!!!!!!!!!! Processing pages error happened!", err);
-                                updateSucceed = false;
                             }
                             callback();
                         }
@@ -105,17 +102,17 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
                 }
             ],
             function (err) {
-                if (err || !updateSucceed) {
+                if (err) {
                     LogProgress("!!!!!!!!!!!!!!!!!!!! Update failed!", err);
                 }
                 else {
                     LogProgress("Update finished successfully!", err);
-                    response.end();
                 }
+                response.end();
             });
         callback();
     })
-}
+};
 
 function CollectModules(jira, callback) {
     var requestString = "project = PLEX-UXC AND issuetype = epic AND summary ~ Module AND NOT summary ~ automation ORDER BY key ASC";
@@ -134,7 +131,7 @@ function CollectModules(jira, callback) {
                         }
                         module.key = epic.key;
                         module.summary = epic.fields.summary;
-                        module.save(function (module) {
+                        module.save(function () {
                             epicsList.push(epic.key);
                             LogProgress(epic.key + " : " + epic.fields.summary + " Collected");
                             callback2();
@@ -178,7 +175,7 @@ function CollectPages(full, jira, moduleKey, callback) {
 
 function ProcessPage(jira, storyKey, callback) {
     jira.findIssue(storyKey + "?expand=changelog", function (error, issue) {
-        if (error) {
+        if (error || (issue == null)) {
             LogProgress("!!!!!!!!!!!!!!!!!!!! " + storyKey + ' : Story was not found at JIRA!', error);
             callback(error);
         }
