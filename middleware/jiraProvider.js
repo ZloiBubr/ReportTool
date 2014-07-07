@@ -45,11 +45,11 @@ var LogProgress = function (text, error) {
 };
 
 exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
-    ClearDB(full, function (err) {
-        if (err) {
-            LogProgress("!!!!!!!!!!!!!!!!!!!! DB Cleanup error happened!", err);
-            callback(err);
-        }
+//    ClearDB(full, function (err) {
+//        if (err) {
+//            LogProgress("!!!!!!!!!!!!!!!!!!!! DB Cleanup error happened!", err);
+//            callback(err);
+//        }
         issuesList = [];
         epicsList = [];
         epicIssueMap = {};
@@ -111,7 +111,7 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
                 response.end();
             });
         callback();
-    })
+//    })
 };
 
 function CollectModules(jira, callback) {
@@ -230,6 +230,7 @@ function SavePage(jira, issue, callback) {
         function (err) {
             if (err) {
                 LogProgress("!!!!!!!!!!!!!!!!!!!! " + page.key + ' : Error processing worklogs from subtasks!', err);
+                callback(err);
             }
             page.save(function (err, page) {
                 if (err) {
