@@ -15,6 +15,7 @@ var http = require('http');
 var path = require('path');
 var config = require('./config');
 var log = require('./libs/log')(module);
+var ClearDB = require('./middleware/createDb').Clear;
 
 var app = express();
 
@@ -64,8 +65,56 @@ app.get('/pagebysizedata', pagebysize.get);
 app.get('/pagedata/:id', pagedata.get);
 app.get('/wavedata', wave.get);
 app.get('/personaldata', personaldata.get);
-
+app.get('/cleandb', function(req, res) {
+    ClearDB(function (err) {
+        if (err) {
+            var errMessage = "!!!!!!!!!!!!!!!!!!!! DB Cleanup error happened!";
+            LogProgress(errMessage, err);
+            res.send(403, errMessage);
+        }
+        else {
+            res.send(200, 'OK');
+        }
+    });
+});
 
 http.createServer(app).listen(config.get('port'), function () {
     log.info('Express server listening on port ' + config.get('port'));
 });
+
+process.on
+(
+    'uncaughtException',
+    function (err)
+    {
+        var log = err.stack;
+
+
+        // print note to console
+        console.log("SERVER CRASHED!");
+        console.log(log);
+
+        // email log to developer
+        console.log("EMAILING ERROR");
+        var mailer = require('./libs/mailer');
+        mailer.sendMail("NODE SERVER CRASHED", log);
+
+
+        // If we exit straight away, the write log and send email operations wont have time to run
+        setTimeout
+        (
+            function()
+            {
+
+                // uncomment these lines to close the process instead of re-starting
+                //console.log("KILLING PROCESS");
+                //process.exit();
+
+                // re-start the server
+                console.log("SERVER RESTARTING...");
+//                startServer(); // This function starts the server
+            },
+            10000
+        );
+    }
+);

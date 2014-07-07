@@ -17,6 +17,7 @@
         "async": "*",
         "underscore": "*",
         "connect": "*",
-        "cookie": "*"
+        "cookie": "*",
+        "nodemailer": "*"
     }
 }

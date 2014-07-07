@@ -6,7 +6,6 @@ var config = require('../config');
 var log = require('../libs/log')(module);
 var Module = require('../models/module').Module;
 var Page = require('../models/page').Page;
-var ClearDB = require('./createDb').Clear;
 var _ = require('underscore');
 var async = require('async');
 
@@ -45,73 +44,67 @@ var LogProgress = function (text, error) {
 };
 
 exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
-//    ClearDB(full, function (err) {
-//        if (err) {
-//            LogProgress("!!!!!!!!!!!!!!!!!!!! DB Cleanup error happened!", err);
-//            callback(err);
-//        }
-        issuesList = [];
-        epicsList = [];
-        epicIssueMap = {};
+    issuesList = [];
+    epicsList = [];
+    epicIssueMap = {};
 
-        var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), jiraUser, jiraPassword, '2');
-        var counter = 0;
-        var lastProgress = 0;
+    var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), jiraUser, jiraPassword, '2');
+    var counter = 0;
+    var lastProgress = 0;
 
-        LogProgress("**** async");
-        async.series([
-                function (callback) {
-                    //grab all modules
-                    LogProgress("**** async collect modules");
-                    CollectModules(jira, callback);
-                },
-                function (callback) {
-                    //grab pages list
-                    async.eachLimit(epicsList, 5, function (epic, callback2) {
-                            LogProgress("**** async collect pages for module: " + epic);
-                            CollectPages(full, jira, epic, callback2);
-                        },
-                        function (err) {
-                            if (err) {
-                                LogProgress("!!!!!!!!!!!!!!!!!!!! Collecting pages error happened!", err);
-                                callback(err);
-                            }
-                            callback();
+    LogProgress("**** async");
+    async.series([
+            function (callback) {
+                //grab all modules
+                LogProgress("**** async collect modules");
+                CollectModules(jira, callback);
+            },
+            function (callback) {
+                //grab pages list
+                async.eachLimit(epicsList, 5, function (epic, callback2) {
+                        LogProgress("**** async collect pages for module: " + epic);
+                        CollectPages(full, jira, epic, callback2);
+                    },
+                    function (err) {
+                        if (err) {
+                            LogProgress("!!!!!!!!!!!!!!!!!!!! Collecting pages error happened!", err);
+                            callback(err);
                         }
-                    )
-                },
-                function (callback) {
-                    //process pages
-                    LogProgress("**** async process pages");
-                    async.eachLimit(issuesList, 5, function (issue, callback2) {
-                            var currentProgress = Math.floor((++counter*100)/issuesList.length);
-                            if(lastProgress != currentProgress) {
-                                lastProgress = currentProgress;
-                                UpdateProgress(currentProgress);
-                            }
-                            LogProgress("**** async process page: " + issue);
-                            ProcessPage(jira, issue, callback2);
-                        },
-                        function (err) {
-                            if (err) {
-                                LogProgress("!!!!!!!!!!!!!!!!!!!! Processing pages error happened!", err);
-                            }
-                            callback();
+                        callback();
+                    }
+                )
+            },
+            function (callback) {
+                //process pages
+                LogProgress("**** async process pages");
+                async.eachLimit(issuesList, 5, function (issue, callback2) {
+                        var currentProgress = Math.floor((++counter*100)/issuesList.length);
+                        if(lastProgress != currentProgress) {
+                            lastProgress = currentProgress;
+                            UpdateProgress(currentProgress);
                         }
-                    )
-                }
-            ],
-            function (err) {
-                if (err) {
-                    LogProgress("!!!!!!!!!!!!!!!!!!!! Update failed!", err);
-                }
-                else {
-                    LogProgress("Update finished successfully!", err);
-                }
-                response.end();
-            });
-        callback();
-//    })
+                        LogProgress("**** async process page: " + issue);
+                        ProcessPage(jira, issue, callback2);
+                    },
+                    function (err) {
+                        if (err) {
+                            LogProgress("!!!!!!!!!!!!!!!!!!!! Processing pages error happened!", err);
+                        }
+                        callback();
+                    }
+                )
+            }
+        ],
+        function (err) {
+            if (err) {
+                LogProgress("!!!!!!!!!!!!!!!!!!!! Update failed!", err);
+            }
+            else {
+                LogProgress("Update finished successfully!", err);
+            }
+            response.end();
+        });
+    callback();
 };
 
 function CollectModules(jira, callback) {

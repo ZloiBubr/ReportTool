@@ -41,6 +41,7 @@
 
     <div class="row form-actions">
         <div class="col-lg-3 col-lg-offset-2">
+            <button type="button" class="btn btn-primary" onclick="CleanDB()">Clean DB</button>
             <button type="submit" class="btn btn-primary" ng-disabled="loginForm.$invalid" data-loading-text="Updating...">Update</button>
             <span class="help-block error"></span>
         </div>
@@ -54,6 +55,26 @@
 <script type="text/javascript" src="/jsc/serverEvents.js"></script>
 
 <script>
+    function CleanDB() {
+        $.ajax({
+            url: "/cleandb",
+            method: "GET",
+//            complete: function () {
+//            },
+            statusCode: {
+                200: function () {
+                    alert("DB has been cleaned up!");
+                },
+                404: function () {
+                    alert("Operation was not found on server!");
+                },
+                403: function (jqXHR) {
+                    var error = JSON.parse(jqXHR.responseText);
+                    $('.error', form).html(error.message);
+                }
+            }
+        });
+    }
     $(document.forms['loginForm']).on('submit', function () {
         var form = $(this);
 
