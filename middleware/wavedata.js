@@ -34,7 +34,8 @@ function waveData() {
                                     readyForAcceptance: false,
                                     readyForQA: false,
                                     teamName: "",
-                                    smeName: ""
+                                    smeName: "",
+                                    pages: 0
                                 }
                             ],
                             reportedSP: 0,
@@ -281,7 +282,8 @@ function putDataPoint(wavedata,
             readyForQA: status == 'Ready for QA' || status == "Testing in Progress",
             blocked: status == 'Blocked',
             teamName: teamName,
-            smeName: smeName
+            smeName: smeName,
+            pages: 0
         };
         moduled.cloudApp.push(cloudAppd);
     }
@@ -294,6 +296,7 @@ function putDataPoint(wavedata,
     cloudAppd.summarySP += storyPoints;
     cloudAppd.progress = cloudAppd.reportedSP*100/cloudAppd.summarySP;
     cloudAppd.uri = initUri + "CloudApp_" + cloudApp + ") AND labels in(PageModuleGroup_" + moduleGroup + ") AND labels in(PageModule_" + moduleName + ") AND labels in(" + wave + ")";
+    cloudAppd.pages++;
 
 
     var cloudAppStatus = statusList.getStatusByName(cloudAppd.status);

@@ -20,6 +20,7 @@ exports.statuses = function() {
     this.testingInProgress = new exports.statusEntity();
     this.resolved = new exports.statusEntity();
     this.accepted = new exports.statusEntity();//(closed)
+    this.pages = 0;
 
     this.blocked.weight = 0;
     this.open.weight = 1;

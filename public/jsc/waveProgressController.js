@@ -26,9 +26,11 @@ function waveProgressController($scope, $resource, $window, $filter) {
         $scope.total = new $scope.statuses();
         $scope.total.all = {isChecked :true};
         $scope.total.total = 0;
+        $scope.total.pages = 0;
     }
 
     $scope.processWithRowSpans = function () {
+        $scope.total.pages = 0;
         $scope.invertedWaveProgressData=[];
 
         _.each($scope.waveProgressData.waves, function(waveProgressItem){
@@ -49,6 +51,7 @@ function waveProgressController($scope, $resource, $window, $filter) {
 
                             if(statusEntity.isChecked)
                             {
+                                $scope.total.pages += cloudAppItem.pages;
                                 $scope.invertedWaveProgressData.push({appItem: cloudAppItem});
                                 cloudAppItem.progress == 100 ? $scope.total.complete++ : void(0);
                                 return cloudAppMemo + 1;
