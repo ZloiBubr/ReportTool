@@ -18,6 +18,9 @@ var epicIssueMap = {};
 var brokenPagesList = [];
 var updateInProgress = false;
 
+var _jiraUser = "";
+var _jiraPass = "";
+
 exports.rememberResponse = function (res) {
     response = res;
     UpdateProgress(0);
@@ -50,12 +53,14 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
         callback();
     }
 
+    _jiraUser = jiraUser;
+    _jiraPass = jiraPassword;
+
     issuesList = [];
     epicsList = [];
     epicIssueMap = {};
     updateInProgress = true;
 
-    var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), jiraUser, jiraPassword, '2');
     var counter = 0;
     var lastProgress = 0;
     brokenPagesList = [];
@@ -65,13 +70,13 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
             function (callback) {
                 //grab all modules
                 LogProgress("**** async collect modules");
-                CollectModules(jira, callback);
+                CollectModules(callback);
             },
             function (callback) {
                 //grab pages list
                 async.eachSeries(epicsList, function (epic, callback2) {
                         LogProgress("**** async collect pages for module: " + epic);
-                        CollectPages(full, jira, epic, callback2);
+                        CollectPages(full, epic, callback2);
                     },
                     function (err) {
                         if (err) {
@@ -92,7 +97,7 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
                             UpdateProgress(currentProgress);
                         }
                         LogProgress("**** async process page: " + issue);
-                        ProcessPage(jira, issue, callback2);
+                        ProcessPage(issue, callback2);
                     },
                     function (err) {
                         if (err) {
@@ -107,7 +112,7 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
                 LogProgress("**** async reprocess pages");
                 async.eachSeries(brokenPagesList, function (issue, callback2) {
                         LogProgress("**** async process page: " + issue);
-                        ProcessPage(jira, issue, callback2);
+                        ProcessPage(issue, callback2);
                     },
                     function (err) {
                         if (err) {
@@ -131,11 +136,12 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
     callback();
 };
 
-function CollectModules(jira, callback) {
+function CollectModules(callback) {
     var requestString = "project = PLEX-UXC AND issuetype = epic AND summary ~ Module AND NOT summary ~ automation ORDER BY key ASC";
 
     UpdateProgress(1);
 
+    var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), _jiraUser, _jiraPass, '2');
     jira.searchJira(requestString, null, function (error, epics) {
         if (error) {
             callback(error);
@@ -165,10 +171,12 @@ function CollectModules(jira, callback) {
     });
 }
 
-function CollectPages(full, jira, moduleKey, callback) {
+function CollectPages(full, moduleKey, callback) {
     var queryString = full ?
         util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s)", moduleKey) :
         util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s) AND updated > -3d", moduleKey);
+
+    var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), _jiraUser, _jiraPass, '2');
     jira.searchJira(queryString, { fields: ["summary"] }, function (error, stories) {
         if (error) {
             callback(error);
@@ -190,7 +198,8 @@ function CollectPages(full, jira, moduleKey, callback) {
     });
 }
 
-function ProcessPage(jira, storyKey, callback) {
+function ProcessPage(storyKey, callback) {
+    var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), _jiraUser, _jiraPass, '2');
     jira.findIssue(storyKey + "?expand=changelog", function (error, issue) {
         if (error) {
             brokenPagesList.push(storyKey);
@@ -203,7 +212,7 @@ function ProcessPage(jira, storyKey, callback) {
             callback(error);
         }
         else {
-            SavePage(jira, issue, function (error) {
+            SavePage(issue, function (error) {
                 if(error) {
                     brokenPagesList.push(storyKey);
                     LogProgress("!!!!!!!!!!!!!!!!!!!! " + storyKey + ' : Story was not saved!', error);
@@ -214,7 +223,7 @@ function ProcessPage(jira, storyKey, callback) {
     });
 }
 
-function SavePage(jira, issue, callback) {
+function SavePage(issue, callback) {
     Page.findOne({ key: issue.key }, function (err, page) {
         if (err) {
             LogProgress("!!!!!!!!!!!!!!!!!!!! " + page.key + ' : Error with Mongo db connection!', err);
@@ -243,6 +252,7 @@ function SavePage(jira, issue, callback) {
         parseHistory(issue, page);
         calcWorklogFromIssue(issue, page);
         async.eachSeries(issue.fields.subtasks, function(subtask, callback2) {
+            var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), _jiraUser, _jiraPass, '2');
             jira.findIssue(subtask.key + "?expand=changelog", function (error, subtask) {
                 if (error) {
                     brokenPagesList.push(issue.key);
