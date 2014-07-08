@@ -109,18 +109,23 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
             },
             function (callback) {
                 //reprocess pages
-                LogProgress("**** async reprocess pages");
-                async.eachSeries(brokenPagesList, function (issue, callback2) {
-                        LogProgress("**** async process page: " + issue);
-                        ProcessPage(issue, callback2);
-                    },
-                    function (err) {
-                        if (err) {
-                            LogProgress("!!!!!!!!!!!!!!!!!!!! Reprocessing pages error happened!", err);
+                if(brokenPagesList.length > 0) {
+                    LogProgress("**** async reprocess pages");
+                    async.eachSeries(brokenPagesList, function (issue, callback2) {
+                            LogProgress("**** async process page: " + issue);
+                            ProcessPage(issue, callback2);
+                        },
+                        function (err) {
+                            if (err) {
+                                LogProgress("!!!!!!!!!!!!!!!!!!!! Reprocessing pages error happened!", err);
+                            }
+                            callback();
                         }
-                        callback();
-                    }
-                )
+                    )
+                }
+                else {
+                    callback();
+                }
             }
         ],
         function (err) {
