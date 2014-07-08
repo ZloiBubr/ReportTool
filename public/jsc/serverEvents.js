@@ -9,6 +9,8 @@ if (!!window.EventSource) {
 //        }
     }, false);
     source.addEventListener('logmessage', function(e) {
+        $("#cleanbtn").button("loading");
+        $("#updatebtn").button("loading");
         var text = e.data;
         $("#serverlog").prepend(text + "<br/>");
     }, false);

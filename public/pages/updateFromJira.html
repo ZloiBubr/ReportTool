@@ -41,8 +41,8 @@
 
     <div class="row form-actions">
         <div class="col-lg-3 col-lg-offset-2">
-            <button type="button" class="btn btn-primary" onclick="CleanDB()">Clean DB</button>
-            <button type="submit" class="btn btn-primary" ng-disabled="loginForm.$invalid" data-loading-text="Updating...">Update</button>
+            <button id="cleanbtn" type="button" class="btn btn-danger" onclick="CleanDB()" data-loading-text="Update is in progress...">Clean DB</button>
+            <button id="updatebtn" type="submit" class="btn btn-primary" ng-disabled="loginForm.$invalid" data-loading-text="Updating data right now...">Update</button>
             <span class="help-block error"></span>
         </div>
     </div>
@@ -80,6 +80,7 @@
 
         $('.error', form).html('');
         $(":submit", form).button("loading");
+        $(":button", form).button("loading");
 
         $.ajax({
             url: "/updatejira",

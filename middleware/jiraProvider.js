@@ -15,6 +15,8 @@ var response = null;
 var epicsList = [];
 var issuesList = [];
 var epicIssueMap = {};
+var brokenPagesList = [];
+var updateInProgress = false;
 
 exports.rememberResponse = function (res) {
     response = res;
@@ -44,13 +46,19 @@ var LogProgress = function (text, error) {
 };
 
 exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
+    if(updateInProgress) {
+        callback();
+    }
+
     issuesList = [];
     epicsList = [];
     epicIssueMap = {};
+    updateInProgress = true;
 
     var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), jiraUser, jiraPassword, '2');
     var counter = 0;
     var lastProgress = 0;
+    brokenPagesList = [];
 
     LogProgress("**** async");
     async.series([
@@ -61,7 +69,7 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
             },
             function (callback) {
                 //grab pages list
-                async.eachLimit(epicsList, 5, function (epic, callback2) {
+                async.eachSeries(epicsList, function (epic, callback2) {
                         LogProgress("**** async collect pages for module: " + epic);
                         CollectPages(full, jira, epic, callback2);
                     },
@@ -93,6 +101,21 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
                         callback();
                     }
                 )
+            },
+            function (callback) {
+                //reprocess pages
+                LogProgress("**** async reprocess pages");
+                async.eachSeries(brokenPagesList, function (issue, callback2) {
+                        LogProgress("**** async process page: " + issue);
+                        ProcessPage(jira, issue, callback2);
+                    },
+                    function (err) {
+                        if (err) {
+                            LogProgress("!!!!!!!!!!!!!!!!!!!! Reprocessing pages error happened!", err);
+                        }
+                        callback();
+                    }
+                )
             }
         ],
         function (err) {
@@ -103,6 +126,7 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
                 LogProgress("Update finished successfully!", err);
             }
             response.end();
+            updateInProgress = false;
         });
     callback();
 };
@@ -168,16 +192,25 @@ function CollectPages(full, jira, moduleKey, callback) {
 
 function ProcessPage(jira, storyKey, callback) {
     jira.findIssue(storyKey + "?expand=changelog", function (error, issue) {
-        if (error || (issue == null)) {
+        if (error) {
+            brokenPagesList.push(storyKey);
             LogProgress("!!!!!!!!!!!!!!!!!!!! " + storyKey + ' : Story was not found at JIRA!', error);
             callback(error);
         }
-        SavePage(jira, issue, function (error) {
-            if(error) {
-                LogProgress("!!!!!!!!!!!!!!!!!!!! " + storyKey + ' : Story was not saved!', error);
-            }
+        if (issue == null || issue.key == null) {
+            brokenPagesList.push(storyKey);
+            LogProgress("!!!!!!!!!!!!!!!!!!!! " + storyKey + ' : Story was not found at JIRA!', error);
             callback(error);
-        });
+        }
+        else {
+            SavePage(jira, issue, function (error) {
+                if(error) {
+                    brokenPagesList.push(storyKey);
+                    LogProgress("!!!!!!!!!!!!!!!!!!!! " + storyKey + ' : Story was not saved!', error);
+                }
+                callback(error);
+            });
+        }
     });
 }
 
@@ -212,6 +245,7 @@ function SavePage(jira, issue, callback) {
         async.eachSeries(issue.fields.subtasks, function(subtask, callback2) {
             jira.findIssue(subtask.key + "?expand=changelog", function (error, subtask) {
                 if (error) {
+                    brokenPagesList.push(issue.key);
                     callback(error);
                 }
                 if (subtask != null) {
