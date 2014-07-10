@@ -13,10 +13,8 @@ function Teams() {
                 "Mark Varabyou",
                 "Raman But-Husaim",
                 "Siarhei Abrazhevich",
-                "Yauheni Lohinau",
 
                 "Artsiom Rusak",
-                "Aliaksei Astashkin",
                 "Aliaksandr Koush",
                 "Alena Charnova",
                 "Nicolay Kostroma"
@@ -38,13 +36,13 @@ function Teams() {
             developers: [
                 "Borys Roshal",
                 "Denys Poliakov",
-                "Dmytro Komar",
                 "Kostiantyn Lazurenko",
                 "Oleksandr Stukalov",
                 "Oleksii Bespalko",
                 "Yevhenii Havryliuk",
                 "Yuriy Shestyora",
                 "Ihor Bershov",
+                "Vladyslav Pilhui",
                 "Oleksandr Zhyltsov",
                 "Oleksii Suriadnyi",
                 "Roman Golovchenko",
@@ -82,9 +80,10 @@ function Teams() {
             ],
             testers: [
                 "Aliaksei Burnosenka",
-                "Yuliya Kalasouskaya",
                 "Viktar Mikalayenka",
                 "Viktoryia Darashenka",
+                "Eugeny Okulik",
+                "Yuliya Kalasouskaya",
                 "Valiantsina Krautsevich"
             ]
         },
@@ -96,11 +95,22 @@ function Teams() {
             developers: [
                 "Mariya Babich",
                 "Volha Shandrokha",
-                "Andrei Krasnou",
                 "Aliaksandr Rusak",
+                "Andrei Kasak",
+                "Andrei Krasnou",
+                "Pavel Krakasevich",
+                "Stepan Zelenin",
+                "Aliaksei Astashkin",
+                "Dzmitry Isachenka",
+                "Eugen Surovets",
                 "Katsiaryna Tsalabanava"
             ],
             testers: [
+                "Anna Novikova",
+                "Anton Rapinchuk",
+                "Igor Andros",
+                "Maria Sobal",
+                "Yuliya Karnatsevich",
                 "Iryna Kutsko"
             ]
         },
@@ -121,11 +131,12 @@ function Teams() {
                 "Siarhei Bahdanovich"
             ],
             testers: [
-                "Iryna Shuliak",
                 "Iryna Koush",
                 "Maryia Kireyeva",
-                "Katsiaryna Kuchko",
-                "Iryna Razorionova"
+                "Iryna Shuliak",
+                "Liudmila Barshcheuskaya",
+                "Iryna Razorionova",
+                "Katsiaryna Kuchko"
             ]
         },
         {
