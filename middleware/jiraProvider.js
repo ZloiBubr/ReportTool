@@ -74,7 +74,7 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
             },
             function (callback) {
                 //grab pages list
-                async.eachSeries(epicsList, function (epic, callback2) {
+                async.eachLimit(epicsList, 10, function (epic, callback2) {
                         LogProgress("**** async collect pages for module: " + epic);
                         CollectPages(full, epic, callback2);
                     },
