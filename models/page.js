@@ -6,6 +6,7 @@ var schema = new Schema({
     uri:                    { type: String },
     summary:                { type: String },
     status:                 { type: String },
+    resolution:             { type: String },
     reporter:               { type: String },
     originalEstimate:       { type: String },
     timeSpent:              { type: String },

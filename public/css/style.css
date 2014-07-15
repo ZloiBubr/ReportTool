@@ -109,6 +109,11 @@ a {
     background-color: #ede8ed !important;
 }
 
+.cancelled
+{
+    background-color: #a8a1fa !important;
+}
+
 .readyForAcceptance
 {
     background-color: #7fc48c !important;

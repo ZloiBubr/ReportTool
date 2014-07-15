@@ -13,6 +13,7 @@
             <li><input type="checkbox" ng-model="total.testingInProgress.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-road"></span><strong> {{total.testingInProgress.count}}</strong>:Testing In Progress</li>
             <li><input type="checkbox" ng-model="total.resolved.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-check"></span><strong> {{total.resolved.count}}</strong>:Resolved</li>
             <li><input type="checkbox" ng-model="total.accepted.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-star"></span><strong> {{total.accepted.count}}</strong>:Accepted</li>
+            <li><input type="checkbox" ng-model="total.cancelled.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-ban-circle"></span><strong> {{total.cancelled.count}}</strong>:Cancelled</li>
             <li><br/></li>
             <li><input type="checkbox" ng-model="total.all.isChecked" ng-change="onSelectDeselectAll()"><span class="glyphicon glyphicon-shopping-cart"></span><strong> {{total.total}}</strong>:Total</li>
             <li><br/></li>
@@ -41,6 +42,7 @@
                             readyForAcceptance: item.appItem.readyForAcceptance,
                             readyForQA: item.appItem.readyForQA,
                             accepted: item.appItem.accepted,
+                            cancelled: item.appItem.cancelled,
                             blocked: item.appItem.blocked}"><a href="{{item.appItem.uri}}">{{item.appItem.name}}</a> : {{item.appItem.progress | number : 0}}% - {{item.appItem.reportedSP | number : 0}} of {{item.appItem.summarySP | number : 0}} SP, {{item.appItem.status}}, {{item.appItem.teamName}}, {{item.appItem.smeName}}, Pages:{{item.appItem.pages}}</td>
                     </tr>
                 </tbody>

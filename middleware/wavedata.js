@@ -29,6 +29,8 @@ function waveData() {
                                     name: "",
                                     uri: "",
                                     status: "",
+                                    resolution: "",
+                                    cancelled: false,
                                     blocked: false,
                                     accepted: false,
                                     readyForAcceptance: false,
@@ -191,13 +193,14 @@ function parsePages(callback) {
             var teamName = getTeamName(page.labels);
             var progress = page.progress;
             var status = page.status;
+            var resolution = page.resolution;
             var calcStoryPoints = storyPoints * progress / 100;
             var isParent = isParentApp(page.labels);
             var smeName = getSMEName(page.labels);
 
             putDataPoint(wavedata,
                 wave, moduleGroup, moduleName, teamName, cloudApp, smeName,
-                calcStoryPoints, storyPoints, status, isParent);
+                calcStoryPoints, storyPoints, status, resolution, isParent);
         }
         SortData(wavedata);
         callback(err, wavedata);
@@ -206,7 +209,7 @@ function parsePages(callback) {
 
 function putDataPoint(wavedata,
                       wave, moduleGroup, moduleName, teamName, cloudApp, smeName,
-                      calcStoryPoints, storyPoints, status, isParent) {
+                      calcStoryPoints, storyPoints, status, resolution, isParent) {
     var initUri = "https://jira.epam.com/jira/issues/?jql=project%20%3D%20PLEX-UXC%20and%20issuetype%3DStory%20AND%20%22Story%20Points%22%20%3E%200%20and%20labels%20in%20(";
     //wave
 
@@ -271,13 +274,16 @@ function putDataPoint(wavedata,
             break;
         }
     }
-    status = status == 'Closed' ? "Accepted" : status;
+    status = status == 'Closed' && resolution == "Done" ? "Accepted" : status;
+    status = status == 'Closed' && resolution != "Done" ? "Cancelled" : status;
     status = status == 'Reopened' ? "Assigned" : status;
 
     if(!cloudAppd) {
         cloudAppd = { progress: 0, reportedSP: 0, summarySP: 0, name: cloudApp,
             status: status,
+            resolution: resolution,
             accepted: status == 'Accepted',
+            cancelled: status == 'Cancelled',
             readyForAcceptance: status == 'Resolved',
             readyForQA: status == 'Ready for QA' || status == "Testing in Progress",
             blocked: status == 'Blocked',

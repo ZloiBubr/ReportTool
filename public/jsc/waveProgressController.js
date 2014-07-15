@@ -123,6 +123,7 @@ function waveProgressController($scope, $resource, $window, $filter) {
         $scope.total.resolved.isChecked = $scope.total.all.isChecked;
         $scope.total.blocked.isChecked = $scope.total.all.isChecked;
         $scope.total.deferred.isChecked = $scope.total.all.isChecked;
+        $scope.total.cancelled.isChecked = $scope.total.all.isChecked;
 
         $scope.processWithRowSpans();
     }

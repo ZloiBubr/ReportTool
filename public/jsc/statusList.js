@@ -20,6 +20,7 @@ exports.statuses = function() {
     this.testingInProgress = new exports.statusEntity();
     this.resolved = new exports.statusEntity();
     this.accepted = new exports.statusEntity();//(closed)
+    this.cancelled = new exports.statusEntity();
     this.pages = 0;
 
     this.blocked.weight = 0;
@@ -32,6 +33,7 @@ exports.statuses = function() {
     this.testingInProgress.weight = 7;
     this.resolved.weight = 8;
     this.accepted.weight = 9;//(closed)
+    this.cancelled.weight = 10;
 
     this.getStatusByName = function(statusName){
         switch(statusName)
@@ -56,6 +58,8 @@ exports.statuses = function() {
                 return this.resolved;
             case "Blocked":
                 return this.blocked;
+            case "Cancelled":
+                return this.cancelled;
 //            case "Reopened":
 //                return this.reopened;
 //            case "":

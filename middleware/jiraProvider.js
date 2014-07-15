@@ -242,6 +242,7 @@ function SavePage(issue, callback) {
         page.uri = "https://jira.epam.com/jira/browse/" + issue.key;
         page.summary = issue.fields.summary;
         page.status = issue.fields.status.name;
+        page.resolution = issue.fields.resolution == null ? "" : issue.fields.resolution.name;
         page.reporter = issue.fields.reporter.displayName;
         page.originalEstimate = issue.fields.timetracking.originalEstimate;
         page.timeSpent = issue.fields.timetracking.timeSpent;
