@@ -262,7 +262,7 @@ function SavePage(issue, callback) {
                     callback(error);
                 }
                 if (subtasks != null) {
-                    async.eachSeries(subtasks, function (subtask, callback2) {
+                    async.eachSeries(subtasks.issues, function (subtask, callback2) {
                             if (subtask != null) {
                                 calcWorklogFromIssue(subtask, page);
                             }
