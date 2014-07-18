@@ -11,7 +11,7 @@ exports.statusEntity = function()
 
 exports.statuses = function() {
     this.blocked = new exports.statusEntity();
-    this.open = new exports.statusEntity();
+    this.opened = new exports.statusEntity();
     this.deferred = new exports.statusEntity();
     this.assigned = new exports.statusEntity(); //+reopen
     this.inProgress = new exports.statusEntity();
@@ -24,22 +24,22 @@ exports.statuses = function() {
     this.pages = 0;
 
     this.blocked.weight = 0;
-    this.open.weight = 1;
+    this.opened.weight = 1;
     this.deferred.weight = 2;
-    this.assigned.weight = 3; //+reopen
+    this.assigned.weight = 3;
     this.inProgress.weight = 4;
     this.codeReview.weight = 5;
     this.readyForQA.weight = 6;
     this.testingInProgress.weight = 7;
     this.resolved.weight = 8;
-    this.accepted.weight = 9;//(closed)
+    this.accepted.weight = 9;
     this.cancelled.weight = 10;
 
     this.getStatusByName = function(statusName){
         switch(statusName)
         {
             case "Open":
-                return this.open;
+                return this.opened;
             case "Deferred":
                 return this.deferred;
             case "Assigned":
@@ -60,10 +60,8 @@ exports.statuses = function() {
                 return this.blocked;
             case "Cancelled":
                 return this.cancelled;
-//            case "Reopened":
-//                return this.reopened;
-//            case "":
-//                return this.unspecified;
+            default :
+                return this.blocked;
         }
     }
 };

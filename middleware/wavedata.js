@@ -310,24 +310,10 @@ function putDataPoint(wavedata,
 
     if(pageStatus.weight < cloudAppStatus.weight){
         cloudAppd.status = status;
+        cloudAppd.accepted = cloudAppd.status == 'Accepted';
+        cloudAppd.cancelled = cloudAppd.status == 'Cancelled';
+        cloudAppd.readyForAcceptance = cloudAppd.status == 'Resolved';
+        cloudAppd.readyForQA = cloudAppd.status == 'Ready for QA' || cloudAppd.status == "Testing in Progress";
+        cloudAppd.blocked = cloudAppd.status == 'Blocked';
     }
-
-//    if(status != cloudAppd.status) {
-//        if((cloudAppd.status == "Ready for QA" || cloudAppd.status == "Testing in Progress") && (status == "Resolved" || status == "Testing in Progress" || status =="Ready for QA")) {
-//            cloudAppd.status = "Testing in Progress";
-//        }
-//        else if(cloudAppd.status == "Resolved" && (status == "Ready for QA" || status == "Testing in Progress")) {
-//            cloudAppd.status = "Ready for QA";
-//            cloudAppd.readyForQA = true;
-//            cloudAppd.accepted = false;
-//            cloudAppd.readyForAcceptance = false;
-//        }
-//        else {
-//            cloudAppd.accepted = false;
-//            cloudAppd.readyForAcceptance = false;
-//            cloudAppd.readyForQA = false;
-//            cloudAppd.blocked = cloudAppd.blocked || status == "Blocked";
-//            cloudAppd.status = cloudAppd.blocked ? "Blocked" : "";
-//        }
-//    }
 }
