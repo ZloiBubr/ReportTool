@@ -90,7 +90,7 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
             function (callback) {
                 //process pages
                 LogProgress("**** async process pages");
-                async.eachLimit(issuesList, 5, function (issue, callback2) {
+                async.eachLimit(issuesList, 10, function (issue, callback2) {
                         var currentProgress = Math.floor((++counter*100)/issuesList.length);
                         if(lastProgress != currentProgress) {
                             lastProgress = currentProgress;
@@ -125,6 +125,8 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
                 }
                 else {
                     callback();
+                    response.end();
+                    updateInProgress = false;
                 }
             }
         ],
@@ -132,11 +134,6 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
             if (err) {
                 LogProgress("!!!!!!!!!!!!!!!!!!!! Update failed!", err);
             }
-            else {
-                LogProgress("Update finished successfully!", err);
-            }
-            response.end();
-            updateInProgress = false;
         });
     callback();
 };
@@ -257,34 +254,38 @@ function SavePage(issue, callback) {
         page.updated = issue.fields.updated;
         parseHistory(issue, page);
         calcWorklogFromIssue(issue, page);
-        async.eachSeries(issue.fields.subtasks, function(subtask, callback2) {
-            var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), _jiraUser, _jiraPass, '2');
-            jira.findIssue(subtask.key, function (error, subtask) {
+        var queryString = util.format("project = PLEXUXC AND parent in (%s)", issue.key);
+        var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), _jiraUser, _jiraPass, '2');
+        jira.searchJira(queryString, { fields: ["summary", "worklog"] }, function (error, subtasks) {
                 if (error) {
-                    brokenPagesList.push(issue.key);
+                    LogProgress("!!!!!!!!!!!!!!!!!!!! " + page.key + ' : Error quering subtasks!', error);
                     callback(error);
                 }
-                if (subtask != null) {
-                    calcWorklogFromIssue(subtask, page);
+                if (subtasks != null) {
+                    async.eachSeries(subtasks, function (subtask, callback2) {
+                            if (subtask != null) {
+                                calcWorklogFromIssue(subtask, page);
+                            }
+                            callback2();
+                        },
+                        function (err) {
+                            if (err) {
+                                LogProgress("!!!!!!!!!!!!!!!!!!!! " + page.key + ' : Error processing worklogs from subtasks!', err);
+                                callback(err);
+                            }
+                            page.save(function (err, page) {
+                                if (err) {
+                                    LogProgress("!!!!!!!!!!!!!!!!!!!! " + page.key + ' : Was not saved to Mongo db due to error!', err);
+                                    callback(err);
+                                }
+                                else {
+                                    callback();
+                                }
+                            })
+                        });
                 }
-                callback2();
-            });
-        },
-        function (err) {
-            if (err) {
-                LogProgress("!!!!!!!!!!!!!!!!!!!! " + page.key + ' : Error processing worklogs from subtasks!', err);
-                callback(err);
             }
-            page.save(function (err, page) {
-                if (err) {
-                    LogProgress("!!!!!!!!!!!!!!!!!!!! " + page.key + ' : Was not saved to Mongo db due to error!', err);
-                    callback(err);
-                }
-                else {
-                    callback();
-                }
-            })
-        });
+        );
     });
 }
 
