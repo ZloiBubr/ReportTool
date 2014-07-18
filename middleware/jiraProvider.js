@@ -259,7 +259,7 @@ function SavePage(issue, callback) {
         calcWorklogFromIssue(issue, page);
         async.eachSeries(issue.fields.subtasks, function(subtask, callback2) {
             var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), _jiraUser, _jiraPass, '2');
-            jira.findIssue(subtask.key + "?expand=changelog", function (error, subtask) {
+            jira.findIssue(subtask.key, function (error, subtask) {
                 if (error) {
                     brokenPagesList.push(issue.key);
                     callback(error);
