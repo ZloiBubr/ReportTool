@@ -113,7 +113,7 @@ function waveProgressController($scope, $resource, $window, $filter) {
 
     $scope.onSelectDeselectAll = function()
     {
-        $scope.total.opened.isChecked = $scope.total.all.isChecked;
+        $scope.total.open.isChecked = $scope.total.all.isChecked;
         $scope.total.assigned.isChecked = $scope.total.all.isChecked;
         $scope.total.inProgress.isChecked = $scope.total.all.isChecked;
         $scope.total.codeReview.isChecked = $scope.total.all.isChecked;

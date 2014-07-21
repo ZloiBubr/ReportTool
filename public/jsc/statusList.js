@@ -11,7 +11,7 @@ exports.statusEntity = function()
 
 exports.statuses = function() {
     this.blocked = new exports.statusEntity();
-    this.opened = new exports.statusEntity();
+    this.open = new exports.statusEntity();
     this.deferred = new exports.statusEntity();
     this.assigned = new exports.statusEntity(); //+reopen
     this.inProgress = new exports.statusEntity();
@@ -24,7 +24,7 @@ exports.statuses = function() {
     this.pages = 0;
 
     this.blocked.weight = 0;
-    this.opened.weight = 1;
+    this.open.weight = 1;
     this.deferred.weight = 2;
     this.assigned.weight = 3;
     this.inProgress.weight = 4;
@@ -39,7 +39,7 @@ exports.statuses = function() {
         switch(statusName)
         {
             case "Open":
-                return this.opened;
+                return this.open;
             case "Deferred":
                 return this.deferred;
             case "Assigned":
