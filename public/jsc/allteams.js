@@ -15,6 +15,7 @@ function Teams() {
                 "Siarhei Abrazhevich",
 
                 "Artsiom Rusak",
+                "Raman Ivanou",
                 "Aliaksandr Koush",
                 "Alena Charnova",
                 "Nicolay Kostroma"
@@ -94,6 +95,8 @@ function Teams() {
             qaTeamLead: "Iryna Kutsko",
             developers: [
                 "Mariya Babich",
+                "Pavel Naumenka",
+                "Sergei Kulick",
                 "Volha Shandrokha",
                 "Aliaksandr Rusak",
                 "Andrei Kasak",
@@ -122,10 +125,14 @@ function Teams() {
             developers: [
                 "Maryna Furman",
                 "Siarhei Zhalezka",
+                "Viachaslau Anufryiuk",
                 "Yury Yamoryk",
                 "Aliaksandr Kladau",
+                "Dzmitry Kavaliou",
+                "Dzmitry Shynkarou",
                 "Maksim Tsikhan",
                 "Petr Falitarchyk",
+                "Yuri Chupyrkin",
                 "Aliaksandr Rykau",
                 "Ivan Dziameshka",
                 "Siarhei Bahdanovich"
@@ -151,7 +158,9 @@ function Teams() {
                 "Viachaslau Naimovich",
                 "Vitali Sonchyk",
                 "Katsiaryna Firsava",
-                "Katsiaryna Kulbitskaya"
+                "Katsiaryna Kulbitskaya",
+                "Maryia Kashtanava",
+                "Rustam Allanazarau"
             ]
         }
     ]
