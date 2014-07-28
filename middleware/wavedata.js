@@ -153,7 +153,9 @@ function SortData(wavedata) {
     wavedata.waves.sort(function (a, b) {
         a = a.name;
         b = b.name;
-        return a > b ? 1 : a < b ? -1 : 0;
+        var v1 = parseInt(a.substring(4));
+        var v2 = parseInt(b.substring(4));
+        return v1 > v2 ? 1 : v1 < v2 ? -1 : 0;
     });
 
     for (var i = 0; i < wavedata.waves.length; i++) {
