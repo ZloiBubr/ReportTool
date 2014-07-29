@@ -107,8 +107,32 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
                     }
                 )
             },
+            // Repeat process for broken pages
             function (callback) {
-                //reprocess pages
+                //reprocess broken pages
+                if(brokenPagesList.length > 0) {
+                    LogProgress("**** async reprocess pages");
+                    async.eachSeries(brokenPagesList, function (issue, callback2) {
+                            LogProgress("**** async process page: " + issue);
+                            ProcessPage(issue, callback2);
+                        },
+                        function (err) {
+                            if (err) {
+                                LogProgress("!!!!!!!!!!!!!!!!!!!! Reprocessing pages error happened!", err);
+                            }
+                            callback();
+                        }
+                    )
+                }
+                else {
+                    callback();
+                    response.end();
+                    updateInProgress = false;
+                }
+            },
+
+            function (callback) {
+                // process linked issues pages
                 if(brokenPagesList.length > 0) {
                     LogProgress("**** async reprocess pages");
                     async.eachSeries(brokenPagesList, function (issue, callback2) {
@@ -139,7 +163,9 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
 };
 
 function CollectModules(callback) {
-    var requestString = "project = PLEX-UXC AND issuetype = epic AND summary ~ Module AND NOT summary ~ automation ORDER BY key ASC";
+    //var requestString = "project = PLEX-UXC AND issuetype = epic AND summary ~ Module AND NOT summary ~ automation ORDER BY key ASC";
+    // using only for debug mode
+    var requestString = "project = PLEX-UXC AND issuetype = epic AND 'Epic Name' = 'Part Module'";
 
     UpdateProgress(1);
 

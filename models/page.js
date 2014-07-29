@@ -30,6 +30,10 @@ var schema = new Schema({
             dateChanged:    { type: Date },
             dateStarted:    { type: Date }
         }],
+    issues:[{
+        inward: {type: String},
+        issue: {type: Schema.Types.ObjectId, ref: 'Issue'}
+    }],
     created:                { type: String },
     updated:                { type: String }
 });
