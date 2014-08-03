@@ -6,6 +6,7 @@ var config = require('../config');
 var log = require('../libs/log')(module);
 var Module = require('../models/module').Module;
 var Page = require('../models/page').Page;
+var Issue = require('../models/issue').Issue;
 var _ = require('underscore');
 var async = require('async');
 
@@ -15,6 +16,7 @@ var response = null;
 var epicsList = [];
 var issuesList = [];
 var epicIssueMap = {};
+var linkedIssueUniqList = [];
 var brokenPagesList = [];
 var updateInProgress = false;
 
@@ -58,6 +60,7 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
 
     issuesList = [];
     epicsList = [];
+    linkedIssueUniqList = {};
     epicIssueMap = {};
     updateInProgress = true;
 
@@ -126,32 +129,31 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
                 }
                 else {
                     callback();
-                    response.end();
-                    updateInProgress = false;
                 }
             },
 
             function (callback) {
                 // process linked issues pages
-                if(brokenPagesList.length > 0) {
-                    LogProgress("**** async reprocess pages");
-                    async.eachSeries(brokenPagesList, function (issue, callback2) {
-                            LogProgress("**** async process page: " + issue);
-                            ProcessPage(issue, callback2);
-                        },
-                        function (err) {
-                            if (err) {
-                                LogProgress("!!!!!!!!!!!!!!!!!!!! Reprocessing pages error happened!", err);
-                            }
-                            callback();
+                LogProgress("**** process linked issues pages");
+                async.eachSeries(Object.keys(linkedIssueUniqList), function (linkedIssueKey, callback2) {
+                        var linkedIssue = linkedIssueUniqList[linkedIssueKey];
+                        LogProgress("**** process linked issues pages: " + linkedIssueKey);
+                        ProcessLinkedIssue(linkedIssue, callback2);
+
+                        //ProcessPage(issue, callback2);
+                    },
+                    function (err) {
+                        if (err) {
+                            LogProgress("!!!!!!!!!!!!!!!!!!!! Reprocessing  Issue/Question/Bug error happened!", err);
                         }
-                    )
-                }
-                else {
-                    callback();
-                    response.end();
-                    updateInProgress = false;
-                }
+                        callback();
+                    }
+                )
+
+                callback();
+                response.end();
+                updateInProgress = false;
+
             }
         ],
         function (err) {
@@ -245,11 +247,103 @@ function ProcessPage(storyKey, callback) {
                     brokenPagesList.push(storyKey);
                     LogProgress("!!!!!!!!!!!!!!!!!!!! " + storyKey + ' : Story was not saved!', error);
                 }
+                _.each(issue.fields.issuelinks, function (linkedIssueItem){
+                    var linkedIssue = linkedIssueItem.inwardIssue ? linkedIssueItem.inwardIssue : linkedIssueItem.outwardIssue;
+                    if(linkedIssue.fields.issuetype.name == "Story"){
+                        return;
+                    }
+
+                    if(_.isUndefined(linkedIssueUniqList[linkedIssue.key]))
+                    {
+                        linkedIssueUniqList[linkedIssue.key] = {
+                            linkedIssueKey : linkedIssue.key,
+                            linkedPages : [{
+                                key : issue.key,
+                                _id : issue._id,
+                                linkType: linkedIssueItem.type.inward
+                            }]
+                            };
+                    }else{
+                        linkedIssueUniqList[linkedIssue.key].linkedPages.push({
+                            key : issue.key,
+                            _id : issue._id,
+                            linkType: linkedIssueItem.type.inward});
+                    }
+                });
+
                 callback(error);
             });
         }
     });
 }
+
+function ProcessLinkedIssue(linkedIssue, callback)
+{
+    var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), _jiraUser, _jiraPass, '2');
+    jira.findIssue(linkedIssue.linkedIssueKey + "?expand=changelog", function (error, linkedIssue) {
+        if (error) {
+            LogProgress("!!!!!!!!!!!!!!!!!!!! " + linkedIssue.linkedIssueKey + ' : Issue/Question/Bug was not found at JIRA!', error);
+            callback(error);
+        }
+        if (linkedIssue == null || linkedIssue.key == null) {
+            LogProgress("!!!!!!!!!!!!!!!!!!!! " + linkedIssue.linkedIssueKey + ' : Issue/Question/Bug was not found at JIRA!', error);
+            callback(error);
+        }
+        else{
+            SaveLinkedIssue(linkedIssue, function(error){
+                if(error) {
+                    LogProgress("!!!!!!!!!!!!!!!!!!!! " + linkedIssue.key + ' : Issue/Question/Bug was not saved!', error);
+                }
+
+                callback(error);
+            });
+        }
+    });
+}
+
+function SaveLinkedIssue(linkedIssue, callback) {
+    Issue.findOne({key: linkedIssue.key}, function (err, dbIssue) {
+        if (err) {
+            LogProgress("!!!!!!!!!!!!!!!!!!!! " + page.key + ' : Error with Mongo db connection!', err);
+            callback(err);
+        }
+
+        if(!dbIssue){
+            dbIssue = new Issue();
+        }
+
+
+
+        dbIssue.key = linkedIssue.key;
+        dbIssue.uri = "https://jira.epam.com/jira/browse/" + linkedIssue.key;
+        dbIssue.summary = linkedIssue.fields.summary;
+        dbIssue.status = linkedIssue.fields.status.name;
+        dbIssue.resolution = linkedIssue.fields.resolution == null ? "" : linkedIssue.fields.resolution.name;
+        dbIssue.reporter = linkedIssue.fields.reporter.displayName;
+        dbIssue.originalEstimate = linkedIssue.fields.timetracking.originalEstimate;
+        dbIssue.timeSpent = linkedIssue.fields.timetracking.timeSpent;
+        dbIssue.labels = linkedIssue.fields.labels;
+        if (linkedIssue.fields.assignee != null)
+            dbIssue.assignee = linkedIssue.fields.assignee.displayName;
+
+        dbIssue.pages = new Array();
+        _.each(linkedIssueUniqList[linkedIssue.key].linkedPages, function(linkedPage){
+            dbIssue.pages.push({linkType : linkedPage.linkType, page: linkedPage._id})
+        });
+
+        dbIssue.save(function(err, issue){
+            if(err){
+                LogProgress("!!!!!!!!!!!!!!!!!!!! " + issue.key + ' : Was not saved to Mongo db due to error!', err);
+                callback(err);
+            }
+            else {
+                callback();
+            }
+        });
+
+    });
+}
+
 
 function SavePage(issue, callback) {
     Page.findOne({ key: issue.key }, function (err, page) {

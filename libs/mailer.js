@@ -12,7 +12,8 @@ var smtpTransport = nodemailer.createTransport("SMTP",{
 // setup e-mail data with unicode symbols
 var mailOptions = {
     from: "Report Tool ✔ <reporttool.server@gmail.com>", // sender address
-    to: "siarhei_hladkou@epam.com, Heorhi_Vilkitski@epam.com", // list of receivers
+    //to: "siarhei_hladkou@epam.com, Heorhi_Vilkitski@epam.com", // list of receivers
+    to: "", // list of receivers
     subject: "Uncaught Error on server ✔", // Subject line
     text: "Error Happened ✔", // plaintext body
     html: "<b>Error Happened ✔</b>" // html body

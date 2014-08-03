@@ -11,21 +11,21 @@ var schema = new Schema({
     summary:                { type: String },
 
     pages:[{
-        inward: {type: String},
+        linkType: {type: String},
         page: {type: Schema.Types.ObjectId, ref: 'Page'}
-    }]
+    }],
 
-//    status:                 { type: String },
-//
-//    resolution:             { type: String },
-//    reporter:               { type: String },
-//    originalEstimate:       { type: String },
-//    timeSpent:              { type: String },
-//    labels:                 { type: String },
-//    assignee:               { type: String },
-//
-//    blockers:               { type: String },
-//    progress:               { type: String },
+    status:                 { type: String },
+
+    resolution:             { type: String },
+    reporter:               { type: String },
+    originalEstimate:       { type: String },
+    timeSpent:              { type: String },
+    labels:                 { type: String },
+    assignee:               { type: String },
+
+    blockers:               { type: String },
+    progress:               { type: String },
 //
 //    storyPoints:            { type: String },
 //    devFinished:            { type: String },
@@ -48,4 +48,4 @@ var schema = new Schema({
 //    updated:                { type: String }
 });
 
-exports.issue = mongoose.model('Issue', schema);
+exports.Issue = mongoose.model('Issue', schema);
