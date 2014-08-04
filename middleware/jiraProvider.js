@@ -144,7 +144,7 @@ function CollectModules(callback) {
     UpdateProgress(1);
 
     var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), _jiraUser, _jiraPass, '2');
-    jira.searchJira(requestString, null, function (error, epics) {
+    jira.searchJira(requestString, { fields: ["summary", "duedate"] }, function (error, epics) {
         if (error) {
             callback(error);
         }
@@ -156,6 +156,7 @@ function CollectModules(callback) {
                         }
                         module.key = epic.key;
                         module.summary = epic.fields.summary;
+                        module.duedate = new Date(epic.fields.duedate);
                         module.save(function () {
                             epicsList.push(epic.key);
                             LogProgress(epic.key + " : " + epic.fields.summary + " Collected");

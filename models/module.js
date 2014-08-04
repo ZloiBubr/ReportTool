@@ -7,7 +7,8 @@ var Schema = mongoose.Schema;
 var schema = new Schema({
     key:        { type: String, unique: true, index: true },
     summary:    { type: String },
-    created:    { type: Date, default: Date.now() }
+    created:    { type: Date, default: Date.now() },
+    duedate:    { type: Date }
 });
 
 exports.Module = mongoose.model('Module', schema);

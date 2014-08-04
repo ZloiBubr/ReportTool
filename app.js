@@ -9,7 +9,8 @@ var weekly = require('./routes/calcweeklyprogress');
 var pagebysize = require('./routes/calcpagebysize');
 var pagedata = require('./routes/getpagedata');
 var progress = require('./routes/calcprogress');
-var wave = require('./routes/calcwave');
+var wavedata = require('./routes/calcwave');
+var moduledata = require('./routes/calcmodule');
 var personaldata = require('./routes/personaldata');
 var http = require('http');
 var path = require('path');
@@ -63,7 +64,8 @@ app.get('/progressdata', progress.get);
 app.get('/weeklydata', weekly.get);
 app.get('/pagebysizedata', pagebysize.get);
 app.get('/pagedata/:id', pagedata.get);
-app.get('/wavedata', wave.get);
+app.get('/wavedata', wavedata.get);
+app.get('/moduledata', moduledata.get);
 app.get('/personaldata', personaldata.get);
 app.get('/cleandb', function(req, res) {
     ClearDB(function (err) {
