@@ -1,0 +1,28 @@
+<div id="container" class="container" ng-controller="moduleProgressController" style="padding-left: 150px">
+    <div class="visible-md visible-lg visible-sm" style="position:fixed; left: 10px; top:150px; font-size: 12pt ">
+        <ul class="list-unstyled">
+            <li>SME:<select class="form-control headerSelectWidth" ng-model="filteredSme" class="headerSelectWidth" ng-options="sme.name as sme.name for sme in allSmes" ng-change="filterModuleBySme()"></select></li>
+            <li>Module Group:<select class="form-control headerSelectWidth" ng-model="filteredMG" class="headerSelectWidth" ng-options="moduleGroup.name as moduleGroup.name for moduleGroup in allGroups" ng-change="filterModuleByGroup()"></select></li>
+            <li><input type="checkbox" ng-model="total.done.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-remove"></span><strong> {{total.done.count}}</strong>:Done</li>
+            <li><br/></li>
+            <li><input type="checkbox" ng-model="total.all.isChecked" ng-change="onSelectDeselectAll()"><span class="glyphicon glyphicon-shopping-cart"></span><strong> {{total.total}}</strong>:Total</li>
+        </ul>
+    </div>
+    <div class="row">
+
+        <div class="col-lg-12">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Module</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat = "item in invertedWaveProgressData">
+                    <td class="table_cell_border" rowspan="{{item.module.rowSpan}}" ng-if="isExist(item.module)" ng-class="{red: isUnknownExist(item.module.name)}"><a href="{{item.module.uri}}">{{item.module.name}}</a> : {{item.module.progress | number : 0}}% - {{item.module.reportedSP | number : 0}} of {{item.module.summarySP | number : 0}} SP</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
