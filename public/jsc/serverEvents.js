@@ -1,9 +1,17 @@
 if (!!window.EventSource) {
     var source = new EventSource('/update_progress');
     source.addEventListener('progress', function(e) {
-        var percentage = e.data;
+        var data = JSON.parse(e.data);
+        if(data.page)
+        {
+            $("#page_progress .bar").css({ width: data.page + '%' });
+        }
+        else{
+            $("#issue_progress .bar").css({ width: data.issue + '%' });
+        }
+
         //update progress bar in client
-        $("#progress .bar").css({ width: percentage + '%' });
+
 //        if(percentage == '100') {
 //            window.location.href = "/";
 //        }

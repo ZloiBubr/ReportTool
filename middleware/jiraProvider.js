@@ -25,14 +25,15 @@ var _jiraPass = "";
 
 exports.rememberResponse = function (res) {
     response = res;
-    UpdateProgress(0);
+    UpdateProgress(0, "page");
+    UpdateProgress(0, "issues");
 };
 
-var UpdateProgress = function (progress) {
+var UpdateProgress = function (progress, type) {
     response.write("event: progress\n");
-    response.write("data: " + progress.toString() + "\n\n");
+    response.write('data: {"' + type + '":' + progress.toString() + '}\n\n');
     if (progress > 0) {
-        LogProgress("********** Progress " + progress.toString() + "% **********");
+        LogProgress("**********"+ type +" Progress " + progress.toString() + "% **********");
     }
 };
 
@@ -97,7 +98,7 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
                         var currentProgress = Math.floor((++counter*100)/issuesList.length);
                         if(lastProgress != currentProgress) {
                             lastProgress = currentProgress;
-                            UpdateProgress(currentProgress);
+                            UpdateProgress(currentProgress, "page");
                         }
                         LogProgress("**** async process page: " + issue);
                         ProcessPage(issue, callback2);
@@ -135,25 +136,28 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
             function (callback) {
                 // process linked issues pages
                 LogProgress("**** process linked issues pages");
-                async.eachSeries(Object.keys(linkedIssueUniqList), function (linkedIssueKey, callback2) {
+                var keys = Object.keys(linkedIssueUniqList)
+                counter = 0;
+                lastProgress = 0;
+                async.eachLimit(keys, 10, function (linkedIssueKey, callback2) {
+                        var currentProgress = Math.floor((++counter*100)/keys.length);
+                        if(lastProgress != currentProgress) {
+                            lastProgress = currentProgress;
+                            UpdateProgress(currentProgress, "issue");
+                        }
                         var linkedIssue = linkedIssueUniqList[linkedIssueKey];
                         LogProgress("**** process linked issues pages: " + linkedIssueKey);
                         ProcessLinkedIssue(linkedIssue, callback2);
-
-                        //ProcessPage(issue, callback2);
                     },
                     function (err) {
                         if (err) {
                             LogProgress("!!!!!!!!!!!!!!!!!!!! Reprocessing  Issue/Question/Bug error happened!", err);
                         }
                         callback();
+                        response.end();
+                        updateInProgress = false;
                     }
                 )
-
-                callback();
-                response.end();
-                updateInProgress = false;
-
             }
         ],
         function (err) {
@@ -169,7 +173,8 @@ function CollectModules(callback) {
     // using only for debug mode
     var requestString = "project = PLEX-UXC AND issuetype = epic AND 'Epic Name' = 'Part Module'";
 
-    UpdateProgress(1);
+    UpdateProgress(1, "page");
+    UpdateProgress(1, "issue");
 
     var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), _jiraUser, _jiraPass, '2');
     jira.searchJira(requestString, { fields: ["summary", "duedate"] }, function (error, epics) {
@@ -281,7 +286,7 @@ function ProcessPage(storyKey, callback) {
 function ProcessLinkedIssue(linkedIssue, callback)
 {
     var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), _jiraUser, _jiraPass, '2');
-    jira.findIssue(linkedIssue.linkedIssueKey + "?expand=changelog", function (error, linkedIssue) {
+    jira.findIssue(linkedIssue.linkedIssueKey, function (error, linkedIssue) {
         if (error) {
             LogProgress("!!!!!!!!!!!!!!!!!!!! " + linkedIssue.linkedIssueKey + ' : Issue/Question/Bug was not found at JIRA!', error);
             callback(error);
@@ -312,8 +317,6 @@ function SaveLinkedIssue(linkedIssue, callback) {
         if(!dbIssue){
             dbIssue = new Issue();
         }
-
-
 
         dbIssue.key = linkedIssue.key;
         dbIssue.uri = "https://jira.epam.com/jira/browse/" + linkedIssue.key;
