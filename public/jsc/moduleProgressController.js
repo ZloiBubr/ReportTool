@@ -3,7 +3,7 @@
  */
 
 function moduleProgressController($scope, $resource, $window, $filter) {
-    var timeSheetDataResource = $resource('/wavedata');
+    var moduleDataResource = $resource('/moduledata');
 
     /* ------------------------------------------------------ Init/Reinit -------------------------------*/
     $scope.init = function () {
@@ -19,7 +19,7 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         $scope.filteredTeam = $scope.allTeams[0].id;
         $scope.isTotalWasCalculated = false;
         $scope.reInitTotal();
-        $scope.getTimeSheetData().done($scope.processWithRowSpans);
+        $scope.getModuleData().done($scope.processWithRowSpans);
     };
 
     $scope.reInitTotal = function(){
@@ -31,14 +31,14 @@ function moduleProgressController($scope, $resource, $window, $filter) {
 
     $scope.processWithRowSpans = function () {
         $scope.total.pages = 0;
-        $scope.invertedWaveProgressData=[];
+        $scope.invertedModuleProgressData=[];
 
-        _.each($scope.waveProgressData.waves, function(waveProgressItem){
-            var firstWaveIndex = $scope.invertedWaveProgressData.length;
+        _.each($scope.moduleProgressData.moduleGroup, function(moduleGroupItem){
+            var firstWaveIndex = $scope.invertedModuleProgressData.length;
             waveProgressItem.rowSpan = _.reduce(waveProgressItem.moduleGroup, function(moduleGroupMemo, moduleGroupItem){
-                var firstModuleGroupIndex = $scope.invertedWaveProgressData.length;
+                var firstModuleGroupIndex = $scope.invertedModuleProgressData.length;
                 moduleGroupItem.rowSpan = _.reduce(moduleGroupItem.module, function(moduleMemo, moduleItem){
-                    var firstCloudAppIndex = $scope.invertedWaveProgressData.length;
+                    var firstCloudAppIndex = $scope.invertedModuleProgressData.length;
                     moduleItem.rowSpan = _.reduce(moduleItem.cloudApp, function(cloudAppMemo, cloudAppItem){
                         var statusEntity = $scope.total.getStatusByName(cloudAppItem.status);
 
@@ -52,7 +52,7 @@ function moduleProgressController($scope, $resource, $window, $filter) {
                         if(statusEntity.isChecked)
                         {
                             $scope.total.pages += cloudAppItem.pages;
-                            $scope.invertedWaveProgressData.push({appItem: cloudAppItem});
+                            $scope.invertedModuleProgressData.push({appItem: cloudAppItem});
                             cloudAppItem.progress == 100 ? $scope.total.complete++ : void(0);
                             return cloudAppMemo + 1;
                         }
@@ -60,11 +60,11 @@ function moduleProgressController($scope, $resource, $window, $filter) {
                         return cloudAppMemo;
                     },0);
 
-                    if(_.isUndefined($scope.invertedWaveProgressData[firstCloudAppIndex])){
+                    if(_.isUndefined($scope.invertedModuleProgressData[firstCloudAppIndex])){
                         return moduleMemo;
                     }
 
-                    $scope.invertedWaveProgressData[firstCloudAppIndex].module = moduleItem;
+                    $scope.invertedModuleProgressData[firstCloudAppIndex].module = moduleItem;
                     return moduleMemo + moduleItem.rowSpan;
                 },0);
 
@@ -86,20 +86,20 @@ function moduleProgressController($scope, $resource, $window, $filter) {
 
     /* -------------------------------------------------------Event handlers ------------------------ */
     /* --------------------------------------------- Actions ------------------------------*/
-    $scope.getTimeSheetData = function () {
+    $scope.getModuleData = function () {
         var loadingDfrd = $.Deferred();
 
-        var getTimeSheetSuccess = function (data) {
-            $scope.waveProgressData = data;
+        var getModuleSuccess = function (data) {
+            $scope.moduleProgressData = data;
             loadingDfrd.resolve();
         };
 
-        var getTimeSheetFail = function (err) {
+        var getModuleFail = function (err) {
             $scope.errMessage = err;
             loadingDfrd.reject(err);
         };
 
-        timeSheetDataResource.get($scope.common, getTimeSheetSuccess, getTimeSheetFail);
+        moduleDataResource.get($scope.common, getModuleSuccess, getModuleFail);
         return loadingDfrd.promise();
     };
 
