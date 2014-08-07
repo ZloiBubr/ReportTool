@@ -12,6 +12,7 @@ var progress = require('./routes/calcprogress');
 var wavedata = require('./routes/calcwave');
 var moduledata = require('./routes/calcmodule');
 var personaldata = require('./routes/personaldata');
+var issuesdata = require('./routes/issuesdata');
 var http = require('http');
 var path = require('path');
 var config = require('./config');
@@ -67,6 +68,7 @@ app.get('/pagedata/:id', pagedata.get);
 app.get('/wavedata', wavedata.get);
 app.get('/moduledata', moduledata.get);
 app.get('/personaldata', personaldata.get);
+app.get('/issuesdata', issuesdata.get);
 app.get('/cleandb', function(req, res) {
     ClearDB(function (err) {
         if (err) {
