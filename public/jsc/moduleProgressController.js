@@ -19,6 +19,7 @@ function moduleProgressController($scope, $resource, $window, $filter) {
     $scope.dataLoad = function () {
         $scope.filteredSme = $scope.allSMEs[0].id;
         $scope.filteredMG = $scope.allModuleGroups[0].id;
+        $scope.filteredTeam = $scope.allTeams[0].id;
         $scope.isTotalWasCalculated = false;
         $scope.reInitTotal();
         $scope.getModuleData().done($scope.processWithRowSpans);
@@ -94,6 +95,9 @@ function moduleProgressController($scope, $resource, $window, $filter) {
                 }
                 _.each(groupProgressItem.module, function(moduleProgressItem) {
                     if($scope.filteredSme != $scope.allSMEs[0].id && moduleProgressItem.smenames.indexOf($scope.filteredSme) < 0){
+                        return;
+                    }
+                    if($scope.filteredTeam != $scope.allTeams[0].id && moduleProgressItem.teamnames.indexOf($scope.filteredTeam) < 0){
                         return;
                     }
                     var acceptedEntity = $scope.total.getStatusByName("Accepted");
@@ -197,9 +201,11 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         $scope.processWithRowSpans();
     }
 
-    $scope.filterCloudAppByStatus = function(item)
+    $scope.filterModuleByTeam = function()
     {
-        return $scope.getStatusEntity(item.appItem.status).isChecked;
+        $scope.reInitTotal();
+        $scope.isTotalWasCalculated = false;
+        $scope.processWithRowSpans();
     }
 
     $scope.isUnknownExist = function(item)
