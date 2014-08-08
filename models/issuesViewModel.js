@@ -2,26 +2,32 @@
  * Created by Heorhi_Vilkitski on 8/5/2014.
  */
 exports.issues = function () {
-    this.dates = [
+    this.issues = [
         {
-            date: Date.now(),
-            teams: [
-                {
-                    name: "teamRenaissancePages",
-                    pages: [
-                        {
-                            key: "",
-                            progress: 0,
-                            person: "",
-                            uri: "",
-                            sumprogress: 0,
-                            storypoints: 0,
-                            devspent: 0,
-                            qaspent: 0,
-                            estimated: "",
-                            blockersnum: 0
-                        }
-                    ]}
-            ]}
-    ];
+
+
+        }];
+};
+
+exports.issue = function(key, reporter, timeSpent, lables, assignee, linkedPages){
+    this.key = key || "";
+    this.reporter = reporter || "";
+    this.timeSpent = timeSpent || "";
+    this.labels = lables || [];
+    this.assignee = assignee || "";
+    this.linkedPages = linkedPages || [];
+};
+
+exports.link = function(linkType, page){
+    this.linkType = linkType || "";
+    this.page = page || new exports.linkedPage();
 }
+
+exports.linkedPage = function(key, reporter, timeSpent, labels, assignee, team){
+    this.key = key || "";
+    this.reporter = reporter || "";
+    this.timeSpent = timeSpent || "";
+    this.labels = labels || [];
+    this.assignee = assignee || "";
+    this.team = team || "";
+};

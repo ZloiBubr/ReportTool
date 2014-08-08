@@ -15,6 +15,8 @@ var schema = new Schema({
         page: {type: Schema.Types.ObjectId, ref: 'Page'}
     }],
 
+//    pages:[{type: Schema.Types.ObjectId, ref: 'Page'}],
+
     status:                 { type: String },
 
     resolution:             { type: String },
@@ -25,7 +27,7 @@ var schema = new Schema({
     assignee:               { type: String },
 
     blockers:               { type: String },
-    progress:               { type: String },
+    progress:               { type: String }
 //
 //    storyPoints:            { type: String },
 //    devFinished:            { type: String },

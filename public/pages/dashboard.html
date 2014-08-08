@@ -1,3 +1,11 @@
-<div id="container" class="container-fluid" ng-controller="velocityChartController">
-    My Dashboard
+<div id="container" class="container-fluid" ng-controller="dashboardController">
+
+
+    <div ng-controller="IssuesLinkedToManyPagesController">
+        Widget IssuesLinkedToManyPagesController
+        <ul ng-repeat="issue in sortedCollection">
+            <li>Blocks:{{getBlockersCount(issue)}} - <a href={{"https://jira.epam.com/jira/browse/"+issue.key}}>{{issue.key}}</a></li>
+        </ul>
+    </div>
+
 </div>

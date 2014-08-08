@@ -1,45 +1,30 @@
 /**
- * Created by Heorhi_Vilkitski on 8/5/2014.
+ * Created by Heorhi_Vilkitski on 8/8/2014.
  */
 
-function dashboardController($scope, $resource, $window, $filter, $modal,  $sce) {
+function IssuesLinkedToManyPagesController($scope, $resource, $window, $filter, $modal,  $sce) {
     //var timeSheetDataResource = $resource('/personalData/:from/:to',{from: "@from", to: "@to"});
-    var issueDataResource = $resource('/personalData');
+    //var issueDataResource = $resource('/personalData');
 
     /* ------------------------------------------------------ Init/Reinit -------------------------------*/
     $scope.init = function () {
-        $scope.common = {};
 
-        $scope.dataLoad();
+        $scope.IssuesLinkedToManyPagesList = [];
+        $scope.$on('issueDataLoaded', $scope.prepareData)
     };
 
     $scope.reInit = function () {
-        $scope.dataLoad();
+        $scope.prepareData();
     };
 
-    $scope.dataLoad = function () {
-        $scope.getTimeSheetData();
+    $scope.prepareData = function () {
+        $scope.sortedCollection = $filter('orderBy')($scope.issueData, function (item) {
+            return $scope.getBlockersCount(item)
+        }, true);
     };
 
     /* -------------------------------------------------------Event handlers ------------------------ */
     /* --------------------------------------------- Actions ------------------------------*/
-    $scope.getTimeSheetData = function () {
-        var loadingDfrd = $.Deferred();
-
-        var getIssueSuccess = function (data) {
-            $scope.issueData = data;
-            loadingDfrd.resolve();
-        };
-
-        var getIssueFail = function (err) {
-            $scope.errMessage = err;
-            loadingDfrd.reject(err);
-        };
-
-        //timeSheetDataResource.get($scope.common, getTimeSheetSuccess, getTimeSheetFail);
-        issueDataResource.get(getIssueSuccess, getIssueFail);
-    };
-
 
 
     /* ------------------------------------------- DOM/Angular events --------------------------------------*/
@@ -64,6 +49,11 @@ function dashboardController($scope, $resource, $window, $filter, $modal,  $sce)
 
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
 
+    $scope.getBlockersCount = function (item) {
+       return _.size(_.filter(item.linkedPages, function (item) {
+            return item.linkType.indexOf("blocked") > -1
+        }));
+    }
 
     $scope.init();
 }

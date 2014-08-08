@@ -169,9 +169,9 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
 };
 
 function CollectModules(callback) {
-    //var requestString = "project = PLEX-UXC AND issuetype = epic AND summary ~ Module AND NOT summary ~ automation ORDER BY key ASC";
+    var requestString = "project = PLEX-UXC AND issuetype = epic AND summary ~ Module AND NOT summary ~ automation ORDER BY key ASC";
     // using only for debug mode
-    var requestString = "project = PLEX-UXC AND issuetype = epic AND 'Epic Name' = 'Part Module'";
+   // var requestString = "project = PLEX-UXC AND issuetype = epic AND 'Epic Name' = 'Part Module'";
 
     UpdateProgress(1, "page");
     UpdateProgress(1, "issue");
@@ -248,7 +248,7 @@ function ProcessPage(storyKey, callback) {
             callback(error);
         }
         else {
-            SavePage(issue, function (error) {
+            SavePage(issue, function (error, dbPage) {
                 if(error) {
                     brokenPagesList.push(storyKey);
                     LogProgress("!!!!!!!!!!!!!!!!!!!! " + storyKey + ' : Story was not saved!', error);
@@ -265,14 +265,14 @@ function ProcessPage(storyKey, callback) {
                             linkedIssueKey : linkedIssue.key,
                             linkedPages : [{
                                 key : issue.key,
-                                _id : issue._id,
+                                _id : dbPage._id,
                                 linkType: linkedIssueItem.type.inward
                             }]
                             };
                     }else{
                         linkedIssueUniqList[linkedIssue.key].linkedPages.push({
                             key : issue.key,
-                            _id : issue._id,
+                            _id : dbPage._id,
                             linkType: linkedIssueItem.type.inward});
                     }
                 });
@@ -332,7 +332,7 @@ function SaveLinkedIssue(linkedIssue, callback) {
 
         dbIssue.pages = new Array();
         _.each(linkedIssueUniqList[linkedIssue.key].linkedPages, function(linkedPage){
-            dbIssue.pages.push({linkType : linkedPage.linkType, page: linkedPage._id})
+            dbIssue.pages.push({linkType:linkedPage.linkType, page: linkedPage._id});
         });
 
         dbIssue.save(function(err, issue){
@@ -403,7 +403,7 @@ function SavePage(issue, callback) {
                                     callback(err);
                                 }
                                 else {
-                                    callback();
+                                    callback(undefined,page);
                                 }
                             })
                         });
