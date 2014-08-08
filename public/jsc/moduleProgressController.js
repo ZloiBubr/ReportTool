@@ -64,6 +64,28 @@ function moduleProgressController($scope, $resource, $window, $filter) {
                 })
             });
         });
+        $scope.allModuleGroups.sort(function (a, b) {
+            a = a.name;
+            b = b.name;
+            if(a == "All") {
+                return -1;
+            }
+            if(b == "All") {
+                return 1;
+            }
+            return a > b ? 1 : a < b ? -1 : 0;
+        });
+        $scope.allSMEs.sort(function (a, b) {
+            a = a.name;
+            b = b.name;
+            if(a == "All") {
+                return -1;
+            }
+            if(b == "All") {
+                return 1;
+            }
+            return a > b ? 1 : a < b ? -1 : 0;
+        });
 
         _.each($scope.moduleProgressData.wave, function(waveProgressItem) {
             _.each(waveProgressItem.moduleGroup, function(groupProgressItem) {
