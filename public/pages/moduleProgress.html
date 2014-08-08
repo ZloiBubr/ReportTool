@@ -1,9 +1,11 @@
 <div id="container" class="container" ng-controller="moduleProgressController" style="padding-left: 150px">
     <div class="visible-md visible-lg visible-sm" style="position:fixed; left: 10px; top:150px; font-size: 12pt ">
         <ul class="list-unstyled">
-            <li>SME:<select class="form-control headerSelectWidth" ng-model="filteredSme" class="headerSelectWidth" ng-options="sme.name as sme.name for sme in allSmes" ng-change="filterModuleBySme()"></select></li>
-            <li>Module Group:<select class="form-control headerSelectWidth" ng-model="filteredMG" class="headerSelectWidth" ng-options="moduleGroup.name as moduleGroup.name for moduleGroup in allGroups" ng-change="filterModuleByGroup()"></select></li>
-            <li><input type="checkbox" ng-model="total.done.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-remove"></span><strong> {{total.done.count}}</strong>:Done</li>
+            <li><input type="checkbox" ng-model="sortByDate" ng-change="onSelectDeselectAll()"> Sort By Date</li>
+            <li>SME:<select class="form-control headerSelectWidth" ng-model="filteredSme" class="headerSelectWidth" ng-options="sme.name as sme.name for sme in allSMEs" ng-change="filterModuleBySme()"></select></li>
+            <li>Module Group:<select class="form-control headerSelectWidth" ng-model="filteredMG" class="headerSelectWidth" ng-options="moduleGroup.name as moduleGroup.name for moduleGroup in allModuleGroups" ng-change="filterModuleByGroup()"></select></li>
+            <li>Team:<select class="form-control headerSelectWidth" ng-model="filteredTeam" class="headerSelectWidth" ng-options="team.name as team.name for team in allTeams" ng-change="filterModuleByTeam()"></select></li>
+            <li><input type="checkbox" ng-model="total.accepted.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-star"></span><strong> {{total.accepted.count}}</strong>:Done</li>
             <li><br/></li>
             <li><input type="checkbox" ng-model="total.all.isChecked" ng-change="onSelectDeselectAll()"><span class="glyphicon glyphicon-shopping-cart"></span><strong> {{total.total}}</strong>:Total</li>
         </ul>
@@ -11,15 +13,49 @@
     <div class="row">
 
         <div class="col-lg-12">
-            <table class="table">
-                <thead>
+            <table class="table table-bordered">
+                <thead class="progressTableMainHeader">
                 <tr>
-                    <th>Module</th>
+                    <th>Progress</th>
+                    <th>Due Date</th>
+                    <th>SMEs</th>
+                    <th>Link</th>
+                    <th>Teams</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng-repeat = "item in invertedWaveProgressData">
-                    <td class="table_cell_border" rowspan="{{item.module.rowSpan}}" ng-if="isExist(item.module)" ng-class="{red: isUnknownExist(item.module.name)}"><a href="{{item.module.uri}}">{{item.module.name}}</a> : {{item.module.progress | number : 0}}% - {{item.module.reportedSP | number : 0}} of {{item.module.summarySP | number : 0}} SP</td>
+                <tr ng-repeat = "module in updatedModuleProgressData">
+                    <td>
+                        <div id="progress"><span class="bar" ng-style="{width: module.progress2}"></span></div>
+                        <div>{{module.progress2}}</div>
+                        <div>{{module.reportedSP | number : 0}}/{{module.summarySP | number : 0}} SP</div>
+                    </td>
+                    <td>
+                        <div>{{module.duedate2 | date:'MMM-dd-yyyy'}}</div>
+                    </td>
+                    <td>
+                        <table>
+                            <tr ng-repeat = "sme in module.smenames">
+                                <td class="table_cell_border">
+                                    <div>{{sme}}</div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td>
+                        <a href="{{module.uri}}">{{module.name}}</a>
+                        <div>Wave: {{module.wave}}</div>
+                        <div>Group: {{module.moduleGroup}}</div>
+                    </td>
+                    <td>
+                        <table>
+                            <tr ng-repeat = "team in module.teamnames">
+                                <td class="table_cell_border">
+                                    <div>{{team}}</div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
                 </tr>
                 </tbody>
             </table>

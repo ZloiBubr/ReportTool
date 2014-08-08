@@ -34,6 +34,9 @@ function appController($scope, $resource, $window) {
         return allTeamsArray;
     }();
 
+    $scope.allSMEs = [{id: "All", name: "All"}];
+    $scope.allModuleGroups = [{id: "All", name: "All"}];
+
     $scope.statuses = $window.exports.statuses;
 }
 

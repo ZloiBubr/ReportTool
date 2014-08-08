@@ -15,7 +15,9 @@ exports.getData = function (req, res) {
 }
 
 function moduleData() {
-    this.moduleGroup = [
+    this.wave = [
+        {
+            moduleGroup: [
                 {
                     module: [
                         {
@@ -33,10 +35,19 @@ function moduleData() {
                     reportedSP: 0,
                     summarySP: 0,
                     progress: 0,
+                    duedate: Date.parse("1/1/1970"),
                     name: "",
                     uri: ""
                 }
-            ];
+            ],
+            reportedSP: 0,
+            summarySP: 0,
+            progress: 0,
+            duedate: Date.parse("1/1/1970"),
+            name: "",
+            uri: ""
+        }
+    ];
 }
 
 function getTeamName(labels) {
@@ -91,25 +102,50 @@ function getModuleName(labels) {
     return labels.substring(index+11,index2);
 }
 
+function getWaveName(labels) {
+    var index = labels.indexOf("Wave");
+    if(index < 0) {
+        return "UnknownWave";
+    }
+    var index2 = labels.indexOf(',', index);
+    if(index2 < 0) {
+        index2 = labels.length;
+    }
+
+    return labels.substring(index,index2);
+}
+
 function SortData(moduledata) {
-    moduledata.moduleGroup.sort(function (a, b) {
+    moduledata.wave.sort(function (a, b) {
         a = a.name;
         b = b.name;
-        return a > b ? 1 : a < b ? -1 : 0;
+        var v1 = parseInt(a.substring(4));
+        var v2 = parseInt(b.substring(4));
+        return v1 > v2 ? 1 : v1 < v2 ? -1 : 0;
     });
 
-    for (var i = 0; i < moduledata.moduleGroup.length; i++) {
-        moduledata.moduleGroup[i].module.sort(function (a, b) {
+    _.each(moduledata.wave, function(wave) {
+        wave.moduleGroup.sort(function (a, b) {
             a = a.name;
             b = b.name;
             return a > b ? 1 : a < b ? -1 : 0;
         });
-    }
+    });
+
+    _.each(moduledata.wave, function(wave) {
+        _.each(wave.moduleGroup, function(group) {
+            group.module.sort(function (a, b) {
+                a = a.name;
+                b = b.name;
+                return a > b ? 1 : a < b ? -1 : 0;
+            });
+        });
+    });
 }
 
 function parsePages(callback) {
     var moduledata = new moduleData();
-    moduledata.moduleGroup = [];
+    moduledata.wave = [];
 
     epicDueDateMap = {};
     async.series([
@@ -135,7 +171,8 @@ function parsePages(callback) {
                     var calcStoryPoints = storyPoints * progress / 100;
                     var smeName = getSMEName(page.labels);
                     var duedate = epicDueDateMap[page.epicKey];
-                    putDataPoint(moduledata,
+                    var wave = getWaveName(page.labels);
+                    putDataPoint(moduledata, wave,
                         moduleGroup, moduleName, teamName, smeName,
                         calcStoryPoints, storyPoints, duedate, page.epicKey);
                     callback2();
@@ -150,28 +187,53 @@ function parsePages(callback) {
     ]);
 }
 
-function putDataPoint(moduledata,
+function putDataPoint(moduledata, wave,
                       moduleGroup, moduleName, teamName, smeName,
                       calcStoryPoints, storyPoints, duedate, moduleKey) {
     var initUri = "https://jira.epam.com/jira/issues/?jql=project%20%3D%20PLEX-UXC%20and%20issuetype%3DStory%20AND%20%22Story%20Points%22%20%3E%200%20and%20labels%20in%20(";
 
+    //wave
+
+    var waved;
+    for (var k = 0; k < moduledata.wave.length; k++) {
+        if (moduledata.wave[k].name == wave) {
+            waved = moduledata.wave[k];
+            break;
+        }
+    }
+    if(!waved) {
+        waved = { moduleGroup: [], progress: 0, reportedSP: 0, summarySP: 0, name: wave, duedate: duedate };
+        moduledata.wave.push(waved);
+    }
+
+    waved.reportedSP += calcStoryPoints;
+    waved.summarySP += storyPoints;
+    waved.progress = waved.reportedSP*100/waved.summarySP;
+    waved.uri = initUri + wave + ")";
+    if(waved.duedate < duedate) {
+        waved.duedate = duedate;
+    }
+
     //module group
     var moduleGroupd;
-    for (var k = 0; k < moduledata.moduleGroup.length; k++) {
-        if (moduledata.moduleGroup[k].name == moduleGroup) {
-            moduleGroupd = moduledata.moduleGroup[k];
+    for (var k = 0; k < waved.moduleGroup.length; k++) {
+        if (waved.moduleGroup[k].name == moduleGroup) {
+            moduleGroupd = waved.moduleGroup[k];
             break;
         }
     }
     if(!moduleGroupd) {
-        moduleGroupd = { module: [], progress: 0, reportedSP: 0, summarySP: 0, name: moduleGroup};
-        moduledata.moduleGroup.push(moduleGroupd);
+        moduleGroupd = { module: [], progress: 0, reportedSP: 0, summarySP: 0, name: moduleGroup, duedate: duedate};
+        waved.moduleGroup.push(moduleGroupd);
     }
 
     moduleGroupd.reportedSP += calcStoryPoints;
     moduleGroupd.summarySP += storyPoints;
     moduleGroupd.progress = moduleGroupd.reportedSP*100/moduleGroupd.summarySP;
     moduleGroupd.uri = initUri + "PageModuleGroup_" + moduleGroup + ")";
+    if(moduleGroupd.duedate < duedate) {
+        moduleGroupd.duedate = duedate;
+    }
 
     //module
     var moduled;
@@ -182,7 +244,7 @@ function putDataPoint(moduledata,
         }
     }
     if(!moduled) {
-        moduled = { cloudApp: [], progress: 0, reportedSP: 0, summarySP: 0,
+        moduled = { progress: 0, reportedSP: 0, summarySP: 0,
             name: moduleName, duedate: duedate, smenames: [], teamnames: [], key: moduleKey };
         moduleGroupd.module.push(moduled);
     }
@@ -190,7 +252,9 @@ function putDataPoint(moduledata,
     moduled.reportedSP += calcStoryPoints;
     moduled.summarySP += storyPoints;
     moduled.progress = moduled.reportedSP*100/moduled.summarySP;
-    moduled.uri = initUri + "PageModule_" + moduleName + ") AND labels in(PageModuleGroup_" + moduleGroup+ ")";
+    moduled.uri = initUri + "PageModule_" + moduleName + ") AND labels in(PageModuleGroup_" + moduleGroup + ") AND labels in(" + wave + ")";
+    moduled.wave = wave;
+    moduled.moduleGroup = moduleGroup;
 
     if(smeName != "") {
         var found = false;

@@ -3,12 +3,13 @@
  */
 
 function moduleProgressController($scope, $resource, $window, $filter) {
-    var timeSheetDataResource = $resource('/wavedata');
+    var moduleDataResource = $resource('/moduledata');
 
     /* ------------------------------------------------------ Init/Reinit -------------------------------*/
     $scope.init = function () {
         $scope.common = {};
         $scope.dataLoad();
+        $scope.sortByDate = false;
     };
 
     $scope.reInit = function () {
@@ -16,90 +17,155 @@ function moduleProgressController($scope, $resource, $window, $filter) {
     };
 
     $scope.dataLoad = function () {
+        $scope.filteredSme = $scope.allSMEs[0].id;
+        $scope.filteredMG = $scope.allModuleGroups[0].id;
         $scope.filteredTeam = $scope.allTeams[0].id;
         $scope.isTotalWasCalculated = false;
         $scope.reInitTotal();
-        $scope.getTimeSheetData().done($scope.processWithRowSpans);
+        $scope.getModuleData().done($scope.processWithRowSpans);
     };
 
     $scope.reInitTotal = function(){
         $scope.total = new $scope.statuses();
         $scope.total.all = {isChecked :true};
         $scope.total.total = 0;
-        $scope.total.pages = 0;
-    }
+        $scope.allSMEs = [{id: "All", name: "All"}];
+        $scope.allModuleGroups = [{id: "All", name: "All"}];
+    };
 
     $scope.processWithRowSpans = function () {
         $scope.total.pages = 0;
-        $scope.invertedWaveProgressData=[];
-
-        _.each($scope.waveProgressData.waves, function(waveProgressItem){
-            var firstWaveIndex = $scope.invertedWaveProgressData.length;
-            waveProgressItem.rowSpan = _.reduce(waveProgressItem.moduleGroup, function(moduleGroupMemo, moduleGroupItem){
-                var firstModuleGroupIndex = $scope.invertedWaveProgressData.length;
-                moduleGroupItem.rowSpan = _.reduce(moduleGroupItem.module, function(moduleMemo, moduleItem){
-                    var firstCloudAppIndex = $scope.invertedWaveProgressData.length;
-                    moduleItem.rowSpan = _.reduce(moduleItem.cloudApp, function(cloudAppMemo, cloudAppItem){
-                        var statusEntity = $scope.total.getStatusByName(cloudAppItem.status);
-
-                        if($scope.filteredTeam != $scope.allTeams[0].id && cloudAppItem.teamName != $scope.filteredTeam){
-                            return cloudAppMemo;
+        $scope.updatedModuleProgressData=[];
+        //fill in groups and sme combos
+        _.each($scope.moduleProgressData.wave, function(waveProgressItem) {
+            _.each(waveProgressItem.moduleGroup, function(group) {
+                var found = false;
+                _.each($scope.allModuleGroups, function(it_group) {
+                    if(it_group.name == group.name) {
+                        found = true;
+                    }
+                });
+                if(!found) {
+                    $scope.allModuleGroups.push({id: group.name, name: group.name});
+                }
+            });
+            _.each(waveProgressItem.moduleGroup, function(groupProgressItem) {
+                _.each(groupProgressItem.module, function(moduleProgressItem) {
+                    _.each(moduleProgressItem.smenames, function(smeName) {
+                        var found = false;
+                        _.each($scope.allSMEs, function(sme) {
+                            if(sme.name == smeName) {
+                                found = true;
+                            }
+                        });
+                        if(!found) {
+                            $scope.allSMEs.push({id: smeName, name: smeName});
                         }
+                    });
+                })
+            });
+        });
+        $scope.allModuleGroups.sort(function (a, b) {
+            a = a.name;
+            b = b.name;
+            if(a == "All") {
+                return -1;
+            }
+            if(b == "All") {
+                return 1;
+            }
+            return a > b ? 1 : a < b ? -1 : 0;
+        });
+        $scope.allSMEs.sort(function (a, b) {
+            a = a.name;
+            b = b.name;
+            if(a == "All") {
+                return -1;
+            }
+            if(b == "All") {
+                return 1;
+            }
+            return a > b ? 1 : a < b ? -1 : 0;
+        });
 
-                        $scope.isTotalWasCalculated ? void(0) : statusEntity.count++;
-                        $scope.isTotalWasCalculated ? void(0) : $scope.total.total++;
-
-                        if(statusEntity.isChecked)
-                        {
-                            $scope.total.pages += cloudAppItem.pages;
-                            $scope.invertedWaveProgressData.push({appItem: cloudAppItem});
-                            cloudAppItem.progress == 100 ? $scope.total.complete++ : void(0);
-                            return cloudAppMemo + 1;
+        _.each($scope.moduleProgressData.wave, function(waveProgressItem) {
+            _.each(waveProgressItem.moduleGroup, function(groupProgressItem) {
+                if($scope.filteredMG != $scope.allModuleGroups[0].id && groupProgressItem.name != $scope.filteredMG){
+                    return;
+                }
+                _.each(groupProgressItem.module, function(moduleProgressItem) {
+                    if($scope.filteredSme != $scope.allSMEs[0].id && moduleProgressItem.smenames.indexOf($scope.filteredSme) < 0){
+                        return;
+                    }
+                    if($scope.filteredTeam != $scope.allTeams[0].id && moduleProgressItem.teamnames.indexOf($scope.filteredTeam) < 0){
+                        return;
+                    }
+                    var acceptedEntity = $scope.total.getStatusByName("Accepted");
+                    var done = moduleProgressItem.progress == 100;
+                    if(done) {
+                        if(!$scope.isTotalWasCalculated) {
+                            acceptedEntity.count++;
                         }
-
-                        return cloudAppMemo;
-                    },0);
-
-                    if(_.isUndefined($scope.invertedWaveProgressData[firstCloudAppIndex])){
-                        return moduleMemo;
+                    }
+                    if(!$scope.isTotalWasCalculated) {
+                        $scope.total.total++;
                     }
 
-                    $scope.invertedWaveProgressData[firstCloudAppIndex].module = moduleItem;
-                    return moduleMemo + moduleItem.rowSpan;
-                },0);
+                    if(moduleProgressItem.name == "") {
+                        moduleProgressItem.name = "#Unknown";
+                    }
 
+                    if(new Date(moduleProgressItem.duedate) < new Date('2014-01-01')) {
+                        moduleProgressItem.duedate2 = "";
+                    }
+                    else {
+                        moduleProgressItem.duedate2 = moduleProgressItem.duedate;
+                    }
+                    moduleProgressItem.progress = Math.round(moduleProgressItem.progress);
+                    moduleProgressItem.progress2 = moduleProgressItem.progress.toString() + "%";
 
-                if(_.isUndefined($scope.invertedWaveProgressData[firstModuleGroupIndex])){
-                    return moduleGroupMemo;
-                }
-
-                $scope.invertedWaveProgressData[firstModuleGroupIndex].moduleGroup = moduleGroupItem;
-                return moduleGroupMemo + moduleGroupItem.rowSpan;
-            }, 0);
-
-            if(!_.isUndefined($scope.invertedWaveProgressData[firstWaveIndex])){
-                $scope.invertedWaveProgressData[firstWaveIndex].wave = waveProgressItem;
-            }
+                    if(acceptedEntity.isChecked && done)
+                    {
+                        $scope.updatedModuleProgressData.push(moduleProgressItem);
+                    }
+                    else if(!done) {
+                        $scope.updatedModuleProgressData.push(moduleProgressItem);
+                    }
+                });
+            });
         });
+
+        $scope.updatedModuleProgressData.sort(function (a, b) {
+            if($scope.sortByDate) {
+                a = new Date(a.duedate);
+                b = new Date(b.duedate);
+            }
+            else {
+                a = a.name;
+                b = b.name;
+            }
+            return a > b ? 1 : a < b ? -1 : 0;
+        });
+
         $scope.isTotalWasCalculated = true;
     };
 
     /* -------------------------------------------------------Event handlers ------------------------ */
     /* --------------------------------------------- Actions ------------------------------*/
-    $scope.getTimeSheetData = function () {
+    $scope.getModuleData = function () {
         var loadingDfrd = $.Deferred();
 
-        var getTimeSheetSuccess = function (data) {
-            $scope.waveProgressData = data;
+        var getModuleSuccess = function (data) {
+            $scope.moduleProgressData = data;
             loadingDfrd.resolve();
         };
 
-        var getTimeSheetFail = function (err) {
+        var getModuleFail = function (err) {
             $scope.errMessage = err;
             loadingDfrd.reject(err);
         };
 
-        timeSheetDataResource.get($scope.common, getTimeSheetSuccess, getTimeSheetFail);
+        moduleDataResource.get($scope.common, getModuleSuccess, getModuleFail);
         return loadingDfrd.promise();
     };
 
@@ -113,17 +179,7 @@ function moduleProgressController($scope, $resource, $window, $filter) {
 
     $scope.onSelectDeselectAll = function()
     {
-        $scope.total.open.isChecked = $scope.total.all.isChecked;
-        $scope.total.assigned.isChecked = $scope.total.all.isChecked;
-        $scope.total.inProgress.isChecked = $scope.total.all.isChecked;
-        $scope.total.codeReview.isChecked = $scope.total.all.isChecked;
         $scope.total.accepted.isChecked = $scope.total.all.isChecked;
-        $scope.total.readyForQA.isChecked = $scope.total.all.isChecked;
-        $scope.total.testingInProgress.isChecked = $scope.total.all.isChecked;
-        $scope.total.resolved.isChecked = $scope.total.all.isChecked;
-        $scope.total.blocked.isChecked = $scope.total.all.isChecked;
-        $scope.total.deferred.isChecked = $scope.total.all.isChecked;
-        $scope.total.cancelled.isChecked = $scope.total.all.isChecked;
 
         $scope.processWithRowSpans();
     }
@@ -131,16 +187,25 @@ function moduleProgressController($scope, $resource, $window, $filter) {
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
 
 
-    $scope.filterCloudAppByTeam = function()
+    $scope.filterModuleBySme = function()
     {
         $scope.reInitTotal();
         $scope.isTotalWasCalculated = false;
         $scope.processWithRowSpans();
     }
 
-    $scope.filterCloudAppByStatus = function(item)
+    $scope.filterModuleByGroup = function()
     {
-        return $scope.getStatusEntity(item.appItem.status).isChecked;
+        $scope.reInitTotal();
+        $scope.isTotalWasCalculated = false;
+        $scope.processWithRowSpans();
+    }
+
+    $scope.filterModuleByTeam = function()
+    {
+        $scope.reInitTotal();
+        $scope.isTotalWasCalculated = false;
+        $scope.processWithRowSpans();
     }
 
     $scope.isUnknownExist = function(item)

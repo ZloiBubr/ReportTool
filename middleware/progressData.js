@@ -56,13 +56,13 @@ function parsePages(callback) {
 
             //dev estimated time
             var totalhours =
-                storyPoints == 3 ? 8 :
-                storyPoints == 5 ? 16 :
-                storyPoints == 13 ? 40 :
-                storyPoints == 17 ? 60 :
-                storyPoints == 21 ? 80 :
-                storyPoints == 34 ? 120 :
-                storyPoints == 55 ? 160 : 0;
+                storyPoints < 5 ? 8 :
+                storyPoints < 13 ? 16 :
+                storyPoints < 17 ? 40 :
+                storyPoints < 21 ? 60 :
+                storyPoints < 34 ? 80 :
+                storyPoints < 55 ? 120 :
+                storyPoints >= 55 ? 160 : 0;
             var estimated = parseInt(page.progress) > 0 ? devTimeSpent*100/parseInt(page.progress) : totalhours;
             var strestimated = Math.floor(estimated).toString() + 'h/' + totalhours.toString();
 
