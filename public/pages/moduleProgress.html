@@ -1,6 +1,7 @@
 <div id="container" class="container" ng-controller="moduleProgressController" style="padding-left: 150px">
     <div class="visible-md visible-lg visible-sm" style="position:fixed; left: 10px; top:150px; font-size: 12pt ">
         <ul class="list-unstyled">
+            <li><input type="checkbox" ng-model="sortByDate" ng-change="onSelectDeselectAll()"> Sort By Date</li>
             <li>SME:<select class="form-control headerSelectWidth" ng-model="filteredSme" class="headerSelectWidth" ng-options="sme.name as sme.name for sme in allSMEs" ng-change="filterModuleBySme()"></select></li>
             <li>Module Group:<select class="form-control headerSelectWidth" ng-model="filteredMG" class="headerSelectWidth" ng-options="moduleGroup.name as moduleGroup.name for moduleGroup in allModuleGroups" ng-change="filterModuleByGroup()"></select></li>
             <li><input type="checkbox" ng-model="total.accepted.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-star"></span><strong> {{total.accepted.count}}</strong>:Done</li>
@@ -29,7 +30,7 @@
                         <div>{{module.progress2}}</div>
                     </td>
                     <td>
-                        <div>{{module.duedate | date:'MMM-dd-yyyy'}}</div>
+                        <div>{{module.duedate2 | date:'MMM-dd-yyyy'}}</div>
                     </td>
                     <td>
                         <table>

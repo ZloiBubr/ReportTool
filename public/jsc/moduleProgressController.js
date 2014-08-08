@@ -9,6 +9,7 @@ function moduleProgressController($scope, $resource, $window, $filter) {
     $scope.init = function () {
         $scope.common = {};
         $scope.dataLoad();
+        $scope.sortByDate = false;
     };
 
     $scope.reInit = function () {
@@ -89,7 +90,10 @@ function moduleProgressController($scope, $resource, $window, $filter) {
                     }
 
                     if(new Date(moduleProgressItem.duedate) < new Date('2014-01-01')) {
-                        moduleProgressItem.duedate = "";
+                        moduleProgressItem.duedate2 = "";
+                    }
+                    else {
+                        moduleProgressItem.duedate2 = moduleProgressItem.duedate;
                     }
                     moduleProgressItem.progress = Math.round(moduleProgressItem.progress);
                     moduleProgressItem.progress2 = moduleProgressItem.progress.toString() + "%";
@@ -106,8 +110,14 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         });
 
         $scope.updatedModuleProgressData.sort(function (a, b) {
-            a = a.name;
-            b = b.name;
+            if($scope.sortByDate) {
+                a = new Date(a.duedate);
+                b = new Date(b.duedate);
+            }
+            else {
+                a = a.name;
+                b = b.name;
+            }
             return a > b ? 1 : a < b ? -1 : 0;
         });
 
