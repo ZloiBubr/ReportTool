@@ -19,7 +19,6 @@
                     <th>Due Date</th>
                     <th>SMEs</th>
                     <th>Link</th>
-                    <th>SP</th>
                     <th>Teams</th>
                 </tr>
                 </thead>
@@ -28,6 +27,7 @@
                     <td>
                         <div id="progress"><span class="bar" ng-style="{width: module.progress2}"></span></div>
                         <div>{{module.progress2}}</div>
+                        <div>{{module.reportedSP | number : 0}}/{{module.summarySP | number : 0}} SP</div>
                     </td>
                     <td>
                         <div>{{module.duedate2 | date:'MMM-dd-yyyy'}}</div>
@@ -45,9 +45,6 @@
                         <a href="{{module.uri}}">{{module.name}}</a>
                         <div>Wave: {{module.wave}}</div>
                         <div>Group: {{module.moduleGroup}}</div>
-                    </td>
-                    <td>
-                        <div>{{module.summarySP | number : 0}}</div>
                     </td>
                     <td>
                         <table>
