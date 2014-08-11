@@ -155,6 +155,13 @@ function SortData(wavedata) {
         b = b.name;
         var v1 = parseInt(a.substring(4));
         var v2 = parseInt(b.substring(4));
+
+        if(a == "UnknownWave") {
+            return 1;
+        }
+        if(b == "UnknownWave") {
+            return -1;
+        }
         return v1 > v2 ? 1 : v1 < v2 ? -1 : 0;
     });
 
