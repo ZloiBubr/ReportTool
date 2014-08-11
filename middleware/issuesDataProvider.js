@@ -35,11 +35,12 @@ function parsePages(callback) {
 
             _.each(issues, function (dbIssue) {
 
-                if(dbIssue.status == statusList.accepted ||
-                    dbIssue.status == statusList.cancelled ||
-                    dbIssue.status == statusList.resolved ||
-                    dbIssue.status == statusList.readyForQA ||
-                    dbIssue.status == statusList.codeReview
+                if(dbIssue.status == statusList.accepted.name ||
+                    dbIssue.status == statusList.cancelled.name ||
+                    dbIssue.status == statusList.resolved.name ||
+                    dbIssue.status == statusList.readyForQA.name ||
+                    dbIssue.status == statusList.codeReview.name ||
+                    dbIssue.status == statusList.closed.name
                     )
                 {
                     return;

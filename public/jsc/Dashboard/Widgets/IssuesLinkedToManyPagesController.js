@@ -8,9 +8,10 @@ function IssuesLinkedToManyPagesController($scope, $resource, $window, $filter, 
 
     /* ------------------------------------------------------ Init/Reinit -------------------------------*/
     $scope.init = function () {
-
         $scope.IssuesLinkedToManyPagesList = [];
         $scope.$on('issueDataLoaded', $scope.prepareData)
+
+        $scope.TeamFilter = "TeamNova"
     };
 
     $scope.reInit = function () {
@@ -18,8 +19,42 @@ function IssuesLinkedToManyPagesController($scope, $resource, $window, $filter, 
     };
 
     $scope.prepareData = function () {
-        $scope.sortedCollection = $filter('orderBy')($scope.issueData, function (item) {
-            return $scope.getBlockersCount(item)
+        _.each($scope.issueData, function (item) {
+
+            var blockersCount = 0;
+            var teamsInvolved = [];
+            _.each(item.linkedPages, function(linkedPageItem){
+
+                // Blockers count calculating
+                if(linkedPageItem.linkType.indexOf("blocked") > -1){
+                    blockersCount++;
+                }
+
+                // Teams involved in Issue aggregating
+                if(!_.find(teamsInvolved, function(teamItem){
+                    return teamItem == linkedPageItem.page.team;
+                })){
+                    teamsInvolved.push(linkedPageItem.page.team)
+                }
+            });
+
+
+            item.isHotIssue = _.some(item.labels, function(labelItem){
+                return labelItem.indexOf("HotIssue") > -1 || labelItem.indexOf("Hotissue") > -1;
+            });
+
+            item.teamsInvolved = teamsInvolved;
+            item.blockersCount = blockersCount;
+
+            // filter issues where more than 0 blockers
+            if($scope.getBlockersCount(item) > 0) {
+                $scope.IssuesLinkedToManyPagesList.push(item);
+            }
+        }, true);
+
+        // Sorting issues based on blockersCount
+        $scope.IssuesLinkedToManyPagesList = $filter('orderBy')($scope.IssuesLinkedToManyPagesList, function (item) {
+            return item.blockersCount;
         }, true);
     };
 

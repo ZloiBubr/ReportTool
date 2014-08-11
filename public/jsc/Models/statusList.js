@@ -21,6 +21,7 @@ exports.statuses = function() {
     this.testingInProgress = new exports.statusEntity("Testing in Progress");
     this.resolved = new exports.statusEntity("Resolved");
     this.accepted = new exports.statusEntity("Accepted");//(closed)
+    this.closed = new exports.statusEntity("Closed");
     this.cancelled = new exports.statusEntity("Cancelled");
     this.pages = 0;
 
