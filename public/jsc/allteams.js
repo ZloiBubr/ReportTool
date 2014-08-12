@@ -6,8 +6,9 @@ function Teams() {
             teamLead: "Anton Valadzko",
             qaTeamLead: "Aliaksandra Kutynka",
             developers: [
+                "Andrei Osipau2",
                 "Dzianis Arlouski",
-                "Hanna Kastsian",
+
                 "Iryna Kucharenka1",
                 "Ivan Izmer",
                 "Mark Varabyou",
@@ -17,8 +18,11 @@ function Teams() {
                 "Artsiom Rusak",
                 "Raman Ivanou",
                 "Aliaksandr Koush",
-                "Alena Charnova",
-                "Nicolay Kostroma"
+                "Nicolay Kostroma",
+                "Valentina Napolnova",
+
+                "Aliaksey Rahatka",
+                "Pavel Kastsiuk"
             ],
             testers: [
                 "Pavel Vysotsky",
@@ -77,7 +81,11 @@ function Teams() {
                 "Edhar Liashok",
                 "Raman Prakofyeu",
                 "Ruslan Khilmanovich",
-                "Anton Kratenok"
+                "Anton Kratenok",
+
+                "Dzmitry Chapurok",
+                "Evgeny Sinitsyn"
+
             ],
             testers: [
                 "Aliaksei Burnosenka",
@@ -101,12 +109,16 @@ function Teams() {
                 "Aliaksandr Rusak",
                 "Andrei Kasak",
                 "Andrei Krasnou",
+                "Katsiaryna Sasina",
                 "Pavel Krakasevich",
                 "Stepan Zelenin",
-                "Aliaksei Astashkin",
                 "Dzmitry Isachenka",
                 "Eugen Surovets",
-                "Katsiaryna Tsalabanava"
+                "Katsiaryna Tsalabanava",
+
+                "Hleb Krotsik",
+                "Uladzimir Vysotski"
+
             ],
             testers: [
                 "Anna Novikova",
@@ -135,7 +147,10 @@ function Teams() {
                 "Yuri Chupyrkin",
                 "Aliaksandr Rykau",
                 "Ivan Dziameshka",
-                "Siarhei Bahdanovich"
+                "Siarhei Bahdanovich",
+
+                "Aleh Dukel",
+                "Ivan Yanchuk"
             ],
             testers: [
                 "Iryna Koush",
