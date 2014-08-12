@@ -5,6 +5,8 @@ var Page = require('../models/page').Page;
 var log = require('../libs/log')(module);
 var async = require('async');
 var _ = require('underscore');
+var statusExport = require('../public/jsc/statusList');
+var statusList = new statusExport.statuses();
 
 var epicDueDateMap = {};
 
@@ -15,39 +17,31 @@ exports.getData = function (req, res) {
 }
 
 function moduleData() {
-    this.wave = [
-        {
-            moduleGroup: [
-                {
-                    module: [
-                        {
-                            key: "",
-                            reportedSP: 0,
-                            summarySP: 0,
-                            progress: 0,
-                            teamnames: [],
-                            smenames: [],
-                            duedate: Date.parse("1/1/1970"),
-                            name: "",
-                            uri: ""
-                        }
-                    ],
-                    reportedSP: 0,
-                    summarySP: 0,
-                    progress: 0,
-                    duedate: Date.parse("1/1/1970"),
-                    name: "",
-                    uri: ""
-                }
-            ],
-            reportedSP: 0,
-            summarySP: 0,
-            progress: 0,
-            duedate: Date.parse("1/1/1970"),
-            name: "",
-            uri: ""
-        }
-    ];
+    this.moduleGroup = [
+            {
+                module: [
+                    {
+                        key: "",
+                        reportedSP: 0,
+                        summarySP: 0,
+                        progress: 0,
+                        teamnames: [],
+                        smenames: [],
+                        duedate: Date.parse("1/1/1970"),
+                        accepted: false,
+                        status: "",
+                        name: "",
+                        uri: ""
+                    }
+                ],
+                reportedSP: 0,
+                summarySP: 0,
+                progress: 0,
+                duedate: Date.parse("1/1/1970"),
+                name: "",
+                uri: ""
+            }
+        ];
 }
 
 function getTeamName(labels) {
@@ -77,81 +71,58 @@ function getSMEName(labels) {
 }
 
 function getModuleGroupName(labels) {
+    var groupName = "#UnknownModuleGroup";
     var index = labels.indexOf("PageModuleGroup_");
     if(index < 0) {
-        return "UnknownModuleGroup";
+        return groupName;
     }
     var index2 = labels.indexOf(',', index);
     if(index2 < 0) {
         index2 = labels.length;
     }
 
-    return labels.substring(index+16,index2);
+    if(labels.substring(index+16,index2) != "") {
+        groupName = labels.substring(index+16,index2);
+    }
+    return groupName;
 }
 
 function getModuleName(labels) {
+    var moduleName = "#UnknownModule";
     var index = labels.indexOf("PageModule_");
     if(index < 0) {
-        return "UnknownModule";
+        return moduleName;
     }
     var index2 = labels.indexOf(',', index);
     if(index2 < 0) {
         index2 = labels.length;
     }
 
-    return labels.substring(index+11,index2);
-}
-
-function getWaveName(labels) {
-    var index = labels.indexOf("Wave");
-    if(index < 0) {
-        return "UnknownWave";
+    if(labels.substring(index+11,index2) != "") {
+        moduleName = labels.substring(index+11,index2);
     }
-    var index2 = labels.indexOf(',', index);
-    if(index2 < 0) {
-        index2 = labels.length;
-    }
-
-    return labels.substring(index,index2);
+    return moduleName;
 }
 
 function SortData(moduledata) {
-    moduledata.wave.sort(function (a, b) {
+    moduledata.moduleGroup.sort(function (a, b) {
         a = a.name;
         b = b.name;
-        var v1 = parseInt(a.substring(4));
-        var v2 = parseInt(b.substring(4));
-        if(a == "UnknownWave") {
-            return 1;
-        }
-        if(b == "UnknownWave") {
-            return -1;
-        }
-        return v1 > v2 ? 1 : v1 < v2 ? -1 : 0;
+        return a > b ? 1 : a < b ? -1 : 0;
     });
 
-    _.each(moduledata.wave, function(wave) {
-        wave.moduleGroup.sort(function (a, b) {
+    _.each(moduledata.moduleGroup, function(group) {
+        group.module.sort(function (a, b) {
             a = a.name;
             b = b.name;
             return a > b ? 1 : a < b ? -1 : 0;
-        });
-    });
-
-    _.each(moduledata.wave, function(wave) {
-        _.each(wave.moduleGroup, function(group) {
-            group.module.sort(function (a, b) {
-                a = a.name;
-                b = b.name;
-                return a > b ? 1 : a < b ? -1 : 0;
-            });
         });
     });
 }
 
 function parsePages(callback) {
     var moduledata = new moduleData();
-    moduledata.wave = [];
+    moduledata.moduleGroup = [];
 
     epicDueDateMap = {};
     async.series([
@@ -176,11 +147,14 @@ function parsePages(callback) {
                     var progress = page.progress;
                     var calcStoryPoints = storyPoints * progress / 100;
                     var smeName = getSMEName(page.labels);
-                    var duedate = epicDueDateMap[page.epicKey];
-                    var wave = getWaveName(page.labels);
-                    putDataPoint(moduledata, wave,
+                    var dueDate = epicDueDateMap[page.epicKey];
+                    var status = page.status;
+                    var resolution = page.resolution;
+                    status = status == 'Closed' && resolution == "Done" ? "Accepted" : status;
+
+                    putDataPoint(moduledata, status,
                         moduleGroup, moduleName, teamName, smeName,
-                        calcStoryPoints, storyPoints, duedate, page.epicKey);
+                        calcStoryPoints, storyPoints, dueDate, page.epicKey);
                     callback2();
                 });
                 callback3();
@@ -193,52 +167,30 @@ function parsePages(callback) {
     ]);
 }
 
-function putDataPoint(moduledata, wave,
+function putDataPoint(moduledata, status,
                       moduleGroup, moduleName, teamName, smeName,
-                      calcStoryPoints, storyPoints, duedate, moduleKey) {
+                      calcStoryPoints, storyPoints, dueDate, moduleKey) {
     var initUri = "https://jira.epam.com/jira/issues/?jql=project%20%3D%20PLEX-UXC%20and%20issuetype%3DStory%20AND%20%22Story%20Points%22%20%3E%200%20and%20labels%20in%20(";
-
-    //wave
-
-    var waved;
-    for (var k = 0; k < moduledata.wave.length; k++) {
-        if (moduledata.wave[k].name == wave) {
-            waved = moduledata.wave[k];
-            break;
-        }
-    }
-    if(!waved) {
-        waved = { moduleGroup: [], progress: 0, reportedSP: 0, summarySP: 0, name: wave, duedate: duedate };
-        moduledata.wave.push(waved);
-    }
-
-    waved.reportedSP += calcStoryPoints;
-    waved.summarySP += storyPoints;
-    waved.progress = waved.reportedSP*100/waved.summarySP;
-    waved.uri = initUri + wave + ")";
-    if(waved.duedate < duedate) {
-        waved.duedate = duedate;
-    }
 
     //module group
     var moduleGroupd;
-    for (var k = 0; k < waved.moduleGroup.length; k++) {
-        if (waved.moduleGroup[k].name == moduleGroup) {
-            moduleGroupd = waved.moduleGroup[k];
+    for (var k = 0; k < moduledata.moduleGroup.length; k++) {
+        if (moduledata.moduleGroup[k].name == moduleGroup) {
+            moduleGroupd = moduledata.moduleGroup[k];
             break;
         }
     }
     if(!moduleGroupd) {
-        moduleGroupd = { module: [], progress: 0, reportedSP: 0, summarySP: 0, name: moduleGroup, duedate: duedate};
-        waved.moduleGroup.push(moduleGroupd);
+        moduleGroupd = { module: [], progress: 0, reportedSP: 0, summarySP: 0, name: moduleGroup, duedate: dueDate};
+        moduledata.moduleGroup.push(moduleGroupd);
     }
 
     moduleGroupd.reportedSP += calcStoryPoints;
     moduleGroupd.summarySP += storyPoints;
     moduleGroupd.progress = moduleGroupd.reportedSP*100/moduleGroupd.summarySP;
     moduleGroupd.uri = initUri + "PageModuleGroup_" + moduleGroup + ")";
-    if(moduleGroupd.duedate < duedate) {
-        moduleGroupd.duedate = duedate;
+    if(moduleGroupd.duedate < dueDate) {
+        moduleGroupd.duedate = dueDate;
     }
 
     //module
@@ -251,16 +203,24 @@ function putDataPoint(moduledata, wave,
     }
     if(!moduled) {
         moduled = { progress: 0, reportedSP: 0, summarySP: 0,
-            name: moduleName, duedate: duedate, smenames: [], teamnames: [], key: moduleKey };
+            name: moduleName, duedate: dueDate, smenames: [], teamnames: [], key: moduleKey, accepted: status == "Accepted", status: status};
         moduleGroupd.module.push(moduled);
     }
 
     moduled.reportedSP += calcStoryPoints;
     moduled.summarySP += storyPoints;
     moduled.progress = moduled.reportedSP*100/moduled.summarySP;
-    moduled.uri = initUri + "PageModule_" + moduleName + ") AND labels in(PageModuleGroup_" + moduleGroup + ") AND labels in(" + wave + ")";
-    moduled.wave = wave;
+    moduled.uri = initUri + "PageModule_" + moduleName + ") AND labels in(PageModuleGroup_" + moduleGroup + ")";
     moduled.moduleGroup = moduleGroup;
+    moduled.accepted = moduled.accepted ? status == "Accepted" : false;
+
+
+    var moduleStatus = statusList.getStatusByName(moduled.status);
+    var newStatus = statusList.getStatusByName(status);
+
+    if(newStatus.weight < moduleStatus.weight){
+        moduled.status = status;
+    }
 
     if(smeName != "") {
         var found = false;
