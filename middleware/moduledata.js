@@ -5,7 +5,7 @@ var Page = require('../models/page').Page;
 var log = require('../libs/log')(module);
 var async = require('async');
 var _ = require('underscore');
-var statusExport = require('../public/jsc/statusList');
+var statusExport = require('../public/jsc/models/statusList');
 var statusList = new statusExport.statuses();
 
 var epicDueDateMap = {};
