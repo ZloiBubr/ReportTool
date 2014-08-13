@@ -1,0 +1,17 @@
+<div class="panel panel-default">
+    <!-- Default panel contents -->
+    <div class="panel-heading container-fluid">
+        <div class="row">
+            <div class="col-lg-2">
+                <label for="teamFilterControl">Team:</label>
+                <select id="teamFilterControl" class="form-control headerSelectWidth" ng-model="common.filteredTeam" class="headerSelectWidth" ng-options="team.id as team.name for team in allTeams"></select>
+            </div>
+            <div class="col-lg-1">
+                <div class="spinner" ng-show="isLoading"></div>
+            </div>
+        </div>
+
+    </div>
+    <div class="panel-body">
+    </div>
+</div>

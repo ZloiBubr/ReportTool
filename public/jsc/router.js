@@ -15,7 +15,7 @@ myApp.config(function($stateProvider, $urlRouterProvider) {
         })
         .state('dashboard', {
             url: "/dashboard",
-            templateUrl: "pages/dashboard.html"
+            templateUrl: "../pages/dashboard/dashboard.html"
         })
         .state('weeklyVelocity', {
             url: "/weeklyVelocity",

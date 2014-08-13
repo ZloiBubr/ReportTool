@@ -9,7 +9,11 @@ function IssuesLinkedToManyPagesController($scope, $resource, $window, $filter, 
     /* ------------------------------------------------------ Init/Reinit -------------------------------*/
     $scope.init = function () {
         $scope.IssuesLinkedToManyPagesList = [];
-        $scope.$on('issueDataLoaded', $scope.prepareData)
+        $scope.statuses = new $scope.statuses();
+        $scope.$on('issueDataLoaded', $scope.prepareData);
+
+        $scope.nowDate = new Date();
+        $scope.nowDate.setHours(12,0,0);
 
         $scope.TeamFilter = "TeamNova"
     };
@@ -19,32 +23,13 @@ function IssuesLinkedToManyPagesController($scope, $resource, $window, $filter, 
     };
 
     $scope.prepareData = function () {
+        console.log($scope.issueData);
         _.each($scope.issueData, function (item) {
+            var linkedPagesResult = processLinkedPages(item);
+            processLabels(item);
 
-            var blockersCount = 0;
-            var teamsInvolved = [];
-            _.each(item.linkedPages, function(linkedPageItem){
-
-                // Blockers count calculating
-                if(linkedPageItem.linkType.indexOf("blocked") > -1){
-                    blockersCount++;
-                }
-
-                // Teams involved in Issue aggregating
-                if(!_.find(teamsInvolved, function(teamItem){
-                    return teamItem == linkedPageItem.page.team;
-                })){
-                    teamsInvolved.push(linkedPageItem.page.team)
-                }
-            });
-
-
-            item.isHotIssue = _.some(item.labels, function(labelItem){
-                return labelItem.indexOf("HotIssue") > -1 || labelItem.indexOf("Hotissue") > -1;
-            });
-
-            item.teamsInvolved = teamsInvolved;
-            item.blockersCount = blockersCount;
+            item.teamsInvolved = linkedPagesResult.teamsInvolved;
+            item.blockersCount = linkedPagesResult.blockersCount;
 
             // filter issues where more than 0 blockers
             if($scope.getBlockersCount(item) > 0) {
@@ -56,6 +41,42 @@ function IssuesLinkedToManyPagesController($scope, $resource, $window, $filter, 
         $scope.IssuesLinkedToManyPagesList = $filter('orderBy')($scope.IssuesLinkedToManyPagesList, function (item) {
             return item.blockersCount;
         }, true);
+    };
+
+
+    var processLinkedPages = function(item){
+        var result = {
+            blockersCount: 0,
+            teamsInvolved: []
+        }
+
+        _.each(item.linkedPages, function(linkedPageItem){
+
+            // Blockers count calculating
+            if(linkedPageItem.linkType.indexOf("blocked") > -1){
+                result.blockersCount++;
+            }
+
+            // Teams involved in Issue aggregating
+            if(!_.find(result.teamsInvolved, function(teamItem){
+                return teamItem == linkedPageItem.page.team;
+            })){
+                result.teamsInvolved.push(linkedPageItem.page.team)
+            }
+        });
+
+        return result;
+    };
+
+    var processLabels = function(item){
+        _.each(item.labels, function(labelItem){
+            if(labelItem.indexOf("HotIssue") > -1 || labelItem.indexOf("Hotissue") > -1){
+                item.isHotIssue = true;
+            }
+            else if(labelItem.indexOf("F5") > -1 || labelItem.indexOf("F5.") > -1){
+                item.isF5Issue = true;
+            }
+        });
     };
 
     /* -------------------------------------------------------Event handlers ------------------------ */
@@ -88,6 +109,24 @@ function IssuesLinkedToManyPagesController($scope, $resource, $window, $filter, 
        return _.size(_.filter(item.linkedPages, function (item) {
             return item.linkType.indexOf("blocked") > -1
         }));
+    };
+
+    $scope.getLastUpdateDays = function (item) {
+        var itemDate = new Date(item.updated);
+        itemDate.setHours(12,0,0);
+
+        return Math.round(($scope.nowDate - itemDate) / 8.64e7);
+    };
+
+    $scope.filterBlocksIssues = function (item) {
+        if($scope.common.filteredTeam == $scope.allTeams[0].id)
+        {
+            return true;
+        }
+
+        return _.some(item.teamsInvolved, function(team){
+            return team == $scope.common.filteredTeam;
+        });
     }
 
     $scope.init();

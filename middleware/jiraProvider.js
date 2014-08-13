@@ -171,7 +171,7 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
 function CollectModules(callback) {
     var requestString = "project = PLEX-UXC AND issuetype = epic AND summary ~ Module AND NOT summary ~ automation ORDER BY key ASC";
     // using only for debug mode
-   // var requestString = "project = PLEX-UXC AND issuetype = epic AND 'Epic Name' = 'Part Module'";
+    //var requestString = "project = PLEX-UXC AND issuetype = epic AND 'Epic Name' = 'Workflow Module'";
 
     UpdateProgress(1, "page");
     UpdateProgress(1, "issue");
@@ -320,12 +320,17 @@ function SaveLinkedIssue(linkedIssue, callback) {
 
         dbIssue.key = linkedIssue.key;
         dbIssue.uri = "https://jira.epam.com/jira/browse/" + linkedIssue.key;
+        dbIssue.type = linkedIssue.fields.issuetype.name;
         dbIssue.summary = linkedIssue.fields.summary;
         dbIssue.status = linkedIssue.fields.status.name;
         dbIssue.resolution = linkedIssue.fields.resolution == null ? "" : linkedIssue.fields.resolution.name;
         dbIssue.reporter = linkedIssue.fields.reporter.displayName;
         dbIssue.originalEstimate = linkedIssue.fields.timetracking.originalEstimate;
         dbIssue.timeSpent = linkedIssue.fields.timetracking.timeSpent;
+
+        dbIssue.created = linkedIssue.fields.created;
+        dbIssue.updated = linkedIssue.fields.updated;
+
         dbIssue.labels = linkedIssue.fields.labels;
         if (linkedIssue.fields.assignee != null)
             dbIssue.assignee = linkedIssue.fields.assignee.displayName;

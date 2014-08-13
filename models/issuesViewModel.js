@@ -9,12 +9,15 @@ exports.issues = function () {
         }];
 };
 
-exports.issue = function(key, reporter, timeSpent, lables, assignee, linkedPages){
+exports.issue = function(key, type, status, reporter, timeSpent, lables, assignee, updated, linkedPages){
     this.key = key || "";
+    this.type = type || "";
+    this.status = status || "";
     this.reporter = reporter || "";
     this.timeSpent = timeSpent || "";
     this.labels = lables || [];
     this.assignee = assignee || "";
+    this.updated = updated || "";
     this.linkedPages = linkedPages || [];
 };
 

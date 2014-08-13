@@ -9,13 +9,12 @@ var schema = new Schema({
     key:                    { type: String, unique: true, index: true },
     uri:                    { type: String },
     summary:                { type: String },
+    type:                   { type: String },
 
     pages:[{
         linkType: {type: String},
         page: {type: Schema.Types.ObjectId, ref: 'Page'}
     }],
-
-//    pages:[{type: Schema.Types.ObjectId, ref: 'Page'}],
 
     status:                 { type: String },
 
@@ -27,27 +26,10 @@ var schema = new Schema({
     assignee:               { type: String },
 
     blockers:               { type: String },
-    progress:               { type: String }
-//
-//    storyPoints:            { type: String },
-//    devFinished:            { type: String },
-//
-//    qaFinished:             { type: String },
-//    progressHistory: [{
-//        person:         { type: String },
-//        progressFrom:   { type: String },
-//        progressTo:     { type: String },
-//        dateChanged:    { type: Date }
-//    }],
-//    epicKey:                { type: String },
-//    worklogHistory: [{
-//        person:         { type: String },
-//        timeSpent:      { type: String },
-//        dateChanged:    { type: Date },
-//        dateStarted:    { type: Date }
-//    }],
-//    created:                { type: String },
-//    updated:                { type: String }
+    progress:               { type: String },
+
+    created:                { type: String },
+    updated:                { type: String }
 });
 
 exports.Issue = mongoose.model('Issue', schema);

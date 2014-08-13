@@ -55,10 +55,13 @@ function parsePages(callback) {
 
                 var issue = new issuesViewModel.issue(
                     dbIssue.key,
+                    dbIssue.type,
+                    dbIssue.status,
                     dbIssue.reporter,
                     dbIssue.timeSpent,
                     dbIssue.labels.split(','),
                     dbIssue.assignee,
+                    dbIssue.updated,
                     linkedPages
                 );
 

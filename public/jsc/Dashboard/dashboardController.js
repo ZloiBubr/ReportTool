@@ -2,18 +2,21 @@
  * Created by Heorhi_Vilkitski on 8/5/2014.
  */
 
-function dashboardController($scope, $resource, $window, $filter, $modal,  $sce) {
+function dashboardController($scope, $resource, $window, $filter, $modal,  $sce, $timeout) {
     //var timeSheetDataResource = $resource('/personalData/:from/:to',{from: "@from", to: "@to"});
     var issueDataResource = $resource('/issuesData');
 
     /* ------------------------------------------------------ Init/Reinit -------------------------------*/
     $scope.init = function () {
         $scope.common = {};
+        $scope.common.filteredTeam = $scope.allTeams[0].id;
+        $scope.isLoading = true;
 
         $scope.dataLoad();
     };
 
     $scope.reInit = function () {
+        $scope.isLoading = true;
         $scope.dataLoad();
     };
 
@@ -28,8 +31,9 @@ function dashboardController($scope, $resource, $window, $filter, $modal,  $sce)
 
         var getIssueSuccess = function (data) {
             $scope.issueData = data;
-            $scope.$broadcast('issueDataLoaded');
             loadingDfrd.resolve();
+            $scope.$broadcast('issueDataLoaded');
+            $scope.isLoading = false;
         };
 
         var getIssueFail = function (err) {
@@ -64,6 +68,7 @@ function dashboardController($scope, $resource, $window, $filter, $modal,  $sce)
 
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
 
-
-    $scope.init();
+    $timeout(function(){
+        $scope.init();
+    });
 }

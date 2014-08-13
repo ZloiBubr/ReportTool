@@ -67,7 +67,7 @@ app.get('/pagebysizedata', pagebysize.get);
 app.get('/pagedata/:id', pagedata.get);
 app.get('/wavedata', wavedata.get);
 app.get('/moduledata', moduledata.get);
-app.get('/personaldata', personaldata.get);
+app.get('/personaldata/:fromDate/:toDate', personaldata.get);
 app.get('/issuesdata', issuesDataRouter.get);
 app.get('/cleandb', function(req, res) {
     ClearDB(function (err) {

@@ -8,7 +8,10 @@ var async = require('async');
 var _ = require('underscore');
 
 exports.getData = function (req, res) {
-    parsePages(function (err, personaldata) {
+    var fromDate = req.params.fromDate ? new Date(req.params.fromDate) : undefined;
+    var toDate = req.params.toDate ? new Date(req.params.toDate) : undefined;
+
+    parsePages(fromDate, toDate, function (err, personaldata) {
         if (err) throw err;
         res.json(personaldata);
     });
@@ -24,50 +27,66 @@ function fillPersonalData(teamPersonalProgress) {
     })
 }
 
-function parsePages(callback) {
+function parsePages(fromDate, toDate, callback) {
     var teamsModel = new teamsModels.TeamPersonalProgress();
     fillPersonalData(teamsModel);
 
-    teamsModel.startDate.setHours(0, 0, 0, 0);
-    teamsModel.endDate.setHours(0, 0, 0, 0);
-    var daysPeriod = 14;
-    teamsModel.startDate.setDate(teamsModel.startDate.getDate() - daysPeriod);
+
+
+    if(fromDate && toDate){
+        teamsModel.startDate = fromDate;
+        teamsModel.endDate = toDate;
+        teamsModel.startDate.setHours(0, 0, 0, 0);
+        teamsModel.endDate.setHours(0, 0, 0, 0);
+    }
+    else {
+        teamsModel.startDate.setHours(0, 0, 0, 0);
+        teamsModel.endDate.setHours(0, 0, 0, 0);
+        var daysPeriod = 14;
+        teamsModel.startDate.setDate(teamsModel.startDate.getDate() - daysPeriod);
+    }
+
+
 
     async.each(teamsModel.teams, function (team, teamCallback) {
         async.each(team.developers, function (developer, developerCallback) {
 
-            Page.find({worklogHistory: {$elemMatch: {person: developer.name, dateChanged: {$gte: teamsModel.startDate, $lte: teamsModel.endDate}}}},
-                function (err, pages) {
-                    var effectiveDays = 0;
-                    for (var d = new Date(teamsModel.startDate.getTime()); d <= teamsModel.endDate; d.setDate(d.getDate() + 1)) {
-                        var progressDetail = _.find(developer.progressDetails, function (progressDetailedItem) {
-                            return progressDetailedItem.date.getTime() == d.getTime()
-                        });
+            Page.find({progressHistory: {$elemMatch: {person: developer.name, dateChanged: {$gte: teamsModel.startDate, $lte: teamsModel.endDate}}}},
+                function(err, ProgressPages){
+                    Page.find({worklogHistory: {$elemMatch: {person: developer.name, dateChanged: {$gte: teamsModel.startDate, $lte: teamsModel.endDate}}}},
+                        function (err, workLogPages) {
 
-                        if (_.isUndefined(progressDetail)) {
-                            progressDetail = new teamsModels.ProgressDetail(new Date(d));
-                            developer.progressDetails.push(progressDetail)
-                        }
+                            var workLogPages = _.uniq(_.union(ProgressPages,workLogPages),false,function(item){return item.key});
 
-                        _.each(pages, function (pageItem) {
-                            parseWorklogHistory (d, developer, progressDetail, pageItem);
-                            parseProgressHistory (d, developer, progressDetail, pageItem);
-                        });
+                            var effectiveDays = 0;
+                            for (var d = new Date(teamsModel.startDate.getTime()); d <= teamsModel.endDate; d.setDate(d.getDate() + 1)) {
+                                var progressDetail = _.find(developer.progressDetails, function (progressDetailedItem) {
+                                    return progressDetailedItem.date.getTime() == d.getTime()
+                                });
 
-                        if(progressDetail.totalSP != 0 || progressDetail.totalHR != 0){
-                            effectiveDays++;
-                        }
-                    }
+                                if (_.isUndefined(progressDetail)) {
+                                    progressDetail = new teamsModels.ProgressDetail(new Date(d));
+                                    developer.progressDetails.push(progressDetail)
+                                }
 
-                    developer.avgSP =  developer.totalSP/effectiveDays;
-                    developer.avgSPOnAllDays =  developer.totalSP/daysPeriod;
-                    developer.avgSPinHour =  developer.totalSP/developer.totalHR;
-                    effectiveDays
+                                _.each(workLogPages, function (pageItem) {
+                                    parseWorklogHistory (d, developer, progressDetail, pageItem);
+                                    parseProgressHistory (d, developer, progressDetail, pageItem);
+                                });
 
-                    developerCallback();
-                })
+                                if(progressDetail.totalSP != 0 || progressDetail.totalHR != 0){
+                                    effectiveDays++;
+                                }
+                            }
 
+                            developer.avgSP =  developer.totalSP/effectiveDays;
+                            developer.avgSPOnAllDays =  developer.totalSP/daysPeriod;
+                            developer.avgSPinHour =  developer.totalSP/developer.totalHR;
 
+                            developerCallback();
+                        })
+
+                });
 
         }, function (err) {
             teamCallback(err);

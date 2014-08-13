@@ -15,6 +15,17 @@ a {
     vertical-align: middle !important;
 }
 
+.spinner{
+    height: 60px;
+    width: 60px;
+    display: block;
+    background: url('/img/Spinner.gif') no-repeat;
+}
+
+.top_padding_15{
+    padding-top: 15px;
+}
+
 .progressTableMainHeader>tr>th
 {
     vertical-align: top;
