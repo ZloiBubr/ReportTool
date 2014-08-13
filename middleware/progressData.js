@@ -4,6 +4,7 @@ var Module = require('../models/module').Module;
 var Page = require('../models/page').Page;
 var log = require('../libs/log')(module);
 var persons = require('./persons');
+var jiraTextUtility = require('./Utility/JiraTextUtility');
 
 exports.getData = function (req, res) {
     parsePages(function (err, progress) {
@@ -36,7 +37,7 @@ function parsePages(callback) {
             var page = pages[i];
             var storyPoints = parseInt(page.storyPoints) == null ? 0 : parseInt(page.storyPoints);
             var pageProgress = parseInt(page.progress) == null ? 0 : parseInt(page.progress) * storyPoints / 100;
-            var teamName = getTeamName(page.labels);
+            var teamName = jiraTextUtility.getTeamName(page.labels);
             var key = page.key;
 
             //time spent

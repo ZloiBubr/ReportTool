@@ -1,0 +1,40 @@
+<div ng-controller="IssuesLinkedToManyPagesController" class="col-lg-12">
+    <div class="panel panel-default">
+        <!-- Default panel contents -->
+        <div class="panel-heading"><span class="glyphicon glyphicon-th-list"></span> Issues by blocked pages
+        </div>
+        <div class="panel-body" style="height: 500px; overflow: auto">
+            <table class="table">
+                <tr>
+                    <th></th>
+                    <th>Key</th>
+                    <th>Type</th>
+                    <th>Blocks</th>
+                    <th>Status</th>
+                    <th>Teams Involved</th>
+                    <th>Assignee</th>
+                    <th>Updated day ago</th>
+                </tr>
+                <tr ng-repeat="issue in IssuesLinkedToManyPagesList | filter:filterBlocksIssues" ng-init="status = statuses.getStatusByName(issue.status)">
+                    <td>
+                        <span ng-if="issue.isHotIssue" class="glyphicon glyphicon-warning-sign" tooltip="HotIssue"></span>
+                        <span ng-if="issue.isF5Issue" class="glyphicon glyphicon-wrench" tooltip="F5 Issue"></span>
+                    </td>
+                    <td><a href={{"https://jira.epam.com/jira/browse/"+issue.key}}>{{issue.key}}</a></td>
+                    <td ng-switch="issue.type">
+                        <span ng-switch-when='Issue' tooltip="Issue"><span class="glyphicon glyphicon-info-sign"></span></span>
+                        <span ng-switch-when='Question' tooltip="Question"><span class="glyphicon glyphicon-question-sign"></span></span>
+                        <span ng-switch-when='Improvement' tooltip="Improvement"><span class="glyphicon glyphicon-plus-sign"></span></span>
+                        <span ng-switch-when='Bug' tooltip="Bug"><span class="glyphicon glyphicon-ban-circle"></span></span>
+                        <span ng-switch-default>{{issue.type}}</span>
+                        </td>
+                    <td>{{issue.blockersCount}}</td>
+                    <td><span tooltip="{{status.name}}"><span class="{{status.cssIcon}}"></span></span></td>
+                    <td><span ng-repeat="team in issue.teamsInvolved"> {{team}}; </span></td>
+                    <td>{{issue.assignee}}</td>
+                    <td>{{getLastUpdateDays(issue)}}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>

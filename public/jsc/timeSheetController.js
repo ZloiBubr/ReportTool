@@ -4,23 +4,29 @@
 
 function timeSheetController($scope, $resource, $window, $filter, $modal,  $sce) {
     //var timeSheetDataResource = $resource('/personalData/:from/:to',{from: "@from", to: "@to"});
-    var timeSheetDataResource = $resource('/personalData');
+    var timeSheetDataResource = $resource('/personalData/:fromDate/:toDate', {fromDate: "@from", toDate: "@to"});
 
     /* ------------------------------------------------------ Init/Reinit -------------------------------*/
     $scope.init = function () {
         $scope.common = {};
-        var fromDate = new Date();
-        var monthBackShift = 2;
-        var month = (fromDate.getMonth() - monthBackShift) >= 0 ? fromDate.getMonth() - monthBackShift : 12 - (fromDate.getMonth() - monthBackShift);
+        var fromQuery = new Date();
+        var toQuery = new Date();
+        var daysBackShift = 14;
+        $scope.isLoading = true;
+        //var monthBackShift = 2;
+        //var month = ($scope.fromQuery.getMonth() - monthBackShift) >= 0 ? $scope.fromQuery.getMonth() - monthBackShift : 12 - ($scope.fromQuery.getMonth() - monthBackShift);
+        //$scope.fromQuery.setMonth(month);
 
-        fromDate.setMonth(month);
-        $scope.from = $filter('date')(fromDate,"yyyy-MM-dd");
-        $scope.to = $filter('date')(new Date(),"yyyy-MM-dd");
+        fromQuery.setDate(fromQuery.getDate()-daysBackShift);
+
+        $scope.from = $filter('date')(fromQuery,"yyyy-MM-dd");
+        $scope.to = $filter('date')(toQuery,"yyyy-MM-dd");
 
         $scope.dataLoad();
     };
 
     $scope.reInit = function () {
+        $scope.isLoading = true;
         $scope.dataLoad();
     };
 
@@ -35,6 +41,7 @@ function timeSheetController($scope, $resource, $window, $filter, $modal,  $sce)
 
         var getTimeSheetSuccess = function (data) {
             $scope.personalData = data;
+            $scope.isLoading = false;
             loadingDfrd.resolve();
         };
 
@@ -44,7 +51,7 @@ function timeSheetController($scope, $resource, $window, $filter, $modal,  $sce)
         };
 
         //timeSheetDataResource.get($scope.common, getTimeSheetSuccess, getTimeSheetFail);
-        timeSheetDataResource.get(getTimeSheetSuccess, getTimeSheetFail);
+        timeSheetDataResource.get({fromDate: $scope.from, toDate: $scope.to}, getTimeSheetSuccess, getTimeSheetFail);
     };
 
 

@@ -19,4 +19,8 @@ module.exports = function(app) {
     app.get('/getpagedata', function(req, res) {
         res.render('page');
     });
+
+   /* app.get('/issues/getAll', function(req, res) {
+        res.render('issuesdata');
+    });*/
 };

@@ -1,6 +1,25 @@
 <div id="container" class="container-fluid" ng-controller="timeSheetController">
     <div class="row">
-        <div class="col-lg-5"><h3>From:{{personalData.startDate | date:'dd-MM-yyyy'}}  To:{{personalData.endDate | date:'dd-MM-yyyy'}}</h3></div>
+        <div class="col-lg-2">
+            <label for="fromDateControl">From:</label>
+            <input id="fromDateControl" type="date" ng-model="from" class="form-control" ng-change="onDateChange()"/>
+        </div>
+        <div class="col-lg-2">
+            <label for="toDateControl">To:</label>
+            <input id="toDateControl" type="date" ng-model="to" class="form-control" ng-change="onDateChange()"/>
+        </div>
+
+        <div class="col-lg-2">
+            <div class="checkbox top_padding_15">
+                <label>
+                    <input ng-model="isShowOnlyTotal" type="checkbox"> Display Only Total
+                </label>
+            </div>
+        </div>
+
+        <div class="col-lg-1">
+            <div class="spinner" ng-show="isLoading"></div>
+        </div>
     </div>
 
 
@@ -12,7 +31,7 @@
             <!--</tr>-->
             <tr>
                 <th>{{teamItem.name}}</th>
-                <th  style="text-align: center; cursor: default" ng-repeat="progressDetailItem in teamItem.developers[getDeveloperIndexNotEmpty(teamItem.developers)].progressDetails">
+                <th ng-if="!isShowOnlyTotal"  style="text-align: center; cursor: default" ng-repeat="progressDetailItem in teamItem.developers[getDeveloperIndexNotEmpty(teamItem.developers)].progressDetails">
                     <span tooltip-placement="top"  tooltip-html-unsafe="{{progressDetailItem.date | date:'dd-MM-yyyy'}}">
                         {{progressDetailItem.date | date:'EEE'}}
                     </span>
@@ -26,7 +45,7 @@
         <tbody>
             <tr ng-repeat="developerItem in teamItem.developers">
                 <td><a class="btn btn-link" href="{{getDeveloperTimeSheetLink(developerItem.name)}}">{{developerItem.name}}</a></td>
-                <td style="text-align: center" ng-repeat="progressDetail in developerItem.progressDetails" ng-class="{info: isWeekend(progressDetail)}"><a class="btn btn-link" ng-click="onCellClick(progressDetail)" ng-bind-html="getCellHrSpString(progressDetail)"></a></td>
+                <td ng-if="!isShowOnlyTotal" style="text-align: center" ng-repeat="progressDetail in developerItem.progressDetails" ng-class="{info: isWeekend(progressDetail)}"><a class="btn btn-link" ng-click="onCellClick(progressDetail)" ng-bind-html="getCellHrSpString(progressDetail)"></a></td>
                 <td style="text-align: center"><strong><span  class='hour-timesheet-color'>{{toFloat(developerItem.totalHR) | number:2}}</span>/<sup>{{toFloat(developerItem.totalSP) | number:2}}</sup></strong></td>
                 <td style="text-align: center; cursor: default"><strong><span  class='hour-timesheet-color'  tooltip-placement="top"  tooltip-html-unsafe="{{toFloat(developerItem.avgSPOnAllDays) | number:2}}(SP/all_days)">{{toFloat(developerItem.avgSP) | number:2}}</span></strong></td>
                 <td style="text-align: center"><strong><span  class='hour-timesheet-color'>{{toFloat(developerItem.avgSPinHour) | number:2}}</span></strong></td>

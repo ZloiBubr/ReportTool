@@ -13,6 +13,10 @@ myApp.config(function($stateProvider, $urlRouterProvider) {
             url: "/cumulative",
             templateUrl: "pages/cumulative.html"
         })
+        .state('dashboard', {
+            url: "/dashboard",
+            templateUrl: "../pages/dashboard/dashboard.html"
+        })
         .state('weeklyVelocity', {
             url: "/weeklyVelocity",
             templateUrl: "pages/weeklyVelocity.html"

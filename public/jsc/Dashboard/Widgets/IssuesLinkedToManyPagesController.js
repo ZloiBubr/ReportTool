@@ -1,0 +1,133 @@
+/**
+ * Created by Heorhi_Vilkitski on 8/8/2014.
+ */
+
+function IssuesLinkedToManyPagesController($scope, $resource, $window, $filter, $modal,  $sce) {
+    //var timeSheetDataResource = $resource('/personalData/:from/:to',{from: "@from", to: "@to"});
+    //var issueDataResource = $resource('/personalData');
+
+    /* ------------------------------------------------------ Init/Reinit -------------------------------*/
+    $scope.init = function () {
+        $scope.IssuesLinkedToManyPagesList = [];
+        $scope.statuses = new $scope.statuses();
+        $scope.$on('issueDataLoaded', $scope.prepareData);
+
+        $scope.nowDate = new Date();
+        $scope.nowDate.setHours(12,0,0);
+
+        $scope.TeamFilter = "TeamNova"
+    };
+
+    $scope.reInit = function () {
+        $scope.prepareData();
+    };
+
+    $scope.prepareData = function () {
+        console.log($scope.issueData);
+        _.each($scope.issueData, function (item) {
+            var linkedPagesResult = processLinkedPages(item);
+            processLabels(item);
+
+            item.teamsInvolved = linkedPagesResult.teamsInvolved;
+            item.blockersCount = linkedPagesResult.blockersCount;
+
+            // filter issues where more than 0 blockers
+            if($scope.getBlockersCount(item) > 0) {
+                $scope.IssuesLinkedToManyPagesList.push(item);
+            }
+        }, true);
+
+        // Sorting issues based on blockersCount
+        $scope.IssuesLinkedToManyPagesList = $filter('orderBy')($scope.IssuesLinkedToManyPagesList, function (item) {
+            return item.blockersCount;
+        }, true);
+    };
+
+
+    var processLinkedPages = function(item){
+        var result = {
+            blockersCount: 0,
+            teamsInvolved: []
+        }
+
+        _.each(item.linkedPages, function(linkedPageItem){
+
+            // Blockers count calculating
+            if(linkedPageItem.linkType.indexOf("blocked") > -1){
+                result.blockersCount++;
+            }
+
+            // Teams involved in Issue aggregating
+            if(!_.find(result.teamsInvolved, function(teamItem){
+                return teamItem == linkedPageItem.page.team;
+            })){
+                result.teamsInvolved.push(linkedPageItem.page.team)
+            }
+        });
+
+        return result;
+    };
+
+    var processLabels = function(item){
+        _.each(item.labels, function(labelItem){
+            if(labelItem.indexOf("HotIssue") > -1 || labelItem.indexOf("Hotissue") > -1){
+                item.isHotIssue = true;
+            }
+            else if(labelItem.indexOf("F5") > -1 || labelItem.indexOf("F5.") > -1){
+                item.isF5Issue = true;
+            }
+        });
+    };
+
+    /* -------------------------------------------------------Event handlers ------------------------ */
+    /* --------------------------------------------- Actions ------------------------------*/
+
+
+    /* ------------------------------------------- DOM/Angular events --------------------------------------*/
+//    $scope.onDateChange = function()
+//    {
+//        $scope.reInit();
+//    }
+//
+//    $scope.onCellClick = function(item) {
+//
+//        var modalInstance = $modal.open({
+//            templateUrl: '/pages/modal/timeSheetPageModal.html',
+//            controller: timeSheetPageModalController,
+//            size: "sm",
+//            resolve: {
+//                item: function () {
+//                    return item;
+//                }
+//            }
+//        });
+//    }
+
+    /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
+
+    $scope.getBlockersCount = function (item) {
+       return _.size(_.filter(item.linkedPages, function (item) {
+            return item.linkType.indexOf("blocked") > -1
+        }));
+    };
+
+    $scope.getLastUpdateDays = function (item) {
+        var itemDate = new Date(item.updated);
+        itemDate.setHours(12,0,0);
+
+        return Math.round(($scope.nowDate - itemDate) / 8.64e7);
+    };
+
+    $scope.filterBlocksIssues = function (item) {
+        if($scope.common.filteredTeam == $scope.allTeams[0].id)
+        {
+            return true;
+        }
+
+        return _.some(item.teamsInvolved, function(team){
+            return team == $scope.common.filteredTeam;
+        });
+    }
+
+    $scope.init();
+}

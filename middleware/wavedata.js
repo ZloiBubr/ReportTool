@@ -4,7 +4,7 @@ var Module = require('../models/module').Module;
 var Page = require('../models/page').Page;
 var log = require('../libs/log')(module);
 
-var statusExport = require('../public/jsc/statusList');
+var statusExport = require('../public/jsc/Models/statusList');
 var statusList = new statusExport.statuses();
 
 exports.getData = function (req, res) {
