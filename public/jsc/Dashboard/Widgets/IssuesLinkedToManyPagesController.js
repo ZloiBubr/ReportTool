@@ -27,6 +27,7 @@ function IssuesLinkedToManyPagesController($scope, $resource, $window, $filter, 
         _.each($scope.issueData, function (item) {
             var linkedPagesResult = processLinkedPages(item);
             processLabels(item);
+            item.lastDaysAgo = getLastUpdateDays(item);
 
             item.teamsInvolved = linkedPagesResult.teamsInvolved;
             item.blockersCount = linkedPagesResult.blockersCount;
@@ -48,7 +49,7 @@ function IssuesLinkedToManyPagesController($scope, $resource, $window, $filter, 
         var result = {
             blockersCount: 0,
             teamsInvolved: []
-        }
+        };
 
         _.each(item.linkedPages, function(linkedPageItem){
 
@@ -79,29 +80,29 @@ function IssuesLinkedToManyPagesController($scope, $resource, $window, $filter, 
         });
     };
 
+    var getLastUpdateDays = function (item) {
+        var itemDate = new Date(item.updated);
+        itemDate.setHours(12,0,0);
+
+        return Math.round(($scope.nowDate - itemDate) / 8.64e7);
+    };
+
     /* -------------------------------------------------------Event handlers ------------------------ */
+    $scope.onSortingClick = function(sortName){
+        if(sortName == $scope.sortingModel.selected){
+            $scope.sortingModel.isASC = !$scope.sortingModel.isASC;
+        }
+        else {
+            $scope.sortingModel.selected = sortName;
+            $scope.sortingModel.isASC = true;
+        }
+
+        $scope.sortBlocksIssues();
+    };
     /* --------------------------------------------- Actions ------------------------------*/
 
 
     /* ------------------------------------------- DOM/Angular events --------------------------------------*/
-//    $scope.onDateChange = function()
-//    {
-//        $scope.reInit();
-//    }
-//
-//    $scope.onCellClick = function(item) {
-//
-//        var modalInstance = $modal.open({
-//            templateUrl: '/pages/modal/timeSheetPageModal.html',
-//            controller: timeSheetPageModalController,
-//            size: "sm",
-//            resolve: {
-//                item: function () {
-//                    return item;
-//                }
-//            }
-//        });
-//    }
 
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
 
@@ -111,12 +112,12 @@ function IssuesLinkedToManyPagesController($scope, $resource, $window, $filter, 
         }));
     };
 
-    $scope.getLastUpdateDays = function (item) {
-        var itemDate = new Date(item.updated);
-        itemDate.setHours(12,0,0);
-
-        return Math.round(($scope.nowDate - itemDate) / 8.64e7);
+    $scope.sortBlocksIssues = function()
+    {
+       var getter =  $scope.sortingModel[$scope.sortingModel.selected].getter;
+       $scope.IssuesLinkedToManyPagesList = $filter('orderBy')($scope.IssuesLinkedToManyPagesList, getter, $scope.sortingModel.isASC);
     };
+
 
     $scope.filterBlocksIssues = function (item) {
         if($scope.common.filteredTeam == $scope.allTeams[0].id)
@@ -127,7 +128,27 @@ function IssuesLinkedToManyPagesController($scope, $resource, $window, $filter, 
         return _.some(item.teamsInvolved, function(team){
             return team == $scope.common.filteredTeam;
         });
-    }
+    };
+
+
+    $scope.sortingModel = {
+        selected: "blockers",
+        isASC : true,
+
+        blockers:{
+            getter: function(item){return item.blockersCount;}
+        },
+
+        daysAgo:{
+            getter: function(item){
+                return item.lastDaysAgo;
+            }
+        },
+
+        assignee:{
+            getter: function(item){return item.assignee;}
+        }
+    };
 
     $scope.init();
 }

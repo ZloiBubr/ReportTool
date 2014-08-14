@@ -6,13 +6,17 @@ body {
 a {
     color: #007fa8;
 }
-
+ /*------------------------------------Common---------------------------*/
 .progress_no_top_line > td {
     border-top: none !important;
 }
 
 .vcenter {
     vertical-align: middle !important;
+}
+
+.sorted_column{
+    cursor: pointer;
 }
 
 .spinner{
@@ -25,6 +29,16 @@ a {
 .top_padding_15{
     padding-top: 15px;
 }
+
+/*------------------------------------End_Common---------------------------*/
+
+/*----------------------------------Dashboard------------------------------*/
+
+.glyphicon.glyphicon-sort{
+    font-size: 8pt;
+}
+
+/*----------------------------------End Dashboard------------------------------*/
 
 .progressTableMainHeader>tr>th
 {

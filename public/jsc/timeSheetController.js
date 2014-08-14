@@ -27,6 +27,7 @@ function timeSheetController($scope, $resource, $window, $filter, $modal,  $sce)
 
     $scope.reInit = function () {
         $scope.isLoading = true;
+        $scope.isShowOnlyTotal = true;
         $scope.dataLoad();
     };
 

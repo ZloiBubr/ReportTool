@@ -9,11 +9,26 @@
                     <th></th>
                     <th>Key</th>
                     <th>Type</th>
-                    <th>Blocks</th>
+                    <th class="sorted_column" ng-click="onSortingClick('blockers')"><span class="glyphicon glyphicon-sort" style="font-size: 8pt"></span> Blocks
+                        <span ng-show="sortingModel.selected == 'blockers'">&nbsp;
+                            <span ng-show="sortingModel.isASC">▴</span>
+                            <span ng-show="!sortingModel.isASC">▾</span>
+                        </span>
+                    </th>
                     <th>Status</th>
                     <th>Teams Involved</th>
-                    <th>Assignee</th>
-                    <th>Updated day ago</th>
+                    <th class="sorted_column" ng-click="onSortingClick('assignee')"><span class="glyphicon glyphicon-sort"></span> Assignee
+                        <span ng-show="sortingModel.selected == 'assignee'">&nbsp;
+                            <span ng-show="sortingModel.isASC == true">▴</span>
+                            <span ng-show="sortingModel.isASC == false">▾</span>
+                        </span>
+                    </th>
+                    <th class="sorted_column" ng-click="onSortingClick('daysAgo')"><span class="glyphicon glyphicon-sort"></span> Updated day ago
+                        <span ng-show="sortingModel.selected == 'daysAgo'">&nbsp;
+                            <span ng-show="sortingModel.isASC == true">▴</span>
+                            <span ng-show="sortingModel.isASC == false">▾</span>
+                        </span>
+                    </th>
                 </tr>
                 <tr ng-repeat="issue in IssuesLinkedToManyPagesList | filter:filterBlocksIssues" ng-init="status = statuses.getStatusByName(issue.status)">
                     <td>
@@ -32,7 +47,7 @@
                     <td><span tooltip="{{status.name}}"><span class="{{status.cssIcon}}"></span></span></td>
                     <td><span ng-repeat="team in issue.teamsInvolved"> {{team}}; </span></td>
                     <td>{{issue.assignee}}</td>
-                    <td>{{getLastUpdateDays(issue)}}</td>
+                    <td>{{issue.lastDaysAgo}}</td>
                 </tr>
             </table>
         </div>

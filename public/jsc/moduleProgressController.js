@@ -130,17 +130,7 @@ function moduleProgressController($scope, $resource, $window, $filter) {
             });
         });
 
-        $scope.updatedModuleProgressData.sort(function (a, b) {
-            if($scope.sortByDate) {
-                a = new Date(a.duedate);
-                b = new Date(b.duedate);
-            }
-            else {
-                a = a.name;
-                b = b.name;
-            }
-            return a > b ? 1 : a < b ? -1 : 0;
-        });
+        $scope.updatedModuleProgressData = $filter('orderBy')($scope.updatedModuleProgressData, $scope.sortingModel.dueDate.getter, $scope.sortingModel.isASC);
 
         $scope.isTotalWasCalculated = true;
     };
@@ -153,6 +143,12 @@ function moduleProgressController($scope, $resource, $window, $filter) {
             scope.push(moduleProgressItem);
         }
     }
+
+    function sortModuleProgressData() {
+        var getter =  $scope.sortingModel[$scope.sortingModel.selected].getter;
+        $scope.updatedModuleProgressData = $filter('orderBy')($scope.updatedModuleProgressData, getter, $scope.sortingModel.isASC);
+    }
+
     /* -------------------------------------------------------Event handlers ------------------------ */
     /* --------------------------------------------- Actions ------------------------------*/
     $scope.getModuleData = function () {
@@ -188,36 +184,51 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         $scope.total.readyForQA.isChecked = $scope.total.all.isChecked;
 
         $scope.processWithRowSpans();
-    }
+    };
+
+    $scope.onSortingClick = function(sortName){
+        if(sortName == $scope.sortingModel.selected){
+            $scope.sortingModel.isASC = !$scope.sortingModel.isASC;
+        }
+        else {
+            $scope.sortingModel.selected = sortName;
+            $scope.sortingModel.isASC = true;
+        }
+
+        sortModuleProgressData();
+    };
 
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
 
 
-    $scope.filterModuleBySme = function()
+    $scope.filterModule = function()
     {
         $scope.reInitTotal();
         $scope.isTotalWasCalculated = false;
         $scope.processWithRowSpans();
-    }
-
-    $scope.filterModuleByGroup = function()
-    {
-        $scope.reInitTotal();
-        $scope.isTotalWasCalculated = false;
-        $scope.processWithRowSpans();
-    }
-
-    $scope.filterModuleByTeam = function()
-    {
-        $scope.reInitTotal();
-        $scope.isTotalWasCalculated = false;
-        $scope.processWithRowSpans();
-    }
+    };
 
     $scope.isUnknownExist = function(item)
     {
         return item.indexOf("Unknown") > -1;
-    }
+    };
+
+    $scope.sortingModel = {
+        selected: "dueDate",
+        isASC : true,
+
+        progress:{
+            getter: function(item){ return item.progress; }
+        },
+
+        dueDate:{
+            getter: function(item){ return item.duedate2; }
+        },
+
+        moduleGroup:{
+            getter: function(item){ return item.moduleGroup; }
+        }
+    };
 
 
     $scope.init();
