@@ -286,21 +286,20 @@ function ProcessPage(storyKey, callback) {
 function ProcessLinkedIssue(linkedIssue, callback)
 {
     var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), _jiraUser, _jiraPass, '2');
-    jira.findIssue(linkedIssue.linkedIssueKey, function (error, linkedIssue) {
+    jira.findIssue(linkedIssue.linkedIssueKey, function (error, jiraLinkedIssue) {
         if (error) {
             LogProgress("!!!!!!!!!!!!!!!!!!!! " + linkedIssue.linkedIssueKey + ' : Issue/Question/Bug was not found at JIRA!', error);
             callback(error);
         }
-        if (linkedIssue == null || linkedIssue.key == null) {
+        if (jiraLinkedIssue == null || jiraLinkedIssue.key == null) {
             LogProgress("!!!!!!!!!!!!!!!!!!!! " + linkedIssue.linkedIssueKey + ' : Issue/Question/Bug was not found at JIRA!', error);
             callback(error);
         }
         else{
-            SaveLinkedIssue(linkedIssue, function(error){
+            SaveLinkedIssue(jiraLinkedIssue, function(error){
                 if(error) {
-                    LogProgress("!!!!!!!!!!!!!!!!!!!! " + linkedIssue.key + ' : Issue/Question/Bug was not saved!', error);
+                    LogProgress("!!!!!!!!!!!!!!!!!!!! " + jiraLinkedIssue.key + ' : Issue/Question/Bug was not saved!', error);
                 }
-
                 callback(error);
             });
         }
