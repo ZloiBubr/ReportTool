@@ -7,7 +7,7 @@ if (!!window.EventSource) {
             $("#page_progress .bar").css({ width: data.page + '%' });
         }
         else{
-            $("#issue_progress .bar").css({ width: data.issue + '%' });
+            $("#issue_progress .bar").css({ width: data.issues + '%' });
         }
 
         //update progress bar in client
@@ -21,6 +21,10 @@ if (!!window.EventSource) {
         $("#updatebtn").button("loading");
         var text = e.data;
         $("#serverlog").prepend(text + "<br/>");
+    }, false);
+    source.addEventListener('errmessage', function(e) {
+        var text = e.data;
+        $("#errorlog").prepend(text + "<br/>");
     }, false);
     source.addEventListener('error', function(e) {
         source.close();
