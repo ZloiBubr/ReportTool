@@ -251,28 +251,30 @@ function CollectPagesFromJira(jira, full, moduleKey, callback) {
 }
 
 function ProcessLinkedIssues(issue, dbPage) {
-    _.each(issue.fields.issuelinks, function (linkedIssueItem) {
-        var linkedIssue = linkedIssueItem.inwardIssue ? linkedIssueItem.inwardIssue : linkedIssueItem.outwardIssue;
-        if (linkedIssue.fields.issuetype.name != "Story") {
-            if (_.isUndefined(linkedIssueUniqList[linkedIssue.key])) {
-                linkedIssueUniqList[linkedIssue.key] = {
-                    linkedIssueKey: linkedIssue.key,
-                    linkedPages: [
-                        {
-                            key: issue.key,
-                            _id: dbPage._id,
-                            linkType: linkedIssueItem.type.inward
-                        }
-                    ]
-                };
-            } else {
-                linkedIssueUniqList[linkedIssue.key].linkedPages.push({
-                    key: issue.key,
-                    _id: dbPage._id,
-                    linkType: linkedIssueItem.type.inward});
+    if(dbPage != null) {
+        _.each(issue.fields.issuelinks, function (linkedIssueItem) {
+            var linkedIssue = linkedIssueItem.inwardIssue ? linkedIssueItem.inwardIssue : linkedIssueItem.outwardIssue;
+            if (linkedIssue.fields.issuetype.name != "Story") {
+                if (_.isUndefined(linkedIssueUniqList[linkedIssue.key])) {
+                    linkedIssueUniqList[linkedIssue.key] = {
+                        linkedIssueKey: linkedIssue.key,
+                        linkedPages: [
+                            {
+                                key: issue.key,
+                                _id: dbPage._id,
+                                linkType: linkedIssueItem.type.inward
+                            }
+                        ]
+                    };
+                } else {
+                    linkedIssueUniqList[linkedIssue.key].linkedPages.push({
+                        key: issue.key,
+                        _id: dbPage._id,
+                        linkType: linkedIssueItem.type.inward});
+                }
             }
-        }
-    });
+        });
+    }
 }
 
 function ProcessBlockersFromJira(jira, linkedIssue, callback) {
