@@ -100,12 +100,7 @@ function moduleProgressController($scope, $resource, $window, $filter) {
                 moduleProgressItem.progress = Math.round(moduleProgressItem.progress);
                 moduleProgressItem.progress2 = moduleProgressItem.progress.toString() + "%";
 
-                if(new Date(moduleProgressItem.duedate) < new Date('2014-01-01')) {
-                    moduleProgressItem.duedate2 = "";
-                }
-                else {
-                    moduleProgressItem.duedate2 = moduleProgressItem.duedate;
-                }
+                moduleProgressItem.duedate2 = moduleProgressItem.duedate;
                 moduleProgressItem.acceptedName = moduleProgressItem.accepted ? "Yes" : "No";
 
                 var accepted = moduleProgressItem.status == "Accepted";

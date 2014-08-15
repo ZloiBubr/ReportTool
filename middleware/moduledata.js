@@ -129,7 +129,7 @@ function parsePages(callback) {
         function (callback) {
             Module.find({}).exec(function(err, modules) {
                 async.each(modules, function(module, callback) {
-                    epicDueDateMap[module.key] = module.duedate == null ? new Date("1/1/1970") : module.duedate;
+                    epicDueDateMap[module.key] = module.duedate == null ? null : module.duedate;
                     callback();
                 },
                     function () {

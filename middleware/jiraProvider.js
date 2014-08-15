@@ -132,7 +132,7 @@ function Step1CollectModules(jira, callback) {
                     }
                     module.key = epic.key;
                     module.summary = epic.fields.summary;
-                    module.duedate = new Date(epic.fields.duedate);
+                    module.duedate = epic.fields.duedate == null ? null : new Date(epic.fields.duedate);
                     module.save(function () {
                         epicsList.push(epic.key);
                         LogProgress(epic.key + " : " + " Module Collected");
