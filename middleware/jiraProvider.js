@@ -285,9 +285,11 @@ function ProcessBlockersFromJira(jira, linkedIssue, callback) {
         if (error || jiraLinkedIssue == null) {
             callback(error);
         }
-        SaveLinkedIssue(jiraLinkedIssue, function (error) {
-            callback(error);
-        });
+        else {
+            SaveLinkedIssue(jiraLinkedIssue, function (error) {
+                callback(error);
+            });
+        }
     });
 }
 
