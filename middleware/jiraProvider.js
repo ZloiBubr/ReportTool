@@ -84,13 +84,13 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
         //step 3
         function (callback) {
             //process pages
-            LogProgress("**** Step 3: process pages");
+            LogProgress("**** Step 3: process " + issuesList.length + " pages");
             Step3ProcessPages(jira, callback);
         },
         //step 4
         function (callback) {
             // process linked issues pages
-            LogProgress("**** Step 4: process blockers");
+            LogProgress("**** Step 4: process " + linkedIssueUniqList.length + " blockers");
             Step4ProcessBlockers(jira, callback);
         },
         //step 5
@@ -135,15 +135,16 @@ function Step1CollectModules(jira, callback) {
                     module.duedate = new Date(epic.fields.duedate);
                     module.save(function () {
                         epicsList.push(epic.key);
-                        LogProgress(epic.key + " : " + epic.fields.summary + " Collected");
+                        LogProgress(epic.key + " : " + " Module Collected");
                         callback();
                     })
                 });
             },
             function (err) {
                 if (err) {
-                    LogProgress("!!!!!!!!!!!!!!!!!!!! Collect modules error happened!", err);
+                    LogProgress("Collect modules error happened!", err);
                 }
+                LogProgress(epicsList.length + " : " + " Modules Collected");
                 callback(err);
             });
         }
@@ -157,7 +158,7 @@ function Step2CollectPages(jira, full, callback) {
         },
         function (err) {
             if (err) {
-                LogProgress("!!!!!!!!!!!!!!!!!!!! Collecting pages error happened!", err);
+                LogProgress("Collecting pages error happened!", err);
             }
             callback(err);
         }
@@ -173,28 +174,11 @@ function Step3ProcessPages(jira, callback) {
                 lastProgress = currentProgress;
                 UpdateProgress(currentProgress, "page");
             }
-            jira.findIssue(issueKey + "?expand=changelog", function (error, issue) {
-                if (error) {
-                    callback(error);
-                }
-                else if (issue != null) {
-                    SavePage(jira,issue, function (error, dbPage) {
-                        if (error) {
-                            callback(error);
-                        }
-                        LogProgress(issue.key + " : " + issue.fields.summary + " : Page Collected");
-                        ProcessLinkedIssues(issue, dbPage);
-                        callback();
-                    });
-                }
-                else {
-                    callback();
-                }
-            });
+            ProcessPageFromJira(jira, issueKey, counter, callback);
         },
         function (err) {
             if (err) {
-                LogProgress("!!!!!!!!!!!!!!!!!!!! Processing pages error happened!", err);
+                LogProgress("Processing pages error happened!", err);
             }
             callback(err);
         }
@@ -205,18 +189,18 @@ function Step4ProcessBlockers(jira, callback) {
     var counter = 0;
     var lastProgress = 0;
     var keys = Object.keys(linkedIssueUniqList);
-    async.eachLimit(keys, 10, function (linkedIssueKey, callback2) {
+    async.eachLimit(keys, 10, function (linkedIssueKey, callback) {
             var currentProgress = Math.floor((++counter * 100) / keys.length);
             if (lastProgress != currentProgress) {
                 lastProgress = currentProgress;
                 UpdateProgress(currentProgress, "issues");
             }
             var linkedIssue = linkedIssueUniqList[linkedIssueKey];
-            ProcessBlockersFromJira(jira, linkedIssue, callback2);
+            ProcessBlockersFromJira(jira, linkedIssue, counter, callback);
         },
         function (err) {
             if (err) {
-                LogProgress("!!!!!!!!!!!!!!!!!!!! Reprocessing  Issue/Question/Bug error happened!", err);
+                LogProgress("Processing blockers Issue/Question/Bug error happened!", err);
             }
             callback(err);
         }
@@ -236,16 +220,37 @@ function CollectPagesFromJira(jira, full, moduleKey, callback) {
             async.eachSeries(stories.issues, function (story, callback) {
                     issuesList.push(story.key);
                     epicIssueMap[story.key] = moduleKey;
-                    LogProgress(story.key + " : " + story.fields.summary + " : Page Collected");
+                    LogProgress(story.key + " : " + " : Page Collected");
                     callback();
                 },
                 function (err) {
                     if (err) {
-                        LogProgress("!!!!!!!!!!!!!!!!!!!! Collect pages error happened!", err);
+                        LogProgress("Collect pages error happened!", err);
                     }
                     callback(err);
                 }
             );
+        }
+        else {
+            callback();
+        }
+    });
+}
+
+function ProcessPageFromJira(jira, issueKey, counter, callback) {
+    jira.findIssue(issueKey + "?expand=changelog", function (error, issue) {
+        if (error) {
+            callback(error);
+        }
+        else if (issue != null) {
+            SavePage(jira, issue, function (error, dbPage) {
+                if (error) {
+                    callback(error);
+                }
+                LogProgress(counter + ":" + issue.key + " : Page Collected");
+                ProcessLinkedIssues(issue, dbPage);
+                callback();
+            });
         }
         else {
             callback();
@@ -280,20 +285,18 @@ function ProcessLinkedIssues(issue, dbPage) {
     }
 }
 
-function ProcessBlockersFromJira(jira, linkedIssue, callback) {
+function ProcessBlockersFromJira(jira, linkedIssue, counter, callback) {
     jira.findIssue(linkedIssue.linkedIssueKey, function (error, jiraLinkedIssue) {
         if (error || jiraLinkedIssue == null) {
             callback(error);
         }
         else {
-            SaveLinkedIssue(jiraLinkedIssue, function (error) {
-                callback(error);
-            });
+            SaveLinkedIssue(jiraLinkedIssue, counter, callback);
         }
     });
 }
 
-function SaveLinkedIssue(linkedIssue, callback) {
+function SaveLinkedIssue(linkedIssue, counter, callback) {
     Issue.findOne({key: linkedIssue.key}, function (err, dbIssue) {
         if (err) {
             callback(err);
@@ -326,7 +329,7 @@ function SaveLinkedIssue(linkedIssue, callback) {
         });
 
         dbIssue.save(function (err) {
-            LogProgress(linkedIssue.key + " : " + linkedIssue.fields.summary + " : Issue Collected");
+            LogProgress(counter + ":" + linkedIssue.key + " : " + linkedIssue.fields.summary + " : Issue Collected");
             callback(err);
         });
     });
