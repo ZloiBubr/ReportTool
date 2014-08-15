@@ -29,4 +29,4 @@ exports.data = function () {
             name: "Small"
         }
     ];
-}
+};

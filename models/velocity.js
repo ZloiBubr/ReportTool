@@ -25,4 +25,4 @@ exports.data = function () {
             name: "Total"
         }
     ];
-}
+};

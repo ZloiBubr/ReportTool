@@ -42,7 +42,7 @@ exports.TeamPersonalProgress = function () {
     this.teams = [];
     this.startDate = new Date();
     this.endDate = new Date();
-}
+};
 
 exports.Team =  function(name){
     this.name = name;

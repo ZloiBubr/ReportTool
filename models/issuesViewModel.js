@@ -24,7 +24,7 @@ exports.issue = function(key, type, status, reporter, timeSpent, lables, assigne
 exports.link = function(linkType, page){
     this.linkType = linkType || "";
     this.page = page || new exports.linkedPage();
-}
+};
 
 exports.linkedPage = function(key, reporter, timeSpent, labels, assignee, team){
     this.key = key || "";
