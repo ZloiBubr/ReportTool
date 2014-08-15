@@ -27,7 +27,7 @@ function waveProgressController($scope, $resource, $window, $filter) {
         $scope.total.all = {isChecked :true};
         $scope.total.total = 0;
         $scope.total.pages = 0;
-    }
+    };
 
     $scope.processWithRowSpans = function () {
         $scope.total.pages = 0;
@@ -109,7 +109,7 @@ function waveProgressController($scope, $resource, $window, $filter) {
     $scope.onDateChange = function()
     {
         $scope.reInit();
-    }
+    };
 
     $scope.onSelectDeselectAll = function()
     {
@@ -126,7 +126,7 @@ function waveProgressController($scope, $resource, $window, $filter) {
         $scope.total.cancelled.isChecked = $scope.total.all.isChecked;
 
         $scope.processWithRowSpans();
-    }
+    };
 
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
 
@@ -136,17 +136,17 @@ function waveProgressController($scope, $resource, $window, $filter) {
         $scope.reInitTotal();
         $scope.isTotalWasCalculated = false;
         $scope.processWithRowSpans();
-    }
+    };
 
     $scope.filterCloudAppByStatus = function(item)
     {
         return $scope.getStatusEntity(item.appItem.status).isChecked;
-    }
+    };
 
     $scope.isUnknownExist = function(item)
     {
         return item.indexOf("Unknown") > -1;
-    }
+    };
 
 
     $scope.init();

@@ -45,7 +45,7 @@ function PutSeriesPoint(pData, pName, dateC, progress) {
 }
 
 function getPage(id, callback) {
-    var page = new Page();
+
     Page.find({key: id}, function (err, page) {
         Module.findOne({ key: page[0].epicKey }, function (err, module) {
             if (err) throw err;
@@ -68,7 +68,7 @@ function getPage(id, callback) {
 
                 var progress = parseInt(history.progressTo);
                 var dateC = Date.parse(history.dateChanged);
-                var pName = person + " progress"
+                var pName = person + " progress";
 
                 PutSeriesPoint(pData, pName, dateC, progress);
             }
@@ -102,7 +102,7 @@ function getPage(id, callback) {
                 }
 
                 var dateC = Date.parse(worklog.dateStarted);
-                var pName = person + " hours"
+                var pName = person + " hours";
 
                 PutSeriesPoint(pData, pName, dateC, progress);
             }

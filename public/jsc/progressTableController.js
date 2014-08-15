@@ -13,17 +13,17 @@ function progressTableController($scope, $resource, $window) {
         $scope.common = {};
 
         $scope.dataLoad();
-    }
+    };
 
     $scope.reInit = function () {
         $scope.dataLoad();
-    }
+    };
 
     $scope.dataLoad = function () {
         $scope.filteredTeam = $scope.allTeams[0].id;
         $scope.showOnlyTotal = false;
         $scope.getReportData();
-    }
+    };
 
     /* -------------------------------------------------------Event handlers ------------------------ */
     /* --------------------------------------------- Actions ------------------------------*/
@@ -48,13 +48,11 @@ function progressTableController($scope, $resource, $window) {
                         {
                             itemPage.isGreen = true;
                         }
-                        itemPage.isDone = false;
-                        if(itemPage.sumprogress == itemPage.storypoints) {
-                            itemPage.isDone = true;
-                        }
+
+                        itemPage.isDone = itemPage.sumprogress == itemPage.storypoints;
                     })
                 })
-            })
+            });
             $scope.progressData = data;
             loadingDfrd.resolve();
         };
@@ -65,12 +63,12 @@ function progressTableController($scope, $resource, $window) {
         };
 
         progressSeriesResource.get(getProgressSuccess, getChartFail)
-    }
+    };
 
     /* ------------------------------------------- DOM/Angular events --------------------------------------*/
     $scope.searchIssues = function () {
         $scope.reInit();
-    }
+    };
 
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
 

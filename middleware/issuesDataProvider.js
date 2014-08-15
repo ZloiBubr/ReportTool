@@ -7,7 +7,7 @@ var Page = require('../models/page').Page;
 var Issue = require('../models/issue').Issue;
 var issuesViewModel = require('../models/issuesViewModel');
 var log = require('../libs/log')(module);
-var async = require('async');
+
 var jiraTextUtility = require('./Utility/JiraTextUtility');
 var _ = require('underscore');
 

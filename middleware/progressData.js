@@ -11,7 +11,7 @@ exports.getData = function (req, res) {
         if (err) throw err;
         res.json(progress);
     });
-}
+};
 
 function sortData(progress) {
     progress.dates.sort(function (a, b) {
@@ -103,19 +103,6 @@ function parsePages(callback) {
 
         callback(err, progress);
     })
-}
-
-function getTeamName(labels) {
-    if (labels.indexOf("TeamRenaissance") > -1)
-        return "TeamRenaissance";
-    if (labels.indexOf("TeamInspiration") > -1)
-        return "TeamInspiration";
-    if (labels.indexOf("TeamNova") > -1)
-        return "TeamNova";
-    if (labels.indexOf("TeamLiberty") > -1)
-        return "TeamLiberty";
-    if (labels.indexOf("TeamViva") > -1)
-        return "TeamViva";
 }
 
 function putDataPoint(key, progress, teamName, date, calcStoryPoints, person, uri, devTimeSpent, qaTimeSpent, storyPoints, pageProgress, estimated, blockersnum) {

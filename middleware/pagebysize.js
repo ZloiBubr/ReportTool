@@ -10,7 +10,7 @@ exports.getData = function (req, res) {
         if (err) throw err;
         res.json(data);
     });
-}
+};
 
 function isDeveloper(name) {
     if (persons.isDeveloper(name)) {

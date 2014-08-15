@@ -13,16 +13,16 @@ function pagebysizeChartController($scope, $resource, $window) {
         $scope.common = {};
 
         $scope.dataLoad();
-    }
+    };
 
     $scope.reInit = function () {
         $scope.dataLoad();
-    }
+    };
 
     $scope.dataLoad = function () {
         $.when($scope.getReportData())
             .done($scope.initCharts);
-    }
+    };
 
     // Original link to use setup chart directive
     // https://github.com/pablojim/highcharts-ng
@@ -47,7 +47,7 @@ function pagebysizeChartController($scope, $resource, $window) {
 
             series: $scope.chartsData.data
         });
-    }
+    };
 
     /* -------------------------------------------------------Event handlers ------------------------ */
     /* --------------------------------------------- Actions ------------------------------*/
@@ -76,14 +76,14 @@ function pagebysizeChartController($scope, $resource, $window) {
             loadingDfrd.reject(err);
         };
 
-        velocitySeriesResource.get(getChartSuccess, getChartFail)
+        velocitySeriesResource.get(getChartSuccess, getChartFail);
         return loadingDfrd.promise();
-    }
+    };
 
     /* ------------------------------------------- DOM/Angular events --------------------------------------*/
     $scope.searchIssues = function () {
         $scope.reInit();
-    }
+    };
 
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
     $scope.jiraLabelsTeams = [
@@ -93,7 +93,7 @@ function pagebysizeChartController($scope, $resource, $window) {
         {"id": "LargePlus", "title": "LargePlus"},
         {"id": "Large", "title": "Large"},
         {"id": "Medium", "title": "Medium"},
-        {"id": "Small", "title": "Small"},
+        {"id": "Small", "title": "Small"}
     ];
 
     $scope.init();

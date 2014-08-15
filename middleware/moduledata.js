@@ -14,7 +14,7 @@ exports.getData = function (req, res) {
     parsePages(function (moduledata) {
         res.json(moduledata);
     });
-}
+};
 
 function moduleData() {
     this.moduleGroup = [
@@ -126,20 +126,20 @@ function parsePages(callback) {
 
     epicDueDateMap = {};
     async.series([
-        function (callback3) {
+        function (callback) {
             Module.find({}).exec(function(err, modules) {
-                async.each(modules, function(module, callback2) {
+                async.each(modules, function(module, callback) {
                     epicDueDateMap[module.key] = module.duedate == null ? new Date("1/1/1970") : module.duedate;
-                    callback2();
+                    callback();
                 },
-                function(err) {
-                    callback3();
+                    function () {
+                        callback();
                 })
             });
         },
-        function (callback3) {
+        function (callback) {
             Page.find({}).exec(function (err, pages) {
-                async.each(pages, function(page, callback2) {
+                async.each(pages, function(page, callback) {
                     var storyPoints = page.storyPoints == null ? 0 : parseFloat(page.storyPoints);
                     var moduleGroup = getModuleGroupName(page.labels);
                     var moduleName = getModuleName(page.labels);
@@ -155,12 +155,12 @@ function parsePages(callback) {
                     putDataPoint(moduledata, status,
                         moduleGroup, moduleName, teamName, smeName,
                         calcStoryPoints, storyPoints, dueDate, page.epicKey);
-                    callback2();
+                    callback();
                 });
-                callback3();
+                callback();
             })
         },
-        function(err) {
+        function () {
             SortData(moduledata);
             callback(moduledata);
         }

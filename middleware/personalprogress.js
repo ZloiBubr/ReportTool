@@ -15,7 +15,7 @@ exports.getData = function (req, res) {
         if (err) throw err;
         res.json(personaldata);
     });
-}
+};
 
 function fillPersonalData(teamPersonalProgress) {
     _.each(AllTeams.teams, function (team) {

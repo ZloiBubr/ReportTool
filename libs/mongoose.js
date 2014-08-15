@@ -12,4 +12,4 @@ module.exports = mongoose;
 // Error handler
 mongoose.connection.on('error', function (err) {
     log.error(err)
-})
+});

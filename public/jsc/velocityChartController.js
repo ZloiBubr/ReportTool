@@ -13,16 +13,16 @@ function velocityChartController($scope, $resource, $window) {
         $scope.common = {};
 
         $scope.dataLoad();
-    }
+    };
 
     $scope.reInit = function () {
         $scope.dataLoad();
-    }
+    };
 
     $scope.dataLoad = function () {
         $.when($scope.getReportData())
             .done($scope.initCharts);
-    }
+    };
 
     // Original link to use setup chart directive
     // https://github.com/pablojim/highcharts-ng
@@ -44,7 +44,7 @@ function velocityChartController($scope, $resource, $window) {
             },
             loading: false
         }
-    }
+    };
 
     /* -------------------------------------------------------Event handlers ------------------------ */
     /* --------------------------------------------- Actions ------------------------------*/
@@ -60,14 +60,14 @@ function velocityChartController($scope, $resource, $window) {
             loadingDfrd.reject(err);
         };
 
-        velocitySeriesResource.get(getChartSuccess, getChartFail)
+        velocitySeriesResource.get(getChartSuccess, getChartFail);
         return loadingDfrd.promise();
-    }
+    };
 
     /* ------------------------------------------- DOM/Angular events --------------------------------------*/
     $scope.searchIssues = function () {
         $scope.reInit();
-    }
+    };
 
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
     $scope.jiraLabelsTeams = [

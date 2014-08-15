@@ -174,7 +174,7 @@ function moduleProgressController($scope, $resource, $window, $filter) {
     $scope.onDateChange = function()
     {
         $scope.reInit();
-    }
+    };
 
     $scope.onSelectDeselectAll = function()
     {

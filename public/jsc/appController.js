@@ -42,4 +42,4 @@ function appController($scope, $resource, $window) {
 
 myApp.run(function ($rootScope, $location) {
 
-})
+});

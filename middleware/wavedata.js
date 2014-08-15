@@ -12,7 +12,7 @@ exports.getData = function (req, res) {
         if (err) throw err;
         res.json(wavedata);
     });
-}
+};
 
 function waveData() {
     this.waves = [

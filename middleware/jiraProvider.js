@@ -177,7 +177,7 @@ function Step3ProcessPages(jira, callback) {
                 if (error) {
                     callback(error);
                 }
-                if (issue != null) {
+                else if (issue != null) {
                     SavePage(jira,issue, function (error, dbPage) {
                         if (error) {
                             callback(error);
@@ -204,7 +204,7 @@ function Step3ProcessPages(jira, callback) {
 function Step4ProcessBlockers(jira, callback) {
     var counter = 0;
     var lastProgress = 0;
-    var keys = Object.keys(linkedIssueUniqList)
+    var keys = Object.keys(linkedIssueUniqList);
     async.eachLimit(keys, 10, function (linkedIssueKey, callback2) {
             var currentProgress = Math.floor((++counter * 100) / keys.length);
             if (lastProgress != currentProgress) {
@@ -246,6 +246,9 @@ function CollectPagesFromJira(jira, full, moduleKey, callback) {
                     callback(err);
                 }
             );
+        }
+        else {
+            callback();
         }
     });
 }
@@ -315,7 +318,7 @@ function SaveLinkedIssue(linkedIssue, callback) {
         if (linkedIssue.fields.assignee != null)
             dbIssue.assignee = linkedIssue.fields.assignee.displayName;
 
-        dbIssue.pages = new Array();
+        dbIssue.pages = [];
         _.each(linkedIssueUniqList[linkedIssue.key].linkedPages, function (linkedPage) {
             dbIssue.pages.push({linkType: linkedPage.linkType, page: linkedPage._id});
         });

@@ -13,5 +13,5 @@ exports.getTeamName = function(labels) {
         return "TeamLiberty";
     if (labels.indexOf("TeamViva") > -1)
         return "TeamViva";
-}
+};
 

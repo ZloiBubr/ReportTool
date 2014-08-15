@@ -7,16 +7,16 @@ $scope.jiraId = $stateParams.id;
         $scope.common = {};
 
         $scope.dataLoad();
-    }
+    };;
 
     $scope.reInit = function () {
         $scope.dataLoad();
-    }
+    };;
 
     $scope.dataLoad = function () {
         $.when($scope.getPageData())
             .done($scope.initCharts);
-    }
+    };
 
     $scope.initCharts = function () {
 
@@ -36,7 +36,7 @@ $scope.jiraId = $stateParams.id;
             },
             loading: false
         }
-    }
+    };
 
     /* -------------------------------------------------------Event handlers ------------------------ */
     /* --------------------------------------------- Actions ------------------------------*/
@@ -54,14 +54,14 @@ $scope.jiraId = $stateParams.id;
         };
 
         var id = location.search.replace("?id=",'');
-        pageResource.get({pageid: $scope.jiraId }, getPageSuccess, getPageFail)
+        pageResource.get({pageid: $scope.jiraId }, getPageSuccess, getPageFail);
         return loadingDfrd.promise();
-    }
+    };
 
     /* ------------------------------------------- DOM/Angular events --------------------------------------*/
     $scope.searchIssues = function () {
         $scope.reInit();
-    }
+    };
 
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
 

@@ -17,7 +17,7 @@ var mailOptions = {
     subject: "Uncaught Error on server ✔", // Subject line
     text: "Error Happened ✔", // plaintext body
     html: "<b>Error Happened ✔</b>" // html body
-}
+};
 
 exports.sendMail = function(message, log) {
     mailOptions.text = message + "/n" + log;

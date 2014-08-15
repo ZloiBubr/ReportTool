@@ -56,7 +56,7 @@ a {
 }
 
 .progress_table_no_end_line > table:last-child {
-    margin-bottom: 0px;
+    margin-bottom: 0;
 }
 
 .no-padding td,
@@ -103,7 +103,7 @@ a {
 {
     display: inline-block;
     background: #3d3;
-    width: 0%;
+    width: 0;
     height: 28px;
 }
 

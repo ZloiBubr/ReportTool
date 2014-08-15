@@ -9,7 +9,7 @@ exports.getData = function (req, res) {
         if (err) throw err;
         res.json(velocity);
     });
-}
+};
 
 function parsePages(callback) {
     var velocity = new velocityModel();

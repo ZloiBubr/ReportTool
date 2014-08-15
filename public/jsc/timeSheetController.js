@@ -61,7 +61,7 @@ function timeSheetController($scope, $resource, $window, $filter, $modal,  $sce)
     $scope.onDateChange = function()
     {
         $scope.reInit();
-    }
+    };
 
     $scope.onCellClick = function(item) {
 
@@ -75,7 +75,7 @@ function timeSheetController($scope, $resource, $window, $filter, $modal,  $sce)
                 }
             }
         });
-    }
+    };
 
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
 
@@ -86,7 +86,7 @@ function timeSheetController($scope, $resource, $window, $filter, $modal,  $sce)
     $scope.getDeveloperTimeSheetLink = function(developerName){
         var firstLastNameList = developerName.split(" ");
         return "https://jira.epam.com/jira/secure/TempoUserBoard!timesheet.jspa?userId=" + firstLastNameList[0] + "_" + firstLastNameList[1];
-    }
+    };
 
     $scope.getDeveloperIndexNotEmpty = function(developers) {
 
@@ -115,12 +115,12 @@ function timeSheetController($scope, $resource, $window, $filter, $modal,  $sce)
         }
 
         return $sce.trustAsHtml("<span class='hour-timesheet-color'>" +  totalHR + "</span>" + "<sup style='color:black'>" + totalSP + "</sup>");
-    }
+    };
 
     $scope.isWeekend = function(progressDetail){
         var day = (new Date(progressDetail.date)).getDay();
         return day == 6 || day == 0;
-    }
+    };
 
 
 
