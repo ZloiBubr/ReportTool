@@ -329,7 +329,7 @@ function SaveLinkedIssue(linkedIssue, counter, callback) {
         });
 
         dbIssue.save(function (err) {
-            LogProgress(counter + ":" + linkedIssue.key + " : " + linkedIssue.fields.summary + " : Issue Collected");
+            LogProgress(counter + ":" + linkedIssue.key + " : Issue Collected");
             callback(err);
         });
     });
