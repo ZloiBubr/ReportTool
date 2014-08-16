@@ -48,18 +48,16 @@ function moduleProgressController($scope, $resource, $window, $filter) {
                 $scope.allModuleGroups.push({id: module.moduleGroup, name: module.moduleGroup});
             }
         });
-        _.each($scope.moduleProgressData.module, function(moduleProgressItem) {
-            _.each(moduleProgressItem.smenames, function(smeName) {
-                var found = false;
-                _.each($scope.allSMEs, function(sme) {
-                    if(sme.name == smeName) {
-                        found = true;
-                    }
-                });
-                if(!found) {
-                    $scope.allSMEs.push({id: smeName, name: smeName});
+        _.each($scope.moduleProgressData.module, function(item) {
+            var found = false;
+            _.each($scope.allSMEs, function(sme) {
+                if(sme.name == item.smename) {
+                    found = true;
                 }
             });
+            if(!found) {
+                $scope.allSMEs.push({id: item.smename, name: item.smename});
+            }
         });
         $scope.allModuleGroups.sort(function (a, b) {
             a = a.name;
