@@ -333,8 +333,10 @@ function ProcessBlockersFromJira(jira, linkedIssue, counter, callback) {
                 if (error || jiraLinkedIssue == null) {
                     LogProgress("Collect issues error happened!", error);
                     LogProgress("Restarting Loop for:"+linkedIssue.linkedIssueKey, error);
+                    callback();
                 }
                 else {
+                    loopError = false;
                     SaveLinkedIssue(jiraLinkedIssue, counter, callback);
                 }
             });
