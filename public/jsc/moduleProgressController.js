@@ -141,7 +141,7 @@ function moduleProgressController($scope, $resource, $window, $filter) {
 
     function sortModuleProgressData() {
         var getter =  $scope.sortingModel[$scope.sortingModel.selected].getter;
-        $scope.updatedModuleProgressData = $filter('orderBy')($scope.updatedModuleProgressData, getter, $scope.sortingModel.isASC);
+        $scope.updatedModuleProgressData = $filter('orderBy')($scope.updatedModuleProgressData, getter, !$scope.sortingModel.isASC);
     }
 
     /* -------------------------------------------------------Event handlers ------------------------ */
@@ -221,7 +221,7 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         },
 
         moduleGroup:{
-            getter: function(item){ return item.moduleGroup; }
+            getter: function(item){ return item.name; }
         }
     };
 

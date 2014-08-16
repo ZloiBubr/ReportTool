@@ -115,7 +115,7 @@ function IssuesLinkedToManyPagesController($scope, $resource, $window, $filter, 
     $scope.sortBlocksIssues = function()
     {
        var getter =  $scope.sortingModel[$scope.sortingModel.selected].getter;
-       $scope.IssuesLinkedToManyPagesList = $filter('orderBy')($scope.IssuesLinkedToManyPagesList, getter, $scope.sortingModel.isASC);
+       $scope.IssuesLinkedToManyPagesList = $filter('orderBy')($scope.IssuesLinkedToManyPagesList, getter, !$scope.sortingModel.isASC);
     };
 
 
