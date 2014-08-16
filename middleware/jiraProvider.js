@@ -113,6 +113,7 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
 
 function Step1CollectModules(jira, callback) {
     var requestString = "project = PLEX-UXC AND issuetype = epic AND summary ~ Module AND NOT summary ~ automation ORDER BY key ASC";
+//    var requestString = "project = PLEX-UXC AND key = PLEXUXC-681"; // for debug
     epicsList = [];
 
     UpdateProgress(0, "page");
@@ -192,7 +193,7 @@ function Step3ProcessPages(jira, callback) {
             ProcessPageFromJira(jira, issueKey, counter, callback);
         },
         function (err) {
-            callback(err);
+            callback();
         }
     );
 }
@@ -211,7 +212,7 @@ function Step4ProcessBlockers(jira, callback) {
             ProcessBlockersFromJira(jira, linkedIssue, counter, callback);
         },
         function (err) {
-            callback(err);
+            callback();
         }
     );
 }
@@ -387,7 +388,6 @@ function SaveLinkedIssue(linkedIssue, counter, callback) {
         });
 
         dbIssue.save(function (err) {
-            LogProgress(counter + ":" + linkedIssue.key + " : Issue Collected");
             callback(err);
         });
     });
