@@ -8,9 +8,6 @@ var _ = require('underscore');
 var statusExport = require('../public/jsc/models/statusList');
 var statusList = new statusExport.statuses();
 
-var epicDueDateMap = {};
-var epicAssigneeMap = {};
-
 exports.getData = function (req, res) {
     parsePages(function (moduledata) {
         res.json(moduledata);
@@ -18,31 +15,22 @@ exports.getData = function (req, res) {
 };
 
 function moduleData() {
-    this.moduleGroup = [
-            {
-                module: [
+    this.module = [
                     {
                         key: "",
                         reportedSP: 0,
                         summarySP: 0,
                         progress: 0,
                         teamnames: [],
-                        smenames: [],
+                        smename: "",
                         duedate: Date.parse("1/1/1970"),
                         accepted: false,
                         status: "",
                         name: "",
+                        moduleGroup: "",
                         uri: ""
                     }
-                ],
-                reportedSP: 0,
-                summarySP: 0,
-                progress: 0,
-                duedate: Date.parse("1/1/1970"),
-                name: "",
-                uri: ""
-            }
-        ];
+                ];
 }
 
 function getTeamName(labels) {
@@ -58,21 +46,8 @@ function getTeamName(labels) {
     return labels.substring(index+4,index2);
 }
 
-function getSMEName(labels) {
-    var index = labels.indexOf("SME_");
-    if(index < 0) {
-        return "";
-    }
-    var index2 = labels.indexOf(',', index);
-    if(index2 < 0) {
-        index2 = labels.length;
-    }
-
-    return labels.substring(index+4,index2);
-}
-
 function getModuleGroupName(labels) {
-    var groupName = "#UnknownModuleGroup";
+    var groupName = "Unknown Module Group";
     var index = labels.indexOf("PageModuleGroup_");
     if(index < 0) {
         return groupName;
@@ -88,81 +63,63 @@ function getModuleGroupName(labels) {
     return groupName;
 }
 
-function getModuleName(labels) {
-    var moduleName = "#UnknownModule";
-    var index = labels.indexOf("PageModule_");
-    if(index < 0) {
-        return moduleName;
-    }
-    var index2 = labels.indexOf(',', index);
-    if(index2 < 0) {
-        index2 = labels.length;
-    }
-
-    if(labels.substring(index+11,index2) != "") {
-        moduleName = labels.substring(index+11,index2);
-    }
-    return moduleName;
-}
-
 function SortData(moduledata) {
-    moduledata.moduleGroup.sort(function (a, b) {
+    moduledata.module.sort(function (a, b) {
         a = a.name;
         b = b.name;
         return a > b ? 1 : a < b ? -1 : 0;
-    });
-
-    _.each(moduledata.moduleGroup, function(group) {
-        group.module.sort(function (a, b) {
-            a = a.name;
-            b = b.name;
-            return a > b ? 1 : a < b ? -1 : 0;
-        });
     });
 }
 
 function parsePages(callback) {
     var moduledata = new moduleData();
-    moduledata.moduleGroup = [];
+    moduledata.module = [];
 
-    epicDueDateMap = {};
-    epicAssigneeMap = {};
 
     async.series([
         function (callback) {
             Module.find({}).exec(function(err, modules) {
-                async.each(modules, function(module, callback) {
-                    epicDueDateMap[module.key] = module.duedate == null ? null : module.duedate;
-                    epicAssigneeMap[module.key] = module.assignee;
-                    callback();
-                },
-                    function () {
-                        callback();
-                })
-            });
-        },
-        function (callback) {
-            Page.find({}).exec(function (err, pages) {
-                async.each(pages, function(page, callback) {
-                    var storyPoints = page.storyPoints == null ? 0 : parseFloat(page.storyPoints);
-                    var moduleGroup = getModuleGroupName(page.labels);
-                    var moduleName = getModuleName(page.labels);
-                    var teamName = getTeamName(page.labels);
-                    var progress = page.progress;
-                    var calcStoryPoints = storyPoints * progress / 100;
-                    var smeName = epicAssigneeMap[page.epicKey];//getSMEName(page.labels);
-                    var dueDate = epicDueDateMap[page.epicKey];
-                    var status = page.status;
-                    var resolution = page.resolution;
-                    status = status == 'Closed' && resolution == "Done" ? "Accepted" : status;
+                async.series([
+                    async.eachSeries(modules, function(module, callback) {
+                        Page.find({epicKey: module.key}).exec(function (err, pages) {
+                            if(pages != null && pages.length > 0) {
+                                async.eachSeries(pages, function(page, callback) {
+                                    var storyPoints = page.storyPoints == null ? 0 : parseFloat(page.storyPoints);
 
-                    putDataPoint(moduledata, status,
-                        moduleGroup, moduleName, teamName, smeName,
-                        calcStoryPoints, storyPoints, dueDate, page.epicKey);
+                                    var moduleGroup = getModuleGroupName(page.labels);
+                                    var teamName = getTeamName(page.labels);
+
+                                    var calcStoryPoints = storyPoints * page.progress / 100;
+
+                                    var status = page.status;
+                                    var resolution = page.resolution;
+                                    status = status == 'Closed' && resolution == "Done" ? "Accepted" : status;
+
+                                    putDataPoint(moduledata, status,
+                                        moduleGroup, module.summary, teamName, module.assignee,
+                                        calcStoryPoints, storyPoints, module.duedate, module.key);
+                                    callback();
+                                },
+                                function(err) {
+                                    callback();
+                                });
+                            }
+                            else {
+                                putDataPoint(moduledata, "Empty",
+                                    "Unknown Module Group", module.summary, "", module.assignee,
+                                    0, 0, module.duedate, module.key);
+                                callback();
+                            }
+                        })
+                    },
+                    function(err) {
+                        callback();
+                    })
+                ],
+                function(err) {
                     callback();
                 });
-                callback();
-            })
+            });
         },
         function () {
             SortData(moduledata);
@@ -174,47 +131,28 @@ function parsePages(callback) {
 function putDataPoint(moduledata, status,
                       moduleGroup, moduleName, teamName, smeName,
                       calcStoryPoints, storyPoints, dueDate, moduleKey) {
-    var initUri = "https://jira.epam.com/jira/issues/?jql=project%20%3D%20PLEX-UXC%20and%20issuetype%3DStory%20AND%20%22Story%20Points%22%20%3E%200%20and%20labels%20in%20(";
-
-    //module group
-    var moduleGroupd;
-    for (var k = 0; k < moduledata.moduleGroup.length; k++) {
-        if (moduledata.moduleGroup[k].name == moduleGroup) {
-            moduleGroupd = moduledata.moduleGroup[k];
-            break;
-        }
-    }
-    if(!moduleGroupd) {
-        moduleGroupd = { module: [], progress: 0, reportedSP: 0, summarySP: 0, name: moduleGroup, duedate: dueDate};
-        moduledata.moduleGroup.push(moduleGroupd);
-    }
-
-    moduleGroupd.reportedSP += calcStoryPoints;
-    moduleGroupd.summarySP += storyPoints;
-    moduleGroupd.progress = moduleGroupd.reportedSP*100/moduleGroupd.summarySP;
-    moduleGroupd.uri = initUri + "PageModuleGroup_" + moduleGroup + ")";
-    if(moduleGroupd.duedate < dueDate) {
-        moduleGroupd.duedate = dueDate;
-    }
+    var initUri = "https://jira.epam.com/jira/issues/?filter=49703&jql=project%20%3D%20PLEX-UXC%20and%20issuetype%3DEpic%20AND%20summary%20~%20'";
 
     //module
     var moduled;
-    for (var k = 0; k < moduleGroupd.module.length; k++) {
-        if (moduleGroupd.module[k].name == moduleName) {
-            moduled = moduleGroupd.module[k];
+    for (var k = 0; k < moduledata.module.length; k++) {
+        if (moduledata.module[k].name == moduleName) {
+            moduled = moduledata.module[k];
             break;
         }
     }
     if(!moduled) {
         moduled = { progress: 0, reportedSP: 0, summarySP: 0,
-            name: moduleName, duedate: dueDate, smenames: [], teamnames: [], key: moduleKey, accepted: status == "Accepted", status: status};
-        moduleGroupd.module.push(moduled);
+            name: moduleName, duedate: dueDate, smename: smeName,
+            teamnames: [], key: moduleKey,
+            accepted: status == "Accepted", status: status};
+        moduledata.module.push(moduled);
     }
 
     moduled.reportedSP += calcStoryPoints;
     moduled.summarySP += storyPoints;
     moduled.progress = moduled.reportedSP*100/moduled.summarySP;
-    moduled.uri = initUri + "PageModule_" + moduleName + ") AND labels in(PageModuleGroup_" + moduleGroup + ")";
+    moduled.uri = initUri + moduleName + "'";
     moduled.moduleGroup = moduleGroup;
     moduled.accepted = moduled.accepted ? status == "Accepted" : false;
 
@@ -226,28 +164,15 @@ function putDataPoint(moduledata, status,
         moduled.status = status;
     }
 
-    if(smeName != "") {
-        var found = false;
-        _.each(moduled.smenames, function(smename) {
-            if(smename == smeName) {
-                found = true;
-            }
-        });
-
-        if(!found) {
-            moduled.smenames.push(smeName);
-        }
-    }
-
     if(teamName != "") {
-        var found = false;
+        var foundt = false;
         _.each(moduled.teamnames, function(teamname) {
             if(teamname == teamName) {
-                found = true;
+                foundt = true;
             }
         });
 
-        if(!found) {
+        if(!foundt) {
             moduled.teamnames.push(teamName);
         }
     }

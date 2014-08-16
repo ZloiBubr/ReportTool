@@ -29,7 +29,11 @@
                             <span ng-show="sortingModel.isASC">▴</span>
                             <span ng-show="!sortingModel.isASC">▾</span>
                         </span></th>
-                    <th>SMEs</th>
+                    <th class="sorted_column" ng-click="onSortingClick('smeName')"><span class="glyphicon glyphicon-sort" style="font-size: 8pt"></span> SME
+                        <span ng-show="sortingModel.selected == 'smeName'">&nbsp;
+                            <span ng-show="sortingModel.isASC">▴</span>
+                            <span ng-show="!sortingModel.isASC">▾</span>
+                        </span></th>
                     <th class="sorted_column" ng-click="onSortingClick('moduleGroup')"><span class="glyphicon glyphicon-sort" style="font-size: 8pt"></span> Link
                         <span ng-show="sortingModel.selected == 'moduleGroup'">&nbsp;
                             <span ng-show="sortingModel.isASC">▴</span>
@@ -50,11 +54,7 @@
                     </td>
                     <td>
                         <table>
-                            <tr ng-repeat = "sme in module.smenames">
-                                <td class="table_cell_border">
-                                    <div>{{sme}}</div>
-                                </td>
-                            </tr>
+                            <div>{{module.smename}}</div>
                         </table>
                     </td>
                     <td ng-class="{red: isUnknownExist(module.name),

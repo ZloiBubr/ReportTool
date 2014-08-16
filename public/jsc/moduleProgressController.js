@@ -86,46 +86,44 @@ function moduleProgressController($scope, $resource, $window, $filter) {
             return a > b ? 1 : a < b ? -1 : 0;
         });
 
-        _.each($scope.moduleProgressData.moduleGroup, function(groupProgressItem) {
-            if($scope.filteredMG != $scope.allModuleGroups[0].id && groupProgressItem.name != $scope.filteredMG){
+        _.each($scope.moduleProgressData.module, function(moduleProgressItem) {
+            if($scope.filteredMG != $scope.allModuleGroups[0].id && moduleProgressItem.moduleGroup != $scope.filteredMG){
                 return;
             }
-            _.each(groupProgressItem.module, function(moduleProgressItem) {
-                if($scope.filteredSme != $scope.allSMEs[0].id && moduleProgressItem.smenames.indexOf($scope.filteredSme) < 0){
-                    return;
-                }
-                if($scope.filteredTeam != $scope.allTeams[0].id && moduleProgressItem.teamnames.indexOf($scope.filteredTeam) < 0){
-                    return;
-                }
-                moduleProgressItem.progress = Math.round(moduleProgressItem.progress);
-                moduleProgressItem.progress2 = moduleProgressItem.progress.toString() + "%";
+            if($scope.filteredSme != $scope.allSMEs[0].id && moduleProgressItem.smename != $scope.filteredSme){
+                return;
+            }
+            if($scope.filteredTeam != $scope.allTeams[0].id && moduleProgressItem.teamnames.indexOf($scope.filteredTeam) < 0){
+                return;
+            }
+            moduleProgressItem.progress = Math.round(moduleProgressItem.progress);
+            moduleProgressItem.progress2 = moduleProgressItem.progress.toString() + "%";
 
-                moduleProgressItem.duedate2 = moduleProgressItem.duedate;
-                moduleProgressItem.acceptedName = moduleProgressItem.accepted ? "Yes" : "No";
+            moduleProgressItem.duedate2 = moduleProgressItem.duedate;
+            moduleProgressItem.acceptedName = moduleProgressItem.accepted ? "Yes" : "No";
 
-                var accepted = moduleProgressItem.status == "Accepted";
-                var readyForQa = moduleProgressItem.status == "Ready for QA" || moduleProgressItem.status == "Testing in Progress";
-                var resolved = moduleProgressItem.status == "Resolved";
+            var accepted = moduleProgressItem.status == "Accepted";
+            var readyForQa = moduleProgressItem.status == "Ready for QA" || moduleProgressItem.status == "Testing in Progress";
+            var resolved = moduleProgressItem.status == "Resolved";
 
-                moduleProgressItem.readyForQA = readyForQa;
-                moduleProgressItem.readyForAcceptance = resolved;
+            moduleProgressItem.readyForQA = readyForQa;
+            moduleProgressItem.readyForAcceptance = resolved;
 
-                var acceptedEntity = $scope.total.getStatusByName("Accepted");
-                processEntity(acceptedEntity, accepted, $scope.updatedModuleProgressData, moduleProgressItem);
-                var readyForQaEntity = $scope.total.getStatusByName("Ready for QA");
-                processEntity(readyForQaEntity, readyForQa, $scope.updatedModuleProgressData, moduleProgressItem);
-                var resolvedEntity = $scope.total.getStatusByName("Resolved");
-                processEntity(resolvedEntity, resolved, $scope.updatedModuleProgressData, moduleProgressItem);
-                var inProgressEntity = $scope.total.getStatusByName("In Progress");
-                processEntity(inProgressEntity, !accepted && !resolved && !readyForQa, $scope.updatedModuleProgressData, moduleProgressItem);
+            var acceptedEntity = $scope.total.getStatusByName("Accepted");
+            processEntity(acceptedEntity, accepted, $scope.updatedModuleProgressData, moduleProgressItem);
+            var readyForQaEntity = $scope.total.getStatusByName("Ready for QA");
+            processEntity(readyForQaEntity, readyForQa, $scope.updatedModuleProgressData, moduleProgressItem);
+            var resolvedEntity = $scope.total.getStatusByName("Resolved");
+            processEntity(resolvedEntity, resolved, $scope.updatedModuleProgressData, moduleProgressItem);
+            var inProgressEntity = $scope.total.getStatusByName("In Progress");
+            processEntity(inProgressEntity, !accepted && !resolved && !readyForQa, $scope.updatedModuleProgressData, moduleProgressItem);
 
-                if(!$scope.isTotalWasCalculated) {
-                    $scope.total.total++;
-                }
-            });
+            if(!$scope.isTotalWasCalculated) {
+                $scope.total.total++;
+            }
         });
 
-        $scope.updatedModuleProgressData = $filter('orderBy')($scope.updatedModuleProgressData, $scope.sortingModel.dueDate.getter, $scope.sortingModel.isASC);
+        $scope.updatedModuleProgressData = $filter('orderBy')($scope.updatedModuleProgressData, $scope.sortingModel.dueDate.getter, !$scope.sortingModel.isASC);
 
         $scope.isTotalWasCalculated = true;
     };
@@ -222,6 +220,10 @@ function moduleProgressController($scope, $resource, $window, $filter) {
 
         moduleGroup:{
             getter: function(item){ return item.name; }
+        },
+
+        smeName:{
+            getter: function(item){ return item.smename; }
         }
     };
 
