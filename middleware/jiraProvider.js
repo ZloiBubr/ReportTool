@@ -87,7 +87,7 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
         //step 4
         function (callback) {
             // process linked issues pages
-            LogProgress("**** Step 4: process " + linkedIssueUniqList.length + " blockers");
+            LogProgress("**** Step 4: process blockers");
             Step4ProcessBlockers(jira, callback);
         },
         //step 5
