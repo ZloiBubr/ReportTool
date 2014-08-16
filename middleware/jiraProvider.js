@@ -336,7 +336,6 @@ function ProcessBlockersFromJira(jira, linkedIssue, counter, callback) {
                 }
                 else {
                     SaveLinkedIssue(jiraLinkedIssue, counter, callback);
-                    callback();
                 }
             });
         },
