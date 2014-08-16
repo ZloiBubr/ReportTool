@@ -45,7 +45,7 @@ function moduleProgressController($scope, $resource, $window, $filter) {
                 }
             });
             if(!found) {
-                $scope.allModuleGroups.push({id: group.name, name: group.name});
+                $scope.allModuleGroups.push({id: module.moduleGroup, name: module.moduleGroup});
             }
         });
         _.each($scope.moduleProgressData.module, function(moduleProgressItem) {
