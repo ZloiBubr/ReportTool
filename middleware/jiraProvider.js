@@ -45,7 +45,7 @@ var LogProgress = function (text, error) {
         log.error(error);
         if (response) {
             response.write("event: errmessage\n");
-            var errorText = error == null ? "" : error.message == null ? error : error.message;
+            var errorText = error == null ? "not evaluated" : error.message == null ? error : error.message;
             response.write("data: " + text + ", reason - " + errorText + "\n\n");
         }
     }
@@ -332,14 +332,18 @@ function ProcessBlockersFromJira(jira, linkedIssue, counter, callback) {
         },
         function(callback) {
             jira.findIssue(linkedIssue.linkedIssueKey, function (error, jiraLinkedIssue) {
-                if (error || jiraLinkedIssue == null) {
+                if (error) {
                     LogProgress("Collect issues error happened!", error);
                     LogProgress("Restarting Loop for:"+linkedIssue.linkedIssueKey, error);
                     callback();
                 }
-                else {
+                else if(jiraLinkedIssue != null) {
                     loopError = false;
                     SaveLinkedIssue(jiraLinkedIssue, counter, callback);
+                }
+                else {
+                    loopError = false;
+                    callback();
                 }
             });
         },
