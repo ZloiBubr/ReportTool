@@ -45,7 +45,7 @@ var LogProgress = function (text, error) {
         log.error(error);
         if (response) {
             response.write("event: errmessage\n");
-            var errorText = error == null ? "" : error.message;
+            var errorText = error == null ? "" : error.message == null ? error : error.message;
             response.write("data: " + text + ", reason - " + errorText + "\n\n");
         }
     }
