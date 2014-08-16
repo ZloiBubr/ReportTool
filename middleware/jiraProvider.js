@@ -231,6 +231,7 @@ function CollectPagesFromJira(jira, full, moduleKey, callback) {
                 if (error) {
                     LogProgress("Collect pages error happened!", error);
                     LogProgress("Restarting Loop for: "+moduleKey, error);
+                    callback();
                 }
                 if (stories != null) {
                     async.eachSeries(stories.issues, function (story, callback) {
@@ -272,6 +273,7 @@ function ProcessPageFromJira(jira, issueKey, counter, callback) {
                 if (error) {
                     LogProgress("Collect pages error happened!", error);
                     LogProgress("Restarting Loop for: "+issueKey, error);
+                    callback();
                 }
                 else if (issue != null) {
                     SavePage(jira, issue, function (error, dbPage) {
