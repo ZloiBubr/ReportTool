@@ -9,6 +9,7 @@ var statusExport = require('../public/jsc/models/statusList');
 var statusList = new statusExport.statuses();
 
 var epicDueDateMap = {};
+var epicAssigneeMap = {};
 
 exports.getData = function (req, res) {
     parsePages(function (moduledata) {
@@ -125,11 +126,14 @@ function parsePages(callback) {
     moduledata.moduleGroup = [];
 
     epicDueDateMap = {};
+    epicAssigneeMap = {};
+
     async.series([
         function (callback) {
             Module.find({}).exec(function(err, modules) {
                 async.each(modules, function(module, callback) {
                     epicDueDateMap[module.key] = module.duedate == null ? null : module.duedate;
+                    epicAssigneeMap[module.key] = module.assignee;
                     callback();
                 },
                     function () {
@@ -146,7 +150,7 @@ function parsePages(callback) {
                     var teamName = getTeamName(page.labels);
                     var progress = page.progress;
                     var calcStoryPoints = storyPoints * progress / 100;
-                    var smeName = getSMEName(page.labels);
+                    var smeName = epicAssigneeMap[page.epicKey];//getSMEName(page.labels);
                     var dueDate = epicDueDateMap[page.epicKey];
                     var status = page.status;
                     var resolution = page.resolution;

@@ -8,7 +8,8 @@ var schema = new Schema({
     key:        { type: String, unique: true, index: true },
     summary:    { type: String },
     created:    { type: Date, default: Date.now() },
-    duedate:    { type: Date }
+    duedate:    { type: Date },
+    assignee:   { type: String }
 });
 
 exports.Module = mongoose.model('Module', schema);

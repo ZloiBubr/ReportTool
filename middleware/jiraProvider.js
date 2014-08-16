@@ -26,8 +26,10 @@ exports.rememberResponse = function (res) {
 };
 
 var UpdateProgress = function (progress, type) {
-    response.write("event: progress\n");
-    response.write('data: {"' + type + '":' + progress.toString() + '}\n\n');
+    if(response != null) {
+        response.write("event: progress\n");
+        response.write('data: {"' + type + '":' + progress.toString() + '}\n\n');
+    }
     if (progress > 0) {
         LogProgress("**********" + type + " Progress " + progress.toString() + "% **********");
     }
@@ -43,9 +45,8 @@ var LogProgress = function (text, error) {
         log.error(error);
         if (response) {
             response.write("event: errmessage\n");
-            response.write("data: " + text + "\n\n");
-            response.write("event: errmessage\n");
-            response.write("data: " + error.message + "\n\n");
+            var errorText = error == null ? "" : error.message;
+            response.write("data: " + text + ", reason - " + errorText + "\n\n");
         }
     }
     else {
@@ -58,14 +59,10 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
         callback();
     }
 
-    issuesList = [];
-    epicsList = [];
-    linkedIssueUniqList = {};
-    epicIssueMap = {};
     updateInProgress = true;
 
-
     LogProgress("**** Step 0: async processing");
+
     var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), jiraUser, jiraPassword, '2');
 
     async.series([
@@ -116,50 +113,66 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
 
 function Step1CollectModules(jira, callback) {
     var requestString = "project = PLEX-UXC AND issuetype = epic AND summary ~ Module AND NOT summary ~ automation ORDER BY key ASC";
+    epicsList = [];
 
     UpdateProgress(0, "page");
     UpdateProgress(0, "issues");
 
-    jira.searchJira(requestString, { fields: ["summary", "duedate"] }, function (error, epics) {
-        if (error) {
-            callback(error);
+    var loopError = true;
+    async.whilst(function() {
+            return loopError;
+        },
+        function(callback) {
+        jira.searchJira(requestString, { fields: ["summary", "duedate", "assignee"] }, function (error, epics) {
+            if (error) {
+                callback(error);
+            }
+            if (epics != null) {
+                async.eachSeries(epics.issues, function (epic, callback) {
+                        Module.findOne({ key: epic.key }, function (err, module) {
+                            if (!module) {
+                                module = new Module();
+                            }
+                            module.key = epic.key;
+                            module.summary = epic.fields.summary;
+                            module.duedate = epic.fields.duedate == null ? null : new Date(epic.fields.duedate);
+                            module.assignee = epic.fields.assignee == null ? "Unassigned" : epic.fields.assignee.name;
+                            module.save(function () {
+                                epicsList.push(epic.key);
+                                LogProgress(epic.key + " : " + " Module Collected");
+                                callback();
+                            })
+                        });
+                    },
+                    function (err) {
+                        if (err) {
+                            LogProgress("Collect modules error happened!", err);
+                        }
+                        LogProgress(epicsList.length + " : " + " Modules Collected");
+                        if(err == null) {
+                            loopError = false;
+                        }
+                        callback(err);
+                    });
+            }
+        });
+    },
+    function(err) {
+        if(err) {
+            LogProgress("Restarting Loop");
         }
-        if (epics != null) {
-            async.eachSeries(epics.issues, function (epic, callback) {
-                Module.findOne({ key: epic.key }, function (err, module) {
-                    if (!module) {
-                        module = new Module();
-                    }
-                    module.key = epic.key;
-                    module.summary = epic.fields.summary;
-                    module.duedate = epic.fields.duedate == null ? null : new Date(epic.fields.duedate);
-                    module.save(function () {
-                        epicsList.push(epic.key);
-                        LogProgress(epic.key + " : " + " Module Collected");
-                        callback();
-                    })
-                });
-            },
-            function (err) {
-                if (err) {
-                    LogProgress("Collect modules error happened!", err);
-                }
-                LogProgress(epicsList.length + " : " + " Modules Collected");
-                callback(err);
-            });
-        }
+        callback(err);
     });
 }
 
 function Step2CollectPages(jira, full, callback) {
+    issuesList = [];
+    epicIssueMap = {};
+
     async.eachLimit(epicsList, 10, function (epic, callback) {
-            LogProgress("**** collect pages for module: " + epic);
             CollectPagesFromJira(jira, full, epic, callback);
         },
         function (err) {
-            if (err) {
-                LogProgress("Collecting pages error happened!", err);
-            }
             callback(err);
         }
     );
@@ -168,6 +181,8 @@ function Step2CollectPages(jira, full, callback) {
 function Step3ProcessPages(jira, callback) {
     var counter = 0;
     var lastProgress = 0;
+    linkedIssueUniqList = {};
+
     async.eachLimit(issuesList, 10, function (issueKey, callback) {
             var currentProgress = Math.floor((++counter * 100) / issuesList.length);
             if (lastProgress != currentProgress) {
@@ -177,9 +192,6 @@ function Step3ProcessPages(jira, callback) {
             ProcessPageFromJira(jira, issueKey, counter, callback);
         },
         function (err) {
-            if (err) {
-                LogProgress("Processing pages error happened!", err);
-            }
             callback(err);
         }
     );
@@ -199,9 +211,6 @@ function Step4ProcessBlockers(jira, callback) {
             ProcessBlockersFromJira(jira, linkedIssue, counter, callback);
         },
         function (err) {
-            if (err) {
-                LogProgress("Processing blockers Issue/Question/Bug error happened!", err);
-            }
             callback(err);
         }
     );
@@ -212,50 +221,79 @@ function CollectPagesFromJira(jira, full, moduleKey, callback) {
         util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s)", moduleKey) :
         util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s) AND updated > -3d", moduleKey);
 
-    jira.searchJira(queryString, { fields: ["summary"] }, function (error, stories) {
-        if (error) {
-            callback(error);
-        }
-        if (stories != null) {
-            async.eachSeries(stories.issues, function (story, callback) {
-                    issuesList.push(story.key);
-                    epicIssueMap[story.key] = moduleKey;
-                    LogProgress(story.key + " : " + " : Page Collected");
-                    callback();
-                },
-                function (err) {
-                    if (err) {
-                        LogProgress("Collect pages error happened!", err);
-                    }
-                    callback(err);
+    var loopError = true;
+    async.whilst(function() {
+            return loopError;
+        },
+        function(callback) {
+            LogProgress("**** collect pages for module: " + moduleKey);
+            jira.searchJira(queryString, { fields: ["summary"] }, function (error, stories) {
+                if (error) {
+                    LogProgress("Collect pages error happened!", error);
+                    LogProgress("Restarting Loop for: "+moduleKey, error);
                 }
-            );
-        }
-        else {
+                if (stories != null) {
+                    async.eachSeries(stories.issues, function (story, callback) {
+                            issuesList.push(story.key);
+                            epicIssueMap[story.key] = moduleKey;
+                            callback();
+                        },
+                        function (err) {
+                            if (err) {
+                                LogProgress("Restarting Loop for:"+story.key, err);
+                            }
+                            else {
+                                loopError = false;
+                            }
+                            callback();
+                        }
+                    );
+                }
+                else {
+                    loopError = false;
+                    callback();
+                }
+            });
+        },
+        function(err) {
+            LogProgress(moduleKey + " : " + " : Page Collected");
             callback();
         }
-    });
+    );
 }
 
 function ProcessPageFromJira(jira, issueKey, counter, callback) {
-    jira.findIssue(issueKey + "?expand=changelog", function (error, issue) {
-        if (error) {
-            callback(error);
-        }
-        else if (issue != null) {
-            SavePage(jira, issue, function (error, dbPage) {
+    var loopError = true;
+    async.whilst(function() {
+            return loopError;
+        },
+        function(callback) {
+            jira.findIssue(issueKey + "?expand=changelog", function (error, issue) {
                 if (error) {
-                    callback(error);
+                    LogProgress("Collect pages error happened!", error);
+                    LogProgress("Restarting Loop for: "+issueKey, error);
                 }
-                LogProgress(counter + ":" + issue.key + " : Page Collected");
-                ProcessLinkedIssues(issue, dbPage);
-                callback();
+                else if (issue != null) {
+                    SavePage(jira, issue, function (error, dbPage) {
+                        if (error) {
+                            LogProgress("Restarting Loop for:"+issueKey, error);
+                        }
+                        ProcessLinkedIssues(issue, dbPage);
+                        loopError = false;
+                        callback();
+                    });
+                }
+                else {
+                    loopError = false;
+                    callback();
+                }
             });
-        }
-        else {
+        },
+        function(err) {
+            LogProgress(counter + ":" + issueKey + " : Page Collected");
             callback();
         }
-    });
+    );
 }
 
 function ProcessLinkedIssues(issue, dbPage) {
@@ -286,14 +324,26 @@ function ProcessLinkedIssues(issue, dbPage) {
 }
 
 function ProcessBlockersFromJira(jira, linkedIssue, counter, callback) {
-    jira.findIssue(linkedIssue.linkedIssueKey, function (error, jiraLinkedIssue) {
-        if (error || jiraLinkedIssue == null) {
-            callback(error);
+    var loopError = true;
+    async.whilst(function() {
+            return loopError;
+        },
+        function(callback) {
+            jira.findIssue(linkedIssue.linkedIssueKey, function (error, jiraLinkedIssue) {
+                if (error || jiraLinkedIssue == null) {
+                    LogProgress("Collect issues error happened!", error);
+                    LogProgress("Restarting Loop for:"+linkedIssue.linkedIssueKey, error);
+                }
+                else {
+                    SaveLinkedIssue(jiraLinkedIssue, counter, callback);
+                }
+            });
+        },
+        function(err) {
+            LogProgress(counter + ":" + linkedIssue.linkedIssueKey + " : Issue Collected");
+            callback();
         }
-        else {
-            SaveLinkedIssue(jiraLinkedIssue, counter, callback);
-        }
-    });
+    );
 }
 
 function SaveLinkedIssue(linkedIssue, counter, callback) {
