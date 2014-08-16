@@ -37,10 +37,10 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         $scope.total.pages = 0;
         $scope.updatedModuleProgressData=[];
         //fill in groups and sme combos
-        _.each($scope.moduleProgressData.moduleGroup, function(group) {
+        _.each($scope.moduleProgressData.module, function(module) {
             var found = false;
             _.each($scope.allModuleGroups, function(it_group) {
-                if(it_group.name == group.name) {
+                if(it_group.name == module.moduleGroup) {
                     found = true;
                 }
             });
@@ -48,20 +48,18 @@ function moduleProgressController($scope, $resource, $window, $filter) {
                 $scope.allModuleGroups.push({id: group.name, name: group.name});
             }
         });
-        _.each($scope.moduleProgressData.moduleGroup, function(groupProgressItem) {
-            _.each(groupProgressItem.module, function(moduleProgressItem) {
-                _.each(moduleProgressItem.smenames, function(smeName) {
-                    var found = false;
-                    _.each($scope.allSMEs, function(sme) {
-                        if(sme.name == smeName) {
-                            found = true;
-                        }
-                    });
-                    if(!found) {
-                        $scope.allSMEs.push({id: smeName, name: smeName});
+        _.each($scope.moduleProgressData.module, function(moduleProgressItem) {
+            _.each(moduleProgressItem.smenames, function(smeName) {
+                var found = false;
+                _.each($scope.allSMEs, function(sme) {
+                    if(sme.name == smeName) {
+                        found = true;
                     }
                 });
-            })
+                if(!found) {
+                    $scope.allSMEs.push({id: smeName, name: smeName});
+                }
+            });
         });
         $scope.allModuleGroups.sort(function (a, b) {
             a = a.name;
