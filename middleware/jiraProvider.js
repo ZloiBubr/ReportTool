@@ -92,8 +92,8 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
         },
         //step 5
         function (callback) {
-            LogProgress("**** Step 5: Update End");
-            response.end();
+//            LogProgress("**** Step 5: Update End");
+//            response.end();
             updateInProgress = false;
             callback();
         }
