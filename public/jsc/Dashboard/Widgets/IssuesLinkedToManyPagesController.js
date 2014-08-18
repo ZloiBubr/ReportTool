@@ -23,7 +23,6 @@ function IssuesLinkedToManyPagesController($scope, $resource, $window, $filter, 
     };
 
     $scope.prepareData = function () {
-        console.log($scope.issueData);
         _.each($scope.issueData, function (item) {
             var linkedPagesResult = processLinkedPages(item);
             processLabels(item);
@@ -84,7 +83,7 @@ function IssuesLinkedToManyPagesController($scope, $resource, $window, $filter, 
         var itemDate = new Date(item.updated);
         itemDate.setHours(12,0,0);
 
-        return Math.round(($scope.nowDate - itemDate) / 8.64e7);
+        return Math.round(($scope.nowDate.getTime() - itemDate.getTime()) / 8.64e7);
     };
 
     /* -------------------------------------------------------Event handlers ------------------------ */
