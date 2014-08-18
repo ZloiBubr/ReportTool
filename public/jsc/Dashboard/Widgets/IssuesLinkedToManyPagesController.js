@@ -64,7 +64,6 @@ function IssuesLinkedToManyPagesController($scope, $resource, $window, $filter, 
                 result.teamsInvolved.push(linkedPageItem.page.team)
             }
         });
-
         return result;
     };
 
@@ -80,7 +79,11 @@ function IssuesLinkedToManyPagesController($scope, $resource, $window, $filter, 
     };
 
     var getLastUpdateDays = function (item) {
-        var itemDate = new Date(item.updated);
+        if(typeof(item.updated) != "string") {
+            return;
+        }
+
+        var itemDate = new Date(item.updated.substring(0,10).replace(/-/g, "/"));
         itemDate.setHours(12,0,0);
 
         return Math.round(($scope.nowDate.getTime() - itemDate.getTime()) / 8.64e7);
@@ -132,7 +135,7 @@ function IssuesLinkedToManyPagesController($scope, $resource, $window, $filter, 
 
     $scope.sortingModel = {
         selected: "blockers",
-        isASC : true,
+        isASC : false,
 
         blockers:{
             getter: function(item){return item.blockersCount;}
