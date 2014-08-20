@@ -95,9 +95,7 @@ function parsePages(callback) {
                                     var resolution = page.resolution;
                                     status = status == 'Closed' && resolution == "Done" ? "Accepted" : status;
 
-                                    putDataPoint(moduledata, status,
-                                        moduleGroup, module.summary, teamName, module.assignee,
-                                        calcStoryPoints, storyPoints, module.duedate, module.key);
+                                    putDataPoint(moduledata, status, moduleGroup, teamName, calcStoryPoints, storyPoints, module);
                                     callback();
                                 },
                                 function(err) {
@@ -105,9 +103,8 @@ function parsePages(callback) {
                                 });
                             }
                             else {
-                                putDataPoint(moduledata, "Empty",
-                                    "Unknown Module Group", module.summary, "", module.assignee,
-                                    0, 0, module.duedate, module.key);
+                                putDataPoint(moduledata, "Empty", "Unknown Module Group", "", 0, 0, module);
+                                log.info(module.summary);
                                 callback();
                             }
                         })
@@ -128,23 +125,21 @@ function parsePages(callback) {
     ]);
 }
 
-function putDataPoint(moduledata, status,
-                      moduleGroup, moduleName, teamName, smeName,
-                      calcStoryPoints, storyPoints, dueDate, moduleKey) {
+function putDataPoint(moduledata, status, moduleGroup, teamName, calcStoryPoints, storyPoints, module) {
     var initUri = "https://jira.epam.com/jira/issues/?jql=project%20%3D%20PLEX-UXC%20and%20issuetype%3DEpic%20AND%20summary%20~%20'";
 
     //module
     var moduled;
     for (var k = 0; k < moduledata.module.length; k++) {
-        if (moduledata.module[k].name == moduleName) {
+        if (moduledata.module[k].key == module.key) {
             moduled = moduledata.module[k];
             break;
         }
     }
     if(!moduled) {
         moduled = { progress: 0, reportedSP: 0, summarySP: 0,
-            name: moduleName, duedate: dueDate, smename: smeName,
-            teamnames: [], key: moduleKey,
+            name: module.summary, duedate: module.dueDate, smename: module.assignee,
+            teamnames: [], key: module.key,
             accepted: status == "Accepted", status: status};
         moduledata.module.push(moduled);
     }
@@ -152,7 +147,7 @@ function putDataPoint(moduledata, status,
     moduled.reportedSP += calcStoryPoints;
     moduled.summarySP += storyPoints;
     moduled.progress = moduled.reportedSP*100/moduled.summarySP;
-    moduled.uri = initUri + moduleName + "'";
+    moduled.uri = initUri + module.summary + "'";
     moduled.moduleGroup = moduleGroup;
     moduled.accepted = moduled.accepted ? status == "Accepted" : false;
 
