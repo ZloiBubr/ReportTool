@@ -131,7 +131,7 @@ function parsePages(callback) {
 function putDataPoint(moduledata, status,
                       moduleGroup, moduleName, teamName, smeName,
                       calcStoryPoints, storyPoints, dueDate, moduleKey) {
-    var initUri = "https://jira.epam.com/jira/issues/?filter=49703&jql=project%20%3D%20PLEX-UXC%20and%20issuetype%3DEpic%20AND%20summary%20~%20'";
+    var initUri = "https://jira.epam.com/jira/issues/?jql=project%20%3D%20PLEX-UXC%20and%20issuetype%3DEpic%20AND%20summary%20~%20'";
 
     //module
     var moduled;
