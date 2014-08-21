@@ -26,8 +26,11 @@ function moduleData() {
                         duedate: Date.parse("1/1/1970"),
                         accepted: false,
                         status: "",
+                        modulestatus: "",
+                        moduleresolution: "",
                         name: "",
                         moduleGroup: "",
+                        pagescount: 0,
                         uri: ""
                     }
                 ];
@@ -81,7 +84,8 @@ function parsePages(callback) {
             Module.find({}).exec(function(err, modules) {
                 async.series([
                     async.eachSeries(modules, function(module, callback) {
-                        Page.find({epicKey: module.key}).exec(function (err, pages) {
+                            var count = 0;
+                            Page.find({epicKey: module.key}).exec(function (err, pages) {
                             if(pages != null && pages.length > 0) {
                                 async.eachSeries(pages, function(page, callback) {
                                     var storyPoints = page.storyPoints == null ? 0 : parseFloat(page.storyPoints);
@@ -95,7 +99,7 @@ function parsePages(callback) {
                                     var resolution = page.resolution;
                                     status = status == 'Closed' && resolution == "Done" ? "Accepted" : status;
 
-                                    putDataPoint(moduledata, status, moduleGroup, teamName, calcStoryPoints, storyPoints, module);
+                                    putDataPoint(moduledata, status, moduleGroup, teamName, calcStoryPoints, storyPoints, ++count, module);
                                     callback();
                                 },
                                 function(err) {
@@ -103,8 +107,7 @@ function parsePages(callback) {
                                 });
                             }
                             else {
-                                putDataPoint(moduledata, "Empty", "Unknown Module Group", "", 0, 0, module);
-                                log.info(module.summary);
+                                putDataPoint(moduledata, "Empty", "Unknown Module Group", "", 0, 0, count, module);
                                 callback();
                             }
                         })
@@ -125,7 +128,7 @@ function parsePages(callback) {
     ]);
 }
 
-function putDataPoint(moduledata, status, moduleGroup, teamName, calcStoryPoints, storyPoints, module) {
+function putDataPoint(moduledata, status, moduleGroup, teamName, calcStoryPoints, storyPoints, count, module) {
     var initUri = "https://jira.epam.com/jira/issues/?jql=project%20%3D%20PLEX-UXC%20and%20issuetype%3DEpic%20AND%20summary%20~%20'";
 
     //module
@@ -140,7 +143,8 @@ function putDataPoint(moduledata, status, moduleGroup, teamName, calcStoryPoints
         moduled = { progress: 0, reportedSP: 0, summarySP: 0,
             name: module.summary, duedate: module.duedate, smename: module.assignee,
             teamnames: [], key: module.key,
-            accepted: status == "Accepted", status: status};
+            accepted: status == "Accepted", status: status,
+            modulestatus: module.status, moduleresolution: module.resolution };
         moduledata.module.push(moduled);
     }
 
@@ -150,6 +154,7 @@ function putDataPoint(moduledata, status, moduleGroup, teamName, calcStoryPoints
     moduled.uri = initUri + module.summary + "'";
     moduled.moduleGroup = moduleGroup;
     moduled.accepted = moduled.accepted ? status == "Accepted" : false;
+    moduled.pagescount = count;
 
 
     var moduleStatus = statusList.getStatusByName(moduled.status);
