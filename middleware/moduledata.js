@@ -138,7 +138,7 @@ function putDataPoint(moduledata, status, moduleGroup, teamName, calcStoryPoints
     }
     if(!moduled) {
         moduled = { progress: 0, reportedSP: 0, summarySP: 0,
-            name: module.summary, duedate: module.dueDate, smename: module.assignee,
+            name: module.summary, duedate: module.duedate, smename: module.assignee,
             teamnames: [], key: module.key,
             accepted: status == "Accepted", status: status};
         moduledata.module.push(moduled);
