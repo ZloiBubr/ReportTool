@@ -24,6 +24,7 @@ exports.statuses = function() {
     this.accepted = new exports.statusEntity("Accepted","glyphicon glyphicon-star");//(closed)
     this.closed = new exports.statusEntity("Closed","glyphicon glyphicon-star");
     this.cancelled = new exports.statusEntity("Cancelled","glyphicon glyphicon-ban-circle");
+    this.notApplicable = new exports.statusEntity("Not Applicable","glyphicon glyphicon-ban-circle");
     this.pages = 0;
 
     this.blocked.weight = 0;
@@ -37,6 +38,7 @@ exports.statuses = function() {
     this.resolved.weight = 8;
     this.accepted.weight = 9;
     this.cancelled.weight = 10;
+    this.notApplicable.weight = 11;
 
     this.getStatusByName = function(statusName){
         switch(statusName)
@@ -65,6 +67,8 @@ exports.statuses = function() {
                 return this.cancelled;
             case "Closed":
                 return this.closed;
+            case "Not Applicable":
+                return this.notApplicable;
             default :
                 return this.blocked;
         }
