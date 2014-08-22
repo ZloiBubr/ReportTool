@@ -95,24 +95,48 @@ function moduleProgressController($scope, $resource, $window, $filter) {
             moduleProgressItem.progress = Math.round(moduleProgressItem.progress);
             moduleProgressItem.progress2 = moduleProgressItem.progress.toString() + "%";
 
+
             moduleProgressItem.duedate2 = moduleProgressItem.duedate;
             moduleProgressItem.acceptedName = moduleProgressItem.accepted ? "Yes" : "No";
 
             var accepted = moduleProgressItem.status == "Accepted";
             var readyForQa = moduleProgressItem.status == "Ready for QA" || moduleProgressItem.status == "Testing in Progress";
             var resolved = moduleProgressItem.status == "Resolved";
+            var cancelled = moduleProgressItem.modulestatus == "Closed" && moduleProgressItem.moduleresolution == "Out of Scope";
+            var notApplicable = moduleProgressItem.modulestatus == "Closed" && moduleProgressItem.moduleresolution == "Done";
 
+            if(moduleProgressItem.moduleresolution != "") {
+                var stop = true;
+            }
+
+            moduleProgressItem.cancelled = cancelled || notApplicable;
             moduleProgressItem.readyForQA = readyForQa;
             moduleProgressItem.readyForAcceptance = resolved;
 
-            var acceptedEntity = $scope.total.getStatusByName("Accepted");
-            processEntity(acceptedEntity, accepted, $scope.updatedModuleProgressData, moduleProgressItem);
-            var readyForQaEntity = $scope.total.getStatusByName("Ready for QA");
-            processEntity(readyForQaEntity, readyForQa, $scope.updatedModuleProgressData, moduleProgressItem);
-            var resolvedEntity = $scope.total.getStatusByName("Resolved");
-            processEntity(resolvedEntity, resolved, $scope.updatedModuleProgressData, moduleProgressItem);
-            var inProgressEntity = $scope.total.getStatusByName("In Progress");
-            processEntity(inProgressEntity, !accepted && !resolved && !readyForQa, $scope.updatedModuleProgressData, moduleProgressItem);
+            if(cancelled) {
+                var cancelledEntity = $scope.total.getStatusByName("Cancelled");
+                processEntity(cancelledEntity, moduleProgressItem);
+            }
+            else if(notApplicable) {
+                var notApplicableEntity = $scope.total.getStatusByName("Not Applicable");
+                processEntity(notApplicableEntity, moduleProgressItem);
+            }
+            else if(accepted) {
+                var acceptedEntity = $scope.total.getStatusByName("Accepted");
+                processEntity(acceptedEntity, moduleProgressItem);
+            }
+            else if(readyForQa) {
+                var readyForQaEntity = $scope.total.getStatusByName("Ready for QA");
+                processEntity(readyForQaEntity, moduleProgressItem);
+            }
+            else if(resolved) {
+                var resolvedEntity = $scope.total.getStatusByName("Resolved");
+                processEntity(resolvedEntity, moduleProgressItem);
+            }
+            else {
+                var inProgressEntity = $scope.total.getStatusByName("In Progress");
+                processEntity(inProgressEntity, moduleProgressItem);
+            }
 
             if(!$scope.isTotalWasCalculated) {
                 $scope.total.total++;
@@ -124,12 +148,12 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         $scope.isTotalWasCalculated = true;
     };
 
-    function processEntity(entity, condition, scope, moduleProgressItem) {
-        if (entity.isChecked && condition) {
+    function processEntity(entity, moduleProgressItem) {
+        if (entity.isChecked) {
             if (!$scope.isTotalWasCalculated) {
                 entity.count++;
             }
-            scope.push(moduleProgressItem);
+            $scope.updatedModuleProgressData.push(moduleProgressItem);
         }
     }
 
@@ -171,6 +195,8 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         $scope.total.resolved.isChecked = $scope.total.all.isChecked;
         $scope.total.inProgress.isChecked = $scope.total.all.isChecked;
         $scope.total.readyForQA.isChecked = $scope.total.all.isChecked;
+        $scope.total.cancelled.isChecked = $scope.total.all.isChecked;
+        $scope.total.notApplicable.isChecked = $scope.total.all.isChecked;
 
         $scope.processWithRowSpans();
     };

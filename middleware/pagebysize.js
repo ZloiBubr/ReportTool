@@ -18,10 +18,15 @@ function isDeveloper(name) {
     }
     if(name == 'Valentine Zhuck' ||
         name == 'Dzmitry Tabolich' ||
-        name == 'Heorhi Vilkitski') {
+        name == 'Heorhi Vilkitski' ||
+        name == "Hanna Kastsian" ||
+        name == "Alena Charnova" ||
+        name == "Aliaksei Astashkin" ||
+        name == "yauheni_lohinau" ||
+        name == "Dmytro Komar" ||
+        name == undefined) {
         return true;
     }
-//    log.info("---###---" + name);
     return false;
 }
 

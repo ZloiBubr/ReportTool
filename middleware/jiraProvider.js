@@ -124,7 +124,7 @@ function Step1CollectModules(jira, callback) {
             return loopError;
         },
         function(callback) {
-        jira.searchJira(requestString, { fields: ["summary", "duedate", "assignee"] }, function (error, epics) {
+        jira.searchJira(requestString, { fields: ["summary", "duedate", "assignee", "status", "resolution"] }, function (error, epics) {
             if (error) {
                 callback(error);
             }
@@ -138,6 +138,8 @@ function Step1CollectModules(jira, callback) {
                             module.summary = epic.fields.summary;
                             module.duedate = epic.fields.duedate == null ? null : new Date(epic.fields.duedate);
                             module.assignee = epic.fields.assignee == null ? "Unassigned" : epic.fields.assignee.name;
+                            module.status = epic.fields.status.name;
+                            module.resolution = epic.fields.resolution == null ? "" : epic.fields.resolution.name;
                             module.save(function () {
                                 epicsList.push(epic.key);
                                 LogProgress(epic.key + " : " + " Module Collected");

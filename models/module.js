@@ -9,7 +9,9 @@ var schema = new Schema({
     summary:    { type: String },
     created:    { type: Date, default: Date.now() },
     duedate:    { type: Date },
-    assignee:   { type: String }
+    assignee:   { type: String },
+    status:     { type: String },
+    resolution: { type: String }
 });
 
 exports.Module = mongoose.model('Module', schema);
