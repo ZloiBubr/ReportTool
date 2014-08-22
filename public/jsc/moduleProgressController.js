@@ -23,6 +23,7 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         $scope.isTotalWasCalculated = false;
         $scope.reInitTotal();
         $scope.getModuleData().done($scope.processWithRowSpans);
+        $scope.updatedModuleProgressData = $filter('orderBy')($scope.updatedModuleProgressData, $scope.sortingModel.dueDate.getter, !$scope.sortingModel.isASC);
     };
 
     $scope.reInitTotal = function(){
@@ -105,10 +106,6 @@ function moduleProgressController($scope, $resource, $window, $filter) {
             var cancelled = moduleProgressItem.modulestatus == "Closed" && moduleProgressItem.moduleresolution == "Out of Scope";
             var notApplicable = moduleProgressItem.modulestatus == "Closed" && moduleProgressItem.moduleresolution == "Done";
 
-            if(moduleProgressItem.moduleresolution != "") {
-                var stop = true;
-            }
-
             moduleProgressItem.cancelled = cancelled || notApplicable;
             moduleProgressItem.readyForQA = readyForQa;
             moduleProgressItem.readyForAcceptance = resolved;
@@ -143,8 +140,7 @@ function moduleProgressController($scope, $resource, $window, $filter) {
             }
         });
 
-        $scope.updatedModuleProgressData = $filter('orderBy')($scope.updatedModuleProgressData, $scope.sortingModel.dueDate.getter, !$scope.sortingModel.isASC);
-
+        $scope.onSortingClick();
         $scope.isTotalWasCalculated = true;
     };
 
@@ -205,9 +201,9 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         if(sortName == $scope.sortingModel.selected){
             $scope.sortingModel.isASC = !$scope.sortingModel.isASC;
         }
-        else {
-            $scope.sortingModel.selected = sortName;
-            $scope.sortingModel.isASC = true;
+        else if(sortName != null) {
+                $scope.sortingModel.selected = sortName;
+                $scope.sortingModel.isASC = true;
         }
 
         sortModuleProgressData();
