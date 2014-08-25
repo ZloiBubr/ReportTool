@@ -88,19 +88,22 @@ function parsePages(callback) {
                             Page.find({epicKey: module.key}).exec(function (err, pages) {
                             if(pages != null && pages.length > 0) {
                                 async.eachSeries(pages, function(page, callback) {
-                                    var storyPoints = page.storyPoints == null ? 0 : parseFloat(page.storyPoints);
+                                        var storyPoints = page.storyPoints == null ? 0 : parseFloat(page.storyPoints);
 
-                                    var moduleGroup = getModuleGroupName(page.labels);
-                                    var teamName = getTeamName(page.labels);
+                                        var moduleGroup = getModuleGroupName(page.labels);
+                                        var teamName = getTeamName(page.labels);
 
-                                    var calcStoryPoints = storyPoints * page.progress / 100;
+                                        var calcStoryPoints = storyPoints * page.progress / 100;
 
-                                    var status = page.status;
-                                    var resolution = page.resolution;
-                                    status = status == 'Closed' && resolution == "Done" ? "Accepted" : status;
+                                        var status = page.status;
+                                        var resolution = page.resolution;
 
-                                    putDataPoint(moduledata, status, moduleGroup, teamName, calcStoryPoints, storyPoints, ++count, module);
-                                    callback();
+                                        if(!(status == "Closed" && (resolution == "Out of Scope" || resolution == "Duplicate"))) {
+                                            status = status == 'Closed' && resolution == "Done" ? "Accepted" : status;
+
+                                            putDataPoint(moduledata, status, moduleGroup, teamName, calcStoryPoints, storyPoints, ++count, module);
+                                        }
+                                        callback();
                                 },
                                 function(err) {
                                     callback();
