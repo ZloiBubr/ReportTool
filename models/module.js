@@ -11,6 +11,7 @@ var schema = new Schema({
     duedate:    { type: Date },
     assignee:   { type: String },
     status:     { type: String },
+    labels:     { type: String },
     resolution: { type: String }
 });
 
