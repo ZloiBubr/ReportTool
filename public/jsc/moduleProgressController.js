@@ -10,6 +10,7 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         $scope.common = {};
         $scope.dataLoad();
         $scope.sortByDate = false;
+        $scope.filterEod = false;
     };
 
     $scope.reInit = function () {
@@ -93,6 +94,10 @@ function moduleProgressController($scope, $resource, $window, $filter) {
             if($scope.filteredTeam != $scope.allTeams[0].id && moduleProgressItem.teamnames.indexOf($scope.filteredTeam) < 0){
                 return;
             }
+            if($scope.filterEod && !moduleProgressItem.endOfYearDelivery) {
+                return;
+            }
+
             moduleProgressItem.progress = Math.round(moduleProgressItem.progress);
             moduleProgressItem.progress2 = moduleProgressItem.progress.toString() + "%";
 
@@ -209,6 +214,9 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         sortModuleProgressData();
     };
 
+    $scope.onFilterEod = function() {
+        $scope.processWithRowSpans();
+    }
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
 
 
