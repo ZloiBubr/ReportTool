@@ -91,8 +91,16 @@ function moduleProgressController($scope, $resource, $window, $filter) {
             if($scope.filteredSme != $scope.allSMEs[0].id && moduleProgressItem.smename != $scope.filteredSme){
                 return;
             }
-            if($scope.filteredTeam != $scope.allTeams[0].id && moduleProgressItem.teamnames.indexOf($scope.filteredTeam) < 0){
-                return;
+            if($scope.filteredTeam != $scope.allTeams[0].id) {
+                var found = false;
+                _.each(moduleProgressItem.teamnames, function(teamName) {
+                    if(teamName.indexOf($scope.filteredTeam) > -1) {
+                        found = true;
+                    }
+                });
+                if(!found) {
+                    return;
+                }
             }
             if($scope.filterEod && !moduleProgressItem.endOfYearDelivery) {
                 return;

@@ -50,6 +50,19 @@ function getTeamName(labels) {
     return labels.substring(index+4,index2);
 }
 
+function getStreamName(labels) {
+    var index = labels.indexOf("Stream");
+    if(index < 0) {
+        return "";
+    }
+    var index2 = labels.indexOf(',', index);
+    if(index2 < 0) {
+        index2 = labels.length;
+    }
+
+    return labels.substring(index+6,index2);
+}
+
 function getModuleGroupName(labels) {
     var groupName = "Unknown Module Group";
     var index = labels.indexOf("PageModuleGroup_");
@@ -94,6 +107,7 @@ function parsePages(callback) {
 
                                         var moduleGroup = getModuleGroupName(page.labels);
                                         var teamName = getTeamName(page.labels);
+                                        var streamName = getStreamName(page.labels);
 
                                         var calcStoryPoints = storyPoints * page.progress / 100;
 
@@ -103,7 +117,7 @@ function parsePages(callback) {
                                         if(!(status == "Closed" && (resolution == "Out of Scope" || resolution == "Duplicate"))) {
                                             status = status == 'Closed' && resolution == "Done" ? "Accepted" : status;
 
-                                            putDataPoint(moduledata, endOfYearDelivery, status, moduleGroup, teamName, calcStoryPoints, storyPoints, ++count, module);
+                                            putDataPoint(moduledata, endOfYearDelivery, status, moduleGroup, teamName, streamName, calcStoryPoints, storyPoints, ++count, module);
                                         }
                                         callback();
                                 },
@@ -112,7 +126,7 @@ function parsePages(callback) {
                                 });
                             }
                             else {
-                                putDataPoint(moduledata, endOfYearDelivery, "Empty", "Unknown Module Group", "", 0, 0, count, module);
+                                putDataPoint(moduledata, endOfYearDelivery, "Empty", "Unknown Module Group", "", "", 0, 0, count, module);
                                 callback();
                             }
                         })
@@ -133,7 +147,7 @@ function parsePages(callback) {
     ]);
 }
 
-function putDataPoint(moduledata, endOfYearDelivery, status, moduleGroup, teamName, calcStoryPoints, storyPoints, count, module) {
+function putDataPoint(moduledata, endOfYearDelivery, status, moduleGroup, teamName, streamName, calcStoryPoints, storyPoints, count, module) {
     var initUri = "https://jira.epam.com/jira/issues/?jql=project%20%3D%20PLEX-UXC%20and%20issuetype%3DEpic%20AND%20summary%20~%20'";
 
     //module
@@ -169,17 +183,24 @@ function putDataPoint(moduledata, endOfYearDelivery, status, moduleGroup, teamNa
     if(newStatus.weight < moduleStatus.weight){
         moduled.status = status;
     }
-
     if(teamName != "") {
+        var stream = streamName == "" ? "" : ":" + streamName;
+        putTeamName(teamName + stream, moduled);
+    }
+}
+
+function putTeamName(teamName, moduled) {
+    if (teamName != "") {
         var foundt = false;
-        _.each(moduled.teamnames, function(teamname) {
-            if(teamname == teamName) {
+        _.each(moduled.teamnames, function (teamname) {
+            if (teamname == teamName) {
                 foundt = true;
             }
         });
 
-        if(!foundt) {
+        if (!foundt) {
             moduled.teamnames.push(teamName);
         }
     }
 }
+
