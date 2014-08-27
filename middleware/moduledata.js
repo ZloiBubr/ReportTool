@@ -85,6 +85,7 @@ function parsePages(callback) {
             Module.find({}).exec(function(err, modules) {
                 async.series([
                     async.eachSeries(modules, function(module, callback) {
+                            var endOfYearDelivery = module._doc.labels != null ? module._doc.labels.indexOf('EOYDeliverable') > -1 : false;
                             var count = 0;
                             Page.find({epicKey: module.key}).exec(function (err, pages) {
                             if(pages != null && pages.length > 0) {
@@ -98,7 +99,6 @@ function parsePages(callback) {
 
                                         var status = page.status;
                                         var resolution = page.resolution;
-                                        var endOfYearDelivery = module._doc.labels != null ? module._doc.labels.indexOf('EOYDeliverable') > -1 ? true : false : false;
 
                                         if(!(status == "Closed" && (resolution == "Out of Scope" || resolution == "Duplicate"))) {
                                             status = status == 'Closed' && resolution == "Done" ? "Accepted" : status;
@@ -112,7 +112,7 @@ function parsePages(callback) {
                                 });
                             }
                             else {
-                                putDataPoint(moduledata, false, "Empty", "Unknown Module Group", "", 0, 0, count, module);
+                                putDataPoint(moduledata, endOfYearDelivery, "Empty", "Unknown Module Group", "", 0, 0, count, module);
                                 callback();
                             }
                         })
