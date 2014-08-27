@@ -104,7 +104,7 @@ function moduleProgressController($scope, $resource, $window, $filter) {
             var readyForQa = moduleProgressItem.status == "Ready for QA" || moduleProgressItem.status == "Testing in Progress";
             var resolved = moduleProgressItem.status == "Resolved";
             var cancelled = moduleProgressItem.modulestatus == "Closed" && moduleProgressItem.moduleresolution == "Out of Scope";
-            var notApplicable = moduleProgressItem.modulestatus == "Closed" && moduleProgressItem.moduleresolution == "Done";
+            var notApplicable = moduleProgressItem.modulestatus == "Closed" && moduleProgressItem.moduleresolution == "Done" && moduleProgressItem.pagescount < 1;
 
             moduleProgressItem.cancelled = cancelled || notApplicable;
             moduleProgressItem.readyForQA = readyForQa;

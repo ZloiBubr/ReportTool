@@ -72,7 +72,7 @@ a {
 
 .table-striped > tbody > tr:nth-child(odd) > td,
 .table-striped > tbody > tr:nth-child(odd) > th {
-    background-color: #E0E0E0 !important;
+    background-color: #E0E0E0;
 }
 
 .hour-timesheet-color{
