@@ -215,6 +215,8 @@ function moduleProgressController($scope, $resource, $window, $filter) {
     };
 
     $scope.onFilterEod = function() {
+        $scope.reInitTotal();
+        $scope.isTotalWasCalculated = false;
         $scope.processWithRowSpans();
     }
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
