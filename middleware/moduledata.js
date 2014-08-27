@@ -31,6 +31,7 @@ function moduleData() {
                         name: "",
                         moduleGroup: "",
                         pagescount: 0,
+                        endOfYearDelivery: false,
                         uri: ""
                     }
                 ];
@@ -88,26 +89,30 @@ function parsePages(callback) {
                             Page.find({epicKey: module.key}).exec(function (err, pages) {
                             if(pages != null && pages.length > 0) {
                                 async.eachSeries(pages, function(page, callback) {
-                                    var storyPoints = page.storyPoints == null ? 0 : parseFloat(page.storyPoints);
+                                        var storyPoints = page.storyPoints == null ? 0 : parseFloat(page.storyPoints);
 
-                                    var moduleGroup = getModuleGroupName(page.labels);
-                                    var teamName = getTeamName(page.labels);
+                                        var moduleGroup = getModuleGroupName(page.labels);
+                                        var teamName = getTeamName(page.labels);
 
-                                    var calcStoryPoints = storyPoints * page.progress / 100;
+                                        var calcStoryPoints = storyPoints * page.progress / 100;
 
-                                    var status = page.status;
-                                    var resolution = page.resolution;
-                                    status = status == 'Closed' && resolution == "Done" ? "Accepted" : status;
+                                        var status = page.status;
+                                        var resolution = page.resolution;
+                                        var endOfYearDelivery = module._doc.labels != null ? module._doc.labels.indexOf('EOYDeliverable') > -1 ? true : false : false;
 
-                                    putDataPoint(moduledata, status, moduleGroup, teamName, calcStoryPoints, storyPoints, ++count, module);
-                                    callback();
+                                        if(!(status == "Closed" && (resolution == "Out of Scope" || resolution == "Duplicate"))) {
+                                            status = status == 'Closed' && resolution == "Done" ? "Accepted" : status;
+
+                                            putDataPoint(moduledata, endOfYearDelivery, status, moduleGroup, teamName, calcStoryPoints, storyPoints, ++count, module);
+                                        }
+                                        callback();
                                 },
                                 function(err) {
                                     callback();
                                 });
                             }
                             else {
-                                putDataPoint(moduledata, "Empty", "Unknown Module Group", "", 0, 0, count, module);
+                                putDataPoint(moduledata, false, "Empty", "Unknown Module Group", "", 0, 0, count, module);
                                 callback();
                             }
                         })
@@ -128,7 +133,7 @@ function parsePages(callback) {
     ]);
 }
 
-function putDataPoint(moduledata, status, moduleGroup, teamName, calcStoryPoints, storyPoints, count, module) {
+function putDataPoint(moduledata, endOfYearDelivery, status, moduleGroup, teamName, calcStoryPoints, storyPoints, count, module) {
     var initUri = "https://jira.epam.com/jira/issues/?jql=project%20%3D%20PLEX-UXC%20and%20issuetype%3DEpic%20AND%20summary%20~%20'";
 
     //module
@@ -155,6 +160,7 @@ function putDataPoint(moduledata, status, moduleGroup, teamName, calcStoryPoints
     moduled.moduleGroup = moduleGroup;
     moduled.accepted = moduled.accepted ? status == "Accepted" : false;
     moduled.pagescount = count;
+    moduled.endOfYearDelivery = endOfYearDelivery;
 
 
     var moduleStatus = statusList.getStatusByName(moduled.status);
