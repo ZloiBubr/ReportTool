@@ -36,7 +36,7 @@ function progressTableController($scope, $resource, $window) {
                     _.each(itemTeam.pages, function(itemPage){
                         var prognoseEstimateCollection = itemPage.estimated.split("h/");
                         var koef = prognoseEstimateCollection[0]/prognoseEstimateCollection[1];
-                        if(koef>=2)
+                        if(koef>=2 || (itemPage.progress < 0.001 && itemPage.sumprogress < itemPage.storypoints))
                         {
                             itemPage.isRed = true;
                         }
