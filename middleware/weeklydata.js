@@ -45,9 +45,6 @@ function parsePages(callback) {
 //                }
                 var to = history.progressTo == null || history.progressTo == '' ? 0 : parseInt(history.progressTo);
                 var progress = to - from;
-                if(progress < 0) {
-                    progress = 0;
-                }
                 var calcStoryPoints = storyPoints * progress / 100;
                 putDataPoint(velocity, teamName, date, calcStoryPoints);
                 putDataPoint(velocity, "Total", date, calcStoryPoints);

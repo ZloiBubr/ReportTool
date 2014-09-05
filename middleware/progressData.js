@@ -90,9 +90,6 @@ function parsePages(callback) {
                 var to = history.progressTo == null || history.progressTo == '' ? 0 : parseInt(history.progressTo);
                 var progressDiff = to - from;
                 var calcStoryPoints = storyPoints * progressDiff / 100;
-                if(calcStoryPoints < 0) {
-                    calcStoryPoints = 0;
-                }
                 var uri = page.uri;
                 var blockers = page.blockers != null ? page.blockers.split("PLEXUXC") : [];
                 var blockersnum = blockers.length > 0 ? blockers.length-1 : 0;
