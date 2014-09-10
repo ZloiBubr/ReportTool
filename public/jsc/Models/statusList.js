@@ -9,6 +9,9 @@ exports.statusEntity = function(name, cssIcon)
     this.isChecked = true;
     this.weight = 0;
     this.cssIcon = cssIcon || "";
+    this.pages = 0;
+    this.doneSP = 0;
+    this.summSP = 0;
 };
 
 exports.statuses = function() {
@@ -25,7 +28,6 @@ exports.statuses = function() {
     this.closed = new exports.statusEntity("Closed","glyphicon glyphicon-star");
     this.cancelled = new exports.statusEntity("Cancelled","glyphicon glyphicon-ban-circle");
     this.notApplicable = new exports.statusEntity("Not Applicable","glyphicon glyphicon-ban-circle");
-    this.pages = 0;
 
     this.blocked.weight = 0;
     this.open.weight = 1;

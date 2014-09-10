@@ -36,7 +36,8 @@ function moduleProgressController($scope, $resource, $window, $filter) {
     };
 
     $scope.processWithRowSpans = function () {
-        $scope.total.pages = 0;
+        $scope.total.doneSP = 0;
+        $scope.total.summSP = 0;
         $scope.updatedModuleProgressData=[];
         //fill in groups and sme combos
         _.each($scope.moduleProgressData.module, function(module) {
@@ -162,7 +163,8 @@ function moduleProgressController($scope, $resource, $window, $filter) {
             if (!$scope.isTotalWasCalculated) {
                 entity.count++;
             }
-            $scope.total.pages += moduleProgressItem.summarySP;
+            $scope.total.doneSP += moduleProgressItem.reportedSP;
+            $scope.total.summSP += moduleProgressItem.summarySP;
             $scope.updatedModuleProgressData.push(moduleProgressItem);
         }
     }
