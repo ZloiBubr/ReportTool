@@ -162,6 +162,7 @@ function moduleProgressController($scope, $resource, $window, $filter) {
             if (!$scope.isTotalWasCalculated) {
                 entity.count++;
             }
+            $scope.total.pages += moduleProgressItem.summarySP;
             $scope.updatedModuleProgressData.push(moduleProgressItem);
         }
     }
