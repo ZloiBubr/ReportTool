@@ -6,9 +6,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7bf57d7b-a37e-4b07-a35d-d7de358b28ec" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/pages/moduleProgress.html" afterPath="$PROJECT_DIR$/public/pages/moduleProgress.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/jsc/moduleProgressController.js" afterPath="$PROJECT_DIR$/public/jsc/moduleProgressController.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/jsc/Models/statusList.js" afterPath="$PROJECT_DIR$/public/jsc/Models/statusList.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/pages/cumulative.html" afterPath="$PROJECT_DIR$/public/pages/cumulative.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="ReportTool.iws" />
@@ -45,7 +43,7 @@
       <file leaf-file-name="moduleProgressController.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/public/jsc/moduleProgressController.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1924" max-vertical-offset="4170">
+            <state vertical-scroll-proportion="0.0" vertical-offset="2490" max-vertical-offset="4170">
               <caret line="166" column="64" selection-start-line="166" selection-start-column="64" selection-end-line="166" selection-end-column="64" />
               <folding />
             </state>
@@ -55,7 +53,7 @@
       <file leaf-file-name="statusList.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/public/jsc/Models/statusList.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1320">
+            <state vertical-scroll-proportion="0.0" vertical-offset="165" max-vertical-offset="1320">
               <caret line="11" column="19" selection-start-line="11" selection-start-column="19" selection-end-line="11" selection-end-column="19" />
               <folding />
             </state>
@@ -72,14 +70,24 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="moduleProgress.html" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="moduleProgress.html" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/public/pages/moduleProgress.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.5882353" vertical-offset="0" max-vertical-offset="1410">
+            <state vertical-scroll-proportion="-0.0" vertical-offset="240" max-vertical-offset="1410">
               <caret line="16" column="138" selection-start-line="16" selection-start-column="138" selection-end-line="16" selection-end-column="138" />
               <folding>
-                <marker date="1410368904000" expanded="true" signature="5864:6176" placeholder="{...}" />
+                <marker date="1410369009000" expanded="true" signature="5864:6176" placeholder="{...}" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="cumulative.html" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/public/pages/cumulative.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.113065325" vertical-offset="0" max-vertical-offset="398">
+              <caret line="3" column="6" selection-start-line="3" selection-start-column="6" selection-end-line="3" selection-end-column="6" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -87,7 +95,7 @@
       <file leaf-file-name="moduledata.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/middleware/moduledata.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="2272" max-vertical-offset="3150">
+            <state vertical-scroll-proportion="0.0" vertical-offset="2520" max-vertical-offset="3150">
               <caret line="168" column="21" selection-start-line="168" selection-start-column="12" selection-end-line="168" selection-end-column="21" />
               <folding />
             </state>
@@ -150,7 +158,6 @@
         <option value="$PROJECT_DIR$/public/css/style.css" />
         <option value="$PROJECT_DIR$/public/pages/shared/mainMenu.html" />
         <option value="$PROJECT_DIR$/routes/index.js" />
-        <option value="$PROJECT_DIR$/public/pages/cumulative.html" />
         <option value="$PROJECT_DIR$/public/pages/progressTable.html" />
         <option value="$PROJECT_DIR$/public/jsc/progressTableController.js" />
         <option value="$PROJECT_DIR$/middleware/progressData.js" />
@@ -159,6 +166,7 @@
         <option value="$PROJECT_DIR$/public/jsc/Models/statusList.js" />
         <option value="$PROJECT_DIR$/public/jsc/moduleProgressController.js" />
         <option value="$PROJECT_DIR$/public/pages/moduleProgress.html" />
+        <option value="$PROJECT_DIR$/public/pages/cumulative.html" />
       </list>
     </option>
   </component>
@@ -222,7 +230,6 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -308,24 +315,6 @@
               <option name="myItemId" value="public" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="jsc" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ReportTool" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ReportTool" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="public" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT>
@@ -343,6 +332,7 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -1142,7 +1132,7 @@
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3655914" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24945295" sideWeight="0.258" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32123655" sideWeight="0.5003647" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.36424732" sideWeight="0.4996353" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.36424732" sideWeight="0.4996353" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32258064" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -1461,13 +1451,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/public/pages/cumulative.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.07575758" vertical-offset="0" max-vertical-offset="396">
-          <caret line="2" column="63" selection-start-line="2" selection-start-column="63" selection-end-line="2" selection-end-column="63" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/public/pages/shared/mainMenu.html">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.767624" vertical-offset="171" max-vertical-offset="660">
@@ -1550,7 +1533,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.7371007" vertical-offset="0" max-vertical-offset="1200">
           <caret line="20" column="0" selection-start-line="18" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1588,11 +1570,19 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/public/pages/moduleProgress.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.5882353" vertical-offset="0" max-vertical-offset="1410">
+        <state vertical-scroll-proportion="0.0" vertical-offset="240" max-vertical-offset="1410">
           <caret line="16" column="138" selection-start-line="16" selection-start-column="138" selection-end-line="16" selection-end-column="138" />
           <folding>
-            <marker date="1410368904000" expanded="true" signature="5864:6176" placeholder="{...}" />
+            <marker date="1410369009000" expanded="true" signature="5864:6176" placeholder="{...}" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/public/pages/cumulative.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.113065325" vertical-offset="0" max-vertical-offset="398">
+          <caret line="3" column="6" selection-start-line="3" selection-start-column="6" selection-end-line="3" selection-end-column="6" />
+          <folding />
         </state>
       </provider>
     </entry>
