@@ -38,9 +38,10 @@ exports.statuses = function() {
     this.readyForQA.weight = 6;
     this.testingInProgress.weight = 7;
     this.resolved.weight = 8;
-    this.accepted.weight = 9;
-    this.cancelled.weight = 10;
-    this.notApplicable.weight = 11;
+    this.closed.weight = 9;
+    this.accepted.weight = 10;
+    this.cancelled.weight = 11;
+    this.notApplicable.weight = 12;
 
     this.getStatusByName = function(statusName){
         switch(statusName)
