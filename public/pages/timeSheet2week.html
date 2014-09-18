@@ -39,6 +39,7 @@
                 <th style="text-align: center; cursor: default"><span tooltip-placement="top"  tooltip-html-unsafe="Total Effective Hours<sup>Total Story Points</sup>">Total</span></th>
                 <th style="text-align: center; cursor: default"><span tooltip-placement="top"  tooltip-html-unsafe="Average Story points / Effective days">AvgSP</span></th>
                 <th style="text-align: center; cursor: default"><span tooltip-placement="top"  tooltip-html-unsafe="Average Story points In One Hour">AvgSPiH</span></th>
+                <th style="text-align: center; cursor: default"><span tooltip-placement="top"  tooltip-html-unsafe="Accepted Story points">AcptdSP</span></th>
             </tr>
         </thead>
 
@@ -49,6 +50,7 @@
                 <td style="text-align: center"><strong><span  class='hour-timesheet-color'>{{toFloat(developerItem.totalHR) | number:2}}</span>/<sup>{{toFloat(developerItem.totalSP) | number:2}}</sup></strong></td>
                 <td style="text-align: center; cursor: default"><strong><span  class='hour-timesheet-color'  tooltip-placement="top"  tooltip-html-unsafe="{{toFloat(developerItem.avgSPOnAllDays) | number:2}}(SP/all_days)">{{toFloat(developerItem.avgSP) | number:2}}</span></strong></td>
                 <td style="text-align: center"><strong><span  class='hour-timesheet-color'>{{toFloat(developerItem.avgSPinHour) | number:2}}</span></strong></td>
+                <td style="text-align: center"><strong><span  class='hour-timesheet-color'>{{toFloat(developerItem.totalAcceptedSP) | number:2}}</span></strong></td>
             </tr>
         </tbody>
     </table>

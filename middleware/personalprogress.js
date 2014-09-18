@@ -79,6 +79,8 @@ function parsePages(fromDate, toDate, callback) {
                                 }
                             }
 
+                            parseStatusClosed(developer, ProgressPages, teamsModel);
+
                             developer.avgSP =  developer.totalSP/effectiveDays;
                             developer.avgSPOnAllDays =  developer.totalSP/daysPeriod;
                             developer.avgSPinHour =  developer.totalSP/developer.totalHR;
@@ -144,6 +146,14 @@ function parseProgressHistory (day, developer, progressDetail, pageItem) {
     });
 }
 
+function parseStatusClosed(developer, pages, t) {
+    _.each(pages, function (pageItem) {
+        if (pageItem.status == "Closed" && pageItem.resolution == "Done" && pageItem.progress == "100")
+        {
+            developer.totalAcceptedSP += parseFloat(pageItem.storyPoints);
+        }
+    });
+}
 
 
 function datesCompareHelper(date1, date2) {
