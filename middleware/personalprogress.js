@@ -79,7 +79,7 @@ function parsePages(fromDate, toDate, callback) {
                                 }
                             }
 
-                            parseStatusClosed(developer, ProgressPages, teamsModel);
+                            parseStatusClosed(developer, ProgressPages);
 
                             developer.avgSP =  developer.totalSP/effectiveDays;
                             developer.avgSPOnAllDays =  developer.totalSP/daysPeriod;
@@ -146,7 +146,7 @@ function parseProgressHistory (day, developer, progressDetail, pageItem) {
     });
 }
 
-function parseStatusClosed(developer, pages, t) {
+function parseStatusClosed(developer, pages) {
     _.each(pages, function (pageItem) {
         if (pageItem.status == "Closed" && pageItem.resolution == "Done" && pageItem.progress == "100")
         {
