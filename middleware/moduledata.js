@@ -116,7 +116,11 @@ function parsePages(callback) {
 
                                         status = status == 'Closed' && resolution == "Done" ? "Accepted" : status;
 
-                                        putDataPoint(moduledata, endOfYearDelivery, status, moduleGroup, teamName, streamName, calcStoryPoints, storyPoints, ++count, module);
+                                        var ignore = status == "Closed" && resolution == "Out of Scope";
+
+                                        if(!ignore) {
+                                            putDataPoint(moduledata, endOfYearDelivery, status, moduleGroup, teamName, streamName, calcStoryPoints, storyPoints, ++count, module);
+                                        }
                                         callback();
                                 },
                                 function(err) {
