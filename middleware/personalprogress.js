@@ -79,9 +79,22 @@ function parsePages(fromDate, toDate, callback) {
                                 }
                             }
 
-                            developer.avgSP =  developer.totalSP/effectiveDays;
+                            developer.avgSP =  developer.totalSP/(effectiveDays || 1);
                             developer.avgSPOnAllDays =  developer.totalSP/daysPeriod;
-                            developer.avgSPinHour =  developer.totalSP/developer.totalHR;
+                            developer.avgSPinHour =  developer.totalSP/(developer.totalHR || 1);
+
+                            team.totalTeamSP += developer.totalSP;
+                            team.totalTeamHR += developer.totalHR;
+
+                            if(developer.avgSP)
+                            {
+                                team.totalAvgSP += developer.avgSP;
+                            }
+
+                            if(developer.avgSPinHour && developer.avgSPinHour != 'Infinity')
+                            {
+                                team.totalAvgSPinHour += developer.avgSPinHour;
+                            }
 
                             developerCallback();
                         })

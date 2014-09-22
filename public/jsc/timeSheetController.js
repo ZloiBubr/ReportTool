@@ -79,6 +79,24 @@ function timeSheetController($scope, $resource, $window, $filter, $modal,  $sce)
 
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
 
+    $scope.getTotal = function(date, developers){
+        var total = 0;
+
+        for (var i = 0; i < developers.length; i++) {
+            for(var j = 0; j < developers[i].progressDetails.length; j++)
+            {
+                if(developers[i].progressDetails[j].date == date)
+                {
+                    total += developers[i].progressDetails[j].totalSP;
+                }
+            }
+        }
+
+        return total;
+    };
+
+    $scope.predicate = 'name';
+
     $scope.toFloat = function(item){
         return parseFloat(item);
     };
@@ -102,7 +120,6 @@ function timeSheetController($scope, $resource, $window, $filter, $modal,  $sce)
         return function(item)
         {
             return item.name !== "Automation";
-
         }
     };
 
