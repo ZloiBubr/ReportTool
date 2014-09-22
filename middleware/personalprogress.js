@@ -80,9 +80,10 @@ function parsePages(fromDate, toDate, callback) {
                             }
 
                             developer.avgSP =  developer.totalSP/(effectiveDays || 1);
-                            parseStatusClosed(developer, ProgressPages);
                             developer.avgSPOnAllDays =  developer.totalSP/daysPeriod;
                             developer.avgSPinHour =  developer.totalSP/(developer.totalHR || 1);
+
+                            parseStatusClosed(developer, ProgressPages);
 
                             team.totalTeamSP += developer.totalSP;
                             team.totalTeamHR += developer.totalHR;
@@ -92,9 +93,14 @@ function parsePages(fromDate, toDate, callback) {
                                 team.totalAvgSP += developer.avgSP;
                             }
 
-                            if(developer.avgSPinHour && developer.avgSPinHour != 'Infinity')
+                            if(developer.avgSPinHour)
                             {
                                 team.totalAvgSPinHour += developer.avgSPinHour;
+                            }
+
+                            if(developer.totalAcceptedSP)
+                            {
+                                team.totalTeamAcceptedSP += developer.totalAcceptedSP;
                             }
 
                             developerCallback();

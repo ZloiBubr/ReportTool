@@ -55,7 +55,11 @@
                         <span tooltip-placement="top"  tooltip-html-unsafe="Average Story points In One Hour">AvgSPiH</span>
                     </a>
                 </th>
-                <th style="text-align: center; cursor: default"><span tooltip-placement="top"  tooltip-html-unsafe="Accepted Story points">AcptdSP</span></th>
+                <th style="text-align: center; cursor: default">
+                    <a class="sorted_column" ng-click="predicate='totalAcceptedSP'; reverse=!reverse">
+                        <span tooltip-placement="top"  tooltip-html-unsafe="Accepted Story points">AcptdSP</span>
+                    </a>
+                </th>
             </tr>
         </thead>
 
@@ -78,7 +82,11 @@
                         <span  class='hour-timesheet-color'>{{toFloat(developerItem.avgSPinHour) | number:2}}</span>
                     </strong>
                 </td>
-                <td style="text-align: center"><strong><span  class='hour-timesheet-color'>{{toFloat(developerItem.totalAcceptedSP) | number:2}}</span></strong></td>
+                <td style="text-align: center">
+                    <strong>
+                        <span  class='hour-timesheet-color'>{{toFloat(developerItem.totalAcceptedSP) | number:2}}</span>
+                    </strong>
+                </td>
             </tr>
         </tbody>
 
@@ -93,6 +101,8 @@
                 <td style="text-align: center; cursor: default"><span tooltip-placement="top"  tooltip-html-unsafe="Total EH <sup> / Total SP</sup>">{{toFloat(teamItem.totalTeamHR) | number:2}}</span> / <sup>{{toFloat(teamItem.totalTeamSP) | number:2}}</sup></td>
                 <td style="text-align: center; cursor: default"><span tooltip-placement="top"  tooltip-html-unsafe="Total SP/Days">{{toFloat(teamItem.totalAvgSP) | number:2}}</span></td>
                 <td style="text-align: center; cursor: default"><span tooltip-placement="top"  tooltip-html-unsafe="Total SP/Hour">{{toFloat(teamItem.totalAvgSPinHour) | number:2}}</span></td>
+                <td style="text-align: center; cursor: default"><span tooltip-placement="top"  tooltip-html-unsafe="Total AcptdSP">{{toFloat(teamItem.totalTeamAcceptedSP) | number:2}}</span></td>
+
             </tr>
         </tfoot>
     </table>

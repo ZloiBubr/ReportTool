@@ -8,6 +8,7 @@ exports.TeamPersonalProgress = function () {
             name: "Nova",
             totalTeamSP: 0,
             totalTeamHR: 0,
+            totalTeamAcceptedSP: 0,
             totalAvgSP: 0,
             totalAvgSPinHour: 0,
             developers: [
@@ -54,6 +55,7 @@ exports.Team =  function(name){
     this.developers = [];
     this.totalTeamSP = 0;
     this.totalTeamHR = 0;
+    this.totalTeamAcceptedSP = 0;
     this.totalAvgSP = 0;
     this.totalAvgSPinHour = 0;
 };
