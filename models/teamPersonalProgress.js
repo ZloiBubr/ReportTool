@@ -13,6 +13,7 @@ exports.TeamPersonalProgress = function () {
             developers: [
                 {
                     name: "Heorhi vilkitsi",
+                    totalAcceptedSP: 0,
                     totalSP: 20,
                     totalHR: 40,
                     avgSP: 0,
@@ -59,6 +60,7 @@ exports.Team =  function(name){
 
 exports.Developer =  function(name){
     this.name = name;
+    this.totalAcceptedSP = 0;
     this.totalSP = 0;
     this.totalHR = 0;
     this.avgSP = 0;

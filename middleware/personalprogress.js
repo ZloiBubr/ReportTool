@@ -80,6 +80,7 @@ function parsePages(fromDate, toDate, callback) {
                             }
 
                             developer.avgSP =  developer.totalSP/(effectiveDays || 1);
+                            parseStatusClosed(developer, ProgressPages);
                             developer.avgSPOnAllDays =  developer.totalSP/daysPeriod;
                             developer.avgSPinHour =  developer.totalSP/(developer.totalHR || 1);
 
@@ -157,6 +158,14 @@ function parseProgressHistory (day, developer, progressDetail, pageItem) {
     });
 }
 
+function parseStatusClosed(developer, pages) {
+    _.each(pages, function (pageItem) {
+        if (pageItem.status == "Closed" && pageItem.resolution == "Done" && pageItem.progress == "100")
+        {
+            developer.totalAcceptedSP += parseFloat(pageItem.storyPoints);
+        }
+    });
+}
 
 
 function datesCompareHelper(date1, date2) {
