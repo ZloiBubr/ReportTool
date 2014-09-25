@@ -115,6 +115,7 @@ function parsePages(callback) {
                                         var resolution = page.resolution;
 
                                         status = status == 'Closed' && resolution == "Done" ? "Accepted" : status;
+                                        status = status == 'Closed' && resolution == "Implemented" ? "Accepted" : status;
 
                                         var ignore = status == "Closed" && resolution == "Out of Scope";
 
