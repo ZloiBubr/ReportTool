@@ -176,6 +176,16 @@ thead th {
     height: 35px;
 }
 
+tfoot td {
+    font-weight: bold;
+    background-color: #73c0ff ;
+    color: white;
+    height: 35px;
+    text-align: left;
+    border-bottom: 2px solid #ddd;
+    padding-top: 8px !important;
+}
+
 tr {
     height: 35px;
 }
