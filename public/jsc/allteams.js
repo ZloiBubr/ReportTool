@@ -136,6 +136,7 @@ function Teams() {
             teamLead: "Valentine Zhuck",
             qaTeamLead: "Katsiaryna Kuchko",
             developers: [
+                "Valentine Zhuck",
                 "Maryna Furman",
                 "Siarhei Zhalezka",
                 "Viachaslau Anufryiuk",
