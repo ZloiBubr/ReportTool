@@ -117,7 +117,7 @@ function parsePages(callback) {
                                         status = status == 'Closed' && resolution == "Done" ? "Accepted" : status;
                                         status = status == 'Closed' && resolution == "Implemented" ? "Accepted" : status;
 
-                                        var ignore = status == "Closed" && resolution == "Out of Scope";
+                                        var ignore = status == "Closed" && (resolution == "Out of Scope" || resolution == "Rejected");
 
                                         if(!ignore) {
                                             putDataPoint(moduledata, endOfYearDelivery, status, moduleGroup, teamName, streamName, calcStoryPoints, storyPoints, ++count, module);
