@@ -6,9 +6,15 @@ exports.TeamPersonalProgress = function () {
     this.teams = [
         {
             name: "Nova",
+            totalTeamSP: 0,
+            totalTeamHR: 0,
+            totalTeamAcceptedSP: 0,
+            totalAvgSP: 0,
+            totalAvgSPinHour: 0,
             developers: [
                 {
                     name: "Heorhi vilkitsi",
+                    totalAcceptedSP: 0,
                     totalSP: 20,
                     totalHR: 40,
                     avgSP: 0,
@@ -47,10 +53,16 @@ exports.TeamPersonalProgress = function () {
 exports.Team =  function(name){
     this.name = name;
     this.developers = [];
+    this.totalTeamSP = 0;
+    this.totalTeamHR = 0;
+    this.totalTeamAcceptedSP = 0;
+    this.totalAvgSP = 0;
+    this.totalAvgSPinHour = 0;
 };
 
 exports.Developer =  function(name){
     this.name = name;
+    this.totalAcceptedSP = 0;
     this.totalSP = 0;
     this.totalHR = 0;
     this.avgSP = 0;
