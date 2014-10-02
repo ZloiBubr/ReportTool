@@ -24,27 +24,54 @@ function velocityChartController($scope, $resource, $window) {
             .done($scope.initCharts);
     };
 
-    // Original link to use setup chart directive
-    // https://github.com/pablojim/highcharts-ng
     $scope.initCharts = function () {
-
-        $scope.chartConfig = {
-            options: {
-                chart: {
-                    type: 'line',
-                    zoomType: 'x'
-                }
+        $('#container').highcharts({
+            chart: {
+                type: 'line',
+                zoomType: 'x'
             },
-            series: $scope.chartsData.data,
             title: {
-                text: 'Cumulative Velocity'
+                text: 'Cumulative Velocity',
+                x: -20 //center
+            },
+            subtitle: {
+                text: 'Source: jira.epam.com',
+                x: -20
             },
             xAxis: {
                 type: 'datetime'
             },
-            loading: false
-        }
+            plotOptions: {
+                line: {
+                    dataLabels: {
+                        enabled: false
+                    },
+                    enableMouseTracking: true
+                }
+            },
+            yAxis: {
+                title: {
+                    text: 'Velocity (Story Points)'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                valueSuffix: 'SP'
+            },
+            legend: {
+                layout: 'horizontal',
+                align: 'bottom',
+                verticalAlign: 'bottom',
+                borderWidth: 0
+            },
+            series: $scope.chartsData.data
+        });
     };
+
 
     /* -------------------------------------------------------Event handlers ------------------------ */
     /* --------------------------------------------- Actions ------------------------------*/

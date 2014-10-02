@@ -27,24 +27,43 @@ function pagebysizeChartController($scope, $resource, $window) {
     // Original link to use setup chart directive
     // https://github.com/pablojim/highcharts-ng
     $scope.initCharts = function () {
-        var chart = new Highcharts.Chart({
+        $('#container').highcharts({
             chart: {
-                renderTo: 'container',
                 type: 'areaspline',
                 zoomType: 'x'
             },
             title: {
-                text: 'Development Time Spent by Story Size'
+                text: 'Pages by Size',
+                x: -20 //center
+            },
+            subtitle: {
+                text: 'Source: jira.epam.com',
+                x: -20
             },
             xAxis: {
                 type: 'datetime'
+            },
+            yAxis: {
+                title: {
+                    text: 'Development effort (Hours)'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
             },
             tooltip: {
                 formatter: function () {
                     return this.point.tooltip;
                 }
             },
-
+            legend: {
+                layout: 'horizontal',
+                align: 'bottom',
+                verticalAlign: 'bottom',
+                borderWidth: 0
+            },
             series: $scope.chartsData.data
         });
     };
@@ -55,9 +74,9 @@ function pagebysizeChartController($scope, $resource, $window) {
         var loadingDfrd = $.Deferred();
         var getChartSuccess = function (data) {
             $scope.chartsData = data;
-            var avarageSeries = [];
+            var averageSeries = [];
             _.each($scope.chartsData.data, function(itemSeries){
-                avarageSeries.push({
+                averageSeries.push({
                     name: itemSeries.name + ':trend',
                     type: 'line',
                     marker: { enabled: false },
@@ -67,7 +86,7 @@ function pagebysizeChartController($scope, $resource, $window) {
                 });
             });
 
-            $scope.chartsData.data = _.union($scope.chartsData.data, avarageSeries);
+            $scope.chartsData.data = _.union($scope.chartsData.data, averageSeries);
             loadingDfrd.resolve();
         };
 
