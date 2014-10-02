@@ -102,7 +102,6 @@ function parsePages(callback) {
                             var endOfYearDelivery = module._doc.labels != null ? module._doc.labels.indexOf('EOYDeliverable') > -1 : false;
                             var q1Delivery = module._doc.labels != null ? module._doc.labels.indexOf('Q1Deliverable') > -1 : false;
                             var q2Delivery = module._doc.labels != null ? module._doc.labels.indexOf('Q2Deliverable') > -1 : false;
-                            var q2Delivery = q2Delivery || module._doc.duedate == null;
                             var q2Delivery = q2Delivery || !(endOfYearDelivery || q1Delivery);
                             var count = 0;
                             Page.find({epicKey: module.key}).exec(function (err, pages) {
