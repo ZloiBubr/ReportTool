@@ -81,7 +81,7 @@ function pagebysizeChartController($scope, $resource, $window) {
                     type: 'line',
                     marker: { enabled: false },
                     data: (function() {
-                        return fitData(itemSeries.data).data;
+                        return itemSeries.data.length > 1 ? fitData(itemSeries.data).data : itemSeries.data;
                     })()
                 });
             });
