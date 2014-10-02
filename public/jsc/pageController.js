@@ -19,23 +19,51 @@ $scope.jiraId = $stateParams.id;
     };
 
     $scope.initCharts = function () {
-
-        $scope.chartConfig = {
-            options: {
-                chart: {
-                    type: 'line',
-                    zoomType: 'x'
-                }
+        $('#container').highcharts({
+            chart: {
+                type: 'line',
+                zoomType: 'x'
             },
-            series: $scope.pageData.pData.series,
             title: {
-                text: 'Progress & Time'
+                text: 'Progress & Time',
+                x: -20 //center
+            },
+            subtitle: {
+                text: 'Source: jira.epam.com',
+                x: -20
             },
             xAxis: {
                 type: 'datetime'
             },
-            loading: false
-        }
+            plotOptions: {
+                line: {
+                    dataLabels: {
+                        enabled: false
+                    },
+                    enableMouseTracking: true
+                }
+            },
+            yAxis: {
+                title: {
+                    text: 'Progress & Time'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                valueSuffix: ''
+            },
+            legend: {
+                layout: 'horizontal',
+                align: 'bottom',
+                verticalAlign: 'bottom',
+                borderWidth: 0
+            },
+            series: $scope.pageData.pData.series
+        });
     };
 
     /* -------------------------------------------------------Event handlers ------------------------ */

@@ -67,6 +67,13 @@ function parsePages(callback) {
                 teamData2[1] = teamDataPoints + teamDataPoints2;
             }
         }
+        //4. round
+        for (var k = 0; k < velocity.data.length; k++) {
+            var team = velocity.data[k];
+            for (var l = 0; l < team.data.length; l++) {
+                team.data[l][1] = Math.round(team.data[l][1]);
+            }
+        }
         callback(err, velocity);
     })
 }

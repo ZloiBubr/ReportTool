@@ -1,4 +1,4 @@
-<div id="container" class="container" ng-controller="pageController">
+<div id="page" class="container" ng-controller="pageController">
     <div>
         <span class="key">{{pageData.epicKey}}</span><br/>
         <span class="summary">{{pageData.moduleSummary}}</span><br/>
@@ -34,5 +34,5 @@
             </tbody>
         </table>
     </div>
-    <highchart id="chart1" class="col-sm-12" config="chartConfig"></highchart>
-</div> <!-- /container -->
+    <div id="container" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
+</div>

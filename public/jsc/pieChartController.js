@@ -5,8 +5,8 @@
  * Time: 21:51
  * To change this template use File | Settings | File Templates.
  */
-function weeklyChartController($scope, $resource, $window) {
-    var velocitySeriesResource = $resource('/weeklydata');
+function pieChartController($scope, $resource, $window) {
+    var pieSeriesResource = $resource('/piedata');
 
     /* ------------------------------------------------------ Init/Reinit -------------------------------*/
     $scope.init = function () {
@@ -27,51 +27,23 @@ function weeklyChartController($scope, $resource, $window) {
     // Original link to use setup chart directive
     // https://github.com/pablojim/highcharts-ng
     $scope.initCharts = function () {
-        $('#container').highcharts({
-            chart: {
-                type: 'line',
-                zoomType: 'x'
+
+        $scope.chartConfig = {
+            options: {
+                chart: {
+                    type: 'pie',
+                    zoomType: 'x'
+                }
             },
+            series: $scope.chartsData.data,
             title: {
-                text: 'Cumulative Velocity',
-                x: -20 //center
-            },
-            subtitle: {
-                text: 'Source: jira.epam.com',
-                x: -20
+                text: 'Weekly Velocity'
             },
             xAxis: {
                 type: 'datetime'
             },
-            plotOptions: {
-                line: {
-                    dataLabels: {
-                        enabled: false
-                    },
-                    enableMouseTracking: true
-                }
-            },
-            yAxis: {
-                title: {
-                    text: 'Weekly Velocity (Story Points)'
-                },
-                plotLines: [{
-                    value: 0,
-                    width: 1,
-                    color: '#808080'
-                }]
-            },
-            tooltip: {
-                valueSuffix: 'SP'
-            },
-            legend: {
-                layout: 'horizontal',
-                align: 'bottom',
-                verticalAlign: 'bottom',
-                borderWidth: 0
-            },
-            series: $scope.chartsData.data
-        });
+            loading: false
+        }
     };
 
     /* -------------------------------------------------------Event handlers ------------------------ */
