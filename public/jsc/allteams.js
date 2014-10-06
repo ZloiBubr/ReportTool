@@ -103,20 +103,18 @@ function Teams() {
             teamLead: "Dzmitry Tabolich",
             qaTeamLead: "Iryna Kutsko",
             developers: [
-                "Mariya Babich",
                 "Pavel Naumenka",
                 "Sergei Kulick",
                 "Volha Shandrokha",
                 "Aliaksandr Rusak",
                 "Andrei Kasak",
                 "Andrei Krasnou",
-                "Katsiaryna Sasina",
                 "Pavel Krakasevich",
                 "Stepan Zelenin",
                 "Dzmitry Isachenka",
                 "Eugen Surovets",
                 "Katsiaryna Tsalabanava",
-
+                "Vitali Podobed",
                 "Hleb Krotsik",
                 "Uladzimir Vysotski"
 
