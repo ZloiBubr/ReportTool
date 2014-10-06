@@ -41,11 +41,11 @@ function parsePages(callback) {
         for (var i = 0; i < pages.length; i++) {
             var page = pages[i];
 
+            //interested only at finished pages
             if(page.devFinished == undefined) {
                 continue;
             }
-            var dateDevFinished = page.devFinished == undefined ? new Date(Date.parse(page.updated)).getTime() : new Date(Date.parse(page.devFinished)).getTime();
-//            var dateQaFinished = new Date(Date.parse(page.qaFinished)).getTime();
+            var dateDevFinished = new Date(Date.parse(page.devFinished)).getTime();
             var pageSize = getPageSize(page.labels);
             var timeSpent = 0;
             //calc time spent
@@ -69,9 +69,9 @@ function parsePages(callback) {
         for (var k = 0; k < model.data.length; k++) {
             var team = model.data[k];
             team.data.sort(function (a, b) {
-                a = new Date(a.x);
-                b = new Date(b.x);
-                return a > b ? 1 : a < b ? -1 : 0;
+                var aa = new Date(a.x);
+                var bb = new Date(b.x);
+                return aa > bb ? 1 : aa < bb ? -1 : 0;
             });
         }
         callback(err, model);

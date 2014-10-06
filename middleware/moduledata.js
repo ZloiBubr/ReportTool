@@ -32,6 +32,7 @@ function moduleData() {
                         moduleGroup: "",
                         pagescount: 0,
                         endOfYearDelivery: false,
+                        q1Delivery: false,
                         uri: ""
                     }
                 ];
@@ -99,6 +100,9 @@ function parsePages(callback) {
                 async.series([
                     async.eachSeries(modules, function(module, callback) {
                             var endOfYearDelivery = module._doc.labels != null ? module._doc.labels.indexOf('EOYDeliverable') > -1 : false;
+                            var q1Delivery = module._doc.labels != null ? module._doc.labels.indexOf('Q1Deliverable') > -1 : false;
+                            var q2Delivery = module._doc.labels != null ? module._doc.labels.indexOf('Q2Deliverable') > -1 : false;
+                            var q2Delivery = q2Delivery || !(endOfYearDelivery || q1Delivery);
                             var count = 0;
                             Page.find({epicKey: module.key}).exec(function (err, pages) {
                             if(pages != null && pages.length > 0) {
@@ -117,10 +121,10 @@ function parsePages(callback) {
                                         status = status == 'Closed' && resolution == "Done" ? "Accepted" : status;
                                         status = status == 'Closed' && resolution == "Implemented" ? "Accepted" : status;
 
-                                        var ignore = status == "Closed" && resolution == "Out of Scope";
+                                        var ignore = status == "Closed" && (resolution == "Out of Scope" || resolution == "Rejected");
 
                                         if(!ignore) {
-                                            putDataPoint(moduledata, endOfYearDelivery, status, moduleGroup, teamName, streamName, calcStoryPoints, storyPoints, ++count, module);
+                                            putDataPoint(moduledata, endOfYearDelivery, q1Delivery, q2Delivery, status, moduleGroup, teamName, streamName, calcStoryPoints, storyPoints, ++count, module);
                                         }
                                         callback();
                                 },
@@ -129,7 +133,7 @@ function parsePages(callback) {
                                 });
                             }
                             else {
-                                putDataPoint(moduledata, endOfYearDelivery, "Empty", "Unknown Module Group", "", "", 0, 0, count, module);
+                                putDataPoint(moduledata, endOfYearDelivery, q1Delivery, q2Delivery, "Empty", "Unknown Module Group", "", "", 0, 0, count, module);
                                 callback();
                             }
                         })
@@ -150,7 +154,7 @@ function parsePages(callback) {
     ]);
 }
 
-function putDataPoint(moduledata, endOfYearDelivery, status, moduleGroup, teamName, streamName, calcStoryPoints, storyPoints, count, module) {
+function putDataPoint(moduledata, endOfYearDelivery, q1Delivery, q2Delivery, status, moduleGroup, teamName, streamName, calcStoryPoints, storyPoints, count, module) {
     var initUri = "https://jira.epam.com/jira/issues/?jql=project%20%3D%20PLEX-UXC%20and%20issuetype%3DEpic%20AND%20summary%20~%20'";
 
     //module
@@ -178,6 +182,8 @@ function putDataPoint(moduledata, endOfYearDelivery, status, moduleGroup, teamNa
     moduled.accepted = moduled.accepted ? status == "Accepted" : false;
     moduled.pagescount = count;
     moduled.endOfYearDelivery = endOfYearDelivery;
+    moduled.q1Delivery = q1Delivery;
+    moduled.q2Delivery = q2Delivery;
 
 
     var moduleStatus = statusList.getStatusByName(moduled.status);

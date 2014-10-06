@@ -30,27 +30,81 @@
                 <!--<th colspan="{{teamItem.developers[0].progressDetails.length + 2}}">{{teamItem.name}}</th>-->
             <!--</tr>-->
             <tr>
-                <th>{{teamItem.name}}</th>
+                <th>
+                    <a class="sorted_column" ng-click="predicate='name'; reverse=!reverse">
+                        {{teamItem.name}}
+                    </a>
+                </th>
                 <th ng-if="!isShowOnlyTotal"  style="text-align: center; cursor: default" ng-repeat="progressDetailItem in teamItem.developers[getDeveloperIndexNotEmpty(teamItem.developers)].progressDetails">
                     <span tooltip-placement="top"  tooltip-html-unsafe="{{progressDetailItem.date | date:'dd-MM-yyyy'}}">
                         {{progressDetailItem.date | date:'EEE'}}
                     </span>
                 </th>
-                <th style="text-align: center; cursor: default"><span tooltip-placement="top"  tooltip-html-unsafe="Total Effective Hours<sup>Total Story Points</sup>">Total</span></th>
-                <th style="text-align: center; cursor: default"><span tooltip-placement="top"  tooltip-html-unsafe="Average Story points / Effective days">AvgSP</span></th>
-                <th style="text-align: center; cursor: default"><span tooltip-placement="top"  tooltip-html-unsafe="Average Story points In One Hour">AvgSPiH</span></th>
+                <th style="text-align: center; cursor: default">
+                    <a class="sorted_column" ng-click="predicate='totalSP'; reverse=!reverse">
+                        <span tooltip-placement="top"  tooltip-html-unsafe="Total Effective Hours<sup>Total Story Points</sup>">Total</span>
+                    </a>
+                </th>
+                <th style="text-align: center; cursor: default">
+                    <a class="sorted_column" ng-click="predicate='avgSP'; reverse=!reverse">
+                        <span tooltip-placement="top"  tooltip-html-unsafe="Average Story points / Effective days">AvgSP</span>
+                    </a>
+                </th>
+                <th style="text-align: center; cursor: default">
+                    <a class="sorted_column" ng-click="predicate='avgSPinHour'; reverse=!reverse">
+                        <span tooltip-placement="top"  tooltip-html-unsafe="Average Story points In One Hour">AvgSPiH</span>
+                    </a>
+                </th>
+                <th style="text-align: center; cursor: default">
+                    <a class="sorted_column" ng-click="predicate='totalAcceptedSP'; reverse=!reverse">
+                        <span tooltip-placement="top"  tooltip-html-unsafe="Accepted Story points">AcptdSP</span>
+                    </a>
+                </th>
             </tr>
         </thead>
 
         <tbody>
-            <tr ng-repeat="developerItem in teamItem.developers">
+            <tr ng-repeat="developerItem in teamItem.developers | orderBy:predicate:reverse">
                 <td><a class="btn btn-link" href="{{getDeveloperTimeSheetLink(developerItem.name)}}">{{developerItem.name}}</a></td>
                 <td ng-if="!isShowOnlyTotal" style="text-align: center" ng-repeat="progressDetail in developerItem.progressDetails" ng-class="{info: isWeekend(progressDetail)}"><a class="btn btn-link" ng-click="onCellClick(progressDetail)" ng-bind-html="getCellHrSpString(progressDetail)"></a></td>
-                <td style="text-align: center"><strong><span  class='hour-timesheet-color'>{{toFloat(developerItem.totalHR) | number:2}}</span>/<sup>{{toFloat(developerItem.totalSP) | number:2}}</sup></strong></td>
-                <td style="text-align: center; cursor: default"><strong><span  class='hour-timesheet-color'  tooltip-placement="top"  tooltip-html-unsafe="{{toFloat(developerItem.avgSPOnAllDays) | number:2}}(SP/all_days)">{{toFloat(developerItem.avgSP) | number:2}}</span></strong></td>
-                <td style="text-align: center"><strong><span  class='hour-timesheet-color'>{{toFloat(developerItem.avgSPinHour) | number:2}}</span></strong></td>
+                <td style="text-align: center">
+                    <strong>
+                        <span  class='hour-timesheet-color'>{{toFloat(developerItem.totalHR) | number:2}}</span> / <sup>{{toFloat(developerItem.totalSP) | number:2}}</sup>
+                    </strong>
+                </td>
+                <td style="text-align: center; cursor: default">
+                    <strong>
+                        <span  class='hour-timesheet-color'  tooltip-placement="top"  tooltip-html-unsafe="{{toFloat(developerItem.avgSPOnAllDays) | number:2}}(SP/all_days)">{{toFloat(developerItem.avgSP) | number:2}}</span>
+                    </strong>
+                </td>
+                <td style="text-align: center">
+                    <strong>
+                        <span  class='hour-timesheet-color'>{{toFloat(developerItem.avgSPinHour) | number:2}}</span>
+                    </strong>
+                </td>
+                <td style="text-align: center">
+                    <strong>
+                        <span  class='hour-timesheet-color'>{{toFloat(developerItem.totalAcceptedSP) | number:2}}</span>
+                    </strong>
+                </td>
             </tr>
         </tbody>
+
+        <tfoot>
+            <tr>
+                <td>Totals:</td>
+                <td ng-if="!isShowOnlyTotal"  style="text-align: center; cursor: default" ng-repeat="progressDetailItem in teamItem.developers[getDeveloperIndexNotEmpty(teamItem.developers)].progressDetails">
+                    <span tooltip-placement="top"  tooltip-html-unsafe="{{'Total SP for ' + (progressDetailItem.date | date:'dd-MM-yyyy')}}">
+                        {{toFloat(getTotal(progressDetailItem.date, teamItem.developers)) | number:2}}
+                    </span>
+                </td>
+                <td style="text-align: center; cursor: default"><span tooltip-placement="top"  tooltip-html-unsafe="Total EH <sup> / Total SP</sup>">{{toFloat(teamItem.totalTeamHR) | number:2}}</span> / <sup>{{toFloat(teamItem.totalTeamSP) | number:2}}</sup></td>
+                <td style="text-align: center; cursor: default"><span tooltip-placement="top"  tooltip-html-unsafe="Total SP/Days">{{toFloat(teamItem.totalAvgSP) | number:2}}</span></td>
+                <td style="text-align: center; cursor: default"><span tooltip-placement="top"  tooltip-html-unsafe="Total SP/Hour">{{toFloat(teamItem.totalAvgSPinHour) | number:2}}</span></td>
+                <td style="text-align: center; cursor: default"><span tooltip-placement="top"  tooltip-html-unsafe="Total AcptdSP">{{toFloat(teamItem.totalTeamAcceptedSP) | number:2}}</span></td>
+
+            </tr>
+        </tfoot>
     </table>
 
 

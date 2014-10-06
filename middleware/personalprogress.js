@@ -79,9 +79,29 @@ function parsePages(fromDate, toDate, callback) {
                                 }
                             }
 
-                            developer.avgSP =  developer.totalSP/effectiveDays;
+                            developer.avgSP =  developer.totalSP/(effectiveDays || 1);
                             developer.avgSPOnAllDays =  developer.totalSP/daysPeriod;
-                            developer.avgSPinHour =  developer.totalSP/developer.totalHR;
+                            developer.avgSPinHour =  developer.totalSP/(developer.totalHR || 1);
+
+                            parseStatusClosed(developer, ProgressPages);
+
+                            team.totalTeamSP += developer.totalSP;
+                            team.totalTeamHR += developer.totalHR;
+
+                            if(developer.avgSP)
+                            {
+                                team.totalAvgSP += developer.avgSP;
+                            }
+
+                            if(developer.avgSPinHour)
+                            {
+                                team.totalAvgSPinHour += developer.avgSPinHour;
+                            }
+
+                            if(developer.totalAcceptedSP)
+                            {
+                                team.totalTeamAcceptedSP += developer.totalAcceptedSP;
+                            }
 
                             developerCallback();
                         })
@@ -144,6 +164,14 @@ function parseProgressHistory (day, developer, progressDetail, pageItem) {
     });
 }
 
+function parseStatusClosed(developer, pages) {
+    _.each(pages, function (pageItem) {
+        if (pageItem.status == "Closed" && pageItem.resolution == "Done" && pageItem.progress == "100")
+        {
+            developer.totalAcceptedSP += parseFloat(pageItem.storyPoints);
+        }
+    });
+}
 
 
 function datesCompareHelper(date1, date2) {

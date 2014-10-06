@@ -11,6 +11,8 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         $scope.dataLoad();
         $scope.sortByDate = false;
         $scope.filterEod = false;
+        $scope.filterQ1 = false;
+        $scope.filterQ2 = false;
     };
 
     $scope.reInit = function () {
@@ -104,6 +106,12 @@ function moduleProgressController($scope, $resource, $window, $filter) {
                 }
             }
             if($scope.filterEod && !moduleProgressItem.endOfYearDelivery) {
+                return;
+            }
+            if($scope.filterQ1 && !moduleProgressItem.q1Delivery) {
+                return;
+            }
+            if($scope.filterQ2 && !moduleProgressItem.q2Delivery) {
                 return;
             }
 
@@ -226,6 +234,16 @@ function moduleProgressController($scope, $resource, $window, $filter) {
     };
 
     $scope.onFilterEod = function() {
+        $scope.reInitTotal();
+        $scope.isTotalWasCalculated = false;
+        $scope.processWithRowSpans();
+    }
+    $scope.onFilterQ1 = function() {
+        $scope.reInitTotal();
+        $scope.isTotalWasCalculated = false;
+        $scope.processWithRowSpans();
+    }
+    $scope.onFilterQ2 = function() {
         $scope.reInitTotal();
         $scope.isTotalWasCalculated = false;
         $scope.processWithRowSpans();

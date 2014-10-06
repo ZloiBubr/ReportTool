@@ -60,6 +60,13 @@ function parsePages(callback) {
                 return a > b ? 1 : a < b ? -1 : 0;
             });
         }
+        //3. round
+        for (var k = 0; k < velocity.data.length; k++) {
+            var team = velocity.data[k];
+            for (var l = 0; l < team.data.length; l++) {
+                team.data[l][1] = Math.round(team.data[l][1]*10)/10;
+            }
+        }
         callback(err, velocity);
     })
 }
