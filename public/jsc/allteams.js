@@ -8,7 +8,7 @@ function Teams() {
             developers: [
                 "Andrei Osipau2",
                 "Dzianis Arlouski",
-
+                "Siarhei Tkachenka",
                 "Iryna Kucharenka1",
                 "Ivan Izmer",
                 "Mark Varabyou",
