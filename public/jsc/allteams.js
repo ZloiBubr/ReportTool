@@ -83,7 +83,7 @@ function Teams() {
                 "Raman Prakofyeu",
                 "Ruslan Khilmanovich",
                 "Anton Kratenok",
-
+                "Siarhei Maksimau1",
                 "Dzmitry Chapurok",
                 "Evgeny Sinitsyn"
 
