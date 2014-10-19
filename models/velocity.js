@@ -23,6 +23,10 @@ exports.data = function () {
         {
             data: [],
             name: "Total"
+        },
+        {
+            data: [],
+            name: "TeamUnknown"
         }
     ];
 };
