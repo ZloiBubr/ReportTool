@@ -119,6 +119,10 @@ function parsePages(callback) {
                                 async.eachSeries(pages, function(page, callback) {
                                         var storyPoints = page.storyPoints == null ? 0 : parseFloat(page.storyPoints);
 
+                                        //if(page.epicKey == 'PLEXUXC-2056') {
+                                        //    log.info(page.key + ', ' + page.status + ', ' + page.resolution);
+                                        //}
+
                                         var moduleGroup = getModuleGroupName(page.labels);
                                         var teamName = getTeamName(page.labels);
                                         var streamName = getStreamName(page.labels);
@@ -131,7 +135,7 @@ function parsePages(callback) {
                                         status = status == 'Closed' && resolution == "Done" ? "Accepted" : status;
                                         status = status == 'Closed' && resolution == "Implemented" ? "Accepted" : status;
 
-                                        var ignore = status == "Closed" && (resolution == "Out of Scope" || resolution == "Rejected");
+                                        var ignore = status == "Closed" && (resolution == "Out of Scope" || resolution == "Rejected" || resolution == "Canceled");
 
                                         if(!ignore) {
                                             putDataPoint(moduledata, endOfYearDelivery, q1Delivery, q2Delivery, dueDateConfirmed, status, moduleGroup, teamName, streamName, calcStoryPoints, storyPoints, ++count, module);
