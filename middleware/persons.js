@@ -1,4 +1,5 @@
 var AllTeams = require ('../public/jsc/allteams').AllTeams;
+var oldDevelopers = require ('../public/jsc/allteams').OldDevelopers;
 
 exports.isDeveloper = function (name) {
     for(var i=0; i<AllTeams.teams.length-1; i++) {
@@ -9,7 +10,9 @@ exports.isDeveloper = function (name) {
             }
         }
     }
-
+    if(oldDevelopers(name)) {
+        return true;
+    }
     return false;
 };
 

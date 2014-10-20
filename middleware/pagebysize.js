@@ -16,17 +16,6 @@ function isDeveloper(name) {
     if (persons.isDeveloper(name)) {
             return true;
     }
-    if(name == 'Valentine Zhuck' ||
-        name == 'Dzmitry Tabolich' ||
-        name == 'Heorhi Vilkitski' ||
-        name == "Hanna Kastsian" ||
-        name == "Alena Charnova" ||
-        name == "Aliaksei Astashkin" ||
-        name == "yauheni_lohinau" ||
-        name == "Dmytro Komar" ||
-        name == undefined) {
-        return true;
-    }
     return false;
 }
 
