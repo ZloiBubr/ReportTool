@@ -3,7 +3,7 @@ function Teams() {
         {
             id: "TeamRenaissance",
             name: "Renaissance",
-            teamLead: "Anton Valadzko",
+            teamLead: "Aliaksandr Koush",
             qaTeamLead: "Aliaksandra Kutynka",
             developers: [
                 "Andrei Osipau2",
@@ -14,13 +14,11 @@ function Teams() {
                 "Mark Varabyou",
                 "Raman But-Husaim",
                 "Siarhei Abrazhevich",
-
                 "Artsiom Rusak",
                 "Raman Ivanou",
                 "Aliaksandr Koush",
                 "Nicolay Kostroma",
                 "Valentina Napolnova",
-
                 "Aliaksey Rahatka",
                 "Pavel Kastsiuk",
                 "Juliana Stolnik"
@@ -78,7 +76,6 @@ function Teams() {
                 "Ilya Kazlou1",
                 "Katsiaryna Kaliukhovich",
                 "Vadzim Vysotski",
-                "Aliaksei Labachou",
                 "Edhar Liashok",
                 "Raman Prakofyeu",
                 "Ruslan Khilmanovich",
@@ -86,14 +83,13 @@ function Teams() {
                 "Siarhei Maksimau1",
                 "Dzmitry Chapurok",
                 "Evgeny Sinitsyn"
-
             ],
             testers: [
                 "Aliaksei Burnosenka",
                 "Viktar Mikalayenka",
-                "Viktoryia Darashenka",
                 "Eugeny Okulik",
                 "Yuliya Kalasouskaya",
+                "Hanna Maskalenka",
                 "Valiantsina Krautsevich"
             ]
         },
@@ -125,7 +121,8 @@ function Teams() {
                 "Igor Andros",
                 "Maria Sobal",
                 "Yuliya Karnatsevich",
-                "Iryna Kutsko"
+                "Iryna Kutsko",
+                "Natalya Krestelyova"
             ]
         },
         {
@@ -148,7 +145,7 @@ function Teams() {
                 "Aliaksandr Rykau",
                 "Ivan Dziameshka",
                 "Siarhei Bahdanovich",
-
+                "Andrei Lysenka",
                 "Aleh Dukel",
                 "Ivan Yanchuk"
             ],
@@ -166,10 +163,7 @@ function Teams() {
             name: "Automation",
             teamLead: "Aliaksandr Basau",
             developers: [
-                "Aliaksandr Basau",
-                "Julia Zhavnerchik",
                 "Nadzeya Mishurava",
-                "Stepan Zelenin",
                 "Viachaslau Naimovich",
                 "Vitali Sonchyk",
                 "Katsiaryna Firsava",
