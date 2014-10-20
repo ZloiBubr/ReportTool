@@ -186,6 +186,9 @@ exports.OldDevelopers = function oldDevelopers(name) {
         name == "Aliaksei Astashkin" ||
         name == "yauheni_lohinau" ||
         name == "Dmytro Komar" ||
+        name == "Aliaksei Labachou" ||
+        name == "Mariya Babich" ||
+        name == "Katsiaryna Sasina" ||
         name == undefined) {
         return true;
     }
