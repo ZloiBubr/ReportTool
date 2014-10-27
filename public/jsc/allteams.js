@@ -110,6 +110,7 @@ function Teams() {
                 "Dzmitry Isachenka",
                 "Eugen Surovets",
                 "Katsiaryna Tsalabanava",
+                "Kate Tsalabanava",
                 "Vitali Podobed",
                 "Hleb Krotsik",
                 "Uladzimir Vysotski"
