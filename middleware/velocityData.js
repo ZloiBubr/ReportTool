@@ -43,6 +43,7 @@ function parsePages(callback) {
                 var progress = to - from;
                 var calcStoryPoints = storyPoints * progress / 100;
                 putDataPoint(velocity, teamName, date, calcStoryPoints);
+                putDataPoint(velocity, "Total", date, calcStoryPoints);
             }
         }
 
@@ -89,6 +90,7 @@ function getTeamName(labels) {
         return "TeamLiberty";
     if (labels.indexOf("TeamViva") > -1)
         return "TeamViva";
+    return "TeamUnknown";
 }
 
 function putDataPoint(velocity, teamName, date, calcStoryPoints) {
