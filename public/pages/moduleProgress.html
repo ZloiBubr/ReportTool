@@ -4,6 +4,7 @@
             <li><input type="checkbox" ng-model="filterEod" ng-change="onFilterEod()"><img width="40" height="40" alt="EOY" src="img/cartoon-santa.jpg"/>EOY Modules</li>
             <li><input type="checkbox" ng-model="filterQ1" ng-change="onFilterQ1()"><img width="40" height="40" alt="Q1" src="img/banny.png"/>Q1 Modules</li>
             <li><input type="checkbox" ng-model="filterQ2" ng-change="onFilterQ2()"><img width="40" height="40" alt="Q2" src="img/finish.png"/>Q2 Modules</li>
+            <li>Fix Version:<select class="form-control headerSelectWidth" ng-model="filteredVersion" class="headerSelectWidth" ng-options="version.name as version.name for version in allVersions" ng-change="filterModule()"></select></li>
             <li>SME:<select class="form-control headerSelectWidth" ng-model="filteredSme" class="headerSelectWidth" ng-options="sme.name as sme.name for sme in allSMEs" ng-change="filterModule()"></select></li>
             <li>Module Group:<select class="form-control headerSelectWidth" ng-model="filteredMG" class="headerSelectWidth" ng-options="moduleGroup.name as moduleGroup.name for moduleGroup in allModuleGroups" ng-change="filterModule()"></select></li>
             <li>Team:<select class="form-control headerSelectWidth" ng-model="filteredTeam" class="headerSelectWidth" ng-options="team.name as team.name for team in allTeams" ng-change="filterModule()"></select></li>

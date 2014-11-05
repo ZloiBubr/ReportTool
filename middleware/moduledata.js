@@ -90,6 +90,23 @@ function getModuleGroupName(labels) {
     return groupName;
 }
 
+function getSizeName(labels) {
+    var sizeName = "Unknown";
+    var index = labels.indexOf("PageSize");
+    if(index < 0) {
+        return sizeName;
+    }
+    var index2 = labels.indexOf(',', index);
+    if(index2 < 0) {
+        index2 = labels.length;
+    }
+
+    if(labels.substring(index+8,index2) != "") {
+        sizeName = labels.substring(index+8,index2);
+    }
+    return sizeName;
+}
+
 function SortData(moduledata) {
     moduledata.module.sort(function (a, b) {
         a = a.name;
@@ -102,6 +119,7 @@ function parsePages(callback) {
     var moduledata = new moduleData();
     moduledata.module = [];
 
+    var pageByMonthArray = [[],[],[],[],[],[],[],[],[],[],[],[]];
 
     async.series([
         function (callback) {
@@ -118,6 +136,19 @@ function parsePages(callback) {
                             if(pages != null && pages.length > 0) {
                                 async.eachSeries(pages, function(page, callback) {
                                         var storyPoints = page.storyPoints == null ? 0 : parseFloat(page.storyPoints);
+
+                                        if(page.devFinished != null) {
+                                            var dfDate = new Date(Date.parse(page.devFinished));
+                                            var dfMonth = dfDate.getMonth();
+                                            var sizeName = getSizeName(page.labels);
+                                            var monthItems = pageByMonthArray[dfMonth];
+                                            if(monthItems[sizeName] != null) {
+                                                monthItems[sizeName]++;
+                                            }
+                                            else {
+                                                monthItems[sizeName] = 1;
+                                            }
+                                        }
 
                                         //if(page.epicKey == 'PLEXUXC-2056') {
                                         //    log.info(page.key + ', ' + page.status + ', ' + page.resolution);
@@ -184,7 +215,9 @@ function putDataPoint(moduledata, endOfYearDelivery, q1Delivery, q2Delivery, due
             name: module.summary, duedate: module.duedate, smename: module.assignee,
             teamnames: [], key: module.key,
             accepted: status == "Accepted", status: status,
-            modulestatus: module.status, moduleresolution: module.resolution };
+            modulestatus: module.status, moduleresolution: module.resolution,
+            fixVersions: module.fixVersions
+        };
         moduledata.module.push(moduled);
     }
 

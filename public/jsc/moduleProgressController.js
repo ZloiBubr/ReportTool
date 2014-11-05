@@ -23,6 +23,7 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         $scope.filteredSme = $scope.allSMEs[0].id;
         $scope.filteredMG = $scope.allModuleGroups[0].id;
         $scope.filteredTeam = $scope.allTeams[0].id;
+        $scope.filteredVersion = $scope.allVersions[0].id;
         $scope.isTotalWasCalculated = false;
         $scope.reInitTotal();
         $scope.getModuleData().done($scope.processWithRowSpans);
@@ -35,12 +36,25 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         $scope.total.total = 0;
         $scope.allSMEs = [{id: "All", name: "All"}];
         $scope.allModuleGroups = [{id: "All", name: "All"}];
+        $scope.allVersions = [{id: "All", name: "All"}];
     };
 
     $scope.processWithRowSpans = function () {
         $scope.total.doneSP = 0;
         $scope.total.summSP = 0;
         $scope.updatedModuleProgressData=[];
+        //fill in Versions combo
+        _.each($scope.moduleProgressData.module, function(module) {
+            var found = false;
+            _.each($scope.allVersions, function(version) {
+                if(version.name == module.fixVersions) {
+                    found = true;
+                }
+            });
+            if(!found) {
+                $scope.allVersions.push({id: module.fixVersions, name: module.fixVersions});
+            }
+        });
         //fill in groups and sme combos
         _.each($scope.moduleProgressData.module, function(module) {
             var found = false;
@@ -86,9 +100,23 @@ function moduleProgressController($scope, $resource, $window, $filter) {
             }
             return a > b ? 1 : a < b ? -1 : 0;
         });
+        $scope.allVersions.sort(function (a, b) {
+            a = a.name;
+            b = b.name;
+            if(a == "All") {
+                return -1;
+            }
+            if(b == "All") {
+                return 1;
+            }
+            return a > b ? 1 : a < b ? -1 : 0;
+        });
 
         _.each($scope.moduleProgressData.module, function(moduleProgressItem) {
             if($scope.filteredMG != $scope.allModuleGroups[0].id && moduleProgressItem.moduleGroup != $scope.filteredMG){
+                return;
+            }
+            if($scope.filteredVersion != $scope.allVersions[0].id && moduleProgressItem.fixVersions != $scope.filteredVersion){
                 return;
             }
             if($scope.filteredSme != $scope.allSMEs[0].id && moduleProgressItem.smename != $scope.filteredSme){

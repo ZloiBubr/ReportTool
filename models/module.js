@@ -12,7 +12,8 @@ var schema = new Schema({
     assignee:   { type: String },
     status:     { type: String },
     labels:     { type: String },
-    resolution: { type: String }
+    resolution: { type: String },
+    fixVersions:{ type: String }
 });
 
 exports.Module = mongoose.model('Module', schema);
