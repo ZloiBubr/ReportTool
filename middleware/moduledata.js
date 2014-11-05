@@ -113,6 +113,7 @@ function parsePages(callback) {
                             var q2Delivery = module._doc.labels != null ? module._doc.labels.indexOf('Q2Deliverable') > -1 : false;
                             var q2Delivery = q2Delivery || !(endOfYearDelivery || q1Delivery);
                             var dueDateConfirmed = getDueDateConfirmed(module._doc.labels);
+                            var responsibleTeam = getTeamName(module.labels);
                             var count = 0;
                             Page.find({epicKey: module.key}).exec(function (err, pages) {
                             if(pages != null && pages.length > 0) {
@@ -138,7 +139,7 @@ function parsePages(callback) {
                                         var ignore = status == "Closed" && (resolution == "Out of Scope" || resolution == "Rejected" || resolution == "Canceled");
 
                                         if(!ignore) {
-                                            putDataPoint(moduledata, endOfYearDelivery, q1Delivery, q2Delivery, dueDateConfirmed, status, moduleGroup, teamName, streamName, calcStoryPoints, storyPoints, ++count, module);
+                                            putDataPoint(moduledata, endOfYearDelivery, q1Delivery, q2Delivery, dueDateConfirmed, status, moduleGroup, teamName, streamName, calcStoryPoints, storyPoints, responsibleTeam, ++count, module);
                                         }
                                         callback();
                                 },
@@ -147,7 +148,7 @@ function parsePages(callback) {
                                 });
                             }
                             else {
-                                putDataPoint(moduledata, endOfYearDelivery, q1Delivery, q2Delivery, dueDateConfirmed, "Empty", "Unknown Module Group", "", "", 0, 0, count, module);
+                                putDataPoint(moduledata, endOfYearDelivery, q1Delivery, q2Delivery, dueDateConfirmed, "Empty", "Unknown Module Group", "", "", 0, 0, responsibleTeam, count, module);
                                 callback();
                             }
                         })
@@ -168,7 +169,7 @@ function parsePages(callback) {
     ]);
 }
 
-function putDataPoint(moduledata, endOfYearDelivery, q1Delivery, q2Delivery, dueDateConfirmed, status, moduleGroup, teamName, streamName, calcStoryPoints, storyPoints, count, module) {
+function putDataPoint(moduledata, endOfYearDelivery, q1Delivery, q2Delivery, dueDateConfirmed, status, moduleGroup, teamName, streamName, calcStoryPoints, storyPoints, epicResponsibleTeam,  count, module) {
     var initUri = "https://jira.epam.com/jira/issues/?jql=project%20%3D%20PLEX-UXC%20and%20issuetype%3DEpic%20AND%20summary%20~%20'";
 
     //module
@@ -199,6 +200,10 @@ function putDataPoint(moduledata, endOfYearDelivery, q1Delivery, q2Delivery, due
     moduled.q1Delivery = q1Delivery;
     moduled.q2Delivery = q2Delivery;
     moduled.dueDateConfirmed = dueDateConfirmed;
+    moduled.dueDateConfirmed = dueDateConfirmed;
+    moduled.epicResponsibleTeam = epicResponsibleTeam
+    moduled.priorityName = module.priorityName;
+    moduled.priorityIconUrl = module.priorityIconUrl;
 
 
     var moduleStatus = statusList.getStatusByName(moduled.status);

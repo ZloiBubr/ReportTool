@@ -281,6 +281,10 @@ function moduleProgressController($scope, $resource, $window, $filter) {
 
         smeName:{
             getter: function(item){ return item.smename; }
+        },
+
+        priorityName:{
+            getter: function(item){ return item.priorityName; }
         }
     };
 
