@@ -155,8 +155,9 @@ function parsePages(callback) {
                                         //}
 
                                         var moduleGroup = getModuleGroupName(page.labels);
-                                        var teamName = getTeamName(page.labels);
-                                        var streamName = getStreamName(page.labels);
+                                        var labels = module._doc.labels != null ? module._doc.labels : "";
+                                        var teamName = getTeamName(labels);
+                                        var streamName = getStreamName(labels);
 
                                         var calcStoryPoints = storyPoints * page.progress / 100;
 
