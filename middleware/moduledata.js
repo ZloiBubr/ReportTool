@@ -132,6 +132,10 @@ function parsePages(callback) {
                             var q2Delivery = q2Delivery || !(endOfYearDelivery || q1Delivery);
                             var dueDateConfirmed = getDueDateConfirmed(module._doc.labels);
                             var count = 0;
+                            var labels = module._doc.labels != null ? module._doc.labels : "";
+                            var teamName = getTeamName(labels);
+                            var streamName = getStreamName(labels);
+
                             Page.find({epicKey: module.key}).exec(function (err, pages) {
                             if(pages != null && pages.length > 0) {
                                 async.eachSeries(pages, function(page, callback) {
@@ -155,9 +159,6 @@ function parsePages(callback) {
                                         //}
 
                                         var moduleGroup = getModuleGroupName(page.labels);
-                                        var labels = module._doc.labels != null ? module._doc.labels : "";
-                                        var teamName = getTeamName(labels);
-                                        var streamName = getStreamName(labels);
 
                                         var calcStoryPoints = storyPoints * page.progress / 100;
 
@@ -179,7 +180,7 @@ function parsePages(callback) {
                                 });
                             }
                             else {
-                                putDataPoint(moduledata, endOfYearDelivery, q1Delivery, q2Delivery, dueDateConfirmed, "Empty", "Unknown Module Group", "", "", 0, 0, count, module);
+                                putDataPoint(moduledata, endOfYearDelivery, q1Delivery, q2Delivery, dueDateConfirmed, "Empty", "Unknown Module Group", teamName, streamName, 0, 0, count, module);
                                 callback();
                             }
                         })
