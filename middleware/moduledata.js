@@ -202,7 +202,7 @@ function parsePages(callback) {
 }
 
 function putDataPoint(moduledata, endOfYearDelivery, q1Delivery, q2Delivery, dueDateConfirmed, status, moduleGroup, teamName, streamName, calcStoryPoints, storyPoints, count, module) {
-    var initUri = "https://jira.epam.com/jira/issues/?jql=project%20%3D%20PLEX-UXC%20and%20issuetype%3DEpic%20AND%20summary%20~%20'";
+    var initUri = "https://jira.epam.com/jira/browse/";
 
     //module
     var moduled;
@@ -226,7 +226,7 @@ function putDataPoint(moduledata, endOfYearDelivery, q1Delivery, q2Delivery, due
     moduled.reportedSP += calcStoryPoints;
     moduled.summarySP += storyPoints;
     moduled.progress = moduled.reportedSP*100/moduled.summarySP;
-    moduled.uri = initUri + module.summary + "'";
+    moduled.uri = initUri + module.key;
     moduled.moduleGroup = moduleGroup;
     moduled.accepted = moduled.accepted ? status == "Accepted" : false;
     moduled.pagescount = count;
