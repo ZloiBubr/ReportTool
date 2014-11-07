@@ -13,6 +13,8 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         $scope.filterEod = false;
         $scope.filterQ1 = false;
         $scope.filterQ2 = false;
+        $scope.showTeamTable = false;
+        $scope.showStreams = false;
     };
 
     $scope.reInit = function () {
@@ -232,14 +234,18 @@ function moduleProgressController($scope, $resource, $window, $filter) {
 
     function getTeamObj(teamName) {
         var teamobj = null;
+        var teamNameCorrected = teamName;
+        if(!$scope.showStreams){
+            teamNameCorrected = getCleanTeamName(teamName);
+        }
         _.each($scope.teamLoadData, function (team) {
-            if (team.name == teamName) {
+            if (team.name == teamNameCorrected) {
                 teamobj = team;
             }
         });
         if (teamobj == null) {
             var team = {
-                name: teamName,
+                name: teamNameCorrected,
                 versions: []
             };
             _.each($scope.showVersions, function(version) {
@@ -249,6 +255,15 @@ function moduleProgressController($scope, $resource, $window, $filter) {
             teamobj = team;
         }
         return teamobj;
+    }
+
+    function getCleanTeamName(teamName) {
+        var index = teamName.indexOf(":");
+        if(index < 0) {
+            return teamName;
+        }
+
+        return teamName.substring(0,index);
     }
 
     function processEntity(entity, moduleProgressItem) {

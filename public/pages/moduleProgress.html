@@ -1,9 +1,12 @@
 <div id="container" class="container" ng-controller="moduleProgressController" style="padding-left: 150px">
     <div class="visible-md visible-lg visible-sm" style="position:fixed; left: 10px; top:150px; font-size: 12pt ">
         <ul class="list-unstyled">
-            <li><input type="checkbox" ng-model="filterEod" ng-change="onFilterEod()"><img width="40" height="40" alt="EOY" src="img/cartoon-santa.jpg"/>EOY Modules</li>
-            <li><input type="checkbox" ng-model="filterQ1" ng-change="onFilterQ1()"><img width="40" height="40" alt="Q1" src="img/banny.png"/>Q1 Modules</li>
-            <li><input type="checkbox" ng-model="filterQ2" ng-change="onFilterQ2()"><img width="40" height="40" alt="Q2" src="img/finish.png"/>Q2 Modules</li>
+            <li class="red"><input type="checkbox" ng-model="showTeamTable"> Show Team Table</li>
+            <li class="yellow"><input type="checkbox" ng-model="showStreams" ng-change="onFilterEod()"> Show Streams</li>
+            <li><img width="40" height="40" alt="Conf" src="img/duedate.png"/> DueDate confirmed</li>
+            <li><input type="checkbox" ng-model="filterEod" ng-change="onFilterEod()"> EOY Modules</li>
+            <li><input type="checkbox" ng-model="filterQ1" ng-change="onFilterQ1()"> Q1 Modules</li>
+            <li><input type="checkbox" ng-model="filterQ2" ng-change="onFilterQ2()"> Q2 Modules</li>
             <li>Fix Version:<select class="form-control headerSelectWidth" ng-model="filteredVersion" class="headerSelectWidth" ng-options="version.name as version.name for version in allVersions" ng-change="filterModule()"></select></li>
             <li>SME:<select class="form-control headerSelectWidth" ng-model="filteredSme" class="headerSelectWidth" ng-options="sme.name as sme.name for sme in allSMEs" ng-change="filterModule()"></select></li>
             <li>Module Group:<select class="form-control headerSelectWidth" ng-model="filteredMG" class="headerSelectWidth" ng-options="moduleGroup.name as moduleGroup.name for moduleGroup in allModuleGroups" ng-change="filterModule()"></select></li>
@@ -20,7 +23,7 @@
             <li><label><span class="glyphicon glyphicon-asterisk"></span><strong>{{total.doneSP | number : 0}}/{{total.summSP | number : 0}}</strong>:SP</label></li>
         </ul>
     </div>
-    <div class="row">
+    <div class="row" ng-show="showTeamTable">
         <table class="table table-bordered">
             <thead class="progressTableMainHeader">
             <tr>
@@ -85,9 +88,6 @@
                     </td>
                     <td>
                         <div>{{module.duedate2 | date:'MMM-dd-yyyy'}}</div>
-                        <img ng-show="module.endOfYearDelivery" width="40" height="40" alt="EOY" src="img/cartoon-santa.jpg"/>
-                        <img ng-show="module.q1Delivery" width="40" height="40" alt="Q1" src="img/banny.png"/>
-                        <img ng-show="module.q2Delivery" width="40" height="40" alt="Q2" src="img/finish.png"/>
                         <img ng-show="module.dueDateConfirmed" width="40" height="40" alt="Conf" src="img/duedate.png"/>
                     </td>
                     <td>
