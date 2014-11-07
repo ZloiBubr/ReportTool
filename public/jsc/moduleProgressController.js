@@ -17,6 +17,7 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         $scope.showStreams = false;
         $scope.showModules = false;
         $scope.showCompletedModules = true;
+        $scope.showCards = false;
     };
 
     $scope.reInit = function () {

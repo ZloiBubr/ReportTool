@@ -3,8 +3,9 @@
         <ul class="list-unstyled">
             <li class="red"><input type="checkbox" ng-model="showTeamTable"> Teams Table</li>
             <li><input type="checkbox" ng-model="showStreams" ng-change="onFilterEod()"> Streams</li>
-            <li><input type="checkbox" ng-model="showModules" ng-change="onFilterEod()"> Modules</li>
-            <li><input type="checkbox" ng-model="showCompletedModules" ng-change="onFilterEod()"> Completed Modules</li>
+            <li><input type="checkbox" ng-model="showCards" ng-change="onFilterEod()"> Cards</li>
+            <li><input type="checkbox" ng-model="showModules" ng-change="onFilterEod()"> SME / Modules</li>
+            <li><input type="checkbox" ng-model="showCompletedModules" ng-change="onFilterEod()"> Completed</li>
             <li><br/></li>
             <li><img width="40" height="40" alt="Conf" src="img/duedate.png"/> DueDate confirmed</li>
             <li><br/></li>
@@ -43,7 +44,7 @@
                     </td>
                     <td ng-repeat="version in team.versions">
                         <div class="bg-primary"><sup style="color: #f7ecb5">{{version.done | number : 0}}</sup><span style="font-style: italic">{{version.total | number : 0}}</span></div>
-                        <table class="table table-condensed">
+                        <table class="table table-condensed" ng-if="showCards">
                             <tr ng-repeat = "card in version.smeNames">
                                 <td ng-class="{'bg-info': !card.completed, green: card.completed}">
                                     <div>{{card.name}} <sup style="color: #0028c1">{{card.reportedSP}}</sup><span style="font-style: italic">{{card.summarySP}}</span></div>
