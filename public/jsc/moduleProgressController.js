@@ -16,6 +16,7 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         $scope.showTeamTable = false;
         $scope.showStreams = false;
         $scope.showModules = false;
+        $scope.showCompletedModules = false;
     };
 
     $scope.reInit = function () {
@@ -234,7 +235,10 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         if(!found) {
             var completed = reportedSP == summarySP;
             var card = { name: name, completed: completed, reportedSP: reportedSP, summarySP: summarySP};
-            smeNames.push(card);
+            if($scope.showCompletedModules ||
+                !$scope.showCompletedModules && !completed) {
+                smeNames.push(card);
+            }
         }
     }
 
