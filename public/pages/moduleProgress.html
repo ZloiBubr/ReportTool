@@ -3,6 +3,7 @@
         <ul class="list-unstyled">
             <li class="red"><input type="checkbox" ng-model="showTeamTable"> Show Team Table</li>
             <li class="yellow"><input type="checkbox" ng-model="showStreams" ng-change="onFilterEod()"> Show Streams</li>
+            <li class="green"><input type="checkbox" ng-model="showModules" ng-change="onFilterEod()"> Show Modules</li>
             <li><img width="40" height="40" alt="Conf" src="img/duedate.png"/> DueDate confirmed</li>
             <li><input type="checkbox" ng-model="filterEod" ng-change="onFilterEod()"> EOY Modules</li>
             <li><input type="checkbox" ng-model="filterQ1" ng-change="onFilterQ1()"> Q1 Modules</li>
@@ -38,9 +39,9 @@
                     <td ng-repeat="version in team.versions">
                         <div class="bg-primary"><sup style="color: #f7ecb5">{{version.done | number : 0}}</sup><span style="font-style: italic">{{version.total | number : 0}}</span></div>
                         <table class="table table-condensed">
-                            <tr ng-repeat = "smeName in version.smeNames">
-                                <td class="bg-info">
-                                    <div>{{smeName}}</div>
+                            <tr ng-repeat = "card in version.smeNames">
+                                <td ng-class="{'bg-info': !card.completed, green: card.completed}">
+                                    <div>{{card.name}} <sup style="color: #0028c1">{{card.reportedSP}}</sup><span style="font-style: italic">{{card.summarySP}}</span></div>
                                 </td>
                             </tr>
                         </table>

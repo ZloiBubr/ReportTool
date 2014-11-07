@@ -15,6 +15,7 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         $scope.filterQ2 = false;
         $scope.showTeamTable = false;
         $scope.showStreams = false;
+        $scope.showModules = false;
     };
 
     $scope.reInit = function () {
@@ -205,7 +206,10 @@ function moduleProgressController($scope, $resource, $window, $filter) {
                     if(version.name == moduleProgressItem.fixVersions) {
                         version.done += moduleProgressItem.reportedSP;
                         version.total += moduleProgressItem.summarySP;
-                        fillSmeNames(version.smeNames, moduleProgressItem.smename);
+                        var moduleName = $scope.showModules ? getCleanModuleName(moduleProgressItem.name) : moduleProgressItem.smename;
+                        var reportedSP = Math.floor(moduleProgressItem.reportedSP);
+                        var summarySP = Math.floor(moduleProgressItem.summarySP);
+                        fillSmeNames(version.smeNames, moduleName, reportedSP, summarySP);
                     }
                 });
             });
@@ -220,15 +224,17 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         $scope.isTotalWasCalculated = true;
     };
 
-    function fillSmeNames(smeNames, name) {
+    function fillSmeNames(smeNames, name, reportedSP, summarySP) {
         var found = false;
         _.each(smeNames, function (smename) {
-            if(smename == name) {
+            if(smename.name == name) {
                 found = true;
             }
         });
         if(!found) {
-            smeNames.push(name);
+            var completed = reportedSP == summarySP;
+            var card = { name: name, completed: completed, reportedSP: reportedSP, summarySP: summarySP};
+            smeNames.push(card);
         }
     }
 
@@ -249,7 +255,7 @@ function moduleProgressController($scope, $resource, $window, $filter) {
                 versions: []
             };
             _.each($scope.showVersions, function(version) {
-               team.versions.push( {name:version, done: 0, total: 0, smeNames: []});
+               team.versions.push( {name:version, done: 0, total: 0, smeNames: [], completed: false});
             });
             $scope.teamLoadData.push(team);
             teamobj = team;
@@ -264,6 +270,15 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         }
 
         return teamName.substring(0,index);
+    }
+
+    function getCleanModuleName(moduleName) {
+        var index = moduleName.indexOf("Module");
+        if(index < 0) {
+            return moduleName;
+        }
+
+        return moduleName.substring(0,index);
     }
 
     function processEntity(entity, moduleProgressItem) {
