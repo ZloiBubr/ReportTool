@@ -28,6 +28,7 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         $scope.reInitTotal();
         $scope.getModuleData().done($scope.processWithRowSpans);
         $scope.updatedModuleProgressData = $filter('orderBy')($scope.updatedModuleProgressData, $scope.sortingModel.dueDate.getter, !$scope.sortingModel.isASC);
+        $scope.teamLoadData = [];
     };
 
     $scope.reInitTotal = function(){
@@ -37,12 +38,14 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         $scope.allSMEs = [{id: "All", name: "All"}];
         $scope.allModuleGroups = [{id: "All", name: "All"}];
         $scope.allVersions = [{id: "All", name: "All"}];
+        $scope.showVersions = [];
     };
 
     $scope.processWithRowSpans = function () {
         $scope.total.doneSP = 0;
         $scope.total.summSP = 0;
         $scope.updatedModuleProgressData=[];
+        $scope.teamLoadData = [];
         //fill in Versions combo
         _.each($scope.moduleProgressData.module, function(module) {
             var found = false;
@@ -53,6 +56,7 @@ function moduleProgressController($scope, $resource, $window, $filter) {
             });
             if(!found) {
                 $scope.allVersions.push({id: module.fixVersions, name: module.fixVersions});
+                $scope.showVersions.push(module.fixVersions);
             }
         });
         //fill in groups and sme combos
@@ -109,6 +113,9 @@ function moduleProgressController($scope, $resource, $window, $filter) {
             if(b == "All") {
                 return 1;
             }
+            return a > b ? 1 : a < b ? -1 : 0;
+        });
+        $scope.showVersions.sort(function (a, b) {
             return a > b ? 1 : a < b ? -1 : 0;
         });
 
@@ -188,11 +195,61 @@ function moduleProgressController($scope, $resource, $window, $filter) {
             if(!$scope.isTotalWasCalculated) {
                 $scope.total.total++;
             }
+
+            //calculating data for top table
+            _.each(moduleProgressItem.teamnames, function(teamName) {
+                var teamobj = getTeamObj(teamName);
+                _.each(teamobj.versions, function(version) {
+                    if(version.name == moduleProgressItem.fixVersions) {
+                        version.done += moduleProgressItem.reportedSP;
+                        version.total += moduleProgressItem.summarySP;
+                        fillSmeNames(version.smeNames, moduleProgressItem.smename);
+                    }
+                });
+            });
         });
 
+        $scope.teamLoadData.sort(function (a, b) {
+            a = a.name;
+            b = b.name;
+            return a > b ? 1 : a < b ? -1 : 0;
+        });
         $scope.onSortingClick();
         $scope.isTotalWasCalculated = true;
     };
+
+    function fillSmeNames(smeNames, name) {
+        var found = false;
+        _.each(smeNames, function (smename) {
+            if(smename == name) {
+                found = true;
+            }
+        });
+        if(!found) {
+            smeNames.push(name);
+        }
+    }
+
+    function getTeamObj(teamName) {
+        var teamobj = null;
+        _.each($scope.teamLoadData, function (team) {
+            if (team.name == teamName) {
+                teamobj = team;
+            }
+        });
+        if (teamobj == null) {
+            var team = {
+                name: teamName,
+                versions: []
+            };
+            _.each($scope.showVersions, function(version) {
+               team.versions.push( {name:version, done: 0, total: 0, smeNames: []});
+            });
+            $scope.teamLoadData.push(team);
+            teamobj = team;
+        }
+        return teamobj;
+    }
 
     function processEntity(entity, moduleProgressItem) {
         if (entity.isChecked) {
