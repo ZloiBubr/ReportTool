@@ -16,7 +16,7 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         $scope.showTeamTable = false;
         $scope.showStreams = false;
         $scope.showModules = false;
-        $scope.showCompletedModules = false;
+        $scope.showCompletedModules = true;
     };
 
     $scope.reInit = function () {

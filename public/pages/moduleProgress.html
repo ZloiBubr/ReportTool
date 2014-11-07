@@ -1,18 +1,22 @@
 <div id="container" class="container" ng-controller="moduleProgressController" style="padding-left: 150px">
     <div class="visible-md visible-lg visible-sm" style="position:fixed; left: 10px; top:150px; font-size: 12pt ">
         <ul class="list-unstyled">
-            <li class="red"><input type="checkbox" ng-model="showTeamTable"> Show Team Table</li>
-            <li><input type="checkbox" ng-model="showStreams" ng-change="onFilterEod()"> Show Streams</li>
-            <li><input type="checkbox" ng-model="showModules" ng-change="onFilterEod()"> Show Modules</li>
-            <li><input type="checkbox" ng-model="showCompletedModules" ng-change="onFilterEod()"> Show Completed Modules</li>
+            <li class="red"><input type="checkbox" ng-model="showTeamTable"> Teams Table</li>
+            <li><input type="checkbox" ng-model="showStreams" ng-change="onFilterEod()"> Streams</li>
+            <li><input type="checkbox" ng-model="showModules" ng-change="onFilterEod()"> Modules</li>
+            <li><input type="checkbox" ng-model="showCompletedModules" ng-change="onFilterEod()"> Completed Modules</li>
+            <li><br/></li>
             <li><img width="40" height="40" alt="Conf" src="img/duedate.png"/> DueDate confirmed</li>
+            <li><br/></li>
             <li><input type="checkbox" ng-model="filterEod" ng-change="onFilterEod()"> EOY Modules</li>
             <li><input type="checkbox" ng-model="filterQ1" ng-change="onFilterQ1()"> Q1 Modules</li>
             <li><input type="checkbox" ng-model="filterQ2" ng-change="onFilterQ2()"> Q2 Modules</li>
+            <li><br/></li>
             <li>Fix Version:<select class="form-control headerSelectWidth" ng-model="filteredVersion" class="headerSelectWidth" ng-options="version.name as version.name for version in allVersions" ng-change="filterModule()"></select></li>
             <li>SME:<select class="form-control headerSelectWidth" ng-model="filteredSme" class="headerSelectWidth" ng-options="sme.name as sme.name for sme in allSMEs" ng-change="filterModule()"></select></li>
             <li>Module Group:<select class="form-control headerSelectWidth" ng-model="filteredMG" class="headerSelectWidth" ng-options="moduleGroup.name as moduleGroup.name for moduleGroup in allModuleGroups" ng-change="filterModule()"></select></li>
             <li>Team:<select class="form-control headerSelectWidth" ng-model="filteredTeam" class="headerSelectWidth" ng-options="team.name as team.name for team in allTeams" ng-change="filterModule()"></select></li>
+            <li><br/></li>
             <li><input type="checkbox" ng-model="total.inProgress.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-play"></span><strong> {{total.inProgress.count}}</strong>:In Progress</li>
             <li class="readyForQA"><input type="checkbox" ng-model="total.readyForQA.isChecked" ng-change="processWithRowSpans()"> <span class="glyphicon glyphicon-th-list"></span><strong> {{total.readyForQA.count}}</strong>:Testing is in prog</li>
             <li class="readyForAcceptance"><input type="checkbox" ng-model="total.resolved.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-check"></span><strong> {{total.resolved.count}}</strong>:Resolved</li>
