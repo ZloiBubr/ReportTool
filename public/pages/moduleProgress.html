@@ -43,11 +43,11 @@
                         <div>{{team.name}}</div>
                     </td>
                     <td ng-repeat="version in team.versions">
-                        <div class="bg-primary"><sup style="color: #f7ecb5">{{version.done | number : 0}}</sup><span style="font-style: italic">{{version.total | number : 0}}</span></div>
+                        <div class="bg-primary"><sup style="color: #f7ecb5">{{version.done | number : 0}}/</sup><sup style="color: #dca7a7">{{version.restSP}}</sup><span style="font-style: italic">{{version.total | number : 0}}</span></div>
                         <table class="table table-condensed" ng-if="showCards">
                             <tr ng-repeat = "card in version.smeNames">
                                 <td ng-class="{'bg-info': !card.completed, green: card.completed}">
-                                    <div>{{card.name}} <sup style="color: #0028c1">{{card.reportedSP}}</sup><span style="font-style: italic">{{card.summarySP}}</span></div>
+                                    <div>{{card.name}}</div><div><sup style="color: #0028c1">{{card.reportedSP}}/</sup><sup style="color: #dca7a7">{{card.restSP}}</sup><span style="font-style: italic">{{card.summarySP}}</span></div>
                                 </td>
                             </tr>
                         </table>

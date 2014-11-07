@@ -206,8 +206,12 @@ function moduleProgressController($scope, $resource, $window, $filter) {
                 var teamobj = getTeamObj(teamName);
                 _.each(teamobj.versions, function(version) {
                     if(version.name == moduleProgressItem.fixVersions) {
-                        version.done += moduleProgressItem.reportedSP;
-                        version.total += moduleProgressItem.summarySP;
+                        if(!(moduleProgressItem.moduleresolution == "Out of Scope" ||
+                            moduleProgressItem.moduleresolution == "Not Applicable")) {
+                            version.done += moduleProgressItem.reportedSP;
+                            version.total += moduleProgressItem.summarySP;
+                            version.restSP = Math.floor(version.total - version.done);
+                        }
                         var moduleName = $scope.showModules ? getCleanModuleName(moduleProgressItem.name) : moduleProgressItem.smename;
                         var reportedSP = Math.floor(moduleProgressItem.reportedSP);
                         var summarySP = Math.floor(moduleProgressItem.summarySP);
@@ -232,13 +236,15 @@ function moduleProgressController($scope, $resource, $window, $filter) {
             if(card.name == name) {
                 card.reportedSP += reportedSP;
                 card.summarySP += summarySP;
+                card.restSP = card.summarySP - card.reportedSP;
                 card.completed = card.reportedSP == card.summarySP;
                 found = true;
             }
         });
         if(!found) {
             var completed = reportedSP == summarySP;
-            var card = { name: name, completed: completed, reportedSP: reportedSP, summarySP: summarySP};
+            var remaining = summarySP - reportedSP;
+            var card = { name: name, completed: completed, restSP: remaining, reportedSP: reportedSP, summarySP: summarySP};
             if($scope.showCompletedModules ||
                 !$scope.showCompletedModules && !completed) {
                 smeNames.push(card);
