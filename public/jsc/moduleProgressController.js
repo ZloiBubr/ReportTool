@@ -227,8 +227,11 @@ function moduleProgressController($scope, $resource, $window, $filter) {
 
     function fillSmeNames(smeNames, name, reportedSP, summarySP) {
         var found = false;
-        _.each(smeNames, function (smename) {
-            if(smename.name == name) {
+        _.each(smeNames, function (card) {
+            if(card.name == name) {
+                card.reportedSP += reportedSP;
+                card.summarySP += summarySP;
+                card.completed = card.reportedSP == card.summarySP;
                 found = true;
             }
         });
