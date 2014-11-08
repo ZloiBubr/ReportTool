@@ -1,7 +1,3 @@
-/**
- * Created by Heorhi_Vilkitski on 4/11/14.
- */
-
 function moduleProgressController($scope, $resource, $window, $filter) {
     var moduleDataResource = $resource('/moduledata');
 
@@ -16,7 +12,6 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         $scope.showTeamTable = false;
         $scope.showStreams = false;
         $scope.showModules = false;
-        $scope.showCompletedModules = true;
         $scope.showCards = false;
     };
 
@@ -44,56 +39,62 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         $scope.allModuleGroups = [{id: "All", name: "All"}];
         $scope.allVersions = [{id: "All", name: "All"}];
         $scope.showVersions = [];
+        $scope.teamLoadData = [];
     };
 
-    $scope.processWithRowSpans = function () {
-        $scope.total.doneSP = 0;
-        $scope.total.summSP = 0;
-        $scope.updatedModuleProgressData=[];
-        $scope.teamLoadData = [];
+    function FillVersionsCombo() {
         //fill in Versions combo
-        _.each($scope.moduleProgressData.module, function(module) {
+        _.each($scope.moduleProgressData.module, function (module) {
             var found = false;
-            _.each($scope.allVersions, function(version) {
-                if(version.name == module.fixVersions) {
+            _.each($scope.allVersions, function (version) {
+                if (version.name == module.fixVersions) {
                     found = true;
                 }
             });
-            if(!found) {
+            if (!found) {
                 $scope.allVersions.push({id: module.fixVersions, name: module.fixVersions});
                 $scope.showVersions.push(module.fixVersions);
             }
         });
+    }
+
+    function FillGroupsCombo() {
         //fill in groups and sme combos
-        _.each($scope.moduleProgressData.module, function(module) {
+        _.each($scope.moduleProgressData.module, function (module) {
             var found = false;
-            _.each($scope.allModuleGroups, function(it_group) {
-                if(it_group.name == module.moduleGroup) {
+            _.each($scope.allModuleGroups, function (it_group) {
+                if (it_group.name == module.moduleGroup) {
                     found = true;
                 }
             });
-            if(!found) {
+            if (!found) {
                 $scope.allModuleGroups.push({id: module.moduleGroup, name: module.moduleGroup});
             }
         });
-        _.each($scope.moduleProgressData.module, function(item) {
+    }
+
+    function FillSmeCombo() {
+        _.each($scope.moduleProgressData.module, function (item) {
             var found = false;
-            _.each($scope.allSMEs, function(sme) {
-                if(sme.name == item.smename) {
+            _.each($scope.allSMEs, function (sme) {
+                if (sme.name == item.smename) {
                     found = true;
                 }
             });
-            if(!found) {
+            if (!found) {
                 $scope.allSMEs.push({id: item.smename, name: item.smename});
             }
         });
+    }
+
+    function SortCombos() {
         $scope.allModuleGroups.sort(function (a, b) {
             a = a.name;
             b = b.name;
-            if(a == "All") {
+            if (a == "All") {
                 return -1;
             }
-            if(b == "All") {
+            if (b == "All") {
                 return 1;
             }
             return a > b ? 1 : a < b ? -1 : 0;
@@ -101,10 +102,10 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         $scope.allSMEs.sort(function (a, b) {
             a = a.name;
             b = b.name;
-            if(a == "All") {
+            if (a == "All") {
                 return -1;
             }
-            if(b == "All") {
+            if (b == "All") {
                 return 1;
             }
             return a > b ? 1 : a < b ? -1 : 0;
@@ -112,10 +113,10 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         $scope.allVersions.sort(function (a, b) {
             a = a.name;
             b = b.name;
-            if(a == "All") {
+            if (a == "All") {
                 return -1;
             }
-            if(b == "All") {
+            if (b == "All") {
                 return 1;
             }
             return a > b ? 1 : a < b ? -1 : 0;
@@ -123,7 +124,17 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         $scope.showVersions.sort(function (a, b) {
             return a > b ? 1 : a < b ? -1 : 0;
         });
+    }
 
+    $scope.processWithRowSpans = function () {
+        $scope.total.doneSP = 0;
+        $scope.total.summSP = 0;
+        $scope.updatedModuleProgressData=[];
+        $scope.teamLoadData = [];
+        FillVersionsCombo();
+        FillGroupsCombo();
+        FillSmeCombo();
+        SortCombos();
         _.each($scope.moduleProgressData.module, function(moduleProgressItem) {
             if($scope.filteredMG != $scope.allModuleGroups[0].id && moduleProgressItem.moduleGroup != $scope.filteredMG){
                 return;
@@ -175,50 +186,49 @@ function moduleProgressController($scope, $resource, $window, $filter) {
             if(cancelled) {
                 var cancelledEntity = $scope.total.getStatusByName("Cancelled");
                 processEntity(cancelledEntity, moduleProgressItem);
+                if(cancelledEntity.isChecked) {
+                    ProcessCards(moduleProgressItem, "Cancelled");
+                }
             }
             else if(notApplicable) {
                 var notApplicableEntity = $scope.total.getStatusByName("Not Applicable");
                 processEntity(notApplicableEntity, moduleProgressItem);
+                if(notApplicableEntity.isChecked) {
+                   ProcessCards(moduleProgressItem, "Cancelled");
+                }
             }
             else if(accepted) {
                 var acceptedEntity = $scope.total.getStatusByName("Accepted");
                 processEntity(acceptedEntity, moduleProgressItem);
+                if(acceptedEntity.isChecked) {
+                    ProcessCards(moduleProgressItem, "Accepted");
+                }
             }
             else if(readyForQa) {
                 var readyForQaEntity = $scope.total.getStatusByName("Ready for QA");
                 processEntity(readyForQaEntity, moduleProgressItem);
+                if(readyForQaEntity.isChecked) {
+                    ProcessCards(moduleProgressItem, "ReadyForQA");
+                }
             }
             else if(resolved) {
                 var resolvedEntity = $scope.total.getStatusByName("Resolved");
                 processEntity(resolvedEntity, moduleProgressItem);
+                if(resolvedEntity.isChecked) {
+                  ProcessCards(moduleProgressItem, "Resolved");
+                }
             }
             else {
                 var inProgressEntity = $scope.total.getStatusByName("In Progress");
                 processEntity(inProgressEntity, moduleProgressItem);
+                if(inProgressEntity.isChecked) {
+                    ProcessCards(moduleProgressItem, "InProgress");
+                }
             }
 
             if(!$scope.isTotalWasCalculated) {
                 $scope.total.total++;
             }
-
-            //calculating data for top table
-            _.each(moduleProgressItem.teamnames, function(teamName) {
-                var teamobj = getTeamObj(teamName);
-                _.each(teamobj.versions, function(version) {
-                    if(version.name == moduleProgressItem.fixVersions) {
-                        if(!(moduleProgressItem.moduleresolution == "Out of Scope" ||
-                            moduleProgressItem.moduleresolution == "Not Applicable")) {
-                            version.done += moduleProgressItem.reportedSP;
-                            version.total += moduleProgressItem.summarySP;
-                            version.restSP = Math.floor(version.total - version.done);
-                        }
-                        var moduleName = $scope.showModules ? getCleanModuleName(moduleProgressItem.name) : moduleProgressItem.smename;
-                        var reportedSP = Math.floor(moduleProgressItem.reportedSP);
-                        var summarySP = Math.floor(moduleProgressItem.summarySP);
-                        fillSmeNames(version.smeNames, moduleName, reportedSP, summarySP);
-                    }
-                });
-            });
         });
 
         $scope.teamLoadData.sort(function (a, b) {
@@ -230,25 +240,97 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         $scope.isTotalWasCalculated = true;
     };
 
-    function fillSmeNames(smeNames, name, reportedSP, summarySP) {
+    function ProcessCards(moduleProgressItem, status) {
+        //calculating data for top table
+        for(var i=0; i<moduleProgressItem.teamnames.length; i++) {
+            var teamName = moduleProgressItem.teamnames[i];
+            var teamobj = getTeamObj(teamName);
+            for(var j=0; j<teamobj.versions.length; j++) {
+                var version = teamobj.versions[j];
+                if (version.name == moduleProgressItem.fixVersions) {
+                    version.done += moduleProgressItem.reportedSP;
+                    version.total += moduleProgressItem.summarySP;
+                    version.restSP = Math.floor(version.total - version.done);
+                    var moduleName = $scope.showModules ? getCleanModuleName(moduleProgressItem.name) : moduleProgressItem.smename;
+                    var reportedSP = Math.floor(moduleProgressItem.reportedSP);
+                    var summarySP = Math.floor(moduleProgressItem.summarySP);
+                    fillSmeNames(version.smeNames, moduleName, reportedSP, summarySP, status);
+                }
+            }
+        }
+    }
+
+    function fillSmeNames(smeNames, name, reportedSP, summarySP, status) {
         var found = false;
-        _.each(smeNames, function (card) {
+        for(var i=0; i<smeNames.length; i++) {
+            var card = smeNames[i];
             if(card.name == name) {
                 card.reportedSP += reportedSP;
                 card.summarySP += summarySP;
                 card.restSP = card.summarySP - card.reportedSP;
-                card.completed = card.reportedSP == card.summarySP;
+                var oldStatus = card.readyForQA ? "ReadyForQA" :
+                    card.readyForAcceptance ? "Resolved" :
+                        card.accepted ? "Accepted" :
+                            card.cancelled ? "Cancelled" : "InProgress";
+
+                switch(status)
+                {
+                    case "ReadyForQA":
+                        if(oldStatus == "InProgress") {
+                            status = "InProgress";
+                        }
+                        break;
+                    case "Resolved":
+                        if(oldStatus == "InProgress") {
+                            status = "InProgress";
+                        }
+                        else if(oldStatus == "ReadyForQA") {
+                            status = "ReadyForQA";
+                        }
+                        break;
+                    case "Accepted":
+                        if(oldStatus == "InProgress") {
+                            status = "InProgress";
+                        }
+                        else if(oldStatus == "ReadyForQA") {
+                            status = "ReadyForQA";
+                        }
+                        else if(oldStatus == "Resolved") {
+                            status = "Resolved";
+                        }
+                        break;
+                    case "Cancelled":
+                        if(oldStatus == "InProgress") {
+                            status = "InProgress";
+                        }
+                        else if(oldStatus == "ReadyForQA") {
+                            status = "ReadyForQA";
+                        }
+                        else if(oldStatus == "Resolved") {
+                            status = "Resolved";
+                        }
+                        else if(oldStatus == "Accepted") {
+                            status = "Accepted";
+                        }
+                        break;
+                    default:
+                }
+
+                card.readyForQA = status == "ReadyForQA";
+                card.readyForAcceptance = status == "Resolved";
+                card.accepted = status == "Accepted";
+                card.cancelled = status == "Cancelled";
                 found = true;
             }
-        });
+        }
         if(!found) {
-            var completed = reportedSP == summarySP;
             var remaining = summarySP - reportedSP;
-            var card = { name: name, completed: completed, restSP: remaining, reportedSP: reportedSP, summarySP: summarySP};
-            if($scope.showCompletedModules ||
-                !$scope.showCompletedModules && !completed) {
-                smeNames.push(card);
-            }
+            var card = { name: name, restSP: remaining, reportedSP: reportedSP, summarySP: summarySP};
+            card.accepted = status == "Accepted";
+            card.readyForAcceptance = status == "Resolved";
+            card.readyForQA = status == "ReadyForQA";
+            card.cancelled = status == "Cancelled";
+            smeNames.push(card);
         }
     }
 
@@ -258,19 +340,21 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         if(!$scope.showStreams){
             teamNameCorrected = getCleanTeamName(teamName);
         }
-        _.each($scope.teamLoadData, function (team) {
+        for(var i=0; i<$scope.teamLoadData.length; i++) {
+            var team = $scope.teamLoadData[i];
             if (team.name == teamNameCorrected) {
                 teamobj = team;
             }
-        });
+        }
         if (teamobj == null) {
             var team = {
                 name: teamNameCorrected,
                 versions: []
             };
-            _.each($scope.showVersions, function(version) {
-               team.versions.push( {name:version, done: 0, total: 0, smeNames: [], completed: false});
-            });
+            for(var i=0; i<$scope.showVersions.length; i++) {
+                var version = $scope.showVersions[i];
+                team.versions.push( {name:version, done: 0, total: 0, smeNames: [], completed: false});
+            }
             $scope.teamLoadData.push(team);
             teamobj = team;
         }
