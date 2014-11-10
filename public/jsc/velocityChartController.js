@@ -60,7 +60,17 @@ function velocityChartController($scope, $resource, $window) {
                 }]
             },
             tooltip: {
-                valueSuffix: 'SP'
+                formatter: function () {
+                    if(this.point.tooltip == "") {
+                        return this.y;
+                    }
+                    var modules = this.point.tooltip.split(",");
+                    var result = "";
+                    for(var i=0; i<modules.length; i++) {
+                        result += modules[i] + '<br/>';
+                    }
+                    return result;
+                }
             },
             legend: {
                 layout: 'horizontal',
