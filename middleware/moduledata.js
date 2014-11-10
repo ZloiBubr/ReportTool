@@ -135,7 +135,7 @@ function parsePages(callback) {
                                 async.eachSeries(pages, function(page, callback) {
                                         var storyPoints = page.storyPoints == null ? 0 : parseFloat(page.storyPoints);
                                         var moduleGroup = getModuleGroupName(page.labels);
-                                        var progress = parseInt(page.progress);
+                                        var progress = page.progress == null ? 0 : parseInt(page.progress);
 
                                         var calcStoryPoints = storyPoints * progress / 100;
 
