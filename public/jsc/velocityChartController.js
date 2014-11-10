@@ -31,7 +31,7 @@ function velocityChartController($scope, $resource, $window) {
                 zoomType: 'x'
             },
             title: {
-                text: 'Cumulative Velocity',
+                text: 'Burndown',
                 x: -20 //center
             },
             subtitle: {
