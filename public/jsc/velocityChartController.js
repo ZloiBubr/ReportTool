@@ -62,7 +62,7 @@ function velocityChartController($scope, $resource, $window) {
             tooltip: {
                 formatter: function () {
                     if(this.point.tooltip == "") {
-                        return this.y;
+                        return (new Date(this.x)).toDateString() + ":" + this.y;
                     }
                     var modules = this.point.tooltip.split(",");
                     var result = "";

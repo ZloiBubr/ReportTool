@@ -30,6 +30,10 @@ function parsePages(callback) {
         {
             data: [],
             name: "Actual burn"
+        },
+        {
+            data: [],
+            name: "Projected burn"
         }]
     };
     var maximumBurn = 0.0;
@@ -106,22 +110,92 @@ function parsePages(callback) {
             date = date.getTime();
             putDataPoint(velocity, "Planned burn", date, 0.0);
             SortData(velocity);
+            AddProjection(maximumBurn, velocity);
             SumData(maximumBurn, velocity);
+            AdjustProjection(velocity);
             callback(velocity);
         }
     ]);
 }
 
+function AdjustProjection(velocity) {
+    var lastValue = 0.0;
+
+    for (var k = 0; k < velocity.data.length; k++) {
+        var burn = velocity.data[k];
+        if (burn.name == "Actual burn") {
+            lastValue = burn.data[burn.data.length-1].y;
+        }
+    }
+
+    for (var k = 0; k < velocity.data.length; k++) {
+        var burn = velocity.data[k];
+        if(burn.name == "Projected burn") {
+            for (var l = 0; l < burn.data.length-1; l++) {
+                var delta = burn.data[l].y - burn.data[l+1].y;
+                if(l==0) {
+                    burn.data[l].y = Math.floor(lastValue);
+                }
+                else if(l == burn.data.length-2) {
+                    burn.data[l].y = Math.floor(burn.data[l-1].y - delta);
+                    burn.data[l+1].y = Math.floor(burn.data[l].y - delta);
+                }
+                else {
+                    burn.data[l].y = Math.floor(burn.data[l-1].y - delta);
+                }
+            }
+        }
+    }
+}
+
+function AddProjection(maximumBurn, velocity) {
+    var monthAgo = new Date(Date.now());
+    monthAgo.setMonth(monthAgo.getMonth()-1);
+    var monthAgoMsc = monthAgo.getTime();
+    var sum = 0.0;
+    var projectedBurn = null;
+
+    for (var k = 0; k < velocity.data.length; k++) {
+        var burn = velocity.data[k];
+        if(burn.name == "Actual burn") {
+            for (var l = 0; l < burn.data.length; l++) {
+                if(burn.data[l].x > monthAgoMsc) {
+                    sum += burn.data[l].y;
+                }
+            }
+        }
+        if(burn.name == "Projected burn") {
+            projectedBurn = burn;
+        }
+    }
+
+    var projectEnd = new Date(2015,8,1);
+    var pointDate = new Date(Date.now());
+    var pointValue = maximumBurn;
+    projectedBurn.dashStyle = "ShortDash";
+    while(pointDate < projectEnd) {
+        var pointDateMsc = pointDate.getTime();
+        projectedBurn.data.push({x:pointDateMsc, y:pointValue, tooltip: ""});
+        pointValue -= sum;
+        pointDate.setMonth(pointDate.getMonth()+1);
+    }
+}
+
 function SumData(maximumBurn, velocity) {
     for (var k = 0; k < velocity.data.length; k++) {
         var burn = velocity.data[k];
+        if(burn.name == "Projected burn") {
+            continue;
+        }
         for (var l = 0; l < burn.data.length - 1; l++) {
             burn.data[l + 1].y += burn.data[l].y;
         }
     }
-    //4. round
     for (var k = 0; k < velocity.data.length; k++) {
         var burn = velocity.data[k];
+        if(burn.name == "Projected burn") {
+            continue;
+        }
         for (var l = 0; l < burn.data.length; l++) {
             burn.data[l].y = Math.round(maximumBurn - burn.data[l].y);
         }
