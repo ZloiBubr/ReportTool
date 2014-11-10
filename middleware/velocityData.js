@@ -33,6 +33,10 @@ function parsePages(callback) {
                                     if(pages != null && pages.length > 0) {
                                         async.eachSeries(pages, function(page, callback) {
                                                 var storyPoints = page.storyPoints == null ? 0 : parseFloat(page.storyPoints);
+                                                var status = page.status;
+                                                var resolution = page.resolution;
+                                                var ignore = status == "Closed" && (resolution == "Out of Scope" || resolution == "Rejected" || resolution == "Canceled");
+
                                                 for (var j = 0; j < page.progressHistory.length; j++) {
                                                     var history = page.progressHistory[j];
                                                     var date = new Date(Date.parse(history.dateChanged));
@@ -49,20 +53,13 @@ function parsePages(callback) {
                                                     var to = history.progressTo == null || history.progressTo == '' ? 0 : parseInt(history.progressTo);
                                                     var progress = to - from;
                                                     var calcStoryPoints = storyPoints * progress / 100;
-                                                    var status = page.status;
-                                                    var resolution = page.resolution;
 
-                                                    status = status == 'Closed' && resolution == "Done" ? "Accepted" : status;
-                                                    status = status == 'Closed' && resolution == "Implemented" ? "Accepted" : status;
-
-                                                    var ignore = status == "Closed" && (resolution == "Out of Scope" || resolution == "Rejected" || resolution == "Canceled");
-
-                                                    if(!ignore) {
-                                                        putDataPoint(velocity, "Actual burn", date, calcStoryPoints);
-                                                    }
+                                                    putDataPoint(velocity, "Actual burn", date, calcStoryPoints);
                                                 }
                                                 if(module.duedate != null) {
-                                                    maximumBurn += storyPoints;
+                                                    if(!ignore) {
+                                                        maximumBurn += storyPoints;
+                                                    }
                                                     var date = new Date(Date.parse(module.duedate));
                                                     date.setHours(12, 0, 0, 0);
                                                     date = date.getTime();
