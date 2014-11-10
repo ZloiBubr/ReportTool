@@ -6,9 +6,6 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         $scope.common = {};
         $scope.dataLoad();
         $scope.sortByDate = false;
-        $scope.filterEod = false;
-        $scope.filterQ1 = false;
-        $scope.filterQ2 = false;
         $scope.showTeamTable = false;
         $scope.showStreams = false;
         $scope.showModules = false;
@@ -37,7 +34,7 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         $scope.total.total = 0;
         $scope.allSMEs = [{id: "All", name: "All"}];
         $scope.allModuleGroups = [{id: "All", name: "All"}];
-        $scope.allVersions = [{id: "All", name: "All"}];
+        $scope.allVersions = [{id: "All", name: "All"}, {id: "Q1", name: "Q1"}, {id: "Q2", name: "Q2"}];
         $scope.showVersions = [];
         $scope.teamLoadData = [];
     };
@@ -46,14 +43,15 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         //fill in Versions combo
         _.each($scope.moduleProgressData.module, function (module) {
             var found = false;
+            var versionProcessed = module.fixVersions == "" ? "Undefined" : module.fixVersions;
             _.each($scope.allVersions, function (version) {
-                if (version.name == module.fixVersions) {
+                if (version.name == versionProcessed) {
                     found = true;
                 }
             });
             if (!found) {
-                $scope.allVersions.push({id: module.fixVersions, name: module.fixVersions});
-                $scope.showVersions.push(module.fixVersions);
+                $scope.allVersions.push({id: versionProcessed, name: versionProcessed});
+                $scope.showVersions.push(versionProcessed);
             }
         });
     }
@@ -139,8 +137,31 @@ function moduleProgressController($scope, $resource, $window, $filter) {
             if($scope.filteredMG != $scope.allModuleGroups[0].id && moduleProgressItem.moduleGroup != $scope.filteredMG){
                 return;
             }
-            if($scope.filteredVersion != $scope.allVersions[0].id && moduleProgressItem.fixVersions != $scope.filteredVersion){
-                return;
+            if($scope.filteredVersion != $scope.allVersions[0].id) {
+                if($scope.filteredVersion == "Q1") {
+                    if(!(moduleProgressItem.fixVersions == "2.0 January 2015" ||
+                        moduleProgressItem.fixVersions == "3.0 February 2015" ||
+                        moduleProgressItem.fixVersions == "4.0 March 2015"
+                    )) {
+                        return;
+                    }
+                }
+                else if($scope.filteredVersion == "Q2") {
+                    if(!(moduleProgressItem.fixVersions == "5.0 April 2015" ||
+                        moduleProgressItem.fixVersions == "6.0 May 2015" ||
+                        moduleProgressItem.fixVersions == "7.0 June 2015"
+                        )) {
+                        return;
+                    }
+                }
+                else if($scope.filteredVersion == "Undefined"){
+                    if(moduleProgressItem.fixVersions != "") {
+                        return;
+                    }
+                }
+                else if (moduleProgressItem.fixVersions != $scope.filteredVersion) {
+                    return;
+                }
             }
             if($scope.filteredSme != $scope.allSMEs[0].id && moduleProgressItem.smename != $scope.filteredSme){
                 return;
@@ -155,15 +176,6 @@ function moduleProgressController($scope, $resource, $window, $filter) {
                 if(!found) {
                     return;
                 }
-            }
-            if($scope.filterEod && !moduleProgressItem.endOfYearDelivery) {
-                return;
-            }
-            if($scope.filterQ1 && !moduleProgressItem.q1Delivery) {
-                return;
-            }
-            if($scope.filterQ2 && !moduleProgressItem.q2Delivery) {
-                return;
             }
 
             moduleProgressItem.progress = Math.round(moduleProgressItem.progress);
@@ -353,6 +365,9 @@ function moduleProgressController($scope, $resource, $window, $filter) {
             };
             for(var i=0; i<$scope.showVersions.length; i++) {
                 var version = $scope.showVersions[i];
+                if(version == "Undefined") {
+                    version = "";
+                }
                 team.versions.push( {name:version, done: 0, total: 0, smeNames: [], completed: false});
             }
             $scope.teamLoadData.push(team);
