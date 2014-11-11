@@ -391,7 +391,13 @@ function moduleProgressController($scope, $resource, $window, $filter) {
             return moduleName;
         }
 
-        return moduleName.substring(0,index);
+        var prefix = "";
+        var index2 = moduleName.indexOf("Phase");
+        if(index2 > 0) {
+            prefix = "P" + moduleName.substring(index2+6, index2+8);
+        }
+
+        return prefix + " " + moduleName.substring(0,index);
     }
 
     function processEntity(entity, moduleProgressItem) {
