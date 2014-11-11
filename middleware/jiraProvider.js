@@ -96,6 +96,11 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
 //            response.end();
             updateInProgress = false;
             callback();
+        },
+        //step 6
+        function (callback) {
+            LogProgress("**** Update Finished ****");
+            callback();
         }
     ],
     //optional callback
@@ -159,6 +164,9 @@ function Step1CollectModules(jira, callback) {
                         }
                         callback(err);
                     });
+            }
+            else {
+                callback();
             }
         });
     },

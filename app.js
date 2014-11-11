@@ -4,6 +4,7 @@
 
 var express = require('express');
 var jira = require('./routes/updatejira');
+var updatelabels = require('./routes/updateLabels');
 var velocity = require('./routes/calcvelocitydata');
 var weekly = require('./routes/calcweeklyprogress');
 var pagebysize = require('./routes/calcpagebysize');
@@ -55,20 +56,15 @@ app.get('/update_progress', function (req, res) {
     res.writeHead(200, {'Content-Type': 'text/event-stream'});
     jira.rememberResponse(res);
 });
+app.get('/update_labels', function (req, res) {
+    req.socket.setTimeout(1000 * 60 * 10);
+    res.writeHead(200, {'Content-Type': 'text/event-stream'});
+    updatelabels.rememberResponse(res);
+});
 
 //handlers
 app.post('/updatejira', jira.post);
-
-//json
-app.get('/velocitydata', velocity.get);
-app.get('/progressdata', progress.get);
-app.get('/weeklydata', weekly.get);
-app.get('/pagebysizedata', pagebysize.get);
-app.get('/pagedata/:id', pagedata.get);
-app.get('/wavedata', wavedata.get);
-app.get('/moduledata', moduledata.get);
-app.get('/personaldata/:fromDate/:toDate', personaldata.get);
-app.get('/issuesdata', issuesDataRouter.get);
+app.post('/updatelabels', updatelabels.post);
 app.get('/cleandb', function(req, res) {
     ClearDB(function (err) {
         if (err) {
@@ -81,6 +77,17 @@ app.get('/cleandb', function(req, res) {
         }
     });
 });
+
+//json
+app.get('/velocitydata', velocity.get);
+app.get('/progressdata', progress.get);
+app.get('/weeklydata', weekly.get);
+app.get('/pagebysizedata', pagebysize.get);
+app.get('/pagedata/:id', pagedata.get);
+app.get('/wavedata', wavedata.get);
+app.get('/moduledata', moduledata.get);
+app.get('/personaldata/:fromDate/:toDate', personaldata.get);
+app.get('/issuesdata', issuesDataRouter.get);
 
 http.createServer(app).listen(config.get('port'), function () {
     log.info('Express server listening on port ' + config.get('port'));

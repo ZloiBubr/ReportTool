@@ -1,0 +1,89 @@
+
+<form class="form-horizontal container loginForm" action="/" method="POST" name="loginForm" role="form" class="form-horizontal">
+    <fieldset>
+        <legend>Please enter JIRA login information and supplemental parameters</legend>
+        <div class="form-group">
+            <label for="input-username" class="control-label col-lg-2">Name:</label>
+            <div class="col-lg-3">
+                <input name="username" ng-model="username" type="text" class="form-control" id="input-username" placeholder="Name" required>
+                <p class="help-block">Please enter your JIRA login</p>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label for="input-password" class="control-label col-lg-2">Password:</label>
+            <div class="col-lg-3">
+                <input name="password" ng-model="password" type="password"  class="form-control" id="input-password" placeholder="Password" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-lg-2" for="input-jql">JQL Query:</label>
+            <div class="col-lg-3">
+                <input name="jqlquery" ng-model="jqlquery" type="text" class="form-control" id="input-jql" placeholder="JQL Query" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-lg-2" for="input-label-delete">Labels to delete:</label>
+            <div class="col-lg-3">
+                <input name="labelstodelete" ng-model="labelstodelete" type="text" class="form-control" id="input-label-delete" placeholder="Labels to delete">
+                <p class="help-block">Please use comma as separator</p>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-lg-2" for="input-label-add">Labels to add:</label>
+            <div class="col-lg-3">
+                <input name="labelstoadd" ng-model="labelstoadd" type="text" class="form-control" id="input-label-add" placeholder="Labels to add">
+                <p class="help-block">Please use comma as separator</p>
+            </div>
+        </div>
+
+        <p class="bg-danger">Please make sure you checked your JQL and labels twice before pressing button below. <br/>
+            This application does not check labels and JQL for validness.<br/>
+            Only you responsible for final result and will have to perform tonns of manual work restoring labels in case of error.</p>
+        <div class="row form-actions">
+            <div class="col-lg-3 col-lg-offset-2">
+                <button id="updatebtn" type="submit" class="btn btn-primary" ng-disabled="loginForm.$invalid" data-loading-text="Updating data right now...">Update</button>
+                <span class="help-block error"></span>
+            </div>
+        </div>
+
+        <div id="errorlog" style="word-wrap: break-word; color: #ffffff; background-color: #ff0000"></div>
+        <div id="serverlog" style="word-wrap: break-word"></div>
+    </fieldset>
+</form>
+
+<script type="text/javascript" src="/jsc/serverEvents2.js"></script>
+
+<script>
+    $(document.forms['loginForm']).on('submit', function () {
+        var form = $(this);
+
+        $('.error', form).html('');
+        $(":submit", form).button("loading");
+        $(":button", form).button("loading");
+
+        $.ajax({
+            url: "/updatelabels",
+            data: form.serialize(),
+            method: "POST",
+//            complete: function () {
+//                $(":submit", form).button("reset");
+//            },
+            statusCode: {
+                200: function () {
+//                    form.html("Succeed").addClass('alert-success');
+//                    window.location.href = "/";
+                },
+                403: function (jqXHR) {
+                    var error = JSON.parse(jqXHR.responseText);
+                    $('.error', form).html(error.message);
+                }
+            }
+        });
+        return false;
+    });
+</script>

@@ -1,30 +1,12 @@
 if (!!window.EventSource) {
-    var source = new EventSource('/update_progress');
-    source.addEventListener('progress', function(e) {
-        var data = JSON.parse(e.data);
-        if(data.page)
-        {
-            $("#page_progress .bar").css({ width: data.page + '%' });
-        }
-        else{
-            $("#issue_progress .bar").css({ width: data.issues + '%' });
-        }
-
-        //update progress bar in client
-
-//        if(percentage == '100') {
-//            window.location.href = "/";
-//        }
-    }, false);
+    var source = new EventSource('/update_labels');
     source.addEventListener('logmessage', function(e) {
         var text = e.data;
         if(text == "**** Update Succeed ****" ||
             text == "**** Update Failed ****") {
             $("#updatebtn").button("reset");
-            $("#cleanbtn").button("reset");
         }
         else {
-            $("#cleanbtn").button("loading");
             $("#updatebtn").button("loading");
         }
         $("#serverlog").prepend(text + "<br/>");
