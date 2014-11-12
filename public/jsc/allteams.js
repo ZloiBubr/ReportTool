@@ -83,7 +83,8 @@ function Teams() {
                 "Anton Kratenok",
                 "Siarhei Maksimau1",
                 "Dzmitry Chapurok",
-                "Evgeny Sinitsyn"
+                "Evgeny Sinitsyn",
+                "Dzmitry Salodki"
             ],
             testers: [
                 "Aliaksei Burnosenka",
