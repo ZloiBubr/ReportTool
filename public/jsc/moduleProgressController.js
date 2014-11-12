@@ -482,6 +482,49 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         $scope.isTotalWasCalculated = false;
         $scope.processWithRowSpans();
     }
+
+    $scope.onEstimatesButtonClick = function(){
+        if(_.isUndefined($scope.moduleProgressData))
+        {
+            alert("Please, wait till data will be loaded");
+            return;
+        }
+
+        $scope.estimation = {};
+        $scope.estimation.team = _.find($scope.allTeams,function(teamItem){return teamItem.name === $scope.filteredTeam});
+
+        //var teamModules =
+        _.each($scope.estimation.team.streams, function(streamItem){
+            var streamShortCut = $scope.estimation.team.name +":" + streamItem.replace("Stream","");
+            $scope.estimation.stream[streamItem] = {};
+            $scope.estimation.stream[streamItem].modules = _.sortBy(_.filter($scope.moduleProgressData, function(moduleItem){
+                return moduleItem.teamnames[0] === streamShortCut;
+            }), function(item){return item.duedate});
+
+            var previousModuleEndDate = null;
+            _.each($scope.estimation.stream[streamItem].modules, function(moduleItem){
+                var devLeftWorkDays = ((moduleItem.summarySP - moduleItem.reportedSP) / $scope.estimation.daySPVelocity) / $scope.estimation[streamItem+"DevCapacity"];
+                var qaLeftWorkDays = ((moduleItem.summarySP - moduleItem.reportedSP) / $scope.estimation.daySPVelocity) / $scope.estimation[streamItem+"QACapacity"];
+                var startDate = previousModuleEndDate == null ? new Date() : previousModuleEndDate;
+
+                moduleItem.endDevDate = startDate.addBusDays(devLeftWorkDays);
+                moduleItem.endQADate = endDevDate.addBusDays(devLeftWorkDays);
+                moduleItem.endQADate = endDevDate.addBusDays(devLeftWorkDays);
+            })
+        });
+
+        // when input fields filled ------------------------------------------------------------ !!!
+
+
+
+
+
+        $scope.estimation
+        _.each($scope.allTeams)
+        $scope.estimation.streams =
+
+        $scope.allTeams
+    }
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
 
 

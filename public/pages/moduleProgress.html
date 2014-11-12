@@ -25,6 +25,9 @@
             <li><label><span class="glyphicon glyphicon-asterisk"></span><strong>{{total.doneSP | number : 0}}/{{total.summSP | number : 0}}</strong>:SP</label></li>
         </ul>
     </div>
+
+
+
     <div class="row" ng-show="showTeamTable">
         <table class="table table-bordered">
             <thead class="progressTableMainHeader">
@@ -124,4 +127,39 @@
             </table>
         </div>
     </div>
+
+    <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+        Launch demo modal
+    </button>
+
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Delivery Estimation</h4>
+                </div>
+                <div class="modal-body container">
+
+                    <div class="form-group">
+                        <label class="sr-only" for="exampleInputPassword2">Password</label>
+                        <input type="text" class="form-control" id="exampleInputPassword2" placeholder="Password">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-3">
+                            <input type="text" >
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>

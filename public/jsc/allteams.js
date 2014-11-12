@@ -66,6 +66,7 @@ function Teams() {
         {
             id: "TeamNova",
             name: "Nova",
+            streams: ["StreamN1", "StreamN2", "StreamN3"],
             teamLead: "Heorhi Vilkitski",
             qaTeamLead: "Valiantsina Krautsevich",
             developers: [
