@@ -47,7 +47,11 @@
                                     readyForQA: card.readyForQA,
                                     cancelled: card.cancelled,
                                     'bg-info': true}">
-                                    <div>{{card.name}}</div><div><sup style="color: blue">{{card.reportedSP | number : 0}}/</sup><sup style="color: darkred">{{card.summarySP | number : 0}}</sup><span style="font-style: italic">{{card.restSP | number : 0}}</span></div>
+                                    <div id="card_progress">
+                                        <div class="bar" ng-style="{width: card.progress + '%'}"></div>
+                                    </div>
+                                    <div><sup style="color: blue">{{card.reportedSP | number : 0}}/</sup><sup style="color: darkred">{{card.summarySP | number : 0}}</sup><span style="font-style: italic">{{card.restSP | number : 0}}</span></div>
+                                    <a href="{{card.uri}}">{{card.name}}</a>
                                 </td>
                             </tr>
                         </table>

@@ -53,9 +53,6 @@ function getTeamName(labels) {
 }
 
 function getDueDateConfirmed(labels) {
-    if(labels == undefined) {
-        return false;
-    }
     var index = labels.indexOf("DueDateConfirmed");
     if(index < 0) {
         return false;

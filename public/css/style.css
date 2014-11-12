@@ -6,6 +6,10 @@ body {
 a {
     color: #007fa8;
 }
+
+table {
+    max-width: 2000px !important;
+}
  /*------------------------------------Common---------------------------*/
 .progress_no_top_line > td {
     border-top: none !important;
@@ -105,6 +109,24 @@ a {
     background: #3d3;
     width: 0;
     height: 28px;
+}
+
+#card_progress
+{
+    border: solid #cccccc 2px;
+    border-radius: 5px;
+    /* Dimensions */
+    height: 10px;
+    background: #FF0000;
+    margin-bottom: 0px !important;
+}
+
+#card_progress .bar
+{
+    display: block;
+    background: #3d3;
+    width: 0;
+    height: 8px;
 }
 
 .help-icon
