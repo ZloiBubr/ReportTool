@@ -96,6 +96,11 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
 //            response.end();
             updateInProgress = false;
             callback();
+        },
+        //step 6
+        function (callback) {
+            LogProgress("**** Update Finished ****");
+            callback();
         }
     ],
     //optional callback
@@ -124,7 +129,7 @@ function Step1CollectModules(jira, callback) {
             return loopError;
         },
         function(callback) {
-        jira.searchJira(requestString, { fields: ["summary", "duedate", "assignee", "status", "resolution", "labels"] }, function (error, epics) {
+        jira.searchJira(requestString, { fields: ["summary", "duedate", "assignee", "status", "resolution", "labels", "fixVersions"] }, function (error, epics) {
             if (error) {
                 callback(error);
             }
@@ -141,6 +146,7 @@ function Step1CollectModules(jira, callback) {
                             module.status = epic.fields.status.name;
                             module.resolution = epic.fields.resolution == null ? "" : epic.fields.resolution.name;
                             module.labels = epic.fields.labels;
+                            module.fixVersions = epic.fields.fixVersions && epic.fields.fixVersions.length > 0 ? epic.fields.fixVersions[0].name : "";
                             module.save(function () {
                                 epicsList.push(epic.key);
                                 LogProgress(epic.key + " : " + " Module Collected");
@@ -158,6 +164,9 @@ function Step1CollectModules(jira, callback) {
                         }
                         callback(err);
                     });
+            }
+            else {
+                callback();
             }
         });
     },

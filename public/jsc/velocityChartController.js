@@ -31,7 +31,7 @@ function velocityChartController($scope, $resource, $window) {
                 zoomType: 'x'
             },
             title: {
-                text: 'Cumulative Velocity',
+                text: 'Burndown',
                 x: -20 //center
             },
             subtitle: {
@@ -60,7 +60,17 @@ function velocityChartController($scope, $resource, $window) {
                 }]
             },
             tooltip: {
-                valueSuffix: 'SP'
+                formatter: function () {
+                    if(this.point.tooltip == "") {
+                        return (new Date(this.x)).toDateString() + ":" + this.y;
+                    }
+                    var modules = this.point.tooltip.split(",");
+                    var result = "";
+                    for(var i=0; i<modules.length; i++) {
+                        result += modules[i] + '<br/>';
+                    }
+                    return result;
+                }
             },
             legend: {
                 layout: 'horizontal',

@@ -1,12 +1,18 @@
 <div id="container" class="container" ng-controller="moduleProgressController" style="padding-left: 150px">
-    <div class="visible-md visible-lg visible-sm" style="position:fixed; left: 10px; top:150px; font-size: 12pt ">
+    <div class="visible-md visible-lg visible-sm" style="position:fixed; left: 10px; top:80px; font-size: 12pt ">
         <ul class="list-unstyled">
-            <li><input type="checkbox" ng-model="filterEod" ng-change="onFilterEod()"><img width="40" height="40" alt="EOY" src="img/cartoon-santa.jpg"/>EOY Modules</li>
-            <li><input type="checkbox" ng-model="filterQ1" ng-change="onFilterQ1()"><img width="40" height="40" alt="Q1" src="img/banny.png"/>Q1 Modules</li>
-            <li><input type="checkbox" ng-model="filterQ2" ng-change="onFilterQ2()"><img width="40" height="40" alt="Q2" src="img/finish.png"/>Q2 Modules</li>
-            <li>SME:<select class="form-control headerSelectWidth" ng-model="filteredSme" class="headerSelectWidth" ng-options="sme.name as sme.name for sme in allSMEs" ng-change="filterModule()"></select></li>
-            <li>Module Group:<select class="form-control headerSelectWidth" ng-model="filteredMG" class="headerSelectWidth" ng-options="moduleGroup.name as moduleGroup.name for moduleGroup in allModuleGroups" ng-change="filterModule()"></select></li>
-            <li>Team:<select class="form-control headerSelectWidth" ng-model="filteredTeam" class="headerSelectWidth" ng-options="team.name as team.name for team in allTeams" ng-change="filterModule()"></select></li>
+            <li class="red"><input type="checkbox" ng-model="showTeamTable"> Kanban board</li>
+            <li><input type="checkbox" ng-model="showStreams" ng-change="processWithRowSpans()"> Streams</li>
+            <li><input type="checkbox" ng-model="showCards" ng-change="processWithRowSpans()"> Cards</li>
+            <li><input type="checkbox" ng-model="showModules" ng-change="processWithRowSpans()"> SME / Modules</li>
+            <li><br/></li>
+            <li><img width="40" height="40" alt="Conf" src="img/duedate.png"/> DueDate confirmed</li>
+            <li><br/></li>
+            <li>Fix Version:<select class="form-control headerSelectWidth" ng-model="filteredVersion" class="headerSelectWidth" ng-options="version.name as version.name for version in allVersions" ng-change="processWithRowSpans()"></select></li>
+            <li>SME:<select class="form-control headerSelectWidth" ng-model="filteredSme" class="headerSelectWidth" ng-options="sme.name as sme.name for sme in allSMEs" ng-change="processWithRowSpans()"></select></li>
+            <li>Module Group:<select class="form-control headerSelectWidth" ng-model="filteredMG" class="headerSelectWidth" ng-options="moduleGroup.name as moduleGroup.name for moduleGroup in allModuleGroups" ng-change="processWithRowSpans()"></select></li>
+            <li>Team:<select class="form-control headerSelectWidth" ng-model="filteredTeam" class="headerSelectWidth" ng-options="team.name as team.name for team in allTeams" ng-change="processWithRowSpans()"></select></li>
+            <li><br/></li>
             <li><input type="checkbox" ng-model="total.inProgress.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-play"></span><strong> {{total.inProgress.count}}</strong>:In Progress</li>
             <li class="readyForQA"><input type="checkbox" ng-model="total.readyForQA.isChecked" ng-change="processWithRowSpans()"> <span class="glyphicon glyphicon-th-list"></span><strong> {{total.readyForQA.count}}</strong>:Testing is in prog</li>
             <li class="readyForAcceptance"><input type="checkbox" ng-model="total.resolved.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-check"></span><strong> {{total.resolved.count}}</strong>:Resolved</li>
@@ -18,6 +24,37 @@
             <li><br/></li>
             <li><label><span class="glyphicon glyphicon-asterisk"></span><strong>{{total.doneSP | number : 0}}/{{total.summSP | number : 0}}</strong>:SP</label></li>
         </ul>
+    </div>
+    <div class="row" ng-show="showTeamTable">
+        <table class="table table-bordered">
+            <thead class="progressTableMainHeader">
+            <tr>
+                <th>Teams</th>
+                <th ng-repeat="version in showVersions">{{version}}</th>
+            </tr>
+                <tr ng-repeat = "team in teamLoadData">
+                    <div ng-repeat="version in showVersions">
+                    <td class="bg-success">
+                        <div>{{team.name}}</div>
+                    </td>
+                    <td ng-repeat="version in team.versions">
+                        <div>
+                            <sup style="color: blue">{{version.done | number : 0}}/</sup><sup style="color: darkred">{{version.total | number : 0}}</sup><span style="font-style: italic">{{version.restSP | number : 0}}</span></div>
+                        <table class="table table-condensed" ng-if="showCards">
+                            <tr ng-repeat = "card in version.smeNames">
+                                <td ng-class="{accepted: card.accepted,
+                                    readyForAcceptance: card.readyForAcceptance,
+                                    readyForQA: card.readyForQA,
+                                    cancelled: card.cancelled,
+                                    'bg-info': true}">
+                                    <div>{{card.name}}</div><div><sup style="color: blue">{{card.reportedSP | number : 0}}/</sup><sup style="color: darkred">{{card.summarySP | number : 0}}</sup><span style="font-style: italic">{{card.restSP | number : 0}}</span></div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    </div>
+                </tr>
+        </table>
     </div>
     <div class="row">
 
@@ -58,9 +95,6 @@
                     </td>
                     <td>
                         <div>{{module.duedate2 | date:'MMM-dd-yyyy'}}</div>
-                        <img ng-show="module.endOfYearDelivery" width="40" height="40" alt="EOY" src="img/cartoon-santa.jpg"/>
-                        <img ng-show="module.q1Delivery" width="40" height="40" alt="Q1" src="img/banny.png"/>
-                        <img ng-show="module.q2Delivery" width="40" height="40" alt="Q2" src="img/finish.png"/>
                         <img ng-show="module.dueDateConfirmed" width="40" height="40" alt="Conf" src="img/duedate.png"/>
                     </td>
                     <td>
