@@ -269,13 +269,13 @@ function moduleProgressController($scope, $resource, $window, $filter) {
                     var moduleName = $scope.showModules ? getCleanModuleName(moduleProgressItem.name) : moduleProgressItem.smename;
                     var reportedSP = Math.floor(moduleProgressItem.reportedSP);
                     var summarySP = Math.floor(moduleProgressItem.summarySP);
-                    fillSmeNames(teamobj, version, moduleName, reportedSP, summarySP, status, moduleProgressItem.uri, version.name);
+                    fillSmeNames(teamobj, version, moduleName, reportedSP, summarySP, status, moduleProgressItem);
                 }
             }
         }
     }
 
-    function fillSmeNames(teamobj, version, name, reportedSP, summarySP, status, uri, versionName) {
+    function fillSmeNames(teamobj, version, name, reportedSP, summarySP, status, item) {
         var found = false;
         for(var i=0; i<version.smeNames.length; i++) {
             var card = version.smeNames[i];
@@ -284,7 +284,7 @@ function moduleProgressController($scope, $resource, $window, $filter) {
                 card.summarySP += summarySP;
                 card.restSP = card.summarySP - card.reportedSP;
                 var initUri = "https://jira.epam.com/jira/issues/?jql=project%20%3D%20PLEX-UXC%20and%20issuetype%20%3D%20epic%20and%20assignee%20%3D%20";
-                var endUri = versionName == "" ?"%20and%20fixVersion%20is%20EMPTY" : "%20and%20fixVersion%20%3D%20%22" + versionName + "%22";
+                var endUri = version.name == "" ?"%20and%20fixVersion%20is%20EMPTY" : "%20and%20fixVersion%20%3D%20%22" + version.name + "%22";
                 var veryEndUri = "%20and%20labels%20in%20(Team"+ teamobj.name + ")";
                 card.uri = initUri + name + endUri + veryEndUri;
                 card.progress = card.summarySP > 0 ? Math.floor(card.reportedSP*100/card.summarySP) : 0;
@@ -350,7 +350,8 @@ function moduleProgressController($scope, $resource, $window, $filter) {
             card.readyForAcceptance = status == "Resolved";
             card.readyForQA = status == "ReadyForQA";
             card.cancelled = status == "Cancelled";
-            card.uri = uri;
+            card.uri = item.uri;
+            card.dueDateConfirmed = item.dueDateConfirmed;
             card.progress = card.summarySP ? Math.floor(card.reportedSP*100/card.summarySP) : 0;
             version.smeNames.push(card);
         }

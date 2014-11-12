@@ -50,8 +50,27 @@
                                     <div id="card_progress">
                                         <div class="bar" ng-style="{width: card.progress + '%'}"></div>
                                     </div>
-                                    <div><sup style="color: blue">{{card.reportedSP | number : 0}}/</sup><sup style="color: darkred">{{card.summarySP | number : 0}}</sup><span style="font-style: italic">{{card.restSP | number : 0}}</span></div>
-                                    <a href="{{card.uri}}">{{card.name}}</a>
+                                    <div class="disp-block">
+                                        <table class="disp-block">
+                                            <tbody class="disp-block">
+                                                <tr style="height: 20px; margin: 2px; align-items: stretch" class="disp-block">
+                                                    <td style="white-space: nowrap;">
+                                                        <sup style="color: blue">{{card.reportedSP | number : 0}}/</sup>
+                                                    </td>
+                                                    <td style="white-space: nowrap;">
+                                                        <sup style="color: darkred">{{card.summarySP | number : 0}}</sup>
+                                                    </td>
+                                                    <td width="100%" style="white-space: nowrap;">
+                                                        <span style="font-style: italic">{{card.restSP | number : 0}}</span>
+                                                    </td>
+                                                    <td>
+                                                        <img ng-show="card.dueDateConfirmed" width="16" height="16" alt="Conf" src="img/duedate.png"/>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <a class="disp-block" href="{{card.uri}}">{{card.name}}</a>
                                 </td>
                             </tr>
                         </table>

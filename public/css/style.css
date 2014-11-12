@@ -228,3 +228,8 @@ tr th:last-child {
     border-color: #0028c1 !important;
     border-width: 1px !important;
 }
+
+.disp-block {
+    display: block;
+    width: 100%;
+}
