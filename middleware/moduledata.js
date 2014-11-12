@@ -127,9 +127,9 @@ function parsePages(callback) {
             Module.find({}).exec(function(err, modules) {
                 async.series([
                     async.eachSeries(modules, function(module, callback) {
-                            var dueDateConfirmed = getDueDateConfirmed(module._doc.labels);
-                            var count = 0;
                             var labels = module._doc.labels != null ? module._doc.labels : "";
+                            var dueDateConfirmed = getDueDateConfirmed(labels);
+                            var count = 0;
                             var teamName = getTeamName(labels);
                             var streamName = getStreamName(labels);
 
