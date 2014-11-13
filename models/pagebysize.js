@@ -2,31 +2,59 @@ exports.data = function () {
     this.data = [
         {
             data: [],
-            name: "XXXL"
+            name: "XXXLDev"
         },
         {
             data: [],
-            name: "XXL"
+            name: "XXLDev"
         },
         {
             data: [],
-            name: "ExtraLarge"
+            name: "ExtraLargeDev"
         },
         {
             data: [],
-            name: "Large"
+            name: "LargeDev"
         },
         {
             data: [],
-            name: "LargePlus"
+            name: "LargePlusDev"
         },
         {
             data: [],
-            name: "Medium"
+            name: "MediumDev"
         },
         {
             data: [],
-            name: "Small"
+            name: "SmallDev"
+        },
+        {
+            data: [],
+            name: "XXXLQA"
+        },
+        {
+            data: [],
+            name: "XXLQA"
+        },
+        {
+            data: [],
+            name: "ExtraLargeQA"
+        },
+        {
+            data: [],
+            name: "LargeQA"
+        },
+        {
+            data: [],
+            name: "LargePlusQA"
+        },
+        {
+            data: [],
+            name: "MediumQA"
+        },
+        {
+            data: [],
+            name: "SmallQA"
         }
     ];
 };

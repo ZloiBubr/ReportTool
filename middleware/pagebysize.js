@@ -29,28 +29,42 @@ function parsePages(callback) {
     Page.find({}).exec(function (err, pages) {
         for (var i = 0; i < pages.length; i++) {
             var page = pages[i];
+            if(page.resolution == "Out of Scope") {
+                continue;
+            }
 
             //interested only at finished pages
             if(page.devFinished == undefined) {
                 continue;
             }
             var dateDevFinished = new Date(Date.parse(page.devFinished)).getTime();
+            var dateQAFinished = new Date(Date.parse(page.qaFinished)).getTime();
             var pageSize = getPageSize(page.labels);
-            var timeSpent = 0;
+            var timeDevSpent = 0.;
+            var timeQASpent = 0.;
             //calc time spent
             for (var j = 0; j < page.worklogHistory.length; j++) {
                 var worklog = page.worklogHistory[j];
                 if(isDeveloper(worklog.person)) {
-                    timeSpent += parseFloat(worklog.timeSpent);
+                    timeDevSpent += parseFloat(worklog.timeSpent);
+                }
+                else {
+                    timeQASpent += parseFloat(worklog.timeSpent);
                 }
             }
-            if(timeSpent > 0 ||
-                page.status == 'Ready for QA' ||
-                page.status == "Testing in Progress" ||
+            if(dateQAFinished > (new Date("Jan 1, 2014")).getTime() &&
+                (timeDevSpent > 1. && (
                 page.status == "Resolved" ||
                 page.status == "Closed"
-                ) {
-                putDataPoint(model, pageSize, dateDevFinished, timeSpent, page);
+                ))) {
+                putDataPoint(model, pageSize+"Dev", dateQAFinished, timeDevSpent, page);
+            }
+            if(dateQAFinished > (new Date("Jan 1, 2014")).getTime() &&
+                (timeQASpent > 1. && (
+                page.status == "Resolved" ||
+                page.status == "Closed"
+                ))) {
+                putDataPoint(model, pageSize+"QA", dateQAFinished, timeQASpent, page);
             }
         }
 
