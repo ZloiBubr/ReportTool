@@ -6,7 +6,8 @@
             <li><input type="checkbox" ng-model="showCards" ng-change="processWithRowSpans()"> Cards</li>
             <li><input type="checkbox" ng-model="showModules" ng-change="processWithRowSpans()"> SME / Modules</li>
             <li><br/></li>
-            <li><img width="40" height="40" alt="Conf" src="img/duedate.png"/> DueDate confirmed</li>
+            <li><img width="40" height="40" alt="Conf" src="img/duedate2.png"/> DueDate confirmed</li>
+            <li><img width="40" height="40" alt="Conf" src="img/ban.png"/> Card blocked</li>
             <li><br/></li>
             <li>Fix Version:<select class="form-control headerSelectWidth" ng-model="filteredVersion" class="headerSelectWidth" ng-options="version.name as version.name for version in allVersions" ng-change="processWithRowSpans()"></select></li>
             <li>SME:<select class="form-control headerSelectWidth" ng-model="filteredSme" class="headerSelectWidth" ng-options="sme.name as sme.name for sme in allSMEs" ng-change="processWithRowSpans()"></select></li>
@@ -53,7 +54,7 @@
                                     <div class="disp-block">
                                         <table class="disp-block">
                                             <tbody class="disp-block">
-                                                <tr style="height: 20px; margin: 2px; align-items: stretch" class="disp-block">
+                                                <tr style="margin: 2px; align-items: stretch" class="disp-block">
                                                     <td style="white-space: nowrap;">
                                                         <sup style="color: blue">{{card.reportedSP | number : 0}}/</sup>
                                                     </td>
@@ -64,7 +65,8 @@
                                                         <span style="font-style: italic">{{card.restSP | number : 0}}</span>
                                                     </td>
                                                     <td>
-                                                        <img ng-show="card.dueDateConfirmed" width="16" height="16" alt="Conf" src="img/duedate.png"/>
+                                                        <img ng-show="card.dueDateConfirmed" width="16" height="16" alt="Conf" src="img/duedate2.png"/>
+                                                        <img ng-show="card.blocked" width="16" height="16" alt="Conf" src="img/ban.png"/>
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -118,7 +120,7 @@
                     </td>
                     <td>
                         <div>{{module.duedate2 | date:'MMM-dd-yyyy'}}</div>
-                        <img ng-show="module.dueDateConfirmed" width="40" height="40" alt="Conf" src="img/duedate.png"/>
+                        <img ng-show="module.dueDateConfirmed" width="40" height="40" alt="Conf" src="img/duedate2.png"/>
                     </td>
                     <td>
                         <table>

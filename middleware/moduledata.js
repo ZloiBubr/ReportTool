@@ -34,7 +34,8 @@ function moduleData() {
                         endOfYearDelivery: false,
                         q1Delivery: false,
                         dueDateConfirmed: false,
-                        uri: ""
+                        uri: "",
+                        blocked: false
                     }
                 ];
 }
@@ -146,9 +147,10 @@ function parsePages(callback) {
                                         status = status == 'Closed' && resolution == "Implemented" ? "Accepted" : status;
 
                                         var ignore = status == "Closed" && (resolution == "Out of Scope" || resolution == "Rejected" || resolution == "Canceled");
+                                        var blocked = status == "Blocked";
 
                                         if(!ignore) {
-                                            putDataPoint(moduledata, dueDateConfirmed, status, moduleGroup, teamName, streamName, calcStoryPoints, storyPoints, ++count, module);
+                                            putDataPoint(moduledata, dueDateConfirmed, status, moduleGroup, teamName, streamName, calcStoryPoints, storyPoints, ++count, module, blocked);
                                         }
                                         callback();
                                 },
@@ -178,7 +180,7 @@ function parsePages(callback) {
     ]);
 }
 
-function putDataPoint(moduledata, dueDateConfirmed, status, moduleGroup, teamName, streamName, calcStoryPoints, storyPoints, count, module) {
+function putDataPoint(moduledata, dueDateConfirmed, status, moduleGroup, teamName, streamName, calcStoryPoints, storyPoints, count, module, blocked) {
     var initUri = "https://jira.epam.com/jira/browse/";
 
     //module
@@ -195,7 +197,7 @@ function putDataPoint(moduledata, dueDateConfirmed, status, moduleGroup, teamNam
             teamnames: [], key: module.key,
             accepted: status == "Accepted", status: status,
             modulestatus: module.status, moduleresolution: module.resolution,
-            fixVersions: module.fixVersions
+            fixVersions: module.fixVersions, blocked: blocked
         };
         moduledata.module.push(moduled);
     }
@@ -208,6 +210,7 @@ function putDataPoint(moduledata, dueDateConfirmed, status, moduleGroup, teamNam
     moduled.accepted = moduled.accepted ? status == "Accepted" : false;
     moduled.pagescount = count;
     moduled.dueDateConfirmed = dueDateConfirmed;
+    moduled.blocked |= blocked;
 
 
     var moduleStatus = statusList.getStatusByName(moduled.status);
