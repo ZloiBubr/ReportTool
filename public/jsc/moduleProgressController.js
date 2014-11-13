@@ -265,10 +265,10 @@ function moduleProgressController($scope, $resource, $window, $filter) {
                 if (version.name == moduleProgressItem.fixVersions) {
                     version.done += moduleProgressItem.reportedSP;
                     version.total += moduleProgressItem.summarySP;
-                    version.restSP = Math.floor(version.total - version.done);
+                    version.restSP = version.total - version.done;
                     var moduleName = $scope.showModules ? getCleanModuleName(moduleProgressItem.name) : moduleProgressItem.smename;
-                    var reportedSP = Math.floor(moduleProgressItem.reportedSP);
-                    var summarySP = Math.floor(moduleProgressItem.summarySP);
+                    var reportedSP = moduleProgressItem.reportedSP;
+                    var summarySP = moduleProgressItem.summarySP;
                     fillSmeNames(teamobj, version, moduleName, reportedSP, summarySP, status, moduleProgressItem);
                 }
             }
