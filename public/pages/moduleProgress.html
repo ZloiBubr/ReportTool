@@ -128,12 +128,12 @@
         </div>
     </div>
 
-    <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+    <button type="button" class="btn btn-primary btn-lg" ng-click="onEstimatesButtonClick()">
         Launch demo modal
     </button>
 
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog" style="width: 100%">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
@@ -141,16 +141,73 @@
                 </div>
                 <div class="modal-body container">
 
-                    <div class="form-group">
-                        <label class="sr-only" for="exampleInputPassword2">Password</label>
-                        <input type="text" class="form-control" id="exampleInputPassword2" placeholder="Password">
+
+
+                    <div class="row" ng-repeat="(streamKey,StramValue) in estimation.stream">
+                            <label class="col-lg-2 control-label" for="{{streamKey + 'DevCapacity'}}">{{streamKey}} Dev</label>
+                            <div  class="col-lg-2">
+                                <input type="number" class="form-control" id="{{streamKey + 'DevCapacity'}}" placeholder="Developers" ng-model="estimation[streamKey + 'DevCapacity']">
+                            </div>
+
+                            <label class="col-lg-2 control-label" for="{{streamKey + 'QACapacity'}}">QA</label>
+                            <div  class="col-lg-2">
+                                <input type="number" class="form-control" id="{{streamKey + 'QACapacity'}}" placeholder="QAs" ng-model="estimation[streamKey + 'QACapacity']">
+                            </div>
                     </div>
 
                     <div class="row">
-                        <div class="col-lg-3">
-                            <input type="text" >
+                        <label class="col-lg-2 control-label" for="dayDevSpVelocity">dayDevSpVelocity</label>
+                        <div  class="col-lg-2">
+                            <input type="number" class="form-control" id="dayDevSpVelocity" placeholder="SP per day" ng-model="estimation.dayDevSpVelocity">
+                        </div>
+
+                        <label class="col-lg-2 control-label" for="dayQaSpVelocity">dayQaSpVelocity</label>
+                        <div  class="col-lg-2">
+                            <input type="number" class="form-control" id="dayQaSpVelocity" placeholder="SP per day" ng-model="estimation.dayQaSpVelocity">
+                        </div>
+
+                        <label class="col-lg-2 control-label" for="acceptanceDaysGap">acceptanceDaysGap</label>
+                        <div  class="col-lg-2">
+                            <input type="number" class="form-control" id="acceptanceDaysGap" placeholder="acceptanceDaysGap" ng-model="estimation.acceptanceDaysGap">
                         </div>
                     </div>
+
+                    <div class="row" ng-repeat="stream in estimation.stream">
+                        <h2>stream</h2>
+                        <table class="table-bordered table-striped ">
+                            <tr>
+                                <td>Due Date</td>
+                                <td>Module Name / SME</td>
+                                <td>Total SP</td>
+                                <td>Left SP</td>
+                                <td>Left dev(days)</td>
+                                <td>Left qa(days)</td>
+                                <td>End Development</td>
+                                <td>End QA</td>
+                                <td>Acceptance</td>
+                            </tr>
+                            <tr ng-repeat="module in stream.modules">
+                                <td style="width: 100px">{{module.duedate2 | date:'MMM-dd-yyyy'}}</td>
+                                <td style="width: 300px">{{module.name}}</td>
+                                <td style="width: 100px">{{module.summarySP}}</td>
+                                <td style="width: 100px">{{module.summarySP - module.reportedSP | number:1}}</td>
+                                <td style="width: 100px">{{module.devLeftWorkDays | number:1}}</td>
+                                <td style="width: 100px">{{module.qaLeftWorkDays | number:1}}</td>
+                                <td>{{module.endDevDate | date: 'M/d/yyyy'}}</td>
+                                <td>{{module.endQADate | date: 'M/d/yyyy'}}</td>
+                                <td>{{module.endAccDate | date: 'M/d/yyyy'}}</td>
+                            </tr>
+                        </table>
+                        <br/>
+                    </div>
+
+                    <button type="button" class="btn btn-primary btn-lg"  ng-click="onEstimationCalculateButton()">
+                        Calculate
+                    </button>
+
+                    <button type="button" class="btn btn-primary btn-lg"  ng-click="onEstimationClearButton()">
+                        Reset Memory
+                    </button>
 
 
                 </div>

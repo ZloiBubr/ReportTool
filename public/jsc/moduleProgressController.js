@@ -1,4 +1,4 @@
-function moduleProgressController($scope, $resource, $window, $filter) {
+function moduleProgressController($scope, $resource, $window, $filter, $cookies) {
     var moduleDataResource = $resource('/moduledata');
 
     /* ------------------------------------------------------ Init/Reinit -------------------------------*/
@@ -490,43 +490,60 @@ function moduleProgressController($scope, $resource, $window, $filter) {
             return;
         }
 
-        $scope.estimation = {};
-        $scope.estimation.team = _.find($scope.allTeams,function(teamItem){return teamItem.name === $scope.filteredTeam});
+        if(!_.isEmpty(sessionStorage.estimationSettings))
+        {
+            $scope.estimation = JSON.parse(sessionStorage.estimationSettings);
+            $('#myModal').modal({show:true});
+            return;
+        }
 
-        //var teamModules =
+        $scope.estimation = {};
+        $scope.estimation.stream = {};
+        $scope.estimation.team = _.find($scope.allTeams,function(teamItem){return teamItem.name === $scope.filteredTeam});
         _.each($scope.estimation.team.streams, function(streamItem){
             var streamShortCut = $scope.estimation.team.name +":" + streamItem.replace("Stream","");
             $scope.estimation.stream[streamItem] = {};
-            $scope.estimation.stream[streamItem].modules = _.sortBy(_.filter($scope.moduleProgressData, function(moduleItem){
+            $scope.estimation.stream[streamItem].modules = _.sortBy(_.filter($scope.moduleProgressData.module, function(moduleItem){
                 return moduleItem.teamnames[0] === streamShortCut;
             }), function(item){return item.duedate});
 
-            var previousModuleEndDate = null;
-            _.each($scope.estimation.stream[streamItem].modules, function(moduleItem){
-                var devLeftWorkDays = ((moduleItem.summarySP - moduleItem.reportedSP) / $scope.estimation.daySPVelocity) / $scope.estimation[streamItem+"DevCapacity"];
-                var qaLeftWorkDays = ((moduleItem.summarySP - moduleItem.reportedSP) / $scope.estimation.daySPVelocity) / $scope.estimation[streamItem+"QACapacity"];
-                var startDate = previousModuleEndDate == null ? new Date() : previousModuleEndDate;
-
-                moduleItem.endDevDate = startDate.addBusDays(devLeftWorkDays);
-                moduleItem.endQADate = endDevDate.addBusDays(devLeftWorkDays);
-                moduleItem.endQADate = endDevDate.addBusDays(devLeftWorkDays);
-            })
         });
 
-        // when input fields filled ------------------------------------------------------------ !!!
-
-
-
-
-
-        $scope.estimation
-        _.each($scope.allTeams)
-        $scope.estimation.streams =
-
-        $scope.allTeams
+        $('#myModal').modal({show:true});
     }
-    /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
 
+    $scope.onEstimationCalculateButton = function(){
+
+        sessionStorage.estimationSettings = JSON.stringify($scope.estimation);
+
+        _.each($scope.estimation.team.streams, function(streamItem){
+
+            var previousDevModuleEndDate, previousQAModuleEndDate;
+            _.each($scope.estimation.stream[streamItem].modules, function(moduleItem){
+                moduleItem.devLeftWorkDays = ((moduleItem.summarySP - moduleItem.reportedSP) / $scope.estimation.dayDevSpVelocity) / $scope.estimation[streamItem+"DevCapacity"];
+                moduleItem.qaLeftWorkDays = ((moduleItem.summarySP - moduleItem.reportedSP) / $scope.estimation.dayQaSpVelocity) / $scope.estimation[streamItem+"QACapacity"];
+
+                previousDevModuleEndDate = previousDevModuleEndDate ?  previousDevModuleEndDate : new Date();
+                moduleItem.endDevDate = new Date(previousDevModuleEndDate).addBusDays(moduleItem.devLeftWorkDays);
+
+                previousQAModuleEndDate = previousQAModuleEndDate ?  previousQAModuleEndDate : moduleItem.endDevDate;
+                moduleItem.endQADate = new Date(previousQAModuleEndDate).addBusDays(moduleItem.qaLeftWorkDays);
+
+                moduleItem.endAccDate = moduleItem.qaLeftCustomDays ? new Date(moduleItem.endQADate).addBusDays(moduleItem.qaLeftCustomDays) : new Date(moduleItem.endQADate).addBusDays($scope.estimation.acceptanceDaysGap);
+
+
+                previousDevModuleEndDate = moduleItem.endDevDate;
+                previousQAModuleEndDate = moduleItem.endQADate;
+            })
+        });
+    };
+
+
+    $scope.onEstimationClearButton = function(){
+        sessionStorage.removeItem("estimationSettings");
+    }
+
+    /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
 
     $scope.filterModule = function()
     {
