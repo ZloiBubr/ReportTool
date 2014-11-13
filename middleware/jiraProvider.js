@@ -465,7 +465,7 @@ function SavePage(jira, issue, callback) {
 }
 
 function ParseProgress(item, page, author, created) {
-    if (item.fieldtype == 'custom' && item.field == 'Progress') {
+    if (item.fieldtype == 'custom' && (item.field == 'Progress' || item.field == "Progress, %")) {
         var from = item.fromString == null ||
             item.fromString == undefined ||
             item.fromString == ''
