@@ -73,16 +73,16 @@ function parsePages(callback) {
                                                 if(module.duedate != null) {
                                                     if(!ignore) {
                                                         maximumBurn += storyPoints;
+                                                        var date = new Date(Date.parse(module.duedate));
+                                                        date.setHours(12, 0, 0, 0);
+                                                        date = date.getTime();
+                                                        var tooltip = "";
+                                                        if(modulesAdded.indexOf(module.summary) < 0) {
+                                                            tooltip = getCleanModuleName(module.summary);
+                                                            modulesAdded.push(module.summary);
+                                                        }
+                                                        putDataPoint(velocity, "Planned burn", date, storyPoints, tooltip);
                                                     }
-                                                    var date = new Date(Date.parse(module.duedate));
-                                                    date.setHours(12, 0, 0, 0);
-                                                    date = date.getTime();
-                                                    var tooltip = "";
-                                                    if(modulesAdded.indexOf(module.summary) < 0) {
-                                                        tooltip = getCleanModuleName(module.summary);
-                                                        modulesAdded.push(module.summary);
-                                                    }
-                                                    putDataPoint(velocity, "Planned burn", date, storyPoints, tooltip);
                                                 }
                                                 callback();
                                             },
