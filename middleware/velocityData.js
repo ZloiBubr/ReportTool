@@ -144,6 +144,16 @@ function AdjustProjection(velocity) {
                     burn.data[l].y = Math.floor(burn.data[l-1].y - delta);
                 }
             }
+            var negativeIndex = burn.data.length;
+            for (var l = 0; l < burn.data.length; l++) {
+                if(burn.data[l].y < 0.) {
+                    negativeIndex = l;
+                    break;
+                }
+            }
+            if(negativeIndex < burn.data.length) {
+                burn.data = burn.data.slice(0, negativeIndex + 1);
+            }
         }
     }
 }
