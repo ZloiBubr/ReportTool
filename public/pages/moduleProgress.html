@@ -141,39 +141,55 @@
                 </div>
                 <div class="modal-body container">
 
+                    <fieldset class="row">
+                        <legend>Employee count</legend>
+                        <div class="row" ng-repeat="streamName in estimation.team.streams">
+                                <label class="col-lg-2 control-label" for="{{streamName + 'DevCapacity'}}">{{streamName}} Dev</label>
+                                <div  class="col-lg-2">
+                                    <input type="number" class="form-control" id="{{streamName + 'DevCapacity'}}" placeholder="Developers" ng-model="estimation.streams[streamName].devCapacity"  ng-change="onEstimationCalculateButton()">
+                                </div>
 
+                                <label class="col-lg-2 control-label" for="{{streamName + 'QACapacity'}}">QA</label>
+                                <div  class="col-lg-2">
+                                    <input type="number" class="form-control" id="{{streamName + 'QACapacity'}}" placeholder="QAs" ng-model="estimation.streams[streamName].qaCapacity" ng-change="onEstimationCalculateButton()">
+                                </div>
+                        </div>
+                    </fieldset>
 
-                    <div class="row" ng-repeat="(streamKey,StramValue) in estimation.stream">
-                            <label class="col-lg-2 control-label" for="{{streamKey + 'DevCapacity'}}">{{streamKey}} Dev</label>
-                            <div  class="col-lg-2">
-                                <input type="number" class="form-control" id="{{streamKey + 'DevCapacity'}}" placeholder="Developers" ng-model="estimation[streamKey + 'DevCapacity']">
-                            </div>
-
-                            <label class="col-lg-2 control-label" for="{{streamKey + 'QACapacity'}}">QA</label>
-                            <div  class="col-lg-2">
-                                <input type="number" class="form-control" id="{{streamKey + 'QACapacity'}}" placeholder="QAs" ng-model="estimation[streamKey + 'QACapacity']">
-                            </div>
-                    </div>
-
-                    <div class="row">
-                        <label class="col-lg-2 control-label" for="dayDevSpVelocity">dayDevSpVelocity</label>
+                    <fieldset class="row">
+                        <legend>Velocity</legend>
+                        <label class="col-lg-2 control-label" for="dayDevSpVelocity">Dev velocity (sp/day)</label>
                         <div  class="col-lg-2">
-                            <input type="number" class="form-control" id="dayDevSpVelocity" placeholder="SP per day" ng-model="estimation.dayDevSpVelocity">
+                            <input type="number" class="form-control" id="dayDevSpVelocity" placeholder="SP per day" ng-model="estimation.dayDevSpVelocity" ng-change="onEstimationCalculateButton()">
                         </div>
 
-                        <label class="col-lg-2 control-label" for="dayQaSpVelocity">dayQaSpVelocity</label>
+                        <label class="col-lg-2 control-label" for="dayQaSpVelocity">Qa velocity (sp/day)</label>
                         <div  class="col-lg-2">
-                            <input type="number" class="form-control" id="dayQaSpVelocity" placeholder="SP per day" ng-model="estimation.dayQaSpVelocity">
+                            <input type="number" class="form-control" id="dayQaSpVelocity" placeholder="SP per day" ng-model="estimation.dayQaSpVelocity" ng-change="onEstimationCalculateButton()">
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="row">
+                        <legend>Risks</legend>
+
+                        <label class="col-lg-2 control-label" for="devRisk">Dev risk, %</label>
+                        <div  class="col-lg-2">
+                            <input type="number" class="form-control" id="devRisk" placeholder="SP per day" ng-model="estimation.devRisk" ng-change="onEstimationCalculateButton()">
                         </div>
 
-                        <label class="col-lg-2 control-label" for="acceptanceDaysGap">acceptanceDaysGap</label>
+                        <label class="col-lg-2 control-label" for="qaRisk">Qa risk, %</label>
                         <div  class="col-lg-2">
-                            <input type="number" class="form-control" id="acceptanceDaysGap" placeholder="acceptanceDaysGap" ng-model="estimation.acceptanceDaysGap">
+                            <input type="number" class="form-control" id="qaRisk" placeholder="SP per day" ng-model="estimation.qaRisk" ng-change="onEstimationCalculateButton()">
                         </div>
-                    </div>
 
-                    <div class="row" ng-repeat="stream in estimation.stream">
-                        <h2>stream</h2>
+                        <label class="col-lg-2 control-label" for="acceptanceDaysGap">Acceptance risk (days)</label>
+                        <div  class="col-lg-2">
+                            <input type="number" class="form-control" id="acceptanceDaysGap" placeholder="acceptanceDaysGap" ng-model="estimation.acceptanceDaysGap" ng-change="onEstimationCalculateButton()">
+                        </div>
+                    </fieldset>
+
+                    <div class="row" ng-repeat="(streamKey,streamValue) in estimation.streams">
+                        <h2>{{streamKey}}</h2>
                         <table class="table-bordered table-striped ">
                             <tr>
                                 <td>Due Date</td>
@@ -186,24 +202,29 @@
                                 <td>End QA</td>
                                 <td>Acceptance</td>
                             </tr>
-                            <tr ng-repeat="module in stream.modules">
-                                <td style="width: 100px">{{module.duedate2 | date:'MMM-dd-yyyy'}}</td>
+                            <tr ng-repeat="module in streamValue.modules">
+                                <td style="width: 100px">{{module.duedate | date:'MMM-dd-yyyy'}}</td>
                                 <td style="width: 300px">{{module.name}}</td>
                                 <td style="width: 100px">{{module.summarySP}}</td>
                                 <td style="width: 100px">{{module.summarySP - module.reportedSP | number:1}}</td>
                                 <td style="width: 100px">{{module.devLeftWorkDays | number:1}}</td>
-                                <td style="width: 100px">{{module.qaLeftWorkDays | number:1}}</td>
-                                <td>{{module.endDevDate | date: 'M/d/yyyy'}}</td>
-                                <td>{{module.endQADate | date: 'M/d/yyyy'}}</td>
-                                <td>{{module.endAccDate | date: 'M/d/yyyy'}}</td>
+                                <td style="width: 150px">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">auto:{{module.qaLeftWorkDays | number:1}}</span>
+                                        <input type="number" class="form-control" ng-model="module.qaLeftCustomDays" ng-change="onEstimationCalculateButton()"/>
+                                    </div>
+                                </td>
+                                <td class="{{dateEqualColor(module.duedate, module.endDevDate)}}">{{module.endDevDate | date: 'M/d/yyyy'}}</td>
+                                <td class="{{dateEqualColor(module.duedate, module.endDevDate)}}">{{module.endQADate | date: 'M/d/yyyy'}}</td>
+                                <td class="{{dateEqualColor(module.duedate, module.endDevDate)}}">{{module.endAccDate | date: 'M/d/yyyy'}}</td>
                             </tr>
                         </table>
                         <br/>
                     </div>
 
-                    <button type="button" class="btn btn-primary btn-lg"  ng-click="onEstimationCalculateButton()">
-                        Calculate
-                    </button>
+                    <!--<button type="button" class="btn btn-primary btn-lg"  ng-click="onEstimationCalculateButton()">-->
+                        <!--Calculate-->
+                    <!--</button>-->
 
                     <button type="button" class="btn btn-primary btn-lg"  ng-click="onEstimationClearButton()">
                         Reset Memory

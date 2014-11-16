@@ -19,7 +19,7 @@ function moduleProgressController($scope, $resource, $window, $filter, $cookies)
     $scope.dataLoad = function () {
         $scope.filteredSme = $scope.allSMEs[0].id;
         $scope.filteredMG = $scope.allModuleGroups[0].id;
-        $scope.filteredTeam = $scope.allTeams[0].id;
+        $scope.filteredTeam = $scope.allTeams[3].id;
         $scope.filteredVersion = $scope.allVersions[0].id;
         $scope.isTotalWasCalculated = false;
         $scope.reInitTotal();
@@ -250,6 +250,8 @@ function moduleProgressController($scope, $resource, $window, $filter, $cookies)
         });
         $scope.onSortingClick();
         $scope.isTotalWasCalculated = true;
+
+        $scope.onEstimatesButtonClick();
     };
 
     function ProcessCards(moduleProgressItem, status) {
@@ -484,52 +486,116 @@ function moduleProgressController($scope, $resource, $window, $filter, $cookies)
     }
 
     $scope.onEstimatesButtonClick = function(){
+        var restored_model = false;
+        var storage;
         if(_.isUndefined($scope.moduleProgressData))
         {
             alert("Please, wait till data will be loaded");
             return;
         }
 
+        // restore session
         if(!_.isEmpty(sessionStorage.estimationSettings))
         {
-            $scope.estimation = JSON.parse(sessionStorage.estimationSettings);
-            $('#myModal').modal({show:true});
-            return;
+            try {
+                storage = JSON.parse(sessionStorage.estimationSettings);
+                $scope.estimation = {
+                    dayDevSpVelocity: storage.dayDevSpVelocity,
+                    dayQaSpVelocity: storage.dayQaSpVelocity,
+                    acceptanceDaysGap: storage.acceptanceDaysGap
+                };
+
+                // copy all properties from storage avoid "module" property
+                $scope.estimation.streams = {};
+                _.each(storage.streams, function(streamItem, streamKey){
+                    $scope.estimation.streams[streamKey] = {};
+                    _.each(streamItem, function(propertyItem, propertyKey){
+                        if(propertyKey == "modules"){return;}
+                            $scope.estimation.streams[streamKey][propertyKey] = propertyItem;
+                    })
+                });
+
+                restored_model = true;
+            }
+            catch (ex) {
+                console.error(ex);
+                if(confirm("Exception during restoring your previous settings, would you like to override you previous settings and continue?"))
+                {
+                    $scope.estimation = {};
+                }else{
+                    throw ex;
+                }
+            }
+        }
+        else{
+            $scope.estimation = {};
         }
 
-        $scope.estimation = {};
-        $scope.estimation.stream = {};
-        $scope.estimation.team = _.find($scope.allTeams,function(teamItem){return teamItem.name === $scope.filteredTeam});
+        $scope.estimation.team = _.find($scope.allTeams,function(teamItem){return teamItem.id === $scope.filteredTeam});
         _.each($scope.estimation.team.streams, function(streamItem){
             var streamShortCut = $scope.estimation.team.name +":" + streamItem.replace("Stream","");
-            $scope.estimation.stream[streamItem] = {};
-            $scope.estimation.stream[streamItem].modules = _.sortBy(_.filter($scope.moduleProgressData.module, function(moduleItem){
+            $scope.estimation.streams = $scope.estimation.streams || {};
+            $scope.estimation.streams[streamItem] = $scope.estimation.streams[streamItem] || {};
+            $scope.estimation.streams[streamItem].modules = _.sortBy(_.filter($scope.moduleProgressData.module, function(moduleItem){
                 return moduleItem.teamnames[0] === streamShortCut;
             }), function(item){return item.duedate});
 
+            if(restored_model) {
+                _.each($scope.estimation.streams[streamItem].modules, function (moduleItem) {
+                    var module = _.find(storage.streams[streamItem].modules,function(storModuleItem){
+                       return storModuleItem.key === moduleItem.key;
+                    });
+
+                    if(!_.isUndefined(module) || _.isNumber(module.qaLeftCustomDays)){
+                        moduleItem.qaLeftCustomDays = module.qaLeftCustomDays;
+                    }
+                });
+            }
+
+
         });
 
+        if(restored_model){
+            $scope.onEstimationCalculateButton();
+        }
         $('#myModal').modal({show:true});
     }
 
     $scope.onEstimationCalculateButton = function(){
-
-        sessionStorage.estimationSettings = JSON.stringify($scope.estimation);
+        // save session
+        var storage = {
+            dayDevSpVelocity:$scope.estimation.dayDevSpVelocity,
+            dayQaSpVelocity:$scope.estimation.dayQaSpVelocity,
+            acceptanceDaysGap:$scope.estimation.acceptanceDaysGap
+        };
+        storage.streams = {};
+        _.each($scope.estimation.team.streams, function(streamItem){
+            storage.streams[streamItem] = storage.streams[streamItem] || {};
+            storage.streams[streamItem].devCapacity = $scope.estimation.streams[streamItem].devCapacity;
+            storage.streams[streamItem].qaCapacity = $scope.estimation.streams[streamItem].qaCapacity;
+            storage.streams[streamItem].modules = $scope.estimation.streams[streamItem].modules;
+        });
+        sessionStorage.estimationSettings = JSON.stringify(storage);
 
         _.each($scope.estimation.team.streams, function(streamItem){
 
             var previousDevModuleEndDate, previousQAModuleEndDate;
-            _.each($scope.estimation.stream[streamItem].modules, function(moduleItem){
-                moduleItem.devLeftWorkDays = ((moduleItem.summarySP - moduleItem.reportedSP) / $scope.estimation.dayDevSpVelocity) / $scope.estimation[streamItem+"DevCapacity"];
-                moduleItem.qaLeftWorkDays = ((moduleItem.summarySP - moduleItem.reportedSP) / $scope.estimation.dayQaSpVelocity) / $scope.estimation[streamItem+"QACapacity"];
+            _.each($scope.estimation.streams[streamItem].modules, function(moduleItem){
+                moduleItem.devLeftWorkDays = ((moduleItem.summarySP - moduleItem.reportedSP) / $scope.estimation.dayDevSpVelocity) / $scope.estimation.streams[streamItem].devCapacity;
+                moduleItem.qaLeftWorkDays = ((moduleItem.summarySP - moduleItem.reportedSP) / $scope.estimation.dayQaSpVelocity) / $scope.estimation.streams[streamItem].qaCapacity;
+
+                // apply risk
+                moduleItem.devLeftWorkDays = _.isUndefined($scope.estimation.devRisk) || $scope.estimation.devRisk == 0 ? moduleItem.devLeftWorkDays : moduleItem.devLeftWorkDays * $scope.estimation.devRisk;
+                moduleItem.qaLeftWorkDays = _.isUndefined($scope.estimation.qaRisk) || $scope.estimation.devRisk == 0 ? moduleItem.qaLeftWorkDays : moduleItem.qaLeftWorkDays * $scope.estimation.devRisk;
+
 
                 previousDevModuleEndDate = previousDevModuleEndDate ?  previousDevModuleEndDate : new Date();
                 moduleItem.endDevDate = new Date(previousDevModuleEndDate).addBusDays(moduleItem.devLeftWorkDays);
 
                 previousQAModuleEndDate = previousQAModuleEndDate ?  previousQAModuleEndDate : moduleItem.endDevDate;
-                moduleItem.endQADate = new Date(previousQAModuleEndDate).addBusDays(moduleItem.qaLeftWorkDays);
+                moduleItem.endQADate = moduleItem.qaLeftCustomDays ? new Date(previousQAModuleEndDate).addBusDays(moduleItem.qaLeftCustomDays) : new Date(previousQAModuleEndDate).addBusDays(moduleItem.qaLeftWorkDays);
 
-                moduleItem.endAccDate = moduleItem.qaLeftCustomDays ? new Date(moduleItem.endQADate).addBusDays(moduleItem.qaLeftCustomDays) : new Date(moduleItem.endQADate).addBusDays($scope.estimation.acceptanceDaysGap);
+                moduleItem.endAccDate = new Date(moduleItem.endQADate).addBusDays($scope.estimation.acceptanceDaysGap);
 
 
                 previousDevModuleEndDate = moduleItem.endDevDate;
@@ -544,6 +610,24 @@ function moduleProgressController($scope, $resource, $window, $filter, $cookies)
     }
 
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
+
+
+    $scope.dateEqualColor = function(date1,date2)
+    {
+        var d1 = date1 instanceof Date ? date1 : new Date(date1);
+        var d2 = date1 instanceof Date ? date2 : new Date(date2);
+
+        var result;
+        if(d1.getTime() < d2.getTime()){
+            result = "red"
+        } else if (d1.getTime() == d2.getTime()){
+            result = "yellow";
+        } else {
+            result = "green";
+        }
+
+        return result;
+    };
 
     $scope.filterModule = function()
     {
