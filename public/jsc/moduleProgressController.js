@@ -1,4 +1,4 @@
-function moduleProgressController($scope, $resource, $window, $filter, $cookies) {
+function moduleProgressController($scope, $resource, $window, $filter, $cookies, localStorageService) {
     var moduleDataResource = $resource('/moduledata');
 
     /* ------------------------------------------------------ Init/Reinit -------------------------------*/
@@ -495,14 +495,15 @@ function moduleProgressController($scope, $resource, $window, $filter, $cookies)
         }
 
         // restore session
-        if(!_.isEmpty(sessionStorage.estimationSettings))
+        if(!_.isEmpty(localStorageService.get('estimationSettings')))
         {
             try {
-                storage = JSON.parse(sessionStorage.estimationSettings);
+                storage = localStorageService.get('estimationSettings');
                 $scope.estimation = {
                     dayDevSpVelocity: storage.dayDevSpVelocity,
                     dayQaSpVelocity: storage.dayQaSpVelocity,
-                    acceptanceDaysGap: storage.acceptanceDaysGap
+                    acceptanceDaysGap: storage.acceptanceDaysGap,
+                    holidayList: storage.holidayList
                 };
 
                 // copy all properties from storage avoid "module" property
@@ -564,9 +565,10 @@ function moduleProgressController($scope, $resource, $window, $filter, $cookies)
     $scope.onEstimationCalculateButton = function(){
         // save session
         var storage = {
-            dayDevSpVelocity:$scope.estimation.dayDevSpVelocity,
-            dayQaSpVelocity:$scope.estimation.dayQaSpVelocity,
-            acceptanceDaysGap:$scope.estimation.acceptanceDaysGap
+            dayDevSpVelocity: $scope.estimation.dayDevSpVelocity,
+            dayQaSpVelocity: $scope.estimation.dayQaSpVelocity,
+            acceptanceDaysGap: $scope.estimation.acceptanceDaysGap,
+            holidayList: $scope.estimation.holidayList
         };
         storage.streams = {};
         _.each($scope.estimation.team.streams, function(streamItem){
@@ -575,7 +577,20 @@ function moduleProgressController($scope, $resource, $window, $filter, $cookies)
             storage.streams[streamItem].qaCapacity = $scope.estimation.streams[streamItem].qaCapacity;
             storage.streams[streamItem].modules = $scope.estimation.streams[streamItem].modules;
         });
-        sessionStorage.estimationSettings = JSON.stringify(storage);
+        localStorageService.add('estimationSettings', storage);
+        //sessionStorage.estimationSettings = JSON.stringify(storage);
+
+        var holidayList = [];
+            try{
+            if($scope.estimation.holidayList){
+                _.each($scope.estimation.holidayList.split(";"), function(dateStr){
+                    holidayList.push(new Date(dateStr));
+                });
+            }
+        }
+        catch (ex){
+            console.error(ex);
+        }
 
         _.each($scope.estimation.team.streams, function(streamItem){
 
@@ -589,24 +604,28 @@ function moduleProgressController($scope, $resource, $window, $filter, $cookies)
                 moduleItem.qaLeftWorkDays = _.isUndefined($scope.estimation.qaRisk) || $scope.estimation.devRisk == 0 ? moduleItem.qaLeftWorkDays : moduleItem.qaLeftWorkDays * $scope.estimation.devRisk;
 
 
-                previousDevModuleEndDate = previousDevModuleEndDate ?  previousDevModuleEndDate : new Date();
-                moduleItem.endDevDate = new Date(previousDevModuleEndDate).addBusDays(moduleItem.devLeftWorkDays);
+                if(_.isNumber(moduleItem.devLeftWorkDays)) {
+                    previousDevModuleEndDate = previousDevModuleEndDate ? previousDevModuleEndDate : new Date();
+                    moduleItem.endDevDate = new Date(previousDevModuleEndDate).addBusDays(moduleItem.devLeftWorkDays, holidayList);
+                    previousDevModuleEndDate = moduleItem.endDevDate;
+                } else{ return; }
 
-                previousQAModuleEndDate = previousQAModuleEndDate ?  previousQAModuleEndDate : moduleItem.endDevDate;
-                moduleItem.endQADate = moduleItem.qaLeftCustomDays ? new Date(previousQAModuleEndDate).addBusDays(moduleItem.qaLeftCustomDays) : new Date(previousQAModuleEndDate).addBusDays(moduleItem.qaLeftWorkDays);
+                if(_.isNumber(moduleItem.qaLeftWorkDays)) {
+                    previousQAModuleEndDate = previousQAModuleEndDate ? previousQAModuleEndDate : moduleItem.endDevDate;
+                    moduleItem.endQADate = moduleItem.qaLeftCustomDays ? new Date(previousQAModuleEndDate).addBusDays(moduleItem.qaLeftCustomDays, holidayList) : new Date(previousQAModuleEndDate).addBusDays(moduleItem.qaLeftWorkDays, holidayList);
+                    previousQAModuleEndDate = moduleItem.endQADate;
+                } else{ return; }
 
-                moduleItem.endAccDate = new Date(moduleItem.endQADate).addBusDays($scope.estimation.acceptanceDaysGap);
-
-
-                previousDevModuleEndDate = moduleItem.endDevDate;
-                previousQAModuleEndDate = moduleItem.endQADate;
+                if(_.isNumber($scope.estimation.acceptanceDaysGap)) {
+                    moduleItem.endAccDate = new Date(moduleItem.endQADate).addBusDays($scope.estimation.acceptanceDaysGap, holidayList);
+                } else{ return; }
             })
         });
     };
 
 
     $scope.onEstimationClearButton = function(){
-        sessionStorage.removeItem("estimationSettings");
+        localStorageService.removeFromLocalStorage('estimationSettings');
     }
 
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/

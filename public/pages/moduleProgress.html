@@ -167,6 +167,11 @@
                         <div  class="col-lg-2">
                             <input type="number" class="form-control" id="dayQaSpVelocity" placeholder="SP per day" ng-model="estimation.dayQaSpVelocity" ng-change="onEstimationCalculateButton()">
                         </div>
+
+                        <label class="col-lg-2 control-label" for="holidayList">Holiday list [delimiter ";" ]</label>
+                        <div  class="col-lg-2">
+                            <input type="text" class="form-control" id="holidayList" placeholder="dd/mm/yyyy;dd/mm/yyyy..." ng-model="estimation.holidayList" ng-change="onEstimationCalculateButton()">
+                        </div>
                     </fieldset>
 
                     <fieldset class="row">
@@ -174,12 +179,12 @@
 
                         <label class="col-lg-2 control-label" for="devRisk">Dev risk, %</label>
                         <div  class="col-lg-2">
-                            <input type="number" class="form-control" id="devRisk" placeholder="SP per day" ng-model="estimation.devRisk" ng-change="onEstimationCalculateButton()">
+                            <input type="number" class="form-control" id="devRisk" placeholder="%" ng-model="estimation.devRisk" ng-change="onEstimationCalculateButton()">
                         </div>
 
                         <label class="col-lg-2 control-label" for="qaRisk">Qa risk, %</label>
                         <div  class="col-lg-2">
-                            <input type="number" class="form-control" id="qaRisk" placeholder="SP per day" ng-model="estimation.qaRisk" ng-change="onEstimationCalculateButton()">
+                            <input type="number" class="form-control" id="qaRisk" placeholder="%" ng-model="estimation.qaRisk" ng-change="onEstimationCalculateButton()">
                         </div>
 
                         <label class="col-lg-2 control-label" for="acceptanceDaysGap">Acceptance risk (days)</label>

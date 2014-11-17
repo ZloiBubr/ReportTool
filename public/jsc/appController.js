@@ -5,7 +5,7 @@
  * Time: 21:51
  * To change this template use File | Settings | File Templates.
  */
-var myApp = angular.module('App', ["ngResource", "highcharts-ng", "ui.router", "ui.bootstrap","ui.utils", "ngCookies"]);
+var myApp = angular.module('App', ["ngResource", "highcharts-ng", "ui.router", "ui.bootstrap","ui.utils", "ngCookies", "LocalStorageModule"]);
 
 
 function appController($scope, $resource, $window) {
@@ -43,9 +43,11 @@ function appController($scope, $resource, $window) {
 
 myApp.run(function ($rootScope, $location) {
     Number.prototype.mod = function(n) {
-        return ((this%n)+n)%n;
+        return ((this%n)+n)%n;sdlkfj
     }
-    Date.prototype.addBusDays = function(dd) {
+
+    Date.prototype.addBusDays = function(dd, holidays) {
+        var initialDate = new Date(this);
         var wks = Math.floor(dd/5);
         var dys = dd.mod(5);
         var dy = this.getDay();
@@ -58,6 +60,22 @@ myApp.run(function ($rootScope, $location) {
         if (dy + dys > 5) dys += 2;
         if (dy + dys < 1) dys -= 2;
         this.setDate(this.getDate()+wks*7+dys);
+
+        if(holidays){
+            var shiftDaysCount = 0
+            _.each(holidays, function(holiday){
+                if(
+                    (initialDate.getTime() < holiday.getTime() && this.getTime() > holiday.getTime())
+                    || initialDate.getTime() === holiday.getTime()
+                    || this.getTime() === holiday.getTime())
+                {
+                    shiftDaysCount++
+                }
+            }, this);
+            if(shiftDaysCount > 0){
+                this.addBusDays(shiftDaysCount,holidays);
+            }
+        }
 
         return this;
     }
