@@ -341,6 +341,7 @@ function moduleProgressController($scope, $resource, $window, $filter) {
                 card.accepted = status == "Accepted";
                 card.cancelled = status == "Cancelled";
                 card.blocked |= item.blocked;
+                card.deferred |= item.deferred;
                 found = true;
             }
         }
@@ -355,6 +356,7 @@ function moduleProgressController($scope, $resource, $window, $filter) {
             card.dueDateConfirmed = item.dueDateConfirmed;
             card.progress = card.summarySP ? Math.floor(card.reportedSP*100/card.summarySP) : 0;
             card.blocked = item.blocked;
+            card.deferred = item.deferred;
             version.smeNames.push(card);
         }
     }

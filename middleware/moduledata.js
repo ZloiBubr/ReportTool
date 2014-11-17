@@ -147,10 +147,9 @@ function parsePages(callback) {
                                         status = status == 'Closed' && resolution == "Implemented" ? "Accepted" : status;
 
                                         var ignore = status == "Closed" && (resolution == "Out of Scope" || resolution == "Rejected" || resolution == "Canceled");
-                                        var blocked = status == "Blocked";
 
                                         if(!ignore) {
-                                            putDataPoint(moduledata, dueDateConfirmed, status, moduleGroup, teamName, streamName, calcStoryPoints, storyPoints, ++count, module, blocked);
+                                            putDataPoint(moduledata, dueDateConfirmed, status, moduleGroup, teamName, streamName, calcStoryPoints, storyPoints, ++count, module);
                                         }
                                         callback();
                                 },
@@ -180,8 +179,10 @@ function parsePages(callback) {
     ]);
 }
 
-function putDataPoint(moduledata, dueDateConfirmed, status, moduleGroup, teamName, streamName, calcStoryPoints, storyPoints, count, module, blocked) {
+function putDataPoint(moduledata, dueDateConfirmed, status, moduleGroup, teamName, streamName, calcStoryPoints, storyPoints, count, module) {
     var initUri = "https://jira.epam.com/jira/browse/";
+    var blocked = status == "Blocked";
+    var deferred = status == "Deferred";
 
     //module
     var moduled;
@@ -197,7 +198,7 @@ function putDataPoint(moduledata, dueDateConfirmed, status, moduleGroup, teamNam
             teamnames: [], key: module.key,
             accepted: status == "Accepted", status: status,
             modulestatus: module.status, moduleresolution: module.resolution,
-            fixVersions: module.fixVersions, blocked: blocked
+            fixVersions: module.fixVersions, blocked: blocked, deferred: deferred
         };
         moduledata.module.push(moduled);
     }
@@ -211,6 +212,7 @@ function putDataPoint(moduledata, dueDateConfirmed, status, moduleGroup, teamNam
     moduled.pagescount = count;
     moduled.dueDateConfirmed = dueDateConfirmed;
     moduled.blocked |= blocked;
+    moduled.deferred |= deferred;
 
 
     var moduleStatus = statusList.getStatusByName(moduled.status);
