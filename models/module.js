@@ -13,7 +13,8 @@ var schema = new Schema({
     status:     { type: String },
     labels:     { type: String },
     resolution: { type: String },
-    fixVersions:{ type: String }
+    fixVersions:{ type: String },
+    priority:   { type: String }
 });
 
 exports.Module = mongoose.model('Module', schema);

@@ -124,7 +124,7 @@ function AdjustProjection(velocity) {
     for (var k = 0; k < velocity.data.length; k++) {
         var burn = velocity.data[k];
         if (burn.name == "Actual burn") {
-            lastValue = burn.data[burn.data.length-1].y;
+            lastValue = burn.data.length > 0 ? burn.data[burn.data.length-1].y : lastValue;
         }
     }
 

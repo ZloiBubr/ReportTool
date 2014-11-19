@@ -6,10 +6,10 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         $scope.common = {};
         $scope.dataLoad();
         $scope.sortByDate = false;
-        $scope.showTeamTable = false;
+        $scope.showTeamTable = true;
         $scope.showStreams = false;
-        $scope.showModules = false;
-        $scope.showCards = false;
+        $scope.showModules = true;
+        $scope.showCards = true;
     };
 
     $scope.reInit = function () {
@@ -186,19 +186,18 @@ function moduleProgressController($scope, $resource, $window, $filter) {
 
 
             moduleProgressItem.duedate2 = moduleProgressItem.duedate;
-            moduleProgressItem.acceptedName = moduleProgressItem.accepted ? "Yes" : "No";
 
             var accepted = moduleProgressItem.status == "Accepted";
             var readyForQa = moduleProgressItem.status == "Ready for QA" || moduleProgressItem.status == "Testing in Progress";
             var resolved = moduleProgressItem.status == "Resolved";
-            var cancelled = moduleProgressItem.modulestatus == "Closed" && moduleProgressItem.moduleresolution == "Out of Scope";
+            var canceled = moduleProgressItem.modulestatus == "Closed" && moduleProgressItem.moduleresolution == "Out of Scope";
             var notApplicable = moduleProgressItem.modulestatus == "Closed" && moduleProgressItem.moduleresolution == "Done" && moduleProgressItem.pagescount < 1;
 
-            moduleProgressItem.cancelled = cancelled || notApplicable;
+            moduleProgressItem.cancelled = canceled || notApplicable;
             moduleProgressItem.readyForQA = readyForQa;
             moduleProgressItem.readyForAcceptance = resolved;
 
-            if(cancelled) {
+            if(canceled) {
                 var cancelledEntity = $scope.total.getStatusByName("Cancelled");
                 processEntity(cancelledEntity, moduleProgressItem);
                 if(cancelledEntity.isChecked) {
@@ -269,14 +268,16 @@ function moduleProgressController($scope, $resource, $window, $filter) {
                     var moduleName = $scope.showModules ? getCleanModuleName(moduleProgressItem.name) : moduleProgressItem.smename;
                     var reportedSP = moduleProgressItem.reportedSP;
                     var summarySP = moduleProgressItem.summarySP;
-                    fillSmeNames(teamobj, version, moduleName, reportedSP, summarySP, status, moduleProgressItem);
+                    fillCards(teamobj, version, moduleName, reportedSP, summarySP, status, moduleProgressItem);
                 }
             }
         }
     }
 
-    function fillSmeNames(teamobj, version, name, reportedSP, summarySP, status, item) {
+
+    function fillCards(teamobj, version, name, reportedSP, summarySP, status, item) {
         var found = false;
+        var priorityNumber = $scope.getPriorityNumber(item.priority);
         for(var i=0; i<version.smeNames.length; i++) {
             var card = version.smeNames[i];
             if(card.name == name) {
@@ -342,6 +343,7 @@ function moduleProgressController($scope, $resource, $window, $filter) {
                 card.cancelled = status == "Cancelled";
                 card.blocked |= item.blocked;
                 card.deferred |= item.deferred;
+                card.priority = card.priority < priorityNumber ? card.priority : priorityNumber;
                 found = true;
             }
         }
@@ -357,7 +359,20 @@ function moduleProgressController($scope, $resource, $window, $filter) {
             card.progress = card.summarySP ? Math.floor(card.reportedSP*100/card.summarySP) : 0;
             card.blocked = item.blocked;
             card.deferred = item.deferred;
+            card.priority = priorityNumber;
             version.smeNames.push(card);
+        }
+        for(var i=0; i<version.smeNames.length; i++) {
+            version.smeNames.sort(function(a,b) {
+                var aa = a.priority;
+                var bb = b.priority;
+                var c = a.name;
+                var d = b.name;
+                return aa > bb ? 1 :
+                        aa < bb ? -1 :
+                        c > d ? 1 :
+                        c < d ? -1 : 0;
+            });
         }
     }
 
@@ -482,21 +497,6 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         sortModuleProgressData();
     };
 
-    $scope.onFilterEod = function() {
-        $scope.reInitTotal();
-        $scope.isTotalWasCalculated = false;
-        $scope.processWithRowSpans();
-    }
-    $scope.onFilterQ1 = function() {
-        $scope.reInitTotal();
-        $scope.isTotalWasCalculated = false;
-        $scope.processWithRowSpans();
-    }
-    $scope.onFilterQ2 = function() {
-        $scope.reInitTotal();
-        $scope.isTotalWasCalculated = false;
-        $scope.processWithRowSpans();
-    }
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
 
 

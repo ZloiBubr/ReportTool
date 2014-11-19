@@ -36,9 +36,14 @@ function appController($scope, $resource, $window) {
 
     $scope.allSMEs = [{id: "All", name: "All"}];
     $scope.allModuleGroups = [{id: "All", name: "All"}];
+    $scope.allModules = [{id: "All", name: "All"}];
     $scope.allVersions = [{id: "All", name: "All"}];
 
     $scope.statuses = $window.exports.statuses;
+    $scope.STATUS = $window.exports.STATUS;
+    $scope.RESOLUTION = $window.exports.RESOLUTION;
+
+    $scope.getPriorityNumber = $window.exports.getPriorityNumber;
 }
 
 myApp.run(function ($rootScope, $location) {
