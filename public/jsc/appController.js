@@ -34,6 +34,7 @@ function appController($scope, $resource, $window) {
         return allTeamsArray;
     }();
 
+    $scope.allStreams = [{id: "All", name: "All"}];
     $scope.allSMEs = [{id: "All", name: "All"}];
     $scope.allModuleGroups = [{id: "All", name: "All"}];
     $scope.allModules = [{id: "All", name: "All"}];

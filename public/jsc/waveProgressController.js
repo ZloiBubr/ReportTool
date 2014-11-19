@@ -21,6 +21,7 @@ function waveProgressController($scope, $resource, $window, $filter) {
         $scope.filteredMG = $scope.allModuleGroups[0].id;
         $scope.filteredM = $scope.allModules[0].id;
         $scope.filteredTeam = $scope.allTeams[0].id;
+        $scope.filteredStream = $scope.allStreams[0].id;
         $scope.filteredVersion = $scope.allVersions[0].id;
         $scope.isTotalWasCalculated = false;
         $scope.reInitTotal();
@@ -33,6 +34,7 @@ function waveProgressController($scope, $resource, $window, $filter) {
         $scope.total.all = {isChecked :true};
         $scope.total.total = 0;
         $scope.total.pages = 0;
+        $scope.allStreams = [{id: "All", name: "All"}];
         $scope.allSMEs = [{id: "All", name: "All"}];
         $scope.allModuleGroups = [{id: "All", name: "All"}];
         $scope.allModules = [{id: "All", name: "All"}];
@@ -118,6 +120,24 @@ function waveProgressController($scope, $resource, $window, $filter) {
         });
     }
 
+    function FillStreamsCombo() {
+        $scope.allStreams = [{id: "All", name: "All"}];
+        _.each($scope.cloudAppData.cloudApp, function(cloudAppItem){
+            if($scope.filteredTeam != $scope.allTeams[0].id && cloudAppItem.teamName != $scope.filteredTeam){
+                return;
+            }
+            var found = false;
+            _.each($scope.allStreams, function (sme) {
+                if (sme.name == cloudAppItem.streamName) {
+                    found = true;
+                }
+            });
+            if (!found) {
+                $scope.allStreams.push({id: cloudAppItem.streamName, name: cloudAppItem.streamName});
+            }
+        });
+    }
+
     function SortCombos() {
         $scope.allModuleGroups.sort(function (a, b) {
             a = a.name;
@@ -142,6 +162,17 @@ function waveProgressController($scope, $resource, $window, $filter) {
             return a > b ? 1 : a < b ? -1 : 0;
         });
         $scope.allSMEs.sort(function (a, b) {
+            a = a.name;
+            b = b.name;
+            if (a == "All") {
+                return -1;
+            }
+            if (b == "All") {
+                return 1;
+            }
+            return a > b ? 1 : a < b ? -1 : 0;
+        });
+        $scope.allStreams.sort(function (a, b) {
             a = a.name;
             b = b.name;
             if (a == "All") {
@@ -179,6 +210,7 @@ function waveProgressController($scope, $resource, $window, $filter) {
         FillGroupsCombo();
         FillModulesCombo();
         FillSmeCombo();
+        FillStreamsCombo();
         SortCombos();
 
         _.each($scope.cloudAppData.cloudApp, function(cloudAppItem){
@@ -215,6 +247,9 @@ function waveProgressController($scope, $resource, $window, $filter) {
                 }
             }
             if($scope.filteredSme != $scope.allSMEs[0].id && cloudAppItem.smeName != $scope.filteredSme){
+                return;
+            }
+            if($scope.filteredStream != $scope.allStreams[0].id && cloudAppItem.streamName != $scope.filteredStream){
                 return;
             }
             if($scope.filteredTeam != $scope.allTeams[0].id && cloudAppItem.teamName != $scope.filteredTeam) {

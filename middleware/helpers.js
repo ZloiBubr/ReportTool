@@ -57,6 +57,13 @@ exports.getCloudAppName = function(labels) {
     return labels.substring(index+9,index2);
 };
 
+exports.isParentPage = function(labels) {
+    var indexpp = labels.indexOf("CloudApp_ParentPage");
+    if(indexpp > -1) {
+        return true;
+    }
+};
+
 exports.getWaveName = function(labels) {
     var index = labels.indexOf("Wave");
     if(index < 0) {

@@ -70,8 +70,15 @@ function putDataPoint(cloudAppData, module, page) {
     var initUri = "https://jira.epam.com/jira/issues/?jql=project%20%3D%20PLEX-UXC%20and%20issuetype%3DStory%20AND%20%22Story%20Points%22%20%3E%200%20and%20labels%20in%20(";
 
     var labels = module._doc.labels != null ? module._doc.labels : "";
-    var teamName = helpers.getTeamName(labels);
-    var streamName = helpers.getStreamName(labels);
+    var teamName = helpers.getTeamName(page.labels);
+    var streamName = helpers.getStreamName(page.labels);
+    var isParentPage = helpers.isParentPage(page.labels);
+    if(teamName == "") {
+        teamName = helpers.getTeamName(labels);
+    }
+    if(streamName == "") {
+        streamName = helpers.getStreamName(labels);
+    }
     var smeName = module.assignee;
     var moduleGroupName = helpers.getModuleGroupName(page.labels);
     var cloudAppName = helpers.getCloudAppName(page.labels);
@@ -98,6 +105,10 @@ function putDataPoint(cloudAppData, module, page) {
             cloudApp.summarySP += storyPoints;
             cloudApp.progress = cloudApp.reportedSP*100/cloudApp.summarySP;
             cloudApp.pages++;
+            if(isParentPage) {
+                cloudApp.teamName = teamName;
+                cloudApp.streamName = streamName;
+            }
 
             var cloudAppStatus = statusList.getStatusByName(cloudApp.status);
             var pageStatus = statusList.getStatusByName(status);
