@@ -1,13 +1,18 @@
 <div id="container" class="container" ng-controller="moduleProgressController" style="padding-left: 150px">
-    <div class="visible-md visible-lg visible-sm" style="position:fixed; left: 10px; top:80px; font-size: 12pt; max-width: 250px">
+    <div class="visible-md visible-lg visible-sm" style="position:fixed; left: 10px; top:60px; font-size: 12pt; max-width: 250px">
         <ul class="list-unstyled">
+            <li><img width="16" height="16" alt="Conf" src="img/duedate2.png"/> DueDate confirmed</li>
+            <li><img width="16" height="16" alt="Conf" src="img/ban.png"/> Has blockers</li>
+            <li><img width="16" height="16" alt="Conf" src="img/deffered.png"/> Has deferred</li>
+            <li><img width="16" height="16" alt="Conf" src="img/1.png"/>
+                <img width="16" height="16" alt="Conf" src="img/2.png"/>
+                <img width="16" height="16" alt="Conf" src="img/3.png"/>
+                <img width="16" height="16" alt="Conf" src="img/4.png"/>
+                <img width="16" height="16" alt="Conf" src="img/5.png"/> Priority</li>
+            <li><br/></li>
             <li><input type="checkbox" ng-model="showStreams" ng-change="processWithRowSpans()"> Streams</li>
             <li><input type="checkbox" ng-model="showCards" ng-change="processWithRowSpans()"> Cards</li>
             <li><input type="checkbox" ng-model="showModules" ng-change="processWithRowSpans()"> SME / Modules</li>
-            <li><br/></li>
-            <li><img width="20" height="20" alt="Conf" src="img/duedate2.png"/> DueDate confirmed</li>
-            <li><img width="20" height="20" alt="Conf" src="img/ban.png"/> Has blockers</li>
-            <li><img width="20" height="20" alt="Conf" src="img/deffered.png"/> Has deferred</li>
             <li><br/></li>
             <li>Fix Version:<select class="form-control headerSelectWidth" ng-model="filteredVersion" class="headerSelectWidth" ng-options="version.name as version.name for version in allVersions" ng-change="filterModule()"></select></li>
             <li>SME:<select class="form-control headerSelectWidth" ng-model="filteredSme" class="headerSelectWidth" ng-options="sme.name as sme.name for sme in allSMEs" ng-change="filterModule()"></select></li>
