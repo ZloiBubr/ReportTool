@@ -502,8 +502,11 @@ function moduleProgressController($scope, $resource, $window, $filter) {
 
     $scope.filterModule = function()
     {
-        $scope.reInitTotal();
         $scope.isTotalWasCalculated = false;
+        $scope.total = new $scope.statuses();
+        $scope.total.all = {isChecked :true};
+        $scope.total.total = 0;
+        $scope.total.pages = 0;
         $scope.processWithRowSpans();
     };
 

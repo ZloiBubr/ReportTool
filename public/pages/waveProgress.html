@@ -5,12 +5,12 @@
             <li><img width="20" height="20" alt="Conf" src="img/ban.png"/> Has blockers</li>
             <li><img width="20" height="20" alt="Conf" src="img/deffered.png"/> Has deferred</li>
             <li><br/></li>
-            <li>Fix Version:<select class="form-control headerSelectWidth" ng-model="filteredVersion" class="headerSelectWidth" ng-options="version.name as version.name for version in allVersions" ng-change="processWithRowSpans()"></select></li>
-            <li>SME:<select class="form-control headerSelectWidth" ng-model="filteredSme" class="headerSelectWidth" ng-options="sme.name as sme.name for sme in allSMEs" ng-change="processWithRowSpans()"></select></li>
-            <li>Module Group:<select style="max-width: 250px !important;" class="form-control headerSelectWidth" ng-model="filteredMG" class="headerSelectWidth" ng-options="moduleGroup.name as moduleGroup.name for moduleGroup in allModuleGroups" ng-change="processWithRowSpans()"></select></li>
-            <li>Module:<select style="max-width: 250px !important;" class="form-control headerSelectWidth" ng-model="filteredM" class="headerSelectWidth" ng-options="module.name as module.name for module in allModules" ng-change="processWithRowSpans()"></select></li>
-            <li>Team:<select class="form-control headerSelectWidth" ng-model="filteredTeam" class="headerSelectWidth" ng-options="team.name as team.name for team in allTeams" ng-change="processWithRowSpans()"></select></li>
-            <li>Stream:<select class="form-control headerSelectWidth" ng-model="filteredStream" class="headerSelectWidth" ng-options="team.name as team.name for team in allStreams" ng-change="processWithRowSpans()"></select></li>
+            <li>Fix Version:<select class="form-control headerSelectWidth" ng-model="filteredVersion" class="headerSelectWidth" ng-options="version.name as version.name for version in allVersions" ng-change="filterModule()"></select></li>
+            <li>SME:<select class="form-control headerSelectWidth" ng-model="filteredSme" class="headerSelectWidth" ng-options="sme.name as sme.name for sme in allSMEs" ng-change="filterModule()"></select></li>
+            <li>Module Group:<select style="max-width: 250px !important;" class="form-control headerSelectWidth" ng-model="filteredMG" class="headerSelectWidth" ng-options="moduleGroup.name as moduleGroup.name for moduleGroup in allModuleGroups" ng-change="filterModule()"></select></li>
+            <li>Module:<select style="max-width: 250px !important;" class="form-control headerSelectWidth" ng-model="filteredM" class="headerSelectWidth" ng-options="module.name as module.name for module in allModules" ng-change="filterModule()"></select></li>
+            <li>Team:<select class="form-control headerSelectWidth" ng-model="filteredTeam" class="headerSelectWidth" ng-options="team.name as team.name for team in allTeams" ng-change="filterModule()"></select></li>
+            <li>Stream:<select class="form-control headerSelectWidth" ng-model="filteredStream" class="headerSelectWidth" ng-options="team.name as team.name for team in allStreams" ng-change="filterModule()"></select></li>
             <li><input type="checkbox" ng-model="total.deferred.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-time"></span><strong> {{total.deferred.count}}</strong>:Deferred</li>
             <li><input type="checkbox" ng-model="total.open.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-inbox"></span><strong> {{total.open.count}}</strong>:Open</li>
             <li><input type="checkbox" ng-model="total.reopened.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-inbox"></span><strong> {{total.reopened.count}}</strong>:Reopened</li>
@@ -27,7 +27,7 @@
             <li><label><span class="glyphicon glyphicon-asterisk"></span><strong>{{total.pages}}</strong>:Pages</label></li>
         </ul>
     </div>
-    <div class="row">
+    <div>
         <table class="table table-bordered">
             <thead class="progressTableMainHeader">
             <tr>

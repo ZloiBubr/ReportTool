@@ -358,6 +358,15 @@ function waveProgressController($scope, $resource, $window, $filter) {
     {
         return item.indexOf("Unknown") > -1;
     };
+    $scope.filterModule = function()
+    {
+        $scope.isTotalWasCalculated = false;
+        $scope.total = new $scope.statuses();
+        $scope.total.all = {isChecked :true};
+        $scope.total.total = 0;
+        $scope.total.pages = 0;
+        $scope.processWithRowSpans();
+    };
 
 
     $scope.init();
