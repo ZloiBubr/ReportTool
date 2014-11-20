@@ -39,7 +39,13 @@
                     <td ng-repeat="status in cloudAppCards.statuses">
                         <table class="table table-condensed">
                             <tr  ng-repeat = "card in status.cards">
-                                <td class="bg-info">
+                                <td ng-class="{
+                                    blocked: card.status == 'Blocked',
+                                    accepted: card.status == 'Accepted',
+                                    readyForAcceptance: card.status == 'Resolved',
+                                    readyForQA: card.status == 'Ready for QA',
+                                    cancelled: card.status == 'Canceled',
+                                    'bg-info': true}">
                                     <div id="card_progress">
                                         <div class="bar" ng-style="{width: card.progress + '%'}"></div>
                                     </div>
