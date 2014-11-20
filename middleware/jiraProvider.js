@@ -436,7 +436,7 @@ function SavePage(jira, issue, callback) {
         parseHistory(issue, page);
         calcWorklogFromIssue(issue, page);
         var queryString = util.format("project = PLEXUXC AND parent in (%s)", issue.key);
-        jira.searchJira(queryString, { fields: ["summary", "worklog"] }, function (error, subtasks) {
+        jira.searchJira(queryString, { fields: ["summary", "worklog", "status"] }, function (error, subtasks) {
             if (error) {
                 callback(error);
             }
@@ -444,6 +444,10 @@ function SavePage(jira, issue, callback) {
                 async.eachSeries(subtasks.issues, function (subtask, callback) {
                         if (subtask != null) {
                             calcWorklogFromIssue(subtask, page);
+                            if(subtask.fields.summary.indexOf("PLEX-Acceptance") > -1 &&
+                                subtask.fields.status.name == "Closed") {
+                                page.status = "Production";
+                            }
                             callback();
                         }
                     },

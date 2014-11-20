@@ -50,7 +50,8 @@ function waveProgressController($scope, $resource, $window, $filter) {
             {name: $scope.STATUS.TESTINGINPROGRESS.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
             {name: $scope.STATUS.BLOCKED.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
             {name: $scope.STATUS.RESOLVED.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
-            {name: $scope.STATUS.ACCEPTED.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 }
+            {name: $scope.STATUS.ACCEPTED.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
+            {name: $scope.STATUS.PRODUCTION.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 }
         ];
         $scope.cloudAppCards = [];
     };
@@ -349,6 +350,7 @@ function waveProgressController($scope, $resource, $window, $filter) {
         $scope.total.blocked.isChecked = $scope.total.all.isChecked;
         $scope.total.deferred.isChecked = $scope.total.all.isChecked;
         $scope.total.cancelled.isChecked = $scope.total.all.isChecked;
+        $scope.total.production.isChecked = $scope.total.all.isChecked;
 
         $scope.processWithRowSpans();
     };

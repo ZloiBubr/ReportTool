@@ -10,9 +10,10 @@ exports.STATUS = {
     TESTINGINPROGRESS: { value: 8, name: "Testing in Progress", icon: "glyphicon glyphicon-road"},
     RESOLVED: { value: 9, name: "Resolved", icon: "glyphicon glyphicon-check"},
     CLOSED: { value: 10, name: "Closed", icon: "glyphicon glyphicon-star"},
-    ACCEPTED: { value: 11, name: "Accepted", icon: "glyphicon glyphicon-star"},
-    CANCELED: { value: 12, name: "Canceled", icon: "glyphicon glyphicon-ban-circle"},
-    NOTAPPLICABLE: { value: 13, name: "Not Applicable", icon: "glyphicon glyphicon-ban-circle"}
+    PRODUCTION: { value: 11, name: "Production", icon: "glyphicon glyphicon-star"},
+    ACCEPTED: { value: 12, name: "Accepted", icon: "glyphicon glyphicon-star"},
+    CANCELED: { value: 13, name: "Canceled", icon: "glyphicon glyphicon-ban-circle"},
+    NOTAPPLICABLE: { value: 14, name: "Not Applicable", icon: "glyphicon glyphicon-ban-circle"}
 };
 
 exports.RESOLUTION = {
@@ -58,6 +59,7 @@ exports.statuses = function() {
     this.testingInProgress = new exports.statusEntity(exports.STATUS.TESTINGINPROGRESS);
     this.resolved = new exports.statusEntity(exports.STATUS.RESOLVED);
     this.accepted = new exports.statusEntity(exports.STATUS.ACCEPTED);
+    this.production = new exports.statusEntity(exports.STATUS.PRODUCTION);
     this.closed = new exports.statusEntity(exports.STATUS.CLOSED);
     this.cancelled = new exports.statusEntity(exports.STATUS.CANCELED);
     this.notApplicable = new exports.statusEntity(exports.STATUS.NOTAPPLICABLE);
@@ -79,6 +81,8 @@ exports.statuses = function() {
                 return this.codeReview;
             case exports.STATUS.ACCEPTED.name:
                 return this.accepted;
+            case exports.STATUS.PRODUCTION.name:
+                return this.production;
             case exports.STATUS.READYFORQA.name:
                 return this.readyForQA;
             case exports.STATUS.TESTINGINPROGRESS.name:

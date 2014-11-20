@@ -160,6 +160,11 @@ table {
     background-color: #ede8ed !important;
 }
 
+.production
+{
+    background-color: #7fc48c !important;
+}
+
 .cancelled
 {
     background-color: #a8a1fa !important;
@@ -167,7 +172,7 @@ table {
 
 .readyForAcceptance
 {
-    background-color: #7fc48c !important;
+    background-color: #a5f7b2 !important;
 }
 
 .readyForQA
