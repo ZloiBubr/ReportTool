@@ -1,125 +1,168 @@
 var mongoose = require('../libs/mongoose');
-var pagebysizeModel = require('../models/pagebysize').data;
 var Module = require('../models/module').Module;
 var Page = require('../models/page').Page;
 var log = require('../libs/log')(module);
-var persons = require('./persons');
+var helpers = require('../middleware/helpers');
+var statusExport = require('../public/jsc/Models/statusList');
+var statusList = new statusExport.statuses();
+var async = require('async');
+var _ = require('underscore');
 
 exports.getData = function (req, res) {
-    parsePages(function (err, data) {
-        if (err) throw err;
+    parsePages(function (data) {
         res.json(data);
     });
 };
 
-function isDeveloper(name) {
-    if (persons.isDeveloper(name)) {
-            return true;
-    }
-    return false;
+function cloudAppData() {
+    this.cloudApp = [];
+}
+
+function chartData() {
+    this.data = [
+        {
+            data: [],
+            name: "Development Time"
+        },
+        {
+            data: [],
+            name: "QA Time"
+        }
+    ];
 }
 
 function parsePages(callback) {
-    var model = new pagebysizeModel();
-    for (var k = 0; k < model.data.length; k++) {
-        var team = model.data[k];
-        team.data = [];
-    }
-    //1. grab all pages
-    Page.find({}).exec(function (err, pages) {
-        for (var i = 0; i < pages.length; i++) {
-            var page = pages[i];
-            if(page.resolution == "Out of Scope") {
-                continue;
-            }
+    var cloudappdata = new cloudAppData();
+    var chartdata = new chartData();
 
-            //interested only at finished pages
-            if(page.devFinished == undefined) {
-                continue;
-            }
-            var dateDevFinished = new Date(Date.parse(page.devFinished)).getTime();
-            var dateQAFinished = new Date(Date.parse(page.qaFinished)).getTime();
-            var pageSize = getPageSize(page.labels);
-            var timeDevSpent = 0.;
-            var timeQASpent = 0.;
-            //calc time spent
-            for (var j = 0; j < page.worklogHistory.length; j++) {
-                var worklog = page.worklogHistory[j];
-                if(isDeveloper(worklog.person)) {
-                    timeDevSpent += parseFloat(worklog.timeSpent);
-                }
-                else {
-                    timeQASpent += parseFloat(worklog.timeSpent);
-                }
-            }
-            if(dateQAFinished > (new Date("Jan 1, 2014")).getTime() &&
-                (timeDevSpent > 1. && (
-                page.status == "Resolved" ||
-                page.status == "Closed"
-                ))) {
-                putDataPoint(model, pageSize+"Dev", dateQAFinished, timeDevSpent, page);
-            }
-            if(dateQAFinished > (new Date("Jan 1, 2014")).getTime() &&
-                (timeQASpent > 1. && (
-                page.status == "Resolved" ||
-                page.status == "Closed"
-                ))) {
-                putDataPoint(model, pageSize+"QA", dateQAFinished, timeQASpent, page);
-            }
-        }
-
-        //2. sort
-        for (var k = 0; k < model.data.length; k++) {
-            var team = model.data[k];
-            team.data.sort(function (a, b) {
-                var aa = new Date(a.x);
-                var bb = new Date(b.x);
-                return aa > bb ? 1 : aa < bb ? -1 : 0;
+    async.series([
+        function (callback) {
+            Module.find({}).exec(function(err, modules) {
+                async.series([
+                        async.eachSeries(modules, function(module, callback) {
+                                Page.find({epicKey: module.key}).exec(function (err, pages) {
+                                    if(pages != null && pages.length > 0) {
+                                        async.eachSeries(pages, function(page, callback) {
+                                                if(helpers.isActive(page.status, page.resolution)) {
+                                                    putDataPoint(cloudappdata, module, page);
+                                                }
+                                                callback();
+                                            },
+                                            function() {
+                                                callback();
+                                            });
+                                    }
+                                    else {
+                                        callback();
+                                    }
+                                })
+                            },
+                            function() {
+                                callback();
+                            })
+                    ],
+                    function() {
+                        callback();
+                    });
             });
+        },
+        function () {
+            copyCloudAppData(chartdata, cloudappdata);
+            sortChartData(chartdata);
+            callback(chartdata);
         }
-        callback(err, model);
-    })
+    ]);
 }
 
-function getTeamName(labels) {
-    var index = labels.indexOf("Team");
-    if(index < 0) {
-        return "";
+function sortChartData(chartdata) {
+    for (var k = 0; k < chartdata.data.length; k++) {
+        var dataLine = chartdata.data[k];
+        dataLine.data.sort(function (a, b) {
+            var aa = new Date(a.x);
+            var bb = new Date(b.x);
+            return aa > bb ? 1 : aa < bb ? -1 : 0;
+        });
     }
-    var index2 = labels.indexOf(',', index);
-    if(index2 < 0) {
-        index2 = labels.length;
-    }
-
-    return labels.substring(index+4,index2);
 }
 
-function getPageSize(labels) {
-    if (labels.indexOf("PageSizeSmall") > -1)
-        return "Small";
-    if (labels.indexOf("PageSizeMedium") > -1)
-        return "Medium";
-    if (labels.indexOf("PageSizeLargePlus") > -1)
-        return "LargePlus";
-    if (labels.indexOf("PageSizeLarge") > -1)
-        return "Large";
-    if (labels.indexOf("PageSizeExtraLarge") > -1)
-        return "ExtraLarge";
-    if (labels.indexOf("PageSizeXXL") > -1)
-        return "XXL";
-    if (labels.indexOf("PageSizeXXXL") > -1)
-        return "XXXL";
-}
-
-function putDataPoint(model, pageSize, dateDevFinished, timeSpent, page) {
-    for (var k = 0; k < model.data.length; k++) {
-        var size = model.data[k];
-        if (size.name == pageSize) {
-            size.data.push({
-                x: dateDevFinished,
-                y: timeSpent,
-                tooltip: page.key + ' - ' + timeSpent.toFixed(2) + 'h - ' + getTeamName(page.labels) });
-            return;
+function copyCloudAppData(chartdata, cloudappdata) {
+    for(var i=0; i<cloudappdata.cloudApp.length; i++) {
+        var cloudApp = cloudappdata.cloudApp[i];
+        if(!statusExport.isAccepted(cloudApp.status) ||
+            !cloudApp.dateQAFinished) {
+            continue;
         }
+        for (var k = 0; k < chartdata.data.length; k++) {
+            var size = chartdata.data[k];
+            if (size.name == 'Development Time') {
+                size.data.push({
+                    x: cloudApp.dateQAFinished,
+                    y: cloudApp.storyPoints > 0 ? cloudApp.devTimeSpent/cloudApp.storyPoints : 0,
+                    tooltip: cloudApp.name + ' - ' + cloudApp.devTimeSpent.toFixed(2) + 'h - ' + cloudApp.storyPoints + 'SP - ' + cloudApp.teamName });
+            }
+            if (size.name == 'QA Time') {
+                size.data.push({
+                    x: cloudApp.dateQAFinished,
+                    y: cloudApp.storyPoints > 0 ? cloudApp.qaTimeSpent/cloudApp.storyPoints : 0,
+                    tooltip: cloudApp.name + ' - ' + cloudApp.qaTimeSpent.toFixed(2) + 'h - ' + cloudApp.storyPoints + 'SP - ' + cloudApp.teamName });
+            }
+        }
+    }
+}
+
+function putDataPoint(cloudAppData, module, page) {
+    if(!helpers.isActive(page.status, page.resolution)) {
+        return;
+    }
+
+    var moduleGroupName = helpers.getModuleGroupName(page.labels);
+    var cloudAppName = helpers.getCloudAppName(page.labels);
+    var fixVersions = module.fixVersions;
+    var moduleName = helpers.getModuleName(page.labels);
+    var labels = module._doc.labels != null ? module._doc.labels : "";
+    var teamName = helpers.getTeamName(labels);
+    var dateQAFinished = new Date(Date.parse(page.qaFinished)).getTime();
+    var storyPoints = page.storyPoints == null ? 0 : parseFloat(page.storyPoints);
+
+    var timeSpent = helpers.getTimeSpent(page);
+
+    var status = helpers.updateStatus(page.status, page.resolution);
+    var cloudApp;
+    for(var i=0; i<cloudAppData.cloudApp.length; i++) {
+        if(cloudAppData.cloudApp[i].name == cloudAppName &&
+            cloudAppData.cloudApp[i].moduleGroupName == moduleGroupName &&
+            cloudAppData.cloudApp[i].moduleSummary == module.name &&
+            cloudAppData.cloudApp[i].fixVersions == fixVersions) {
+            cloudApp = cloudAppData.cloudApp[i];
+            cloudApp.devTimeSpent += timeSpent.devTimeSpent;
+            cloudApp.qaTimeSpent += timeSpent.qaTimeSpent;
+            cloudApp.dateQAFinished = cloudApp.dateQAFinished < page.dateQAFinished ? page.dateQAFinished : cloudApp.dateQAFinished;
+            cloudApp.storyPoints += storyPoints;
+
+            var cloudAppStatus = statusList.getStatusByName(cloudApp.status);
+            var pageStatus = statusList.getStatusByName(status);
+
+            if(pageStatus.weight < cloudAppStatus.weight){
+                cloudApp.status = status;
+            }
+        }
+    }
+
+    if(!cloudApp) {
+        cloudApp = {
+            name: cloudAppName,
+            status: status,
+            resolution: page.resolution,
+            moduleGroupName: moduleGroupName,
+            moduleName: moduleName,
+            moduleSummary: module.name,
+            fixVersions: fixVersions,
+            devTimeSpent: timeSpent.devTimeSpent,
+            qaTimeSpent: timeSpent.qaTimeSpent,
+            dateQAFinished: dateQAFinished,
+            teamName: teamName,
+            storyPoints: storyPoints
+        };
+        cloudAppData.cloudApp.push(cloudApp);
     }
 }

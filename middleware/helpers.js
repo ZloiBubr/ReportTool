@@ -1,5 +1,6 @@
 var STATUS = require('../public/jsc/models/statusList').STATUS;
 var RESOLUTION = require('../public/jsc/models/statusList').RESOLUTION;
+var persons = require('./persons');
 
 exports.getTeamName = function (labels) {
     var index = labels.indexOf("Team");
@@ -125,6 +126,22 @@ exports.updateStatus = function(status, resolution) {
         newStatus = STATUS.CANCELED.name;
     }
     return newStatus;
+};
+
+exports.getTimeSpent = function(page) {
+    var devTimeSpent = 0;
+    var qaTimeSpent = 0;
+    for (var j = 0; j < page.worklogHistory.length; j++) {
+        var workLog = page.worklogHistory[j];
+        var isDeveloper = persons.isDeveloper(workLog.person);
+        if(isDeveloper) {
+            devTimeSpent += parseFloat(workLog.timeSpent);
+        }
+        else {
+            qaTimeSpent += parseFloat(workLog.timeSpent);
+        }
+    }
+    return { devTimeSpent: devTimeSpent, qaTimeSpent: qaTimeSpent };
 };
 
 exports.isBlocked = function(status) {

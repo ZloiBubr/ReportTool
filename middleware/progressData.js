@@ -3,8 +3,7 @@ var progressModel = require('../models/progress').progress;
 var Module = require('../models/module').Module;
 var Page = require('../models/page').Page;
 var log = require('../libs/log')(module);
-var persons = require('./persons');
-var jiraTextUtility = require('./Utility/JiraTextUtility');
+var helpers = require('../middleware/helpers');
 
 exports.getData = function (req, res) {
     parsePages(function (err, progress) {
@@ -37,22 +36,11 @@ function parsePages(callback) {
             var page = pages[i];
             var storyPoints = parseInt(page.storyPoints) == null ? 0 : parseInt(page.storyPoints);
             var pageProgress = parseInt(page.progress) == null ? 0 : parseInt(page.progress) * storyPoints / 100;
-            var teamName = jiraTextUtility.getTeamName(page.labels);
+            var teamName = helpers.getTeamName(page.labels);
             var key = page.key;
 
             //time spent
-            var devTimeSpent = 0;
-            var qaTimeSpent = 0;
-            for (var j = 0; j < page.worklogHistory.length; j++) {
-                var worklog = page.worklogHistory[j];
-                var isDeveloper = persons.isDeveloper(worklog.person);
-                if(isDeveloper) {
-                    devTimeSpent += parseFloat(worklog.timeSpent);
-                }
-                else {
-                    qaTimeSpent += parseFloat(worklog.timeSpent);
-                }
-            }
+            var timeSpent = helpers.getTimeSpent(page);
 
             //dev estimated time
             var totalhours =
@@ -63,7 +51,7 @@ function parsePages(callback) {
                 storyPoints < 34 ? 80 :
                 storyPoints < 55 ? 120 :
                 storyPoints >= 55 ? 160 : 0;
-            var estimated = parseInt(page.progress) > 0 ? devTimeSpent*100/parseInt(page.progress) : totalhours;
+            var estimated = parseInt(page.progress) > 0 ? timeSpent.devTimeSpent*100/parseInt(page.progress) : totalhours;
             var strestimated = Math.floor(estimated).toString() + 'h/' + totalhours.toString();
 
             var lastTwoWeeks = new Date(Date.now());
@@ -94,7 +82,7 @@ function parsePages(callback) {
                 var blockers = page.blockers != null ? page.blockers.split("PLEXUXC") : [];
                 var blockersnum = blockers.length > 0 ? blockers.length-1 : 0;
 
-                putDataPoint(key, progress, teamName, date, calcStoryPoints, person, uri, devTimeSpent, qaTimeSpent, storyPoints, pageProgress, strestimated, blockersnum);
+                putDataPoint(key, progress, teamName, date, calcStoryPoints, person, uri, timeSpent.devTimeSpent, timeSpent.qaTimeSpent, storyPoints, pageProgress, strestimated, blockersnum);
             }
         }
 

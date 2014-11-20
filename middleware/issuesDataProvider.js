@@ -8,7 +8,6 @@ var Issue = require('../models/issue').Issue;
 var issuesViewModel = require('../models/issuesViewModel');
 var log = require('../libs/log')(module);
 
-var jiraTextUtility = require('./Utility/JiraTextUtility');
 var _ = require('underscore');
 
 var statusExport = require('../public/jsc/Models/statusList');

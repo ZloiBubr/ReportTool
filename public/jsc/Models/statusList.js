@@ -28,6 +28,10 @@ exports.RESOLUTION = {
     OBSOLETE: { name: "Obsolete" }
 };
 
+exports.isAccepted = function(status) {
+   return status == exports.STATUS.ACCEPTED.name || status == exports.STATUS.PRODUCTION.name;
+};
+
 exports.statusEntity = function(status)
 {
     this.name = status.name || "";
