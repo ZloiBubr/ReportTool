@@ -11,15 +11,6 @@ exports.getData = function (req, res) {
     });
 };
 
-function getCleanModuleName(moduleName) {
-    var index = moduleName.indexOf("Module");
-    if(index < 0) {
-        return moduleName;
-    }
-
-    return moduleName.substring(0,index-1);
-}
-
 function parsePages(callback) {
     var velocity = {
         data: [
@@ -78,7 +69,7 @@ function parsePages(callback) {
                                                         date = date.getTime();
                                                         var tooltip = "";
                                                         if(modulesAdded.indexOf(module.summary) < 0) {
-                                                            tooltip = getCleanModuleName(module.summary);
+                                                            tooltip = module.summary;
                                                             modulesAdded.push(module.summary);
                                                         }
                                                         putDataPoint(velocity, "Planned burn", date, storyPoints, tooltip);
