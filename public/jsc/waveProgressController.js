@@ -42,10 +42,10 @@ function waveProgressController($scope, $resource, $window, $filter) {
         $scope.allStatuses = [
             {name: $scope.STATUS.DEFERRED.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
             {name: $scope.STATUS.OPEN.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
-            {name: $scope.STATUS.REOPENED.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
             {name: $scope.STATUS.ASSIGNED.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
             {name: $scope.STATUS.INPROGRESS.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
             {name: $scope.STATUS.CODEREVIEW.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
+            {name: $scope.STATUS.REOPENED.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
             {name: $scope.STATUS.READYFORQA.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
             {name: $scope.STATUS.TESTINGINPROGRESS.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
             {name: $scope.STATUS.BLOCKED.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
