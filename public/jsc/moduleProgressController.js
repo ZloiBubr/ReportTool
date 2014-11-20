@@ -24,7 +24,6 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         $scope.isTotalWasCalculated = false;
         $scope.reInitTotal();
         $scope.getModuleData().done($scope.processWithRowSpans);
-        $scope.updatedModuleProgressData = $filter('orderBy')($scope.updatedModuleProgressData, $scope.sortingModel.dueDate.getter, !$scope.sortingModel.isASC);
         $scope.teamLoadData = [];
     };
 
@@ -250,7 +249,6 @@ function moduleProgressController($scope, $resource, $window, $filter) {
             b = b.name;
             return a > b ? 1 : a < b ? -1 : 0;
         });
-        $scope.onSortingClick();
         $scope.isTotalWasCalculated = true;
     };
 
@@ -485,26 +483,13 @@ function moduleProgressController($scope, $resource, $window, $filter) {
         $scope.processWithRowSpans();
     };
 
-    $scope.onSortingClick = function(sortName){
-        if(sortName == $scope.sortingModel.selected){
-            $scope.sortingModel.isASC = !$scope.sortingModel.isASC;
-        }
-        else if(sortName != null) {
-                $scope.sortingModel.selected = sortName;
-                $scope.sortingModel.isASC = true;
-        }
-
-        sortModuleProgressData();
-    };
-
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
 
 
     $scope.filterModule = function()
     {
         $scope.isTotalWasCalculated = false;
-        $scope.total = new $scope.statuses();
-        $scope.total.all = {isChecked :true};
+        $scope.total.resetCounters();
         $scope.total.total = 0;
         $scope.total.pages = 0;
         $scope.processWithRowSpans();
@@ -513,27 +498,6 @@ function moduleProgressController($scope, $resource, $window, $filter) {
     $scope.isUnknownExist = function(item)
     {
         return item.indexOf("Unknown") > -1;
-    };
-
-    $scope.sortingModel = {
-        selected: "dueDate",
-        isASC : true,
-
-        progress:{
-            getter: function(item){ return item.progress; }
-        },
-
-        dueDate:{
-            getter: function(item){ return item.duedate2; }
-        },
-
-        moduleGroup:{
-            getter: function(item){ return item.name; }
-        },
-
-        smeName:{
-            getter: function(item){ return item.smename; }
-        }
     };
 
 

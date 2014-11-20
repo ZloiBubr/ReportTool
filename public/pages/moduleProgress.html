@@ -1,7 +1,6 @@
 <div id="container" class="container" ng-controller="moduleProgressController" style="padding-left: 150px">
     <div class="visible-md visible-lg visible-sm" style="position:fixed; left: 10px; top:80px; font-size: 12pt; max-width: 250px">
         <ul class="list-unstyled">
-            <li class="red"><input type="checkbox" ng-model="showTeamTable"> Kanban board</li>
             <li><input type="checkbox" ng-model="showStreams" ng-change="processWithRowSpans()"> Streams</li>
             <li><input type="checkbox" ng-model="showCards" ng-change="processWithRowSpans()"> Cards</li>
             <li><input type="checkbox" ng-model="showModules" ng-change="processWithRowSpans()"> SME / Modules</li>
@@ -27,7 +26,7 @@
             <li><label><span class="glyphicon glyphicon-asterisk"></span><strong>{{total.doneSP | number : 0}}/{{total.summSP | number : 0}}</strong>:SP</label></li>
         </ul>
     </div>
-    <div class="row" ng-show="showTeamTable">
+    <div class="row">
         <table class="table table-bordered">
             <thead class="progressTableMainHeader">
             <tr>
@@ -77,73 +76,5 @@
                     </div>
                 </tr>
         </table>
-    </div>
-    <div class="row">
-
-        <div class="col-lg-12">
-            <table class="table table-bordered">
-                <thead class="progressTableMainHeader">
-                <tr>
-                    <th class="sorted_column" ng-click="onSortingClick('progress')"><span class="glyphicon glyphicon-sort" style="font-size: 8pt"></span> Progress
-                        <span ng-show="sortingModel.selected == 'progress'">&nbsp;
-                            <span ng-show="sortingModel.isASC">▴</span>
-                            <span ng-show="!sortingModel.isASC">▾</span>
-                        </span>
-                    </th>
-                    <th class="sorted_column" ng-click="onSortingClick('dueDate')"><span class="glyphicon glyphicon-sort" style="font-size: 8pt"></span> Due Date
-                        <span ng-show="sortingModel.selected == 'dueDate'">&nbsp;
-                            <span ng-show="sortingModel.isASC">▴</span>
-                            <span ng-show="!sortingModel.isASC">▾</span>
-                        </span></th>
-                    <th class="sorted_column" ng-click="onSortingClick('smeName')"><span class="glyphicon glyphicon-sort" style="font-size: 8pt"></span> SME
-                        <span ng-show="sortingModel.selected == 'smeName'">&nbsp;
-                            <span ng-show="sortingModel.isASC">▴</span>
-                            <span ng-show="!sortingModel.isASC">▾</span>
-                        </span></th>
-                    <th class="sorted_column" ng-click="onSortingClick('moduleGroup')"><span class="glyphicon glyphicon-sort" style="font-size: 8pt"></span> Link
-                        <span ng-show="sortingModel.selected == 'moduleGroup'">&nbsp;
-                            <span ng-show="sortingModel.isASC">▴</span>
-                            <span ng-show="!sortingModel.isASC">▾</span>
-                        </span></th>
-                    <th>Teams</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat = "module in updatedModuleProgressData">
-                    <td>
-                        <div id="page_progress"><span class="bar" ng-style="{width: module.progress2}"></span></div>
-                        <div>{{module.progress2}}</div>
-                        <div>{{module.reportedSP | number : 0}}/{{module.summarySP | number : 0}} SP</div>
-                    </td>
-                    <td>
-                        <div>{{module.duedate2 | date:'MMM-dd-yyyy'}}</div>
-                        <img ng-show="module.dueDateConfirmed" width="40" height="40" alt="Conf" src="img/duedate2.png"/>
-                    </td>
-                    <td>
-                        <table>
-                            <div>{{module.smename}}</div>
-                        </table>
-                    </td>
-                    <td ng-class="{red: isUnknownExist(module.name),
-                                    accepted: module.accepted,
-                                    readyForAcceptance: module.readyForAcceptance,
-                                    readyForQA: module.readyForQA,
-                                    cancelled: module.cancelled}">
-                        <a href="{{module.uri}}">{{module.name}}</a>
-                        <div>Group: {{module.moduleGroup}}</div>
-                    </td>
-                    <td>
-                        <table>
-                            <tr ng-repeat = "team in module.teamnames">
-                                <td class="table_cell_border">
-                                    <div>{{team}}</div>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
     </div>
 </div>

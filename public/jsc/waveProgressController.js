@@ -43,12 +43,12 @@ function waveProgressController($scope, $resource, $window, $filter) {
             {name: $scope.STATUS.DEFERRED.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
             {name: $scope.STATUS.OPEN.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
             {name: $scope.STATUS.ASSIGNED.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
+            {name: $scope.STATUS.BLOCKED.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
             {name: $scope.STATUS.INPROGRESS.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
             {name: $scope.STATUS.CODEREVIEW.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
             {name: $scope.STATUS.REOPENED.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
             {name: $scope.STATUS.READYFORQA.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
             {name: $scope.STATUS.TESTINGINPROGRESS.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
-            {name: $scope.STATUS.BLOCKED.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
             {name: $scope.STATUS.RESOLVED.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
             {name: $scope.STATUS.ACCEPTED.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
             {name: $scope.STATUS.PRODUCTION.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 }
@@ -363,8 +363,7 @@ function waveProgressController($scope, $resource, $window, $filter) {
     $scope.filterModule = function()
     {
         $scope.isTotalWasCalculated = false;
-        $scope.total = new $scope.statuses();
-        $scope.total.all = {isChecked :true};
+        $scope.total.resetCounters();
         $scope.total.total = 0;
         $scope.total.pages = 0;
         $scope.processWithRowSpans();
