@@ -120,10 +120,6 @@ function putDataPoint(cloudAppData, module, page) {
 
     var timeSpent = helpers.getTimeSpent(page);
 
-    if(cloudAppName == "CustomerPermissions") {
-        var stop = 'here';
-    }
-
     var status = helpers.updateStatus(page.status, page.resolution);
     var cloudApp;
     for(var i=0; i<cloudAppData.cloudApp.length; i++) {

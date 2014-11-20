@@ -192,6 +192,7 @@ exports.OldDevelopers = function oldDevelopers(name) {
         name == "Aliaksei Labachou" ||
         name == "Mariya Babich" ||
         name == "Katsiaryna Sasina" ||
+        name == "aliaksei_labachou aliaksei_labachou" ||
         name == undefined) {
         return true;
     }
