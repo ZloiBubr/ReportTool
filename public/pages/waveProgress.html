@@ -22,7 +22,6 @@
             <li class="blocked"><input type="checkbox" ng-model="total.blocked.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-remove"></span><strong> {{total.blocked.count}}</strong>:Blocked</li>
             <li class="readyForAcceptance"><input type="checkbox" ng-model="total.resolved.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-check"></span><strong> {{total.resolved.count}}</strong>:Resolved</li>
             <li class="accepted"><input type="checkbox" ng-model="total.accepted.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-star"></span><strong> {{total.accepted.count}}</strong>:Accepted</li>
-            <li class="cancelled"><input type="checkbox" ng-model="total.cancelled.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-ban-circle"></span><strong> {{total.cancelled.count}}</strong>:Cancelled</li>
             <li><input type="checkbox" ng-model="total.all.isChecked" ng-change="onSelectDeselectAll()"><span class="glyphicon glyphicon-shopping-cart"></span><strong> {{total.total}}</strong>:Total</li>
             <li><br/></li>
             <li><label><span class="glyphicon glyphicon-asterisk"></span><strong>{{total.pages}}</strong>:Pages</label></li>

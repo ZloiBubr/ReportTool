@@ -69,6 +69,10 @@ function parsePages(callback) {
 function putDataPoint(cloudAppData, module, page) {
     var initUri = "https://jira.epam.com/jira/issues/?jql=project = PLEX-UXC and issuetype = Story and labels in (";
 
+    if(!helpers.isActive(page.status, page.resolution)) {
+        return;
+    }
+
     var labels = module._doc.labels != null ? module._doc.labels : "";
     var teamName = helpers.getTeamName(page.labels);
     var streamName = helpers.getStreamName(page.labels);

@@ -101,6 +101,8 @@ exports.getDueDateConfirmed = function(labels) {
 exports.isActive = function(status, resolution) {
     return !(status == STATUS.CLOSED.name &&
     (resolution == RESOLUTION.OUTOFSCOPE.name ||
+    resolution == RESOLUTION.OBSOLETE.name ||
+    resolution == RESOLUTION.DUPLICATE.name ||
     resolution == RESOLUTION.REJECTED.name ||
     resolution == RESOLUTION.CANCELED.name));
 };

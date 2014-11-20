@@ -23,6 +23,7 @@ exports.RESOLUTION = {
     REJECTED: { name: "Rejected" },
     CANCELED: { name: "Canceled" },
     ACCEPTED: { name: "Accepted" },
+    DUPLICATE: { name: "Duplicate" },
     OBSOLETE: { name: "Obsolete" }
 };
 
