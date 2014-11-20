@@ -37,44 +37,37 @@
             <tbody>
                 <tr>
                     <td ng-repeat="status in cloudAppCards.statuses">
+                        <div class="disp-block">
+                            <sup style="color: blue">{{status.totalReported | number : 0}}/</sup>
+                            <sup style="color: darkred">{{status.totalRequired | number : 0}}</sup>
+                            <span style="font-style: italic">{{status.totalLeft | number : 0}}</span>
+                        </div>
                         <table class="table table-condensed">
                             <tr  ng-repeat = "card in status.cards">
                                 <td ng-class="{
                                     blocked: card.status == 'Blocked',
                                     accepted: card.status == 'Accepted',
                                     readyForAcceptance: card.status == 'Resolved',
-                                    readyForQA: card.status == 'Ready for QA',
+                                    readyForQA: card.status == 'Ready for QA' || card.status == 'Testing in Progress',
                                     cancelled: card.status == 'Canceled',
                                     'bg-info': true}">
                                     <div id="card_progress">
                                         <div class="bar" ng-style="{width: card.progress + '%'}"></div>
                                     </div>
                                     <div class="disp-block">
-                                        <table class="disp-block">
-                                            <tbody class="disp-block">
-                                            <tr style="margin: 2px; align-items: stretch" class="disp-block">
-                                                <td style="white-space: nowrap;">
-                                                    <sup style="color: blue">{{card.reportedSP | number : 0}}/</sup>
-                                                </td>
-                                                <td style="white-space: nowrap;">
-                                                    <sup style="color: darkred">{{card.summarySP | number : 0}}</sup>
-                                                </td>
-                                                <td width="100%" style="white-space: nowrap;">
-                                                    <span style="font-style: italic">{{card.restSP | number : 0}}</span>
-                                                </td>
-                                                <td>
-                                                    <img ng-show="card.priority == 1" width="16" height="16" alt="Conf" src="img/1.png"/>
-                                                    <img ng-show="card.priority == 2" width="16" height="16" alt="Conf" src="img/2.png"/>
-                                                    <img ng-show="card.priority == 3" width="16" height="16" alt="Conf" src="img/3.png"/>
-                                                    <img ng-show="card.priority == 4" width="16" height="16" alt="Conf" src="img/4.png"/>
-                                                    <img ng-show="card.priority == 5" width="16" height="16" alt="Conf" src="img/5.png"/>
-                                                    <img ng-show="card.dueDateConfirmed" width="16" height="16" alt="Conf" src="img/duedate2.png"/>
-                                                    <img ng-show="card.status == exports.STATUS.BLOCKED.name" width="16" height="16" alt="Conf" src="img/ban.png"/>
-                                                    <img ng-show="card.status == exports.STATUS.DEFERRED.name" width="16" height="16" alt="Conf" src="img/deffered.png"/>
-                                                </td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
+                                        <sup style="color: blue">{{card.reportedSP | number : 0}}/</sup>
+                                        <sup style="color: darkred">{{card.summarySP | number : 0}}</sup>
+                                        <span style="font-style: italic">{{card.restSP | number : 0}}</span>
+                                        <br/>
+                                        <img ng-show="card.priority == 1" width="16" height="16" alt="Conf" src="img/1.png"/>
+                                        <img ng-show="card.priority == 2" width="16" height="16" alt="Conf" src="img/2.png"/>
+                                        <img ng-show="card.priority == 3" width="16" height="16" alt="Conf" src="img/3.png"/>
+                                        <img ng-show="card.priority == 4" width="16" height="16" alt="Conf" src="img/4.png"/>
+                                        <img ng-show="card.priority == 5" width="16" height="16" alt="Conf" src="img/5.png"/>
+                                        <img ng-show="card.dueDateConfirmed" width="16" height="16" alt="Conf" src="img/duedate2.png"/>
+                                        <img ng-show="card.status == exports.STATUS.BLOCKED.name" width="16" height="16" alt="Conf" src="img/ban.png"/>
+                                        <img ng-show="card.status == exports.STATUS.DEFERRED.name" width="16" height="16" alt="Conf" src="img/deffered.png"/>
+                                        <span style="font-style: italic">{{card.pages | number : 0}} Pages</span>
                                     </div>
                                     <a class="disp-block" href="{{card.uri}}">{{card.name}}</a>
                                 </td>

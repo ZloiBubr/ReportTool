@@ -67,7 +67,7 @@ function parsePages(callback) {
 }
 
 function putDataPoint(cloudAppData, module, page) {
-    var initUri = "https://jira.epam.com/jira/issues/?jql=project%20%3D%20PLEX-UXC%20and%20issuetype%3DStory%20AND%20%22Story%20Points%22%20%3E%200%20and%20labels%20in%20(";
+    var initUri = "https://jira.epam.com/jira/issues/?jql=project = PLEX-UXC and issuetype = Story and labels in (";
 
     var labels = module._doc.labels != null ? module._doc.labels : "";
     var teamName = helpers.getTeamName(page.labels);
@@ -96,10 +96,13 @@ function putDataPoint(cloudAppData, module, page) {
     var calcStoryPoints = storyPoints * progress / 100;
 
     var status = helpers.updateStatus(page.status, page.resolution);
-
+    var fullUri = initUri + "CloudApp_" + cloudAppName + ") AND 'Epic Link' = " + module.key;
     var cloudApp;
     for(var i=0; i<cloudAppData.cloudApp.length; i++) {
-        if(cloudAppData.cloudApp[i].name == cloudAppName) {
+        if(cloudAppData.cloudApp[i].name == cloudAppName &&
+        cloudAppData.cloudApp[i].moduleGroupName == moduleGroupName &&
+        cloudAppData.cloudApp[i].moduleSummary == module.name &&
+        cloudAppData.cloudApp[i].fixVersions == fixVersions) {
             cloudApp = cloudAppData.cloudApp[i];
             cloudApp.reportedSP += calcStoryPoints;
             cloudApp.summarySP += storyPoints;
@@ -132,11 +135,12 @@ function putDataPoint(cloudAppData, module, page) {
             smeName: smeName,
             moduleGroupName: moduleGroupName,
             moduleName: moduleName,
+            moduleSummary: module.name,
             fixVersions: fixVersions,
             priority: priority,
             pages: 1,
             dueDateConfirmed: dueDateConfirmed,
-            uri: initUri + "CloudApp_" + cloudAppName + ") AND labels in(PageModuleGroup_" + moduleGroupName + ") AND labels in(PageModule_" + moduleName + ")"
+            uri: fullUri
         };
         cloudAppData.cloudApp.push(cloudApp);
     }

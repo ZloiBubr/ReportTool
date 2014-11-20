@@ -40,18 +40,18 @@ function waveProgressController($scope, $resource, $window, $filter) {
         $scope.allModules = [{id: "All", name: "All"}];
         $scope.allVersions = [{id: "All", name: "All"}, {id: "Q1", name: "Q1"}, {id: "Q2", name: "Q2"}];
         $scope.allStatuses = [
-            {name: $scope.STATUS.DEFERRED.name, cards: []},
-            {name: $scope.STATUS.OPEN.name, cards: []},
-            {name: $scope.STATUS.REOPENED.name, cards: []},
-            {name: $scope.STATUS.ASSIGNED.name, cards: []},
-            {name: $scope.STATUS.INPROGRESS.name, cards: []},
-            {name: $scope.STATUS.CODEREVIEW.name, cards: []},
-            {name: $scope.STATUS.READYFORQA.name, cards: []},
-            {name: $scope.STATUS.TESTINGINPROGRESS.name, cards: []},
-            {name: $scope.STATUS.BLOCKED.name, cards: []},
-            {name: $scope.STATUS.RESOLVED.name, cards: []},
-            {name: $scope.STATUS.ACCEPTED.name, cards: []},
-            {name: $scope.STATUS.CANCELED.name, cards: []}
+            {name: $scope.STATUS.DEFERRED.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
+            {name: $scope.STATUS.OPEN.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
+            {name: $scope.STATUS.REOPENED.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
+            {name: $scope.STATUS.ASSIGNED.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
+            {name: $scope.STATUS.INPROGRESS.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
+            {name: $scope.STATUS.CODEREVIEW.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
+            {name: $scope.STATUS.READYFORQA.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
+            {name: $scope.STATUS.TESTINGINPROGRESS.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
+            {name: $scope.STATUS.BLOCKED.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
+            {name: $scope.STATUS.RESOLVED.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
+            {name: $scope.STATUS.ACCEPTED.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
+            {name: $scope.STATUS.CANCELED.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 }
         ];
         $scope.cloudAppCards = [];
     };
@@ -202,6 +202,9 @@ function waveProgressController($scope, $resource, $window, $filter) {
         $scope.cloudAppCards.statuses = $scope.allStatuses;
         for(var i=0; i<$scope.cloudAppCards.statuses.length; i++) {
             $scope.cloudAppCards.statuses[i].cards = [];
+            $scope.cloudAppCards.statuses[i].totalRequired = 0;
+            $scope.cloudAppCards.statuses[i].totalReported = 0;
+            $scope.cloudAppCards.statuses[i].totalLeft = 0;
         }
         if($scope.cloudAppData == undefined) {
             return;
@@ -266,11 +269,27 @@ function waveProgressController($scope, $resource, $window, $filter) {
                     var status = $scope.cloudAppCards.statuses[i];
                     if (status.name == cloudAppItem.status) {
                         status.cards.push(getCard(cloudAppItem));
+                        status.totalReported += cloudAppItem.reportedSP;
+                        status.totalRequired += cloudAppItem.summarySP;
+                        status.totalLeft = status.totalRequired - status.totalReported;
                         found = true;
+                        status.cards.sort(function(a,b) {
+                            var aa = a.priority;
+                            var bb = b.priority;
+                            var c = a.name;
+                            var d = b.name;
+                            return aa > bb ? 1 :
+                                aa < bb ? -1 :
+                                    c > d ? 1 :
+                                        c < d ? -1 : 0;
+                        });
                     }
                 }
                 if(!found) {
                     $scope.cloudAppCards.statuses[$scope.cloudAppCards.statuses.length-1].cards.push(getCard(cloudAppItem));
+                }
+                if(!$scope.isTotalWasCalculated) {
+                    $scope.total.total++;
                 }
             }
         });
@@ -290,7 +309,8 @@ function waveProgressController($scope, $resource, $window, $filter) {
             uri: cloudAppItem.uri,
             dueDateConfirmed: cloudAppItem.dueDateConfirmed,
             progress: cloudAppItem.summarySP > 0 ? Math.floor(cloudAppItem.reportedSP*100/cloudAppItem.summarySP) : 0,
-            priority: priorityNumber
+            priority: priorityNumber,
+            pages: cloudAppItem.pages
         };
         return card;
     }
