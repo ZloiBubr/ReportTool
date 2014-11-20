@@ -43,9 +43,7 @@ function parsePages(callback) {
                                 Page.find({epicKey: module.key}).exec(function (err, pages) {
                                     if(pages != null && pages.length > 0) {
                                         async.eachSeries(pages, function(page, callback) {
-                                                if(helpers.isActive(page.status, page.resolution)) {
-                                                    putDataPoint(cloudappdata, module, page);
-                                                }
+                                                putDataPoint(cloudappdata, module, page);
                                                 callback();
                                             },
                                             function() {
@@ -111,10 +109,6 @@ function copyCloudAppData(chartdata, cloudappdata) {
 }
 
 function putDataPoint(cloudAppData, module, page) {
-    if(!helpers.isActive(page.status, page.resolution)) {
-        return;
-    }
-
     var moduleGroupName = helpers.getModuleGroupName(page.labels);
     var cloudAppName = helpers.getCloudAppName(page.labels);
     var fixVersions = module.fixVersions;
@@ -125,6 +119,10 @@ function putDataPoint(cloudAppData, module, page) {
     var storyPoints = page.storyPoints == null ? 0 : parseFloat(page.storyPoints);
 
     var timeSpent = helpers.getTimeSpent(page);
+
+    if(cloudAppName == "CustomerPermissions") {
+        var stop = 'here';
+    }
 
     var status = helpers.updateStatus(page.status, page.resolution);
     var cloudApp;
