@@ -7,6 +7,7 @@
                 <img width="16" height="16" alt="Conf" src="img/3.png"/>
                 <img width="16" height="16" alt="Conf" src="img/4.png"/>
                 <img width="16" height="16" alt="Conf" src="img/5.png"/> Priority</li>
+            <li><input type="checkbox" ng-model="detailedView" ng-change="processWithRowSpans()"> Detailed View</li>
             <li><br/></li>
             <li>Fix Version:<select class="form-control headerSelectWidth" ng-model="filteredVersion" class="headerSelectWidth" ng-options="version.name as version.name for version in allVersions" ng-change="filterModule()"></select></li>
             <li>SME:<select class="form-control headerSelectWidth" ng-model="filteredSme" class="headerSelectWidth" ng-options="sme.name as sme.name for sme in allSMEs" ng-change="filterModule()"></select></li>
@@ -75,6 +76,13 @@
                                         <span style="font-style: italic">{{card.pages | number : 0}} Pages</span>
                                     </div>
                                     <a class="disp-block" href="{{card.uri}}">{{card.name}}</a>
+                                    <div  ng-show="detailedView" ng-repeat="assignee in card.assignees">
+                                        <div ng-if="$first"><img width="16" height="16" alt="Conf" src="img/person2.png"/>{{assignee}}</div>
+                                        <div ng-if="!$first"><img width="16" height="16" alt="Conf" src="img/person.png"/>{{assignee}}</div>
+                                    </div>
+                                    <div ng-show="detailedView"><img width="16" height="16" alt="Conf" src="img/clockblue.png"/>{{card.devTimeSpent | number : 0}}hrs</div>
+                                    <div ng-show="detailedView"><img width="16" height="16" alt="Conf" src="img/clockred.png"/>{{card.qaTimeSpent | number : 0}}hrs</div>
+                                    <div ng-show="detailedView"><img width="16" height="16" alt="Conf" src="img/clocksp.png"/>{{(card.qaTimeSpent+card.devTimeSpent)/card.summarySP | number : 0}}hrs per SP</div>
                                 </td>
                             </tr>
                         </table>

@@ -10,6 +10,7 @@ function waveProgressController($scope, $resource, $window, $filter) {
         $scope.common = {};
         $scope.dataLoad();
         $scope.showStreams = false;
+        $scope.detailedView = false;
     };
 
     $scope.reInit = function () {
@@ -268,7 +269,7 @@ function waveProgressController($scope, $resource, $window, $filter) {
                 for(var i=0; i<$scope.cloudAppCards.statuses.length; i++) {
                     var status = $scope.cloudAppCards.statuses[i];
                     if (status.name == cloudAppItem.status) {
-                        status.cards.push(getCard(cloudAppItem));
+                        status.cards.push(getCard($scope.detailedView, cloudAppItem));
                         status.totalReported += cloudAppItem.reportedSP;
                         status.totalRequired += cloudAppItem.summarySP;
                         status.totalLeft = status.totalRequired - status.totalReported;
@@ -297,7 +298,7 @@ function waveProgressController($scope, $resource, $window, $filter) {
         $scope.isTotalWasCalculated = true;
     };
 
-    function getCard(cloudAppItem) {
+    function getCard(detailed, cloudAppItem) {
         var priorityNumber = $scope.getPriorityNumber(cloudAppItem.priority);
         var remaining = cloudAppItem.summarySP - cloudAppItem.reportedSP;
         var card = {
@@ -310,7 +311,10 @@ function waveProgressController($scope, $resource, $window, $filter) {
             dueDateConfirmed: cloudAppItem.dueDateConfirmed,
             progress: cloudAppItem.summarySP > 0 ? Math.floor(cloudAppItem.reportedSP*100/cloudAppItem.summarySP) : 0,
             priority: priorityNumber,
-            pages: cloudAppItem.pages
+            pages: cloudAppItem.pages,
+            assignees: detailed ? cloudAppItem.assignees : [],
+            devTimeSpent: cloudAppItem.devTimeSpent,
+            qaTimeSpent: cloudAppItem.qaTimeSpent
         };
         return card;
     }

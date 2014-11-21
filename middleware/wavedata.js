@@ -91,6 +91,7 @@ function putDataPoint(cloudAppData, module, page) {
     var priority = module.priority;
     var dueDateConfirmed = helpers.getDueDateConfirmed(labels);
 
+    var timeSpent = helpers.getTimeSpent(page);
 
     var storyPoints = page.storyPoints == null ? 0 : parseFloat(page.storyPoints);
     var progress = page.progress == null ? 0 : parseInt(page.progress);
@@ -112,9 +113,22 @@ function putDataPoint(cloudAppData, module, page) {
             cloudApp.summarySP += storyPoints;
             cloudApp.progress = cloudApp.reportedSP*100/cloudApp.summarySP;
             cloudApp.pages++;
+            cloudApp.devTimeSpent += timeSpent.devTimeSpent;
+            cloudApp.qaTimeSpent += timeSpent.qaTimeSpent;
             if(isParentPage) {
                 cloudApp.teamName = teamName;
                 cloudApp.streamName = streamName;
+            }
+
+            var found = false;
+            for(var j=0; j<cloudApp.assignees.length; j++) {
+                if(cloudApp.assignees[j] == page.assignee) {
+                    found = true;
+                    break;
+                }
+            }
+            if(!found) {
+                cloudApp.assignees.push(page.assignee);
             }
 
             var cloudAppStatus = statusList.getStatusByName(cloudApp.status);
@@ -144,7 +158,10 @@ function putDataPoint(cloudAppData, module, page) {
             priority: priority,
             pages: 1,
             dueDateConfirmed: dueDateConfirmed,
-            uri: fullUri
+            uri: fullUri,
+            devTimeSpent: timeSpent.devTimeSpent,
+            qaTimeSpent: timeSpent.qaTimeSpent,
+            assignees: [smeName, page.assignee]
         };
         cloudAppData.cloudApp.push(cloudApp);
     }
