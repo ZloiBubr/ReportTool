@@ -46,6 +46,7 @@
                             <sup style="color: blue">{{status.totalReported | number : 0}}/</sup>
                             <sup style="color: darkred">{{status.totalRequired | number : 0}}</sup>
                             <span style="font-style: italic">{{status.totalLeft | number : 0}}</span>
+                            <span style="color: #737373">Cards:{{status.cards.length | number : 0}}</span>
                         </div>
                         <table class="table table-condensed">
                             <tr  ng-repeat = "card in status.cards">
