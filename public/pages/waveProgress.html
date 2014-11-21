@@ -7,7 +7,7 @@
                 <img width="16" height="16" alt="Conf" src="img/3.png"/>
                 <img width="16" height="16" alt="Conf" src="img/4.png"/>
                 <img width="16" height="16" alt="Conf" src="img/5.png"/> Priority</li>
-            <li><input type="checkbox" ng-model="detailedView" ng-change="processWithRowSpans()"> Detailed View</li>
+            <li class="importantpart"><input type="checkbox" ng-model="detailedView" ng-change="processWithRowSpans()"> Detailed View</li>
             <li><br/></li>
             <li>Fix Version:<select class="form-control headerSelectWidth" ng-model="filteredVersion" class="headerSelectWidth" ng-options="version.name as version.name for version in allVersions" ng-change="filterModule()"></select></li>
             <li>SME:<select class="form-control headerSelectWidth" ng-model="filteredSme" class="headerSelectWidth" ng-options="sme.name as sme.name for sme in allSMEs" ng-change="filterModule()"></select></li>

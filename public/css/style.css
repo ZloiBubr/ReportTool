@@ -180,6 +180,16 @@ table {
     background-color: #fafabf !important;
 }
 
+.importantpart
+{
+    color: #ffffff;
+    border-radius: 5px;
+    border: 2px solid red;
+    padding: 3px;
+    margin: 3px;
+    background: linear-gradient(to right, #feccb1 0%,#f17432 24%,#ea5507 69%,#fb955e 100%);
+}
+
 .done {
     text-decoration: line-through !important;
 }
