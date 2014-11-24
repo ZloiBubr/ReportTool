@@ -115,12 +115,12 @@ function parsePages(callback) {
                     timeQASpent += parseFloat(worklog.timeSpent);
                 }
             }
-            if(dateQAFinished > (new Date("Jan 1, 2014")).getTime() &&
-                (timeDevSpent > 1. && (
+            if(dateDevFinished > (new Date("Jan 1, 2014")).getTime() &&
+                (
                 page.status == "Resolved" ||
                 page.status == "Closed"
-                ))) {
-                putDataPoint(model, pageSize+"Dev", dateQAFinished, timeDevSpent, page);
+                )) {
+                putDataPoint(model, pageSize+"Dev", dateDevFinished, timeDevSpent, page);
             }
 /*
             if(dateQAFinished > (new Date("Jan 1, 2014")).getTime() &&
