@@ -1,4 +1,4 @@
-function moduleProgressController($scope, $resource, $window, $filter, $cookies, localStorageService) {
+function moduleProgressController($scope, $resource, $window, $filter, localStorageService) {
     var moduleDataResource = $resource('/moduledata');
 
     /* ------------------------------------------------------ Init/Reinit -------------------------------*/
@@ -6,10 +6,10 @@ function moduleProgressController($scope, $resource, $window, $filter, $cookies,
         $scope.common = {};
         $scope.dataLoad();
         $scope.sortByDate = false;
-        $scope.showTeamTable = false;
+        $scope.showTeamTable = true;
         $scope.showStreams = false;
-        $scope.showModules = false;
-        $scope.showCards = false;
+        $scope.showModules = true;
+        $scope.showCards = true;
     };
 
     $scope.reInit = function () {
@@ -24,7 +24,6 @@ function moduleProgressController($scope, $resource, $window, $filter, $cookies,
         $scope.isTotalWasCalculated = false;
         $scope.reInitTotal();
         $scope.getModuleData().done($scope.processWithRowSpans);
-        $scope.updatedModuleProgressData = $filter('orderBy')($scope.updatedModuleProgressData, $scope.sortingModel.dueDate.getter, !$scope.sortingModel.isASC);
         $scope.teamLoadData = [];
     };
 
@@ -124,15 +123,47 @@ function moduleProgressController($scope, $resource, $window, $filter, $cookies,
         });
     }
 
-    $scope.processWithRowSpans = function () {
-        $scope.total.doneSP = 0;
-        $scope.total.summSP = 0;
-        $scope.updatedModuleProgressData=[];
-        $scope.teamLoadData = [];
+    function sortCardsData() {
+        for (var j = 0; j < $scope.teamLoadData.length; j++) {
+            var team = $scope.teamLoadData[j];
+            for (var k = 0; k < team.versions.length; k++) {
+                var version = team.versions[k];
+                version.cards.sort(function (a, b) {
+                    var aa = a.priority;
+                    var bb = b.priority;
+                    var c = a.name;
+                    var d = b.name;
+                    return aa > bb ? 1 :
+                        aa < bb ? -1 :
+                            c > d ? 1 :
+                                c < d ? -1 : 0;
+                });
+            }
+        }
+
+        $scope.teamLoadData.sort(function (a, b) {
+            a = a.name;
+            b = b.name;
+            return a > b ? 1 : a < b ? -1 : 0;
+        });
+    }
+
+    function fillAllCombos() {
         FillVersionsCombo();
         FillGroupsCombo();
         FillSmeCombo();
         SortCombos();
+    }
+
+    $scope.processWithRowSpans = function () {
+        $scope.total.doneSP = 0;
+        $scope.total.summSP = 0;
+        $scope.teamLoadData = [];
+        if($scope.moduleProgressData == undefined) {
+            return;
+        }
+        $scope.saveStorageToLocalDb();
+
         _.each($scope.moduleProgressData.module, function(moduleProgressItem) {
             if($scope.filteredMG != $scope.allModuleGroups[0].id && moduleProgressItem.moduleGroup != $scope.filteredMG){
                 return;
@@ -166,75 +197,54 @@ function moduleProgressController($scope, $resource, $window, $filter, $cookies,
             if($scope.filteredSme != $scope.allSMEs[0].id && moduleProgressItem.smename != $scope.filteredSme){
                 return;
             }
-            if($scope.filteredTeam != $scope.allTeams[0].id) {
-                var found = false;
-                _.each(moduleProgressItem.teamnames, function(teamName) {
-                    if(teamName.indexOf($scope.filteredTeam) > -1) {
-                        found = true;
-                    }
-                });
-                if(!found) {
-                    return;
-                }
+            if($scope.filteredTeam != $scope.allTeams[0].id&& moduleProgressItem.teamName != $scope.filteredTeam) {
+                return;
             }
 
-            moduleProgressItem.progress = Math.round(moduleProgressItem.progress);
-            moduleProgressItem.progress2 = moduleProgressItem.progress.toString() + "%";
-
-
-            moduleProgressItem.duedate2 = moduleProgressItem.duedate;
-            moduleProgressItem.acceptedName = moduleProgressItem.accepted ? "Yes" : "No";
-
-            var accepted = moduleProgressItem.status == "Accepted";
-            var readyForQa = moduleProgressItem.status == "Ready for QA" || moduleProgressItem.status == "Testing in Progress";
-            var resolved = moduleProgressItem.status == "Resolved";
-            var cancelled = moduleProgressItem.modulestatus == "Closed" && moduleProgressItem.moduleresolution == "Out of Scope";
-            var notApplicable = moduleProgressItem.modulestatus == "Closed" && moduleProgressItem.moduleresolution == "Done" && moduleProgressItem.pagescount < 1;
-
-            moduleProgressItem.cancelled = cancelled || notApplicable;
-            moduleProgressItem.readyForQA = readyForQa;
-            moduleProgressItem.readyForAcceptance = resolved;
-
-            if(cancelled) {
-                var cancelledEntity = $scope.total.getStatusByName("Cancelled");
+            if(moduleProgressItem.moduleStatus == $scope.STATUS.CLOSED.name &&
+                moduleProgressItem.moduleResolution == $scope.RESOLUTION.OUTOFSCOPE.name) {
+                var cancelledEntity = $scope.total.getStatusByName($scope.STATUS.CANCELED.name);
                 processEntity(cancelledEntity, moduleProgressItem);
                 if(cancelledEntity.isChecked) {
-                    ProcessCards(moduleProgressItem, "Cancelled");
+                    ProcessCards(moduleProgressItem, $scope.STATUS.CANCELED.name);
                 }
             }
-            else if(notApplicable) {
-                var notApplicableEntity = $scope.total.getStatusByName("Not Applicable");
+            else if(moduleProgressItem.moduleStatus == $scope.STATUS.CLOSED.name &&
+                moduleProgressItem.moduleResolution == $scope.RESOLUTION.DONE.name &&
+                moduleProgressItem.pagescount < 1) {
+                var notApplicableEntity = $scope.total.getStatusByName($scope.STATUS.NOTAPPLICABLE.name);
                 processEntity(notApplicableEntity, moduleProgressItem);
                 if(notApplicableEntity.isChecked) {
-                   ProcessCards(moduleProgressItem, "Cancelled");
+                   ProcessCards(moduleProgressItem, $scope.STATUS.CANCELED.name);
                 }
             }
-            else if(accepted) {
-                var acceptedEntity = $scope.total.getStatusByName("Accepted");
+            else if(moduleProgressItem.status == $scope.STATUS.ACCEPTED.name) {
+                var acceptedEntity = $scope.total.getStatusByName($scope.STATUS.ACCEPTED.name);
                 processEntity(acceptedEntity, moduleProgressItem);
                 if(acceptedEntity.isChecked) {
-                    ProcessCards(moduleProgressItem, "Accepted");
+                    ProcessCards(moduleProgressItem, $scope.STATUS.ACCEPTED.name);
                 }
             }
-            else if(readyForQa) {
-                var readyForQaEntity = $scope.total.getStatusByName("Ready for QA");
+            else if(moduleProgressItem.status == $scope.STATUS.READYFORQA.name ||
+                moduleProgressItem.status == $scope.STATUS.TESTINGINPROGRESS.name) {
+                var readyForQaEntity = $scope.total.getStatusByName($scope.STATUS.READYFORQA.name);
                 processEntity(readyForQaEntity, moduleProgressItem);
                 if(readyForQaEntity.isChecked) {
-                    ProcessCards(moduleProgressItem, "ReadyForQA");
+                    ProcessCards(moduleProgressItem, $scope.STATUS.READYFORQA.name);
                 }
             }
-            else if(resolved) {
-                var resolvedEntity = $scope.total.getStatusByName("Resolved");
+            else if(moduleProgressItem.status == $scope.STATUS.RESOLVED.name) {
+                var resolvedEntity = $scope.total.getStatusByName($scope.STATUS.RESOLVED.name);
                 processEntity(resolvedEntity, moduleProgressItem);
                 if(resolvedEntity.isChecked) {
-                  ProcessCards(moduleProgressItem, "Resolved");
+                  ProcessCards(moduleProgressItem, $scope.STATUS.RESOLVED.name);
                 }
             }
             else {
-                var inProgressEntity = $scope.total.getStatusByName("In Progress");
+                var inProgressEntity = $scope.total.getStatusByName($scope.STATUS.INPROGRESS.name);
                 processEntity(inProgressEntity, moduleProgressItem);
                 if(inProgressEntity.isChecked) {
-                    ProcessCards(moduleProgressItem, "InProgress");
+                    ProcessCards(moduleProgressItem, $scope.STATUS.INPROGRESS.name);
                 }
             }
 
@@ -242,147 +252,101 @@ function moduleProgressController($scope, $resource, $window, $filter, $cookies,
                 $scope.total.total++;
             }
         });
-
-        $scope.teamLoadData.sort(function (a, b) {
-            a = a.name;
-            b = b.name;
-            return a > b ? 1 : a < b ? -1 : 0;
-        });
-        $scope.onSortingClick();
+        sortCardsData();
         $scope.isTotalWasCalculated = true;
     };
 
     function ProcessCards(moduleProgressItem, status) {
         //calculating data for top table
-        for(var i=0; i<moduleProgressItem.teamnames.length; i++) {
-            var teamName = moduleProgressItem.teamnames[i];
-            var teamobj = getTeamObj(teamName);
-            for(var j=0; j<teamobj.versions.length; j++) {
-                var version = teamobj.versions[j];
-                if (version.name == moduleProgressItem.fixVersions) {
-                    version.done += moduleProgressItem.reportedSP;
-                    version.total += moduleProgressItem.summarySP;
-                    version.restSP = Math.floor(version.total - version.done);
-                    var moduleName = $scope.showModules ? getCleanModuleName(moduleProgressItem.name) : moduleProgressItem.smename;
-                    var reportedSP = Math.floor(moduleProgressItem.reportedSP);
-                    var summarySP = Math.floor(moduleProgressItem.summarySP);
-                    fillSmeNames(version.smeNames, moduleName, reportedSP, summarySP, status);
-                }
+        var teamName = moduleProgressItem.teamName;
+        if($scope.showStreams) {
+            teamName += moduleProgressItem.streamName;
+        }
+        var teamObj = getTeamObj(teamName);
+        for(var j=0; j<teamObj.versions.length; j++) {
+            var version = teamObj.versions[j];
+            if (version.name == moduleProgressItem.fixVersions) {
+                version.done += moduleProgressItem.reportedSP;
+                version.total += moduleProgressItem.summarySP;
+                version.restSP = version.total - version.done;
+                fillCards(teamObj, version, status, moduleProgressItem);
             }
         }
     }
 
-    function fillSmeNames(smeNames, name, reportedSP, summarySP, status) {
+
+    function fillCards(teamobj, version, status, item) {
         var found = false;
-        for(var i=0; i<smeNames.length; i++) {
-            var card = smeNames[i];
-            if(card.name == name) {
-                card.reportedSP += reportedSP;
-                card.summarySP += summarySP;
+        var cardName = $scope.showModules ? getCleanModuleName(item.name) : item.smename;
+
+        var initUri = "https://jira.epam.com/jira/issues/?jql=project%20%3D%20PLEX-UXC%20and%20issuetype%20%3D%20epic%20and%20assignee%20%3D%20";
+        var endUri = version.name == "" ?"%20and%20fixVersion%20is%20EMPTY" : "%20and%20fixVersion%20%3D%20%22" + version.name + "%22";
+        var veryEndUri = "%20and%20labels%20in%20(Team"+ teamobj.name + ")";
+
+        var priorityNumber = $scope.getPriorityNumber(item.priority);
+
+        for(var i=0; i<version.cards.length; i++) {
+            var card = version.cards[i];
+            if(card.name == cardName) {
+                card.reportedSP += item.reportedSP;
+                card.summarySP += item.summarySP;
                 card.restSP = card.summarySP - card.reportedSP;
-                var oldStatus = card.readyForQA ? "ReadyForQA" :
-                    card.readyForAcceptance ? "Resolved" :
-                        card.accepted ? "Accepted" :
-                            card.cancelled ? "Cancelled" : "InProgress";
+                card.uri = initUri + name + endUri + veryEndUri;
+                card.progress = card.summarySP > 0 ? card.reportedSP*100/card.summarySP : 0;
+                card.priority = card.priority < priorityNumber ? card.priority : priorityNumber;
+                card.hasblockers |= item.hasblockers;
+                card.hasdeferred |= item.hasdeferred;
 
-                switch(status)
-                {
-                    case "ReadyForQA":
-                        if(oldStatus == "InProgress") {
-                            status = "InProgress";
-                        }
-                        break;
-                    case "Resolved":
-                        if(oldStatus == "InProgress") {
-                            status = "InProgress";
-                        }
-                        else if(oldStatus == "ReadyForQA") {
-                            status = "ReadyForQA";
-                        }
-                        break;
-                    case "Accepted":
-                        if(oldStatus == "InProgress") {
-                            status = "InProgress";
-                        }
-                        else if(oldStatus == "ReadyForQA") {
-                            status = "ReadyForQA";
-                        }
-                        else if(oldStatus == "Resolved") {
-                            status = "Resolved";
-                        }
-                        break;
-                    case "Cancelled":
-                        if(oldStatus == "InProgress") {
-                            status = "InProgress";
-                        }
-                        else if(oldStatus == "ReadyForQA") {
-                            status = "ReadyForQA";
-                        }
-                        else if(oldStatus == "Resolved") {
-                            status = "Resolved";
-                        }
-                        else if(oldStatus == "Accepted") {
-                            status = "Accepted";
-                        }
-                        break;
-                    default:
+                var oldStatus = $scope.total.getStatusByName(card.status);
+                var newStatus = $scope.total.getStatusByName(status);
+                if(newStatus.weight < oldStatus.weight){
+                    card.status = newStatus.name;
                 }
-
-                card.readyForQA = status == "ReadyForQA";
-                card.readyForAcceptance = status == "Resolved";
-                card.accepted = status == "Accepted";
-                card.cancelled = status == "Cancelled";
                 found = true;
             }
         }
         if(!found) {
-            var remaining = summarySP - reportedSP;
-            var card = { name: name, restSP: remaining, reportedSP: reportedSP, summarySP: summarySP};
-            card.accepted = status == "Accepted";
-            card.readyForAcceptance = status == "Resolved";
-            card.readyForQA = status == "ReadyForQA";
-            card.cancelled = status == "Cancelled";
-            smeNames.push(card);
+            var newCard = {
+                name: cardName,
+                restSP: item.summarySP - item.reportedSP,
+                reportedSP: item.reportedSP,
+                summarySP: item.summarySP,
+                uri: item.uri,
+                dueDateConfirmed: item.dueDateConfirmed,
+                progress: item.progress,
+                priority: priorityNumber,
+                status: status,
+                hasblockers: item.hasblockers,
+                hasdeferred: item.hasdeferred
+            };
+            version.cards.push(newCard);
         }
     }
 
     function getTeamObj(teamName) {
-        var teamobj = null;
-        var teamNameCorrected = teamName;
-        if(!$scope.showStreams){
-            teamNameCorrected = getCleanTeamName(teamName);
-        }
+        var teamObj = null;
         for(var i=0; i<$scope.teamLoadData.length; i++) {
             var team = $scope.teamLoadData[i];
-            if (team.name == teamNameCorrected) {
-                teamobj = team;
+            if (team.name == teamName) {
+                teamObj = team;
             }
         }
-        if (teamobj == null) {
-            var team = {
-                name: teamNameCorrected,
+        if (teamObj == null) {
+            var newTeam = {
+                name: teamName,
                 versions: []
             };
-            for(var i=0; i<$scope.showVersions.length; i++) {
-                var version = $scope.showVersions[i];
+            for(var j=0; j<$scope.showVersions.length; j++) {
+                var version = $scope.showVersions[j];
                 if(version == "Undefined") {
                     version = "";
                 }
-                team.versions.push( {name:version, done: 0, total: 0, smeNames: [], completed: false});
+                newTeam.versions.push( {name:version, done: 0, total: 0, cards: [], completed: false});
             }
-            $scope.teamLoadData.push(team);
-            teamobj = team;
+            $scope.teamLoadData.push(newTeam);
+            teamObj = newTeam;
         }
-        return teamobj;
-    }
-
-    function getCleanTeamName(teamName) {
-        var index = teamName.indexOf(":");
-        if(index < 0) {
-            return teamName;
-        }
-
-        return teamName.substring(0,index);
+        return teamObj;
     }
 
     function getCleanModuleName(moduleName) {
@@ -407,13 +371,7 @@ function moduleProgressController($scope, $resource, $window, $filter, $cookies,
             }
             $scope.total.doneSP += moduleProgressItem.reportedSP;
             $scope.total.summSP += moduleProgressItem.summarySP;
-            $scope.updatedModuleProgressData.push(moduleProgressItem);
         }
-    }
-
-    function sortModuleProgressData() {
-        var getter =  $scope.sortingModel[$scope.sortingModel.selected].getter;
-        $scope.updatedModuleProgressData = $filter('orderBy')($scope.updatedModuleProgressData, getter, !$scope.sortingModel.isASC);
     }
 
     /* -------------------------------------------------------Event handlers ------------------------ */
@@ -423,6 +381,8 @@ function moduleProgressController($scope, $resource, $window, $filter, $cookies,
 
         var getModuleSuccess = function (data) {
             $scope.moduleProgressData = data;
+            fillAllCombos();
+            $scope.loadStorageFromLocalDb();
             loadingDfrd.resolve();
         };
 
@@ -455,40 +415,15 @@ function moduleProgressController($scope, $resource, $window, $filter, $cookies,
         $scope.processWithRowSpans();
     };
 
-    $scope.onSortingClick = function(sortName){
-        if(sortName == $scope.sortingModel.selected){
-            $scope.sortingModel.isASC = !$scope.sortingModel.isASC;
-        }
-        else if(sortName != null) {
-                $scope.sortingModel.selected = sortName;
-                $scope.sortingModel.isASC = true;
-        }
-
-        sortModuleProgressData();
-    };
-
-    $scope.onFilterEod = function() {
-        $scope.reInitTotal();
-        $scope.isTotalWasCalculated = false;
-        $scope.processWithRowSpans();
-    }
-    $scope.onFilterQ1 = function() {
-        $scope.reInitTotal();
-        $scope.isTotalWasCalculated = false;
-        $scope.processWithRowSpans();
-    }
-    $scope.onFilterQ2 = function() {
-        $scope.reInitTotal();
-        $scope.isTotalWasCalculated = false;
-        $scope.processWithRowSpans();
-    }
-
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
+
 
     $scope.filterModule = function()
     {
-        $scope.reInitTotal();
         $scope.isTotalWasCalculated = false;
+        $scope.total.resetCounters();
+        $scope.total.total = 0;
+        $scope.total.pages = 0;
         $scope.processWithRowSpans();
     };
 
@@ -497,27 +432,53 @@ function moduleProgressController($scope, $resource, $window, $filter, $cookies,
         return item.indexOf("Unknown") > -1;
     };
 
-    $scope.sortingModel = {
-        selected: "dueDate",
-        isASC : true,
-
-        progress:{
-            getter: function(item){ return item.progress; }
-        },
-
-        dueDate:{
-            getter: function(item){ return item.duedate2; }
-        },
-
-        moduleGroup:{
-            getter: function(item){ return item.name; }
-        },
-
-        smeName:{
-            getter: function(item){ return item.smename; }
-        }
+    $scope.saveStorageToLocalDb = function() {
+        // save session
+        var storage = {
+            showStreams: $scope.showStreams,
+            showCards: $scope.showCards,
+            showModules: $scope.showModules,
+            filteredVersion: $scope.filteredVersion,
+            filteredSme: $scope.filteredSme,
+            filteredMG: $scope.filteredMG,
+            filteredTeam: $scope.filteredTeam,
+            total_inProgress_isChecked: $scope.total.inProgress.isChecked,
+            total_readyForQA_isChecked: $scope.total.readyForQA.isChecked,
+            total_resolved_isChecked: $scope.total.resolved.isChecked,
+            total_accepted_isChecked: $scope.total.accepted.isChecked,
+            total_cancelled_isChecked: $scope.total.cancelled.isChecked,
+            total_notApplicable_isChecked: $scope.total.notApplicable.isChecked,
+            total_all_isChecked: $scope.total.all.isChecked
+        };
+        localStorageService.set('moduleProgressController', storage);
     };
 
+    $scope.loadStorageFromLocalDb = function() {
+        // restore session
+        if(!_.isEmpty(localStorageService.get('moduleProgressController')))
+        {
+            try {
+                var storage = localStorageService.get('moduleProgressController');
+                    $scope.showStreams = storage.showStreams;
+                    $scope.showCards = storage.showCards;
+                    $scope.showModules = storage.showModules;
+                    $scope.filteredVersion = storage.filteredVersion;
+                    $scope.filteredSme = storage.filteredSme;
+                    $scope.filteredMG = storage.filteredMG;
+                    $scope.filteredTeam = storage.filteredTeam;
+                    $scope.total.inProgress.isChecked = storage.total_inProgress_isChecked;
+                    $scope.total.readyForQA.isChecked = storage.total_readyForQA_isChecked;
+                    $scope.total.resolved.isChecked = storage.total_resolved_isChecked;
+                    $scope.total.accepted.isChecked = storage.total_accepted_isChecked;
+                    $scope.total.cancelled.isChecked = storage.total_cancelled_isChecked;
+                    $scope.total.notApplicable.isChecked = storage.total_notApplicable_isChecked;
+                    $scope.total.all.isChecked = storage.total_all_isChecked;
+            }
+            catch (ex) {
+                console.error(ex);
+            }
+        }
+    };
 
     $scope.init();
 }

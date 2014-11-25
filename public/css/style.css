@@ -6,6 +6,10 @@ body {
 a {
     color: #007fa8;
 }
+
+table {
+    max-width: 2000px !important;
+}
  /*------------------------------------Common---------------------------*/
 .progress_no_top_line > td {
     border-top: none !important;
@@ -107,6 +111,24 @@ a {
     height: 28px;
 }
 
+#card_progress
+{
+    border: solid #cccccc 2px;
+    border-radius: 5px;
+    /* Dimensions */
+    height: 10px;
+    background: #FF0000;
+    margin-bottom: 0px !important;
+}
+
+#card_progress .bar
+{
+    display: block;
+    background: #3d3;
+    width: 0;
+    height: 6px;
+}
+
 .help-icon
 {
     cursor: help;
@@ -138,6 +160,11 @@ a {
     background-color: #ede8ed !important;
 }
 
+.production
+{
+    background-color: #7fc48c !important;
+}
+
 .cancelled
 {
     background-color: #a8a1fa !important;
@@ -145,12 +172,22 @@ a {
 
 .readyForAcceptance
 {
-    background-color: #7fc48c !important;
+    background-color: #a5f7b2 !important;
 }
 
 .readyForQA
 {
     background-color: #fafabf !important;
+}
+
+.importantpart
+{
+    color: #ffffff;
+    border-radius: 5px;
+    border: 2px solid red;
+    padding: 3px;
+    margin: 3px;
+    background: linear-gradient(to right, #feccb1 0%,#f17432 24%,#ea5507 69%,#fb955e 100%);
 }
 
 .done {
@@ -205,4 +242,9 @@ tr th:last-child {
 .table_cell_border{
     border-color: #0028c1 !important;
     border-width: 1px !important;
+}
+
+.disp-block {
+    display: block;
+    width: 100%;
 }

@@ -1,4 +1,7 @@
 var mongoose = require('../libs/mongoose');
+var helpers = require('../middleware/helpers');
+var STATUS = require('../public/jsc/models/statusList').STATUS;
+var RESOLUTION = require('../public/jsc/models/statusList').RESOLUTION;
 
 var Module = require('../models/module').Module;
 var Page = require('../models/page').Page;
@@ -15,96 +18,7 @@ exports.getData = function (req, res) {
 };
 
 function moduleData() {
-    this.module = [
-                    {
-                        key: "",
-                        reportedSP: 0,
-                        summarySP: 0,
-                        progress: 0,
-                        teamnames: [],
-                        smename: "",
-                        duedate: Date.parse("1/1/1970"),
-                        accepted: false,
-                        status: "",
-                        modulestatus: "",
-                        moduleresolution: "",
-                        name: "",
-                        moduleGroup: "",
-                        pagescount: 0,
-                        endOfYearDelivery: false,
-                        q1Delivery: false,
-                        dueDateConfirmed: false,
-                        uri: ""
-                    }
-                ];
-}
-
-function getTeamName(labels) {
-    var index = labels.indexOf("Team");
-    if(index < 0) {
-        return "";
-    }
-    var index2 = labels.indexOf(',', index);
-    if(index2 < 0) {
-        index2 = labels.length;
-    }
-
-    return labels.substring(index+4,index2);
-}
-
-function getDueDateConfirmed(labels) {
-    var index = labels.indexOf("DueDateConfirmed");
-    if(index < 0) {
-        return false;
-    }
-    return true;
-}
-
-function getStreamName(labels) {
-    var index = labels.indexOf("Stream");
-    if(index < 0) {
-        return "";
-    }
-    var index2 = labels.indexOf(',', index);
-    if(index2 < 0) {
-        index2 = labels.length;
-    }
-
-    return labels.substring(index+6,index2);
-}
-
-function getModuleGroupName(labels) {
-    var groupName = "Unknown Module Group";
-    var index = labels.indexOf("PageModuleGroup_");
-    if(index < 0) {
-        return groupName;
-    }
-    var index2 = labels.indexOf(',', index);
-    if(index2 < 0) {
-        index2 = labels.length;
-    }
-
-    if(labels.substring(index+16,index2) != "") {
-        groupName = labels.substring(index+16,index2);
-    }
-    return groupName;
-}
-
-function getSizeName(labels) {
-    var sizeName = "Unknown";
-    var index = labels.indexOf("PageSize");
-    if(index < 0) {
-        return sizeName;
-    }
-    var index2 = labels.indexOf(',', index);
-    if(index2 < 0) {
-        index2 = labels.length;
-    }
-
-    if(labels.substring(index+8,index2) != "") {
-        sizeName = labels.substring(index+8,index2);
-    }
-    return sizeName;
+    this.module = [];
 }
 
 function SortData(moduledata) {
@@ -124,31 +38,12 @@ function parsePages(callback) {
             Module.find({}).exec(function(err, modules) {
                 async.series([
                     async.eachSeries(modules, function(module, callback) {
-                            var dueDateConfirmed = getDueDateConfirmed(module._doc.labels);
                             var count = 0;
-                            var labels = module._doc.labels != null ? module._doc.labels : "";
-                            var teamName = getTeamName(labels);
-                            var streamName = getStreamName(labels);
-
                             Page.find({epicKey: module.key}).exec(function (err, pages) {
                             if(pages != null && pages.length > 0) {
                                 async.eachSeries(pages, function(page, callback) {
-                                        var storyPoints = page.storyPoints == null ? 0 : parseFloat(page.storyPoints);
-                                        var moduleGroup = getModuleGroupName(page.labels);
-                                        var progress = page.progress == null ? 0 : parseInt(page.progress);
-
-                                        var calcStoryPoints = storyPoints * progress / 100;
-
-                                        var status = page.status;
-                                        var resolution = page.resolution;
-
-                                        status = status == 'Closed' && resolution == "Done" ? "Accepted" : status;
-                                        status = status == 'Closed' && resolution == "Implemented" ? "Accepted" : status;
-
-                                        var ignore = status == "Closed" && (resolution == "Out of Scope" || resolution == "Rejected" || resolution == "Canceled");
-
-                                        if(!ignore) {
-                                            putDataPoint(moduledata, dueDateConfirmed, status, moduleGroup, teamName, streamName, calcStoryPoints, storyPoints, ++count, module);
+                                        if(helpers.isActive(page.status, page.resolution)) {
+                                            putDataPoint(moduledata, module, page, ++count);
                                         }
                                         callback();
                                 },
@@ -157,7 +52,7 @@ function parsePages(callback) {
                                 });
                             }
                             else {
-                                putDataPoint(moduledata, dueDateConfirmed, "Empty", "Unknown Module Group", teamName, streamName, 0, 0, count, module);
+                                putDataPoint(moduledata, module, null, count);
                                 callback();
                             }
                         })
@@ -178,7 +73,23 @@ function parsePages(callback) {
     ]);
 }
 
-function putDataPoint(moduledata, dueDateConfirmed, status, moduleGroup, teamName, streamName, calcStoryPoints, storyPoints, count, module) {
+function putDataPoint(moduledata, module, page, count) {
+    var labels = module._doc.labels ? module._doc.labels : "";
+    var teamName = helpers.getTeamName(labels);
+    var streamName = helpers.getStreamName(labels);
+    var storyPoints, moduleGroup, progress, calcStoryPoints;
+    if(page) {
+        storyPoints = page.storyPoints == null ? 0 : parseFloat(page.storyPoints);
+        moduleGroup = helpers.getModuleGroupName(page.labels);
+        progress = page.progress == null ? 0 : parseInt(page.progress);
+        calcStoryPoints = storyPoints * progress / 100;
+    }
+    else {
+        storyPoints = 0;
+        calcStoryPoints = 0;
+        moduleGroup = "Unknown Module Group";
+    }
+
     var initUri = "https://jira.epam.com/jira/browse/";
 
     //module
@@ -190,12 +101,24 @@ function putDataPoint(moduledata, dueDateConfirmed, status, moduleGroup, teamNam
         }
     }
     if(!moduled) {
-        moduled = { progress: 0, reportedSP: 0, summarySP: 0,
-            name: module.summary, duedate: module.duedate, smename: module.assignee,
-            teamnames: [], key: module.key,
-            accepted: status == "Accepted", status: status,
-            modulestatus: module.status, moduleresolution: module.resolution,
-            fixVersions: module.fixVersions
+        moduled = {
+            key: module.key,
+            name: module.summary,
+            duedate: module.duedate,
+            smename: module.assignee,
+            moduleGroup: moduleGroup,
+            moduleStatus: module.status,
+            moduleResolution: module.resolution,
+            status: page ? helpers.updateStatus(page.status, page.resolution) : STATUS.CANCELED.name,
+            uri: initUri + module.key,
+            fixVersions: module.fixVersions,
+            dueDateConfirmed: helpers.getDueDateConfirmed(labels),
+            priority: module.priority,
+            progress: 0,
+            reportedSP: 0,
+            summarySP: 0,
+            teamName: teamName,
+            streamName: streamName
         };
         moduledata.module.push(moduled);
     }
@@ -203,37 +126,17 @@ function putDataPoint(moduledata, dueDateConfirmed, status, moduleGroup, teamNam
     moduled.reportedSP += calcStoryPoints;
     moduled.summarySP += storyPoints;
     moduled.progress = moduled.reportedSP*100/moduled.summarySP;
-    moduled.uri = initUri + module.key;
-    moduled.moduleGroup = moduleGroup;
-    moduled.accepted = moduled.accepted ? status == "Accepted" : false;
     moduled.pagescount = count;
-    moduled.dueDateConfirmed = dueDateConfirmed;
 
+    if(page) {
+        moduled.hasblockers = page.status == STATUS.BLOCKED.name;
+        moduled.hasdeferred = page.status == STATUS.DEFERRED.name;
 
-    var moduleStatus = statusList.getStatusByName(moduled.status);
-    var newStatus = statusList.getStatusByName(status);
+        var moduleStatus = statusList.getStatusByName(moduled.status);
+        var newStatus = statusList.getStatusByName(helpers.updateStatus(page.status, page.resolution));
 
-    if(newStatus.weight < moduleStatus.weight){
-        moduled.status = status;
-    }
-    if(teamName != "") {
-        var stream = streamName == "" ? "" : ":" + streamName;
-        putTeamName(teamName + stream, moduled);
-    }
-}
-
-function putTeamName(teamName, moduled) {
-    if (teamName != "") {
-        var found = false;
-        _.each(moduled.teamnames, function (teamname) {
-            if (teamname == teamName) {
-                found = true;
-            }
-        });
-
-        if (!found) {
-            moduled.teamnames.push(teamName);
+        if(newStatus.weight < moduleStatus.weight){
+            moduled.status = newStatus.name;
         }
     }
 }
-

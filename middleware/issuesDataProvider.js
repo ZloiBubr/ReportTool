@@ -7,8 +7,8 @@ var Page = require('../models/page').Page;
 var Issue = require('../models/issue').Issue;
 var issuesViewModel = require('../models/issuesViewModel');
 var log = require('../libs/log')(module);
+var helpers = require('../middleware/helpers');
 
-var jiraTextUtility = require('./Utility/JiraTextUtility');
 var _ = require('underscore');
 
 var statusExport = require('../public/jsc/Models/statusList');
@@ -49,7 +49,7 @@ function parsePages(callback) {
                 var linkedPages = [];
                 _.each(dbIssue.pages, function (dbPageItem) {
                     var dbPage = dbPageItem.page;
-                    var linkedPage = new issuesViewModel.linkedPage(dbPage.key, dbPage.reporter, dbPage.timeSpent, dbPage.labels, dbPage.assignee, jiraTextUtility.getTeamName(dbPage.labels));
+                    var linkedPage = new issuesViewModel.linkedPage(dbPage.key, dbPage.reporter, dbPage.timeSpent, dbPage.labels, dbPage.assignee, helpers.getTeamName(dbPage.labels));
                     linkedPages.push(new issuesViewModel.link(dbPageItem.linkType, linkedPage));
                 });
 

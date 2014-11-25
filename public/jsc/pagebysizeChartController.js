@@ -33,7 +33,7 @@ function pagebysizeChartController($scope, $resource, $window) {
                 zoomType: 'x'
             },
             title: {
-                text: 'Pages by Size',
+                text: 'Hours per Page',
                 x: -20 //center
             },
             subtitle: {
@@ -59,9 +59,9 @@ function pagebysizeChartController($scope, $resource, $window) {
                 }
             },
             legend: {
-                layout: 'horizontal',
-                align: 'bottom',
-                verticalAlign: 'bottom',
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'center',
                 borderWidth: 0
             },
             series: $scope.chartsData.data
@@ -105,16 +105,6 @@ function pagebysizeChartController($scope, $resource, $window) {
     };
 
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
-    $scope.jiraLabelsTeams = [
-        {"id": "XXXL", "title": "XXXL"},
-        {"id": "XXL", "title": "XXL"},
-        {"id": "ExtraLarge", "title": "ExtraLarge"},
-        {"id": "LargePlus", "title": "LargePlus"},
-        {"id": "Large", "title": "Large"},
-        {"id": "Medium", "title": "Medium"},
-        {"id": "Small", "title": "Small"}
-    ];
-
     $scope.init();
 }
 

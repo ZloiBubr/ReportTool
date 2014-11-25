@@ -25,6 +25,10 @@ myApp.config(function($stateProvider, $urlRouterProvider) {
             url: "/pagesBySize",
             templateUrl: "pages/pagesBySize.html"
         })
+        .state('normalizedHours', {
+            url: "/normalizedHours",
+            templateUrl: "pages/normalizedHours.html"
+        })
         .state('progressTable', {
             url: "/progressTable",
             templateUrl: "pages/progressTable.html"

@@ -117,7 +117,7 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
 };
 
 function Step1CollectModules(jira, callback) {
-    var requestString = "project = PLEX-UXC AND issuetype = epic AND summary ~ Module AND NOT summary ~ automation ORDER BY key ASC";
+    var requestString = "project = PLEX-UXC AND issuetype = epic AND summary ~ Module AND NOT summary ~ automation AND NOT summary ~ screens ORDER BY key ASC";
     //var requestString = "project = PLEX-UXC AND key = PLEXUXC-9243"; // for debug
     epicsList = [];
 
@@ -129,7 +129,7 @@ function Step1CollectModules(jira, callback) {
             return loopError;
         },
         function(callback) {
-        jira.searchJira(requestString, { fields: ["summary", "duedate", "assignee", "status", "resolution", "labels", "fixVersions"] }, function (error, epics) {
+        jira.searchJira(requestString, { fields: ["summary", "duedate", "assignee", "status", "resolution", "labels", "fixVersions", "priority"] }, function (error, epics) {
             if (error) {
                 callback(error);
             }
@@ -147,6 +147,7 @@ function Step1CollectModules(jira, callback) {
                             module.resolution = epic.fields.resolution == null ? "" : epic.fields.resolution.name;
                             module.labels = epic.fields.labels;
                             module.fixVersions = epic.fields.fixVersions && epic.fields.fixVersions.length > 0 ? epic.fields.fixVersions[0].name : "";
+                            module.priority = epic.fields.priority.name;
                             module.save(function () {
                                 epicsList.push(epic.key);
                                 LogProgress(epic.key + " : " + " Module Collected");
@@ -435,7 +436,7 @@ function SavePage(jira, issue, callback) {
         parseHistory(issue, page);
         calcWorklogFromIssue(issue, page);
         var queryString = util.format("project = PLEXUXC AND parent in (%s)", issue.key);
-        jira.searchJira(queryString, { fields: ["summary", "worklog"] }, function (error, subtasks) {
+        jira.searchJira(queryString, { fields: ["summary", "worklog", "status"] }, function (error, subtasks) {
             if (error) {
                 callback(error);
             }
@@ -443,6 +444,10 @@ function SavePage(jira, issue, callback) {
                 async.eachSeries(subtasks.issues, function (subtask, callback) {
                         if (subtask != null) {
                             calcWorklogFromIssue(subtask, page);
+                            if(subtask.fields.summary.indexOf("PLEX-Acceptance") > -1 &&
+                                subtask.fields.status.name == "Closed") {
+                                page.status = "Production";
+                            }
                             callback();
                         }
                     },
@@ -465,7 +470,7 @@ function SavePage(jira, issue, callback) {
 }
 
 function ParseProgress(item, page, author, created) {
-    if (item.fieldtype == 'custom' && item.field == 'Progress') {
+    if (item.fieldtype == 'custom' && (item.field == 'Progress' || item.field == "Progress, %")) {
         var from = item.fromString == null ||
             item.fromString == undefined ||
             item.fromString == ''

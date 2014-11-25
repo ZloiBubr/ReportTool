@@ -5,8 +5,8 @@
  * Time: 21:51
  * To change this template use File | Settings | File Templates.
  */
-function pieChartController($scope, $resource, $window) {
-    var pieSeriesResource = $resource('/piedata');
+function normalizedChartController($scope, $resource, $window) {
+    var velocitySeriesResource = $resource('/normalizeddata');
 
     /* ------------------------------------------------------ Init/Reinit -------------------------------*/
     $scope.init = function () {
@@ -27,23 +27,45 @@ function pieChartController($scope, $resource, $window) {
     // Original link to use setup chart directive
     // https://github.com/pablojim/highcharts-ng
     $scope.initCharts = function () {
-
-        $scope.chartConfig = {
-            options: {
-                chart: {
-                    type: 'pie',
-                    zoomType: 'x'
-                }
+        $('#container').highcharts({
+            chart: {
+                type: 'areaspline',
+                zoomType: 'x'
             },
-            series: $scope.chartsData.data,
             title: {
-                text: 'Weekly Velocity'
+                text: 'Hours per SP by Cloud App',
+                x: -20 //center
+            },
+            subtitle: {
+                text: 'Source: jira.epam.com',
+                x: -20
             },
             xAxis: {
                 type: 'datetime'
             },
-            loading: false
-        }
+            yAxis: {
+                title: {
+                    text: 'Development effort (Hours)'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                formatter: function () {
+                    return this.point.tooltip;
+                }
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'center',
+                borderWidth: 0
+            },
+            series: $scope.chartsData.data
+        });
     };
 
     /* -------------------------------------------------------Event handlers ------------------------ */
@@ -52,6 +74,19 @@ function pieChartController($scope, $resource, $window) {
         var loadingDfrd = $.Deferred();
         var getChartSuccess = function (data) {
             $scope.chartsData = data;
+            var averageSeries = [];
+            _.each($scope.chartsData.data, function(itemSeries){
+                averageSeries.push({
+                    name: itemSeries.name + ':trend',
+                    type: 'line',
+                    marker: { enabled: false },
+                    data: (function() {
+                        return itemSeries.data.length > 1 ? fitData(itemSeries.data).data : itemSeries.data;
+                    })()
+                });
+            });
+
+            $scope.chartsData.data = _.union($scope.chartsData.data, averageSeries);
             loadingDfrd.resolve();
         };
 
@@ -70,15 +105,6 @@ function pieChartController($scope, $resource, $window) {
     };
 
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
-    $scope.jiraLabelsTeams = [
-        {"id": "TeamNova", "title": "TeamNova"},
-        {"id": "TeamRenaissance", "title": "TeamRenaissance"},
-        {"id": "TeamInspiration", "title": "TeamInspiration"},
-        {"id": "TeamLiberty", "title": "TeamLiberty"},
-        {"id": "TeamViva", "title": "TeamViva"},
-        {"id": "Total", "title": "Total"}
-    ];
-
     $scope.init();
 }
 

@@ -11,15 +11,6 @@ exports.getData = function (req, res) {
     });
 };
 
-function getCleanModuleName(moduleName) {
-    var index = moduleName.indexOf("Module");
-    if(index < 0) {
-        return moduleName;
-    }
-
-    return moduleName.substring(0,index-1);
-}
-
 function parsePages(callback) {
     var velocity = {
         data: [
@@ -73,16 +64,16 @@ function parsePages(callback) {
                                                 if(module.duedate != null) {
                                                     if(!ignore) {
                                                         maximumBurn += storyPoints;
+                                                        var date = new Date(Date.parse(module.duedate));
+                                                        date.setHours(12, 0, 0, 0);
+                                                        date = date.getTime();
+                                                        var tooltip = "";
+                                                        if(modulesAdded.indexOf(module.summary) < 0) {
+                                                            tooltip = module.summary;
+                                                            modulesAdded.push(module.summary);
+                                                        }
+                                                        putDataPoint(velocity, "Planned burn", date, storyPoints, tooltip);
                                                     }
-                                                    var date = new Date(Date.parse(module.duedate));
-                                                    date.setHours(12, 0, 0, 0);
-                                                    date = date.getTime();
-                                                    var tooltip = "";
-                                                    if(modulesAdded.indexOf(module.summary) < 0) {
-                                                        tooltip = getCleanModuleName(module.summary);
-                                                        modulesAdded.push(module.summary);
-                                                    }
-                                                    putDataPoint(velocity, "Planned burn", date, storyPoints, tooltip);
                                                 }
                                                 callback();
                                             },
@@ -124,7 +115,7 @@ function AdjustProjection(velocity) {
     for (var k = 0; k < velocity.data.length; k++) {
         var burn = velocity.data[k];
         if (burn.name == "Actual burn") {
-            lastValue = burn.data[burn.data.length-1].y;
+            lastValue = burn.data.length > 0 ? burn.data[burn.data.length-1].y : lastValue;
         }
     }
 
@@ -143,6 +134,16 @@ function AdjustProjection(velocity) {
                 else {
                     burn.data[l].y = Math.floor(burn.data[l-1].y - delta);
                 }
+            }
+            var negativeIndex = burn.data.length;
+            for (var l = 0; l < burn.data.length; l++) {
+                if(burn.data[l].y < 0.) {
+                    negativeIndex = l;
+                    break;
+                }
+            }
+            if(negativeIndex < burn.data.length) {
+                burn.data = burn.data.slice(0, negativeIndex + 1);
             }
         }
     }

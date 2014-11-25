@@ -1,74 +1,94 @@
 <div id="container" class="container" ng-controller="waveProgressController" style="padding-left: 150px">
-    <div class="visible-md visible-lg visible-sm" style="position:fixed; left: 10px; top:150px; font-size: 12pt ">
+    <div class="visible-md visible-lg visible-sm" style="position:fixed; left: 10px; top:60px; font-size: 12pt; max-width: 250px ">
         <ul class="list-unstyled">
-            <li>Team:<select class="form-control headerSelectWidth" ng-model="filteredTeam" class="headerSelectWidth" ng-options="team.name as team.name for team in allTeams" ng-change="filterCloudAppByTeam()"></select></li>
-            <li class="blocked"><input type="checkbox" ng-model="total.blocked.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-remove"></span><strong> {{total.blocked.count}}</strong>:Blocked</li>
-            <li><input type="checkbox" ng-model="total.open.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-inbox"></span><strong> {{total.open.count}}</strong>:Open</li>
+            <li><img width="16" height="16" alt="Conf" src="img/duedate2.png"/> DueDate confirmed</li>
+            <li><img width="16" height="16" alt="Conf" src="img/1.png"/>
+                <img width="16" height="16" alt="Conf" src="img/2.png"/>
+                <img width="16" height="16" alt="Conf" src="img/3.png"/>
+                <img width="16" height="16" alt="Conf" src="img/4.png"/>
+                <img width="16" height="16" alt="Conf" src="img/5.png"/> Priority</li>
+            <li class="importantpart"><input type="checkbox" ng-model="detailedView" ng-change="processWithRowSpans()"> Detailed View</li>
+            <li><br/></li>
+            <li>Fix Version:<select class="form-control headerSelectWidth" ng-model="filteredVersion" class="headerSelectWidth" ng-options="version.name as version.name for version in allVersions" ng-change="filterModule()"></select></li>
+            <li>SME:<select class="form-control headerSelectWidth" ng-model="filteredSme" class="headerSelectWidth" ng-options="sme.name as sme.name for sme in allSMEs" ng-change="filterModule()"></select></li>
+            <li>Module Group:<select style="max-width: 250px !important;" class="form-control headerSelectWidth" ng-model="filteredMG" class="headerSelectWidth" ng-options="moduleGroup.name as moduleGroup.name for moduleGroup in allModuleGroups" ng-change="filterModule()"></select></li>
+            <li>Module:<select style="max-width: 250px !important;" class="form-control headerSelectWidth" ng-model="filteredM" class="headerSelectWidth" ng-options="module.name as module.name for module in allModules" ng-change="filterModule()"></select></li>
+            <li>Team:<select class="form-control headerSelectWidth" ng-model="filteredTeam" class="headerSelectWidth" ng-options="team.name as team.name for team in allTeams" ng-change="filterModule()"></select></li>
+            <li>Stream:<select class="form-control headerSelectWidth" ng-model="filteredStream" class="headerSelectWidth" ng-options="team.name as team.name for team in allStreams" ng-change="filterModule()"></select></li>
             <li><input type="checkbox" ng-model="total.deferred.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-time"></span><strong> {{total.deferred.count}}</strong>:Deferred</li>
+            <li><input type="checkbox" ng-model="total.open.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-inbox"></span><strong> {{total.open.count}}</strong>:Open</li>
+            <li><input type="checkbox" ng-model="total.reopened.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-inbox"></span><strong> {{total.reopened.count}}</strong>:Reopened</li>
             <li><input type="checkbox" ng-model="total.assigned.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-user"></span><strong> {{total.assigned.count}}</strong>:Assigned</li>
             <li><input type="checkbox" ng-model="total.inProgress.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-play"></span><strong> {{total.inProgress.count}}</strong>:In Progress</li>
             <li><input type="checkbox" ng-model="total.codeReview.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-eye-open"></span><strong> {{total.codeReview.count}}</strong>:Code Review</li>
-            <li><br/></li>
             <li class="readyForQA"><input type="checkbox" ng-model="total.readyForQA.isChecked" ng-change="processWithRowSpans()"> <span class="glyphicon glyphicon-th-list"></span><strong> {{total.readyForQA.count}}</strong>:Ready for QA</li>
             <li class="readyForQA"><input type="checkbox" ng-model="total.testingInProgress.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-road"></span><strong> {{total.testingInProgress.count}}</strong>:Testing In Progress</li>
+            <li class="blocked"><input type="checkbox" ng-model="total.blocked.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-remove"></span><strong> {{total.blocked.count}}</strong>:Blocked</li>
             <li class="readyForAcceptance"><input type="checkbox" ng-model="total.resolved.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-check"></span><strong> {{total.resolved.count}}</strong>:Resolved</li>
             <li class="accepted"><input type="checkbox" ng-model="total.accepted.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-star"></span><strong> {{total.accepted.count}}</strong>:Accepted</li>
-            <li class="cancelled"><input type="checkbox" ng-model="total.cancelled.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-ban-circle"></span><strong> {{total.cancelled.count}}</strong>:Cancelled</li>
-            <li><br/></li>
+            <li class="production"><input type="checkbox" ng-model="total.production.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-star"></span><strong> {{total.production.count}}</strong>:Production</li>
             <li><input type="checkbox" ng-model="total.all.isChecked" ng-change="onSelectDeselectAll()"><span class="glyphicon glyphicon-shopping-cart"></span><strong> {{total.total}}</strong>:Total</li>
             <li><br/></li>
             <li><label><span class="glyphicon glyphicon-asterisk"></span><strong>{{total.pages}}</strong>:Pages</label></li>
         </ul>
     </div>
-    <div class="row">
-
-        <div class="col-lg-12">
-            <table class="table">
-                <thead>
+    <div>
+        <table class="table table-bordered">
+            <thead class="progressTableMainHeader">
+            <tr>
+                <th ng-repeat="status in allStatuses">{{status.name}}</th>
+            </tr>
+            <tbody>
                 <tr>
-                    <th>Wave</th>
-                    <th>ModuleGroup</th>
-                    <th>Module</th>
-                    <th>Cloud App</th>
+                    <td ng-repeat="status in cloudAppCards.statuses">
+                        <div class="disp-block">
+                            <sup style="color: blue">{{status.totalReported | number : 0}}/</sup>
+                            <sup style="color: darkred">{{status.totalRequired | number : 0}}</sup>
+                            <span style="font-style: italic">{{status.totalLeft | number : 0}}</span>
+                            <span style="color: #737373">Cards:{{status.cards.length | number : 0}}</span>
+                        </div>
+                        <table class="table table-condensed">
+                            <tr  ng-repeat = "card in status.cards">
+                                <td ng-class="{
+                                    blocked: card.status == 'Blocked',
+                                    accepted: card.status == 'Accepted',
+                                    readyForAcceptance: card.status == 'Resolved',
+                                    readyForQA: card.status == 'Ready for QA' || card.status == 'Testing in Progress',
+                                    cancelled: card.status == 'Canceled',
+                                    production: card.status == 'Production',
+                                    'bg-info': true}">
+                                    <div id="card_progress">
+                                        <div class="bar" ng-style="{width: card.progress + '%'}"></div>
+                                    </div>
+                                    <div class="disp-block">
+                                        <sup style="color: blue">{{card.reportedSP | number : 0}}/</sup>
+                                        <sup style="color: darkred">{{card.summarySP | number : 0}}</sup>
+                                        <span style="font-style: italic">{{card.restSP | number : 0}}</span>
+                                        <br/>
+                                        <img ng-show="card.priority == 1" width="16" height="16" alt="Conf" src="img/1.png"/>
+                                        <img ng-show="card.priority == 2" width="16" height="16" alt="Conf" src="img/2.png"/>
+                                        <img ng-show="card.priority == 3" width="16" height="16" alt="Conf" src="img/3.png"/>
+                                        <img ng-show="card.priority == 4" width="16" height="16" alt="Conf" src="img/4.png"/>
+                                        <img ng-show="card.priority == 5" width="16" height="16" alt="Conf" src="img/5.png"/>
+                                        <img ng-show="card.dueDateConfirmed" width="16" height="16" alt="Conf" src="img/duedate2.png"/>
+                                        <img ng-show="card.status == exports.STATUS.BLOCKED.name" width="16" height="16" alt="Conf" src="img/ban.png"/>
+                                        <img ng-show="card.status == exports.STATUS.DEFERRED.name" width="16" height="16" alt="Conf" src="img/deffered.png"/>
+                                        <span style="font-style: italic">{{card.pages | number : 0}} Pages</span>
+                                    </div>
+                                    <a class="disp-block" href="{{card.uri}}">{{card.name}}</a>
+                                    <div  ng-show="detailedView" ng-repeat="assignee in card.assignees">
+                                        <div ng-if="$first"><img width="16" height="16" alt="Conf" src="img/person2.png"/>{{assignee}}</div>
+                                        <div ng-if="!$first"><img width="16" height="16" alt="Conf" src="img/person.png"/>{{assignee}}</div>
+                                    </div>
+                                    <div ng-show="detailedView"><img width="16" height="16" alt="Conf" src="img/clockblue.png"/>{{card.devTimeSpent | number : 0}}hrs</div>
+                                    <div ng-show="detailedView"><img width="16" height="16" alt="Conf" src="img/clockred.png"/>{{card.qaTimeSpent | number : 0}}hrs</div>
+                                    <div ng-show="detailedView"><img width="16" height="16" alt="Conf" src="img/clocksp.png"/>{{(card.qaTimeSpent+card.devTimeSpent)/card.summarySP | number : 0}}hrs per SP</div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
                 </tr>
-                </thead>
-                <tbody>
-                    <tr ng-repeat = "item in invertedWaveProgressData">
-                        <td class="table_cell_border" rowspan="{{item.wave.rowSpan}}" ng-if="isExist(item.wave)"><a href="{{item.wave.uri}}">{{item.wave.name}}</a> : {{item.wave.progress | number : 0}}% - {{item.wave.reportedSP | number : 0}} of {{item.wave.summarySP | number : 0}} SP</td>
-                        <td class="table_cell_border" rowspan="{{item.moduleGroup.rowSpan}}" ng-if="isExist(item.moduleGroup)" ng-class="{red: isUnknownExist(item.moduleGroup.name)}"><a href="{{item.moduleGroup.uri}}">{{item.moduleGroup.name}}</a> : {{item.moduleGroup.progress | number : 0}}% - {{item.moduleGroup.reportedSP | number : 0}} of {{item.moduleGroup.summarySP | number : 0}} SP</td>
-                        <td class="table_cell_border" rowspan="{{item.module.rowSpan}}" ng-if="isExist(item.module)" ng-class="{red: isUnknownExist(item.module.name)}"><a href="{{item.module.uri}}">{{item.module.name}}</a> : {{item.module.progress | number : 0}}% - {{item.module.reportedSP | number : 0}} of {{item.module.summarySP | number : 0}} SP</td>
-                        <td class="table_cell_border" ng-if="isExist(item.appItem)"
-                            ng-class="{red: isUnknownExist(item.appItem.name),
-                            readyForAcceptance: item.appItem.readyForAcceptance,
-                            readyForQA: item.appItem.readyForQA,
-                            accepted: item.appItem.accepted,
-                            cancelled: item.appItem.cancelled,
-                            blocked: item.appItem.blocked}"><a href="{{item.appItem.uri}}">{{item.appItem.name}}</a> : {{item.appItem.progress | number : 0}}% - {{item.appItem.reportedSP | number : 0}} of {{item.appItem.summarySP | number : 0}} SP, {{item.appItem.status}}, {{item.appItem.teamName}}, {{item.appItem.smeName}}, Pages:{{item.appItem.pages}}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-
-
-        <!--<div class="col-sm-4">-->
-            <!--<label for="dateFrom">From</label>-->
-            <!--<input class="form-control" id="dateFrom" type="date" ng-model="from" ng-change="onDateChange()"/>-->
-        <!--</div>-->
-        <!--<div class="col-sm-4">-->
-            <!--<label for="dateTo">To</label>-->
-            <!--<input class="form-control" id="dateTo" type="date" ng-model="to" ng-change="onDateChange()"/>-->
-        <!--</div>-->
+            </tbody>
+        </table>
     </div>
-
-    <!--<div class="row">-->
-    <!--<table class="table" >-->
-    <!--<th>-->
-    <!--<tr></tr>-->
-    <!--</th>-->
-    <!--<tr ng-repeat="member in timeSheetData.members">-->
-    <!--<td>{{}}</td>-->
-    <!--</tr>-->
-    <!--</table>-->
-    <!--</div>-->
 </div>
