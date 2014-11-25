@@ -7,6 +7,12 @@
             <table class="table">
                 <tr>
                     <th></th>
+                    <th class="sorted_column" ng-click="onSortingClick('dueDate')"><span class="glyphicon glyphicon-sort" style="font-size: 8pt"></span> Due Date
+                        <span ng-show="sortingModel.selected == 'dueDate'">&nbsp;
+                            <span ng-show="sortingModel.isASC">▴</span>
+                            <span ng-show="!sortingModel.isASC">▾</span>
+                        </span>
+                    </th>
                     <th>Key</th>
                     <th>Type</th>
                     <th class="sorted_column" ng-click="onSortingClick('blockers')"><span class="glyphicon glyphicon-sort" style="font-size: 8pt"></span> Blocks
@@ -34,6 +40,8 @@
                     <td>
                         <span ng-if="issue.isHotIssue" class="glyphicon glyphicon-warning-sign" tooltip="HotIssue"></span>
                         <span ng-if="issue.isF5Issue" class="glyphicon glyphicon-wrench" tooltip="F5 Issue"></span>
+                    </td>
+                    <td> {{issue.dueDate | date:'MMM-dd-yyyy'}} </span>
                     </td>
                     <td><a href={{"https://jira.epam.com/jira/browse/"+issue.key}}>{{issue.key}}</a></td>
                     <td ng-switch="issue.type">

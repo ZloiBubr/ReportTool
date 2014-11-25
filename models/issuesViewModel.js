@@ -26,11 +26,12 @@ exports.link = function(linkType, page){
     this.page = page || new exports.linkedPage();
 };
 
-exports.linkedPage = function(key, reporter, timeSpent, labels, assignee, team){
+exports.linkedPage = function(key, reporter, timeSpent, labels, assignee, team, dueDate){
     this.key = key || "";
     this.reporter = reporter || "";
     this.timeSpent = timeSpent || "";
     this.labels = labels || [];
     this.assignee = assignee || "";
     this.team = team || "";
+    this.dueDate = dueDate || "";
 };
