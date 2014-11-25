@@ -26,7 +26,7 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
         $scope.filteredVersion = $scope.allVersions[0].id;
         $scope.isTotalWasCalculated = false;
         $scope.reInitTotal();
-        $scope.getCloudAppData().done($scope.processWithRowSpans);
+        $scope.getCloudAppData();
         $scope.cloudAppCards = [];
     };
 
@@ -206,7 +206,7 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
         SortCombos();
     }
 
-    $scope.processWithRowSpans = function () {
+    $scope.processWithRowSpans = function (addCards) {
         $scope.total.pages = 0;
         $scope.cloudAppCards=[];
         $scope.cloudAppCards.statuses = $scope.allStatuses;
@@ -219,16 +219,17 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
         if($scope.cloudAppData == undefined) {
             return;
         }
-        $scope.saveStorageToLocalDb();
-
+        if(addCards) {
+            $scope.saveStorageToLocalDb();
+        }
         _.each($scope.cloudAppData.cloudApp, function(cloudAppItem){
-            if($scope.filteredMG != $scope.allModuleGroups[0].id && cloudAppItem.moduleGroupName != $scope.filteredMG){
+            if(addCards && $scope.filteredMG != $scope.allModuleGroups[0].id && cloudAppItem.moduleGroupName != $scope.filteredMG){
                 return;
             }
-            if($scope.filteredM != $scope.allModules[0].id && cloudAppItem.moduleName != $scope.filteredM){
+            if(addCards && $scope.filteredM != $scope.allModules[0].id && cloudAppItem.moduleName != $scope.filteredM){
                 return;
             }
-            if($scope.filteredVersion != $scope.allVersions[0].id) {
+            if(addCards && $scope.filteredVersion != $scope.allVersions[0].id) {
                 if($scope.filteredVersion == "Q1") {
                     if(!(cloudAppItem.fixVersions == "2.0 January 2015" ||
                         cloudAppItem.fixVersions == "3.0 February 2015" ||
@@ -254,13 +255,13 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
                     return;
                 }
             }
-            if($scope.filteredSme != $scope.allSMEs[0].id && cloudAppItem.smeName != $scope.filteredSme){
+            if(addCards && $scope.filteredSme != $scope.allSMEs[0].id && cloudAppItem.smeName != $scope.filteredSme){
                 return;
             }
-            if($scope.filteredStream != $scope.allStreams[0].id && cloudAppItem.streamName != $scope.filteredStream){
+            if(addCards && $scope.filteredStream != $scope.allStreams[0].id && cloudAppItem.streamName != $scope.filteredStream){
                 return;
             }
-            if($scope.filteredTeam != $scope.allTeams[0].id && cloudAppItem.teamName != $scope.filteredTeam) {
+            if(addCards && $scope.filteredTeam != $scope.allTeams[0].id && cloudAppItem.teamName != $scope.filteredTeam) {
                 return;
             }
             var issueEntity = $scope.total.getStatusByName(cloudAppItem.status);
@@ -269,29 +270,31 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
                 if (!$scope.isTotalWasCalculated) {
                     issueEntity.count++;
                 }
-                var found = false;
-                for(var i=0; i<$scope.cloudAppCards.statuses.length; i++) {
-                    var status = $scope.cloudAppCards.statuses[i];
-                    if (status.name == cloudAppItem.status) {
-                        status.cards.push(getCard($scope.detailedView, cloudAppItem));
-                        status.totalReported += cloudAppItem.reportedSP;
-                        status.totalRequired += cloudAppItem.summarySP;
-                        status.totalLeft = status.totalRequired - status.totalReported;
-                        found = true;
-                        status.cards.sort(function(a,b) {
-                            var aa = a.priority;
-                            var bb = b.priority;
-                            var c = a.name;
-                            var d = b.name;
-                            return aa > bb ? 1 :
-                                aa < bb ? -1 :
-                                    c > d ? 1 :
-                                        c < d ? -1 : 0;
-                        });
+                if(addCards) {
+                    var found = false;
+                    for(var i=0; i<$scope.cloudAppCards.statuses.length; i++) {
+                        var status = $scope.cloudAppCards.statuses[i];
+                        if (status.name == cloudAppItem.status) {
+                            status.cards.push(getCard($scope.detailedView, cloudAppItem));
+                            status.totalReported += cloudAppItem.reportedSP;
+                            status.totalRequired += cloudAppItem.summarySP;
+                            status.totalLeft = status.totalRequired - status.totalReported;
+                            found = true;
+                            status.cards.sort(function(a,b) {
+                                var aa = a.priority;
+                                var bb = b.priority;
+                                var c = a.name;
+                                var d = b.name;
+                                return aa > bb ? 1 :
+                                    aa < bb ? -1 :
+                                        c > d ? 1 :
+                                            c < d ? -1 : 0;
+                            });
+                        }
                     }
-                }
-                if(!found) {
-                    $scope.cloudAppCards.statuses[$scope.cloudAppCards.statuses.length-1].cards.push(getCard(cloudAppItem));
+                    if(!found) {
+                        $scope.cloudAppCards.statuses[$scope.cloudAppCards.statuses.length-1].cards.push(getCard(cloudAppItem));
+                    }
                 }
                 if(!$scope.isTotalWasCalculated) {
                     $scope.total.total++;
@@ -330,7 +333,9 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
         var getCloudAppSuccess = function (data) {
             $scope.cloudAppData = data;
             fillAllCombos();
+            $scope.processWithRowSpans(false);
             $scope.loadStorageFromLocalDb();
+            $scope.processWithRowSpans(true);
             loadingDfrd.resolve();
         };
 
@@ -362,7 +367,7 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
         $scope.total.cancelled.isChecked = $scope.total.all.isChecked;
         $scope.total.production.isChecked = $scope.total.all.isChecked;
 
-        $scope.processWithRowSpans();
+        $scope.processWithRowSpans(true);
     };
 
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
@@ -376,7 +381,7 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
         $scope.total.resetCounters();
         $scope.total.total = 0;
         $scope.total.pages = 0;
-        $scope.processWithRowSpans();
+        $scope.processWithRowSpans(true);
     };
 
     $scope.saveStorageToLocalDb = function() {
