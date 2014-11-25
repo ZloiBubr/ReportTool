@@ -72,7 +72,7 @@ function Step1CollectIssues(jira, params, callback) {
             return loopError-- > 0;
         },
         function(callback) {
-            jira.searchJira(params.jqlQuery, { fields: ["summary", "labels"] }, function (error, issues) {
+            jira.searchJira(params.jqlQuery, { fields: ["summary", "labels", "assignee", "priority"] }, function (error, issues) {
                 if (error) {
                     callback(error);
                 }
@@ -102,28 +102,41 @@ function Step1CollectIssues(jira, params, callback) {
 
 function ProcessPageFromJira(jira, params, issue, callback) {
     var loopError = 3;
+    var updateLabels = params.labelsToAdd || params.labelsToDelete;
+    var addWatcher = params.watchersToAdd;
+    var deleteWatcher = params.watchersToDelete;
+    var updateAssignee = params.assigneeName;
+    var updatePriority = params.priorityName;
+
     async.whilst(function() {
             return loopError-- > 0;
         },
         function(callback) {
-            var issueUpdate = {fields: {labels: issue.fields.labels}};
-            var exists = false;
-            for(var j=0; j < issueUpdate.fields.labels.length; j++) {
-                if(params.labelsToAdd == issueUpdate.fields.labels[j]) {
-                    exists = true;
-                    break;
+            var issueUpdate = updateLabels ?
+                {fields: {labels: issue.fields.labels}} :
+                updateAssignee ?
+                {fields: {assignee: { name: params.assigneeName}}} :
+                updatePriority ?
+                {fields: {priority: { name: params.priorityName}}} : {};
+            if(updateLabels) {
+                var exists = false;
+                for(var j=0; j < issueUpdate.fields.labels.length; j++) {
+                    if(params.labelsToAdd == issueUpdate.fields.labels[j]) {
+                        exists = true;
+                        break;
+                    }
+                }
+                if(!exists) {
+                    issueUpdate.fields.labels.push(params.labelsToAdd);
+                }
+                for(var j=0; j < issueUpdate.fields.labels.length; j++) {
+                    if(params.labelsToDelete == issueUpdate.fields.labels[j]) {
+                        issueUpdate.fields.labels.splice(j,1);
+                        break;
+                    }
                 }
             }
-            if(!exists) {
-                issueUpdate.fields.labels.push(params.labelsToAdd);
-            }
-            for(var j=0; j < issueUpdate.fields.labels.length; j++) {
-                if(params.labelsToDelete == issueUpdate.fields.labels[j]) {
-                    issueUpdate.fields.labels.splice(j,1);
-                    break;
-                }
-            }
-            if(params.labelsToAdd != "" || params.labelsToDelete != "") {
+            if(updateLabels || updateAssignee || updatePriority) {
                 jira.updateIssue(issue.key, issueUpdate, function (error) {
                     if (error) {
                         writeToClient("Update issue error happened!", error);
@@ -135,7 +148,7 @@ function ProcessPageFromJira(jira, params, issue, callback) {
                     callback();
                 });
             }
-            if(params.watchersToAdd != "") {
+            if(addWatcher) {
                 jira.addWatcher(issue.key, params.watchersToAdd, function (error) {
                     if (error) {
                         writeToClient("Add watchers error happened!", error);
@@ -147,7 +160,7 @@ function ProcessPageFromJira(jira, params, issue, callback) {
                     callback();
                 });
             }
-            if(params.watchersToDelete != "") {
+            if(deleteWatcher) {
                 jira.deleteWatcher(issue.key, params.watchersToDelete, function (error) {
                     if (error) {
                         writeToClient("Delete watchers error happened!", error);

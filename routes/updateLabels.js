@@ -8,7 +8,9 @@ exports.post = function (req, res) {
         labelsToAdd: req.body.labelstoadd,
         labelsToDelete: req.body.labelstodelete,
         watchersToAdd: req.body.watcherstoadd,
-        watchersToDelete: req.body.watcherstodelete
+        watchersToDelete: req.body.watcherstodelete,
+        assigneeName: req.body.assigneename,
+        priorityName: req.body.priorityname
     };
 
     updateLabels.processItems(params, function (err) {
