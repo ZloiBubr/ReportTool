@@ -117,8 +117,9 @@ function pagebysizeChartController($scope, $resource, $window) {
             if(sizeObj.max < y) {
                 sizeObj.max = y;
             }
-            sizeObj.avg = (sizeObj.avg + y)/2;
+            sizeObj.avg += y;
         }
+        sizeObj.avg = sizeObj.avg/sizeObj.count;
         return sizeObj;
     };
     /* ------------------------------------------- DOM/Angular events --------------------------------------*/
