@@ -15,7 +15,7 @@ function IssuesLinkedToManyPagesController($scope, $resource, $window, $filter, 
         $scope.nowDate = new Date();
         $scope.nowDate.setHours(12,0,0);
 
-        $scope.TeamFilter = "TeamNova"
+        //$scope.TeamFilter = "TeamNova"
     };
 
     $scope.reInit = function () {
@@ -127,8 +127,9 @@ function IssuesLinkedToManyPagesController($scope, $resource, $window, $filter, 
             return true;
         }
 
+        var shortTeamName = $scope.common.filteredTeam.replace("Team","");
         return _.some(item.teamsInvolved, function(team){
-            return team == $scope.common.filteredTeam;
+            return team == shortTeamName;
         });
     };
 

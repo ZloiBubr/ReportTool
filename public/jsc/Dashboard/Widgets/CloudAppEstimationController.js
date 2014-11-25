@@ -2,7 +2,7 @@
  * Created by Heorhi_Vilkitski on 8/8/2014.
  */
 
-function CloudAppEstimationController($scope, $resource, $window, $filter, $cookies, localStorageService) {
+function CloudAppEstimationController($scope, $resource, $window, $filter, localStorageService) {
     var moduleDataResource = $resource('/moduledata');
 
     /* ------------------------------------------------------ Init/Reinit -------------------------------*/
@@ -81,11 +81,11 @@ function CloudAppEstimationController($scope, $resource, $window, $filter, $cook
 
         $scope.estimation.team = _.find($scope.allTeams,function(teamItem){return teamItem.id === $scope.common.filteredTeam});
         _.each($scope.estimation.team.streams, function(streamItem){
-            var streamShortCut = $scope.estimation.team.name +":" + streamItem.replace("Stream","");
+            var streamShortCut = streamItem.replace("Stream","");
             $scope.estimation.streams = $scope.estimation.streams || {};
             $scope.estimation.streams[streamItem] = $scope.estimation.streams[streamItem] || {};
             $scope.estimation.streams[streamItem].modules = _.sortBy(_.filter($scope.moduleProgressData.module, function(moduleItem){
-                return moduleItem.teamnames[0] === streamShortCut;
+                return moduleItem.streamName === streamShortCut;
             }), function(item){return item.duedate});
 
             if(restored_model) {
