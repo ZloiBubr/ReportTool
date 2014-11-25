@@ -34,11 +34,11 @@ function pagebysizeModel() {
         },
         {
             data: [],
-            name: "LargeDev"
+            name: "LargePlusDev"
         },
         {
             data: [],
-            name: "LargePlusDev"
+            name: "LargeDev"
         },
         {
             data: [],
