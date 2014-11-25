@@ -45,7 +45,7 @@
                         </td>
                     <td>{{issue.blockersCount}}</td>
                     <td><span tooltip="{{status.name}}"><span class="{{status.cssIcon}}"></span></span></td>
-                    <td><span ng-repeat="team in issue.teamsInvolved"> {{team}}; </span></td>
+                    <td><span ng-repeat="team in issue.teamsInvolved track by $index"> {{team}} </span></td>
                     <td>{{issue.assignee}}</td>
                     <td>{{issue.lastDaysAgo}}</td>
                 </tr>

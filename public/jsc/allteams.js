@@ -3,6 +3,7 @@ function Teams() {
         {
             id: "TeamRenaissance",
             name: "Renaissance",
+            streams: ["StreamR1", "StreamR2", "StreamR3"],
             teamLead: "Aliaksandr Koush",
             qaTeamLead: "Aliaksandra Kutynka",
             developers: [
@@ -36,6 +37,7 @@ function Teams() {
         {
             id: "TeamInspiration",
             name: "Inspiration",
+            streams: ["StreamIn1", "StreamIn2", "StreamIn3"],
             teamLead: "Sergey Tischenko",
             qaTeamLead: "Denys Pugachov",
             developers: [
@@ -98,6 +100,7 @@ function Teams() {
         {
             id: "TeamLiberty",
             name: "Liberty",
+            streams: ["StreamL1", "StreamL2", "StreamL3"],
             teamLead: "Dzmitry Tabolich",
             qaTeamLead: "Iryna Kutsko",
             developers: [
@@ -131,6 +134,7 @@ function Teams() {
         {
             id: "TeamViva",
             name: "Viva",
+            streams: ["StreamV1", "StreamV2", "StreamV3"],
             teamLead: "Valentine Zhuck",
             qaTeamLead: "Katsiaryna Kuchko",
             developers: [

@@ -1,0 +1,121 @@
+<div ng-controller="CloudAppEstimationController" class="col-lg-8">
+    <div class="panel panel-default">
+        <!-- Default panel contents -->
+        <div class="panel-heading">
+            <span class="glyphicon glyphicon-th-list"> </span> CloudApp Estimation
+            <a href="" ng-if="isEnabled" ng-click="onModalShow()"><span class="pull-right">
+                <span class="glyphicon glyphicon-cog"></span>Setup</span></a>
+        </div>
+        <div class="panel-body" style="height: 500px; overflow: auto">
+            <ng-include ng-if="isEnabled"
+                    src="'pages/dashboard/widgets/CloudAppEstimation/CloudAppEstimation_GridControl.html'"></ng-include>
+            <div ng-if="!isEnabled">
+                <h1>Please Select your Team<h1>
+            </div>
+        </div>
+    </div>
+
+    <div ng-if="isEnabled" class="modal fade" id="estimateModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="width: 100%">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span
+                            aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Delivery Estimation</h4>
+                </div>
+                <div class="modal-body container">
+
+                    <fieldset class="row">
+                        <legend>Employee count</legend>
+                        <div class="row" ng-repeat="streamName in estimation.team.streams">
+                            <label class="col-lg-2 control-label" for="{{streamName + 'DevCapacity'}}">{{streamName}}
+                                Dev</label>
+
+                            <div class="col-lg-2">
+                                <input type="number" class="form-control" id="{{streamName + 'DevCapacity'}}"
+                                       placeholder="Developers" ng-model="estimation.streams[streamName].devCapacity"
+                                       ng-change="onRecalc()">
+                            </div>
+
+                            <label class="col-lg-2 control-label" for="{{streamName + 'QACapacity'}}">QA</label>
+
+                            <div class="col-lg-2">
+                                <input type="number" class="form-control" id="{{streamName + 'QACapacity'}}"
+                                       placeholder="QAs" ng-model="estimation.streams[streamName].qaCapacity"
+                                       ng-change="onRecalc()">
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="row">
+                        <legend>Velocity</legend>
+                        <label class="col-lg-2 control-label" for="dayDevSpVelocity">Dev velocity (sp/day)</label>
+
+                        <div class="col-lg-2">
+                            <input type="number" class="form-control" id="dayDevSpVelocity" placeholder="SP per day"
+                                   ng-model="estimation.dayDevSpVelocity" ng-change="onRecalc()">
+                        </div>
+
+                        <label class="col-lg-2 control-label" for="dayQaSpVelocity">Qa velocity (sp/day)</label>
+
+                        <div class="col-lg-2">
+                            <input type="number" class="form-control" id="dayQaSpVelocity" placeholder="SP per day"
+                                   ng-model="estimation.dayQaSpVelocity" ng-change="onRecalc()">
+                        </div>
+
+                        <label class="col-lg-2 control-label" for="holidayList">Holiday list [delimiter ";" ]</label>
+
+                        <div class="col-lg-2">
+                            <input type="text" class="form-control" id="holidayList"
+                                   placeholder="dd/mm/yyyy;dd/mm/yyyy..." ng-model="estimation.holidayList"
+                                   ng-change="onRecalc()">
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="row">
+                        <legend>Risks</legend>
+
+                        <label class="col-lg-2 control-label" for="devRisk">Dev risk, %</label>
+
+                        <div class="col-lg-2">
+                            <input type="number" class="form-control" id="devRisk" placeholder="%"
+                                   ng-model="estimation.devRisk" ng-change="onRecalc()">
+                        </div>
+
+                        <label class="col-lg-2 control-label" for="qaRisk">Qa risk, %</label>
+
+                        <div class="col-lg-2">
+                            <input type="number" class="form-control" id="qaRisk" placeholder="%"
+                                   ng-model="estimation.qaRisk" ng-change="onRecalc()">
+                        </div>
+
+                        <label class="col-lg-2 control-label" for="acceptanceDaysGap">Acceptance risk (days)</label>
+
+                        <div class="col-lg-2">
+                            <input type="number" class="form-control" id="acceptanceDaysGap"
+                                   placeholder="acceptanceDaysGap" ng-model="estimation.acceptanceDaysGap"
+                                   ng-change="onRecalc()">
+                        </div>
+                    </fieldset>
+
+                    <ng-include
+                            src="'pages/dashboard/widgets/CloudAppEstimation/CloudAppEstimation_GridControl.html'"></ng-include>
+
+                    <!--<button type="button" class="btn btn-primary btn-lg"  ng-click="onRecalc()">-->
+                    <!--Calculate-->
+                    <!--</button>-->
+
+                    <button type="button" class="btn btn-primary btn-lg" ng-click="onEstimationClearButton()">
+                        Reset Memory
+                    </button>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
