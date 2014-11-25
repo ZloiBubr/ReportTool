@@ -48,37 +48,6 @@ function pagebysizeModel() {
             data: [],
             name: "SmallDev"
         }
-/*
-        ,
-        {
-            data: [],
-            name: "XXXLQA"
-        },
-        {
-            data: [],
-            name: "XXLQA"
-        },
-        {
-            data: [],
-            name: "ExtraLargeQA"
-        },
-        {
-            data: [],
-            name: "LargeQA"
-        },
-        {
-            data: [],
-            name: "LargePlusQA"
-        },
-        {
-            data: [],
-            name: "MediumQA"
-        },
-        {
-            data: [],
-            name: "SmallQA"
-        }
-*/
     ];
 }
 
@@ -122,15 +91,6 @@ function parsePages(callback) {
                 )) {
                 putDataPoint(model, pageSize+"Dev", dateDevFinished, timeDevSpent, page);
             }
-/*
-            if(dateQAFinished > (new Date("Jan 1, 2014")).getTime() &&
-                (timeQASpent > 1. && (
-                page.status == "Resolved" ||
-                page.status == "Closed"
-                ))) {
-                putDataPoint(model, pageSize+"QA", dateQAFinished, timeQASpent, page);
-            }
-*/
         }
 
         //2. sort
