@@ -33,7 +33,7 @@ function pagebysizeChartController($scope, $resource, $window) {
                 zoomType: 'x'
             },
             title: {
-                text: 'Hours per SP by Cloud App',
+                text: 'Hours per Page',
                 x: -20 //center
             },
             subtitle: {

@@ -50,11 +50,14 @@
                             <span style="font-style: italic">{{version.restSP | number : 0}}</span>
                         </div>
                         <table class="table table-condensed" ng-if="showCards">
-                            <tr ng-repeat = "card in version.smeNames">
-                                <td ng-class="{accepted: card.accepted,
-                                    readyForAcceptance: card.readyForAcceptance,
-                                    readyForQA: card.readyForQA,
-                                    cancelled: card.cancelled,
+                            <tr ng-repeat = "card in version.cards">
+                                <td ng-class="{
+                                    blocked: card.status == 'Blocked',
+                                    accepted: card.status == 'Accepted',
+                                    readyForAcceptance: card.status == 'Resolved',
+                                    readyForQA: card.status == 'Ready for QA' || card.status == 'Testing in Progress',
+                                    cancelled: card.status == 'Canceled',
+                                    production: card.status == 'Production',
                                     'bg-info': true}">
                                     <div id="card_progress">
                                         <div class="bar" ng-style="{width: card.progress + '%'}"></div>
