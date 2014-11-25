@@ -128,8 +128,10 @@ function putDataPoint(moduledata, module, page, count) {
     moduled.progress = moduled.reportedSP*100/moduled.summarySP;
     moduled.pagescount = count;
 
-
     if(page) {
+        moduled.hasblockers = page.status == STATUS.BLOCKED.name;
+        moduled.hasdeferred = page.status == STATUS.DEFERRED.name;
+
         var moduleStatus = statusList.getStatusByName(moduled.status);
         var newStatus = statusList.getStatusByName(helpers.updateStatus(page.status, page.resolution));
 

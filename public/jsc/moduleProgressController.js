@@ -294,6 +294,8 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
                 card.uri = initUri + name + endUri + veryEndUri;
                 card.progress = card.summarySP > 0 ? card.reportedSP*100/card.summarySP : 0;
                 card.priority = card.priority < priorityNumber ? card.priority : priorityNumber;
+                card.hasblockers |= item.hasblockers;
+                card.hasdeferred |= item.hasdeferred;
 
                 var oldStatus = $scope.total.getStatusByName(card.status);
                 var newStatus = $scope.total.getStatusByName(status);
@@ -313,7 +315,9 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
                 dueDateConfirmed: item.dueDateConfirmed,
                 progress: item.progress,
                 priority: priorityNumber,
-                status: status
+                status: status,
+                hasblockers: item.hasblockers,
+                hasdeferred: item.hasdeferred
             };
             version.cards.push(newCard);
         }

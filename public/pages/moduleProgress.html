@@ -73,8 +73,8 @@
                                         <img ng-show="card.priority == 4" width="16" height="16" alt="Conf" src="img/4.png"/>
                                         <img ng-show="card.priority == 5" width="16" height="16" alt="Conf" src="img/5.png"/>
                                         <img ng-show="card.dueDateConfirmed" width="16" height="16" alt="Conf" src="img/duedate2.png"/>
-                                        <img ng-show="card.blocked" width="16" height="16" alt="Conf" src="img/ban.png"/>
-                                        <img ng-show="card.deferred" width="16" height="16" alt="Conf" src="img/deffered.png"/>
+                                        <img ng-show="card.hasblockers" width="16" height="16" alt="Conf" src="img/ban.png"/>
+                                        <img ng-show="card.hasdeferred" width="16" height="16" alt="Conf" src="img/deffered.png"/>
                                     </div>
                                     <a class="disp-block" href="{{card.uri}}">{{card.name}}</a>
                                 </td>
