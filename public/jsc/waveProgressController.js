@@ -2,7 +2,7 @@
  * Created by Heorhi_Vilkitski on 4/11/14.
  */
 
-function waveProgressController($scope, $resource, $window, $filter) {
+function waveProgressController($scope, $resource, $window, $filter, localStorageService) {
     var cloudAppDataResource = $resource('/wavedata');
 
     /* ------------------------------------------------------ Init/Reinit -------------------------------*/
@@ -197,6 +197,15 @@ function waveProgressController($scope, $resource, $window, $filter) {
         });
     }
 
+    function fillAllCombos() {
+        FillVersionsCombo();
+        FillGroupsCombo();
+        FillModulesCombo();
+        FillSmeCombo();
+        FillStreamsCombo();
+        SortCombos();
+    }
+
     $scope.processWithRowSpans = function () {
         $scope.total.pages = 0;
         $scope.cloudAppCards=[];
@@ -210,12 +219,7 @@ function waveProgressController($scope, $resource, $window, $filter) {
         if($scope.cloudAppData == undefined) {
             return;
         }
-        FillVersionsCombo();
-        FillGroupsCombo();
-        FillModulesCombo();
-        FillSmeCombo();
-        FillStreamsCombo();
-        SortCombos();
+        $scope.saveStorageToLocalDb();
 
         _.each($scope.cloudAppData.cloudApp, function(cloudAppItem){
             if($scope.filteredMG != $scope.allModuleGroups[0].id && cloudAppItem.moduleGroupName != $scope.filteredMG){
@@ -325,6 +329,8 @@ function waveProgressController($scope, $resource, $window, $filter) {
 
         var getCloudAppSuccess = function (data) {
             $scope.cloudAppData = data;
+            fillAllCombos();
+            $scope.loadStorageFromLocalDb();
             loadingDfrd.resolve();
         };
 
@@ -373,6 +379,65 @@ function waveProgressController($scope, $resource, $window, $filter) {
         $scope.processWithRowSpans();
     };
 
+    $scope.saveStorageToLocalDb = function() {
+        // save session
+        var storage = {
+            detailedView: $scope.detailedView,
+            filteredVersion: $scope.filteredVersion,
+            filteredSme: $scope.filteredSme,
+            filteredMG: $scope.filteredMG,
+            filteredM: $scope.filteredM,
+            filteredTeam: $scope.filteredTeam,
+            filteredStream: $scope.filteredStream,
+            total_deferred_isChecked: $scope.total.deferred.isChecked,
+            total_open_isChecked: $scope.total.open.isChecked,
+            total_reopened_isChecked: $scope.total.reopened.isChecked,
+            total_assigned_isChecked: $scope.total.assigned.isChecked,
+            total_inProgress_isChecked: $scope.total.inProgress.isChecked,
+            total_codeReview_isChecked: $scope.total.codeReview.isChecked,
+            total_readyForQA_isChecked: $scope.total.readyForQA.isChecked,
+            total_testingInProgress_isChecked: $scope.total.testingInProgress.isChecked,
+            total_blocked_isChecked: $scope.total.blocked.isChecked,
+            total_resolved_isChecked: $scope.total.resolved.isChecked,
+            total_accepted_isChecked: $scope.total.accepted.isChecked,
+            total_production_isChecked: $scope.total.production.isChecked,
+            total_all_isChecked: $scope.total.all.isChecked
+        };
+        localStorageService.set('waveProgressController', storage);
+    };
+
+    $scope.loadStorageFromLocalDb = function() {
+        // restore session
+        if(!_.isEmpty(localStorageService.get('waveProgressController')))
+        {
+            try {
+                var storage = localStorageService.get('waveProgressController');
+                $scope.detailedView = storage.detailedView;
+                $scope.filteredVersion = storage.filteredVersion;
+                $scope.filteredSme = storage.filteredSme;
+                $scope.filteredMG = storage.filteredMG;
+                $scope.filteredM = storage.filteredM;
+                $scope.filteredTeam = storage.filteredTeam;
+                $scope.filteredStream = storage.filteredStream;
+                $scope.total.deferred.isChecked = storage.total_deferred_isChecked;
+                $scope.total.open.isChecked = storage.total_open_isChecked;
+                $scope.total.reopened.isChecked = storage.total_reopened_isChecked;
+                $scope.total.assigned.isChecked = storage.total_assigned_isChecked;
+                $scope.total.inProgress.isChecked = storage.total_inProgress_isChecked;
+                $scope.total.codeReview.isChecked = storage.total_codeReview_isChecked;
+                $scope.total.readyForQA.isChecked = storage.total_readyForQA_isChecked;
+                $scope.total.testingInProgress.isChecked = storage.total_testingInProgress_isChecked;
+                $scope.total.blocked.isChecked = storage.total_blocked_isChecked;
+                $scope.total.resolved.isChecked = storage.total_resolved_isChecked;
+                $scope.total.accepted.isChecked = storage.total_accepted_isChecked;
+                $scope.total.production.isChecked = storage.total_production_isChecked;
+                $scope.total.all.isChecked = storage.total_all_isChecked;
+            }
+            catch (ex) {
+                console.error(ex);
+            }
+        }
+    };
 
     $scope.init();
 }

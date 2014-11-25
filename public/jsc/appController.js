@@ -5,7 +5,7 @@
  * Time: 21:51
  * To change this template use File | Settings | File Templates.
  */
-var myApp = angular.module('App', ["ngResource", "highcharts-ng", "ui.router", "ui.bootstrap","ui.utils"]);
+var myApp = angular.module('App', ["ngResource", "highcharts-ng", "ui.router", "ui.bootstrap","ui.utils", "LocalStorageModule"]);
 
 
 function appController($scope, $resource, $window) {
