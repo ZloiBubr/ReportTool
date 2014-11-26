@@ -2,6 +2,9 @@
     <div class="panel panel-default">
         <!-- Default panel contents -->
         <div class="panel-heading"><span class="glyphicon glyphicon-th-list"></span> Issues by blocked pages
+            <label class="pull-right">
+                <input ng-model="isHidePostAcceptance" ng-change="reInit()" type="checkbox"> Hide post-acceptance
+            </label>
         </div>
         <div class="panel-body" style="height: 500px; overflow: auto">
             <table class="table">

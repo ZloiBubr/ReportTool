@@ -12,21 +12,21 @@
             <td>End QA</td>
             <td>Acceptance</td>
         </tr>
-        <tr ng-repeat="module in streamValue.modules">
+        <tr ng-repeat="module in streamValue.modules" ng-init="module.done = (module.moduleStatus == 'Resolved' || module.moduleStatus == 'Closed')" ng-class="{done:module.done}">
             <td style="width: 100px">{{module.duedate | date:'MMM-dd-yyyy'}}</td>
-            <td style="width: 300px"><a href="{{module.uri}}">{{module.name}}<a/></td>
+            <td style="width: 300px"><a href="{{module.uri}}">{{module.name}}</a></td>
             <td style="width: 100px">{{module.summarySP}}</td>
             <td style="width: 100px">{{module.summarySP - module.reportedSP | number:1}}</td>
             <td style="width: 100px">{{module.devLeftWorkDays | number:1}}</td>
             <td style="width: 150px">
                 <div class="input-group">
                     <span class="input-group-addon">auto:{{module.qaLeftWorkDays | number:1}}</span>
-                    <input type="number" class="form-control" ng-model="module.qaLeftCustomDays" ng-change="onEstimationCalculateButton()"/>
+                    <input type="number" class="form-control" ng-model="module.qaLeftCustomDays" ng-change="onRecalc()"/>
                 </div>
             </td>
-            <td class="{{dateEqualColor(module.duedate, module.endDevDate)}}"><span tooltip-placement="bottom" tooltip-html-unsafe="{{daysDiff(module.duedate, module.endDevDate)}}">{{module.endDevDate | date: 'M/d/yyyy'}}</span></td>
-            <td class="{{dateEqualColor(module.duedate, module.endQADate)}}"><span tooltip-placement="bottom" tooltip-html-unsafe="{{daysDiff(module.duedate, module.endQADate)}}">{{module.endQADate | date: 'M/d/yyyy'}}</span></td>
-            <td class="{{dateEqualColor(module.duedate, module.endAccDate)}}"><span tooltip-placement="bottom" tooltip-html-unsafe="{{daysDiff(module.duedate, module.endAccDate)}}">{{module.endAccDate | date: 'M/d/yyyy'}}</span></td>
+            <td ng-class="module.done ? 'accepted' : dateEqualColor(module.duedate, module.endDevDate)"><span tooltip-placement="bottom" tooltip-html-unsafe="{{daysDiff(module.duedate, module.endDevDate)}}">{{module.endDevDate | date: 'M/d/yyyy'}}</span></td>
+            <td ng-class="module.done ? 'accepted' : dateEqualColor(module.duedate, module.endQADate)"><span tooltip-placement="bottom" tooltip-html-unsafe="{{daysDiff(module.duedate, module.endQADate)}}">{{module.endQADate | date: 'M/d/yyyy'}}</span></td>
+            <td ng-class="module.done ? 'accepted' : dateEqualColor(module.duedate, module.endAccDate)"><span tooltip-placement="bottom" tooltip-html-unsafe="{{daysDiff(module.duedate, module.endAccDate)}}">{{module.endAccDate | date: 'M/d/yyyy'}}</span></td>
         </tr>
     </table>
     <br/>

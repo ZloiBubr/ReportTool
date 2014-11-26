@@ -86,7 +86,7 @@ function CloudAppEstimationController($scope, $resource, $window, $filter, local
             $scope.estimation.streams[streamItem] = $scope.estimation.streams[streamItem] || {};
             $scope.estimation.streams[streamItem].modules = _.sortBy(_.filter($scope.moduleProgressData.module, function(moduleItem){
                 return moduleItem.streamName === streamShortCut;
-            }), function(item){return item.duedate});
+            }), function(item){return [item.duedate, $scope.getPriorityNumber(item.priority)].join("_");});
 
             if(restored_model) {
                 _.each($scope.estimation.streams[streamItem].modules, function (moduleItem) {
@@ -94,7 +94,7 @@ function CloudAppEstimationController($scope, $resource, $window, $filter, local
                         return storModuleItem.key === moduleItem.key;
                     });
 
-                    if(!_.isUndefined(module) || _.isNumber(module.qaLeftCustomDays)){
+                    if(!_.isUndefined(module) && _.isNumber(module.qaLeftCustomDays)){
                         moduleItem.qaLeftCustomDays = module.qaLeftCustomDays;
                     }
                 });

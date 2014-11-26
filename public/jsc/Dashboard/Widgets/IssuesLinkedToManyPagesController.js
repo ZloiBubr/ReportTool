@@ -14,11 +14,13 @@ function IssuesLinkedToManyPagesController($scope, $resource, $window, $filter, 
 
         $scope.nowDate = new Date();
         $scope.nowDate.setHours(12,0,0);
+        $scope.isHidePostAcceptance = true;
 
         //$scope.TeamFilter = "TeamNova"
     };
 
     $scope.reInit = function () {
+        $scope.IssuesLinkedToManyPagesList = [];
         $scope.prepareData();
     };
 
@@ -32,10 +34,17 @@ function IssuesLinkedToManyPagesController($scope, $resource, $window, $filter, 
             item.blockersCount = linkedPagesResult.blockersCount;
             item.dueDate = linkedPagesResult.dueDate;
 
+
+            // filter for Post-acceptance bugs
+            if($scope.isHidePostAcceptance && _.some(item.labels, function(labelItem){return labelItem === "Post-acceptance"})) {
+                return;
+            }
+
             // filter issues where more than 0 blockers
             if($scope.getBlockersCount(item) > 0) {
                 $scope.IssuesLinkedToManyPagesList.push(item);
             }
+
         }, true);
 
         // Sorting issues based on blockersCount
