@@ -48,14 +48,10 @@ function parsePages(callback) {
         for (var k = 0; k < velocity.data.length; k++) {
             var team = velocity.data[k];
             team.data.sort(function (a, b) {
-                a = new Date(a.x);
-                b = new Date(b.x);
-                return a > b ? 1 : a < b ? -1 : 0;
+                var aa = new Date(a.x);
+                var bb = new Date(b.x);
+                return aa > bb ? 1 : aa < bb ? -1 : 0;
             });
-        }
-        //3. round
-        for (var k = 0; k < velocity.data.length; k++) {
-            var team = velocity.data[k];
             for (var l = 0; l < team.data.length; l++) {
                 team.data[l].y = Math.round(team.data[l].y*10)/10;
             }
