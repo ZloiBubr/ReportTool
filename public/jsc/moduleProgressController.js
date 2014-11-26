@@ -262,7 +262,7 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
         //calculating data for top table
         var teamName = moduleProgressItem.teamName;
         if($scope.showStreams) {
-            teamName += moduleProgressItem.streamName;
+            teamName = moduleProgressItem.streamName ? teamName + ':' + moduleProgressItem.streamName : teamName;
         }
         var teamObj = getTeamObj(teamName);
         for(var j=0; j<teamObj.versions.length; j++) {

@@ -1,7 +1,7 @@
 function Teams() {
     this.teams = [
         {
-            id: "TeamRenaissance",
+            id: "Renaissance",
             name: "Renaissance",
             teamLead: "Aliaksandr Koush",
             qaTeamLead: "Aliaksandra Kutynka",
@@ -34,7 +34,7 @@ function Teams() {
             ]
         },
         {
-            id: "TeamInspiration",
+            id: "Inspiration",
             name: "Inspiration",
             teamLead: "Sergey Tischenko",
             qaTeamLead: "Denys Pugachov",
@@ -64,7 +64,7 @@ function Teams() {
             ]
         },
         {
-            id: "TeamNova",
+            id: "Nova",
             name: "Nova",
             teamLead: "Heorhi Vilkitski",
             qaTeamLead: "Valiantsina Krautsevich",
@@ -96,7 +96,7 @@ function Teams() {
             ]
         },
         {
-            id: "TeamLiberty",
+            id: "Liberty",
             name: "Liberty",
             teamLead: "Dzmitry Tabolich",
             qaTeamLead: "Iryna Kutsko",
@@ -129,7 +129,7 @@ function Teams() {
             ]
         },
         {
-            id: "TeamViva",
+            id: "Viva",
             name: "Viva",
             teamLead: "Valentine Zhuck",
             qaTeamLead: "Katsiaryna Kuchko",
@@ -159,6 +159,17 @@ function Teams() {
                 "Liudmila Barshcheuskaya",
                 "Iryna Razorionova",
                 "Katsiaryna Kuchko"
+            ]
+        },
+        {
+            id: "Elfish",
+            name: "Elfish",
+            teamLead: "Serhiy Haponenko",
+            qaTeamLead: "",
+            developers: [
+                "Serhiy Haponenko"
+            ],
+            testers: [
             ]
         },
         {
