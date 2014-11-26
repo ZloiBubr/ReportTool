@@ -335,6 +335,7 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
             fillAllCombos();
             $scope.processWithRowSpans(false);
             $scope.loadStorageFromLocalDb();
+            FillStreamsCombo();
             $scope.processWithRowSpans(true);
             loadingDfrd.resolve();
         };
@@ -382,6 +383,10 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
         $scope.total.total = 0;
         $scope.total.pages = 0;
         $scope.processWithRowSpans(true);
+    };
+    $scope.filterTeam = function() {
+        FillStreamsCombo();
+        $scope.filterModule();
     };
 
     $scope.saveStorageToLocalDb = function() {
