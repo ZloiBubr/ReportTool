@@ -1,7 +1,7 @@
 function Teams() {
     this.teams = [
         {
-            id: "TeamRenaissance",
+            id: "Renaissance",
             name: "Renaissance",
             streams: ["StreamR1", "StreamR2", "StreamR3"],
             teamLead: "Aliaksandr Koush",
@@ -35,7 +35,7 @@ function Teams() {
             ]
         },
         {
-            id: "TeamInspiration",
+            id: "Inspiration",
             name: "Inspiration",
             streams: ["StreamIn1", "StreamIn2", "StreamIn3"],
             teamLead: "Sergey Tischenko",
@@ -66,7 +66,7 @@ function Teams() {
             ]
         },
         {
-            id: "TeamNova",
+            id: "Nova",
             name: "Nova",
             streams: ["StreamN1", "StreamN2", "StreamN3"],
             teamLead: "Heorhi Vilkitski",
@@ -99,7 +99,7 @@ function Teams() {
             ]
         },
         {
-            id: "TeamLiberty",
+            id: "Liberty",
             name: "Liberty",
             streams: ["StreamL1", "StreamL2", "StreamL3"],
             teamLead: "Dzmitry Tabolich",
@@ -133,7 +133,7 @@ function Teams() {
             ]
         },
         {
-            id: "TeamViva",
+            id: "Viva",
             name: "Viva",
             streams: ["StreamV1", "StreamV2", "StreamV3"],
             teamLead: "Valentine Zhuck",
@@ -164,6 +164,17 @@ function Teams() {
                 "Liudmila Barshcheuskaya",
                 "Iryna Razorionova",
                 "Katsiaryna Kuchko"
+            ]
+        },
+        {
+            id: "Elfish",
+            name: "Elfish",
+            teamLead: "Serhiy Haponenko",
+            qaTeamLead: "",
+            developers: [
+                "Serhiy Haponenko"
+            ],
+            testers: [
             ]
         },
         {

@@ -3,100 +3,94 @@ var RESOLUTION = require('../public/jsc/models/statusList').RESOLUTION;
 var persons = require('./persons');
 
 exports.getTeamName = function (labels) {
-    var index = labels.indexOf("Team");
-    if(index < 0) {
-        return "";
+    var labelsArray = labels.split(',');
+    for(var i=0; i<labelsArray.length; i++) {
+        var label = labelsArray[i];
+        if(label.indexOf("Team") == 0) {
+            return labelsArray[i].substring(4);
+        }
     }
-    var index2 = labels.indexOf(',', index);
-    if(index2 < 0) {
-        index2 = labels.length;
-    }
-
-    return labels.substring(index+4,index2);
+    return "--";
 };
 
 exports.getModuleGroupName = function(labels) {
-    var index = labels.indexOf("PageModuleGroup_");
-    if(index < 0) {
-        return "UnknownModuleGroup";
+    var labelsArray = labels.split(',');
+    for(var i=0; i<labelsArray.length; i++) {
+        var label = labelsArray[i];
+        if(label.indexOf("PageModuleGroup_") == 0) {
+            return labelsArray[i].substring(16);
+        }
     }
-    var index2 = labels.indexOf(',', index);
-    if(index2 < 0) {
-        index2 = labels.length;
-    }
-
-    return labels.substring(index+16,index2);
+    return "PageModuleGroup--";
 };
 
 exports.getModuleName= function(labels) {
-    var index = labels.indexOf("PageModule_");
-    if(index < 0) {
-        return "UnknownModule";
+    var labelsArray = labels.split(',');
+    for(var i=0; i<labelsArray.length; i++) {
+        var label = labelsArray[i];
+        if(label.indexOf("PageModule_") == 0) {
+            return labelsArray[i].substring(11);
+        }
     }
-    var index2 = labels.indexOf(',', index);
-    if(index2 < 0) {
-        index2 = labels.length;
-    }
-
-    return labels.substring(index+11,index2);
+    return "PageModule--";
 };
 
 exports.getCloudAppName = function(labels) {
-    var indexpp = labels.indexOf("CloudApp_ParentPage");
-    var index = labels.indexOf("CloudApp_");
-    if(indexpp > -1 && indexpp == index) {
-        index = labels.indexOf("CloudApp_", indexpp+1);
+    var labelsArray = labels.split(',');
+    for(var i=0; i<labelsArray.length; i++) {
+        var label = labelsArray[i];
+        if(label.indexOf("CloudApp_") == 0) {
+            if(label == "CloudApp_ParentPage") {
+                continue;
+            }
+            return labelsArray[i].substring(11);
+        }
     }
-    if(index < 0) {
-        return "UnknownCloudApp";
-    }
-    var index2 = labels.indexOf(',', index);
-    if(index2 < 0) {
-        index2 = labels.length;
-    }
-
-    return labels.substring(index+9,index2);
+    return "CloudApp--";
 };
 
 exports.isParentPage = function(labels) {
-    var indexpp = labels.indexOf("CloudApp_ParentPage");
-    if(indexpp > -1) {
-        return true;
+    var labelsArray = labels.split(',');
+    for(var i=0; i<labelsArray.length; i++) {
+        var label = labelsArray[i];
+        if(label.indexOf("CloudApp_ParentPage") == 0) {
+            return true;
+        }
     }
+    return false;
 };
 
 exports.getWaveName = function(labels) {
-    var index = labels.indexOf("Wave");
-    if(index < 0) {
-        return "UnknownWave";
+    var labelsArray = labels.split(',');
+    for(var i=0; i<labelsArray.length; i++) {
+        var label = labelsArray[i];
+        if(label.indexOf("Wave") == 0) {
+            return label;
+        }
     }
-    var index2 = labels.indexOf(',', index);
-    if(index2 < 0) {
-        index2 = labels.length;
-    }
-
-    return labels.substring(index,index2);
+    return "Wave--";
 };
 
 exports.getStreamName = function(labels) {
-    var index = labels.indexOf("Stream");
-    if(index < 0) {
-        return "";
+    var labelsArray = labels.split(',');
+    for(var i=0; i<labelsArray.length; i++) {
+        var label = labelsArray[i];
+        if(label.indexOf("Stream") == 0) {
+            return labelsArray[i].substring(6);
+        }
     }
-    var index2 = labels.indexOf(',', index);
-    if(index2 < 0) {
-        index2 = labels.length;
-    }
-
-    return labels.substring(index+6,index2);
+    return "";
 };
 
 exports.getDueDateConfirmed = function(labels) {
-    var index = labels.indexOf("DueDateConfirmed");
-    if(index < 0) {
-        return false;
+    var labelsArray = labels.split(',');
+    for(var i=0; i<labelsArray.length; i++) {
+        var label = labelsArray[i];
+        if(label.indexOf("DueDateConfirmed") == 0) {
+            return true;
+        }
     }
-    return true;
+    return false;
 };
 
 exports.isActive = function(status, resolution) {

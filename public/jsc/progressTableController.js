@@ -108,14 +108,6 @@ function progressTableController($scope, $resource, $window) {
         return missedMembers;
     };
 
-    $scope.jiraLabelsTeams = [
-        {"id": "TeamNova", "title": "TeamNova"},
-        {"id": "TeamRenaissance", "title": "TeamRenaissance"},
-        {"id": "TeamInspiration", "title": "TeamInspiration"}
-    ];
-
-
-
     $scope.init();
 }
 
