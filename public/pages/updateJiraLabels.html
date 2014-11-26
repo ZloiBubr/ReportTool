@@ -26,18 +26,80 @@
         </div>
 
         <div class="form-group">
-            <label class="control-label col-lg-2" for="input-label-delete">Labels to delete:</label>
+            <label class="control-label col-lg-2" for="input-label-add">Add single label:</label>
             <div class="col-lg-3">
-                <input name="labelstodelete" ng-model="labelstodelete" type="text" class="form-control" id="input-label-delete" placeholder="Labels to delete">
-                <p class="help-block">Please use comma as separator</p>
+                <input name="labelstoadd" ng-model="labelstoadd"
+                       ng-disabled="labelstodelete.length > 0 ||
+                       watcherstoadd.length > 0 ||
+                       watcherstodelete.length > 0 ||
+                       assigneename.length > 0 ||
+                       priorityname.length > 0"
+                       type="text" class="form-control" id="input-label-add" placeholder="Label">
             </div>
         </div>
 
         <div class="form-group">
-            <label class="control-label col-lg-2" for="input-label-add">Labels to add:</label>
+            <label class="control-label col-lg-2" for="input-label-delete">Delete single label:</label>
             <div class="col-lg-3">
-                <input name="labelstoadd" ng-model="labelstoadd" type="text" class="form-control" id="input-label-add" placeholder="Labels to add">
-                <p class="help-block">Please use comma as separator</p>
+                <input name="labelstodelete" ng-model="labelstodelete"
+                       ng-disabled="labelstoadd.length > 0 ||
+                       watcherstoadd.length > 0 ||
+                       watcherstodelete.length > 0 ||
+                       assigneename.length > 0 ||
+                       priorityname.length > 0"
+                       type="text" class="form-control" id="input-label-delete" placeholder="Label">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-lg-2" for="input-label-wadd">Add watcher:</label>
+            <div class="col-lg-3">
+                <input name="watcherstoadd" ng-model="watcherstoadd"
+                       ng-disabled="labelstoadd.length > 0 ||
+                       labelstodelete.length > 0 ||
+                       watcherstodelete.length > 0 ||
+                       assigneename.length > 0 ||
+                       priorityname.length > 0"
+                       type="text" class="form-control" id="input-label-wadd" placeholder="Watcher name">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-lg-2" for="input-label-wdelete">Delete watcher:</label>
+            <div class="col-lg-3">
+                <input name="watcherstodelete" ng-model="watcherstodelete"
+                       ng-disabled="labelstoadd.length > 0 ||
+                       watcherstoadd.length > 0 ||
+                       labelstodelete.length > 0 ||
+                       assigneename.length > 0 ||
+                       priorityname.length > 0"
+                       type="text" class="form-control" id="input-label-wdelete" placeholder="Watcher name">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-lg-2" for="input-label-assignee">Update assignee:</label>
+            <div class="col-lg-3">
+                <input name="assigneename" ng-model="assigneename"
+                       ng-disabled="labelstoadd.length > 0 ||
+                       watcherstoadd.length > 0 ||
+                       labelstodelete.length > 0 ||
+                       watcherstodelete.length > 0 ||
+                       priorityname.length > 0"
+                       type="text" class="form-control" id="input-label-assignee" placeholder="Assignee name">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-lg-2" for="input-label-priority">Update priority:</label>
+            <div class="col-lg-3">
+                <input name="priorityname" ng-model="priorityname"
+                       ng-disabled="labelstoadd.length > 0 ||
+                       watcherstoadd.length > 0 ||
+                       labelstodelete.length > 0 ||
+                       assigneename.length > 0 ||
+                       watcherstodelete.length > 0"
+                       type="text" class="form-control" id="input-label-priority" placeholder="Priority name">
             </div>
         </div>
 

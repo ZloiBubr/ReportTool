@@ -11,6 +11,7 @@ function pagebysizeChartController($scope, $resource, $window) {
     /* ------------------------------------------------------ Init/Reinit -------------------------------*/
     $scope.init = function () {
         $scope.common = {};
+        $scope.tabledata = [];
 
         $scope.dataLoad();
     };
@@ -84,6 +85,7 @@ function pagebysizeChartController($scope, $resource, $window) {
                         return itemSeries.data.length > 1 ? fitData(itemSeries.data).data : itemSeries.data;
                     })()
                 });
+                $scope.tabledata.push($scope.getSizeData(itemSeries));
             });
 
             $scope.chartsData.data = _.union($scope.chartsData.data, averageSeries);
@@ -99,6 +101,27 @@ function pagebysizeChartController($scope, $resource, $window) {
         return loadingDfrd.promise();
     };
 
+    $scope.getSizeData = function (series) {
+        var sizeObj = {};
+        sizeObj.name = series.name;
+        sizeObj.min = 1000.;
+        sizeObj.max = 0.;
+        sizeObj.avg = 0.;
+        sizeObj.count = 0;
+        for(var i=0; i<series.data.length; i++) {
+            sizeObj.count++;
+            var y = series.data[i].y;
+            if(sizeObj.min > y) {
+                sizeObj.min = y;
+            }
+            if(sizeObj.max < y) {
+                sizeObj.max = y;
+            }
+            sizeObj.avg += y;
+        }
+        sizeObj.avg = sizeObj.avg/sizeObj.count;
+        return sizeObj;
+    };
     /* ------------------------------------------- DOM/Angular events --------------------------------------*/
     $scope.searchIssues = function () {
         $scope.reInit();

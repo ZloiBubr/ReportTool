@@ -23,7 +23,7 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
         $scope.filteredVersion = $scope.allVersions[0].id;
         $scope.isTotalWasCalculated = false;
         $scope.reInitTotal();
-        $scope.getModuleData().done($scope.processWithRowSpans);
+        $scope.getModuleData();
         $scope.teamLoadData = [];
     };
 
@@ -155,20 +155,22 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
         SortCombos();
     }
 
-    $scope.processWithRowSpans = function () {
+    $scope.processWithRowSpans = function (addCards) {
         $scope.total.doneSP = 0;
         $scope.total.summSP = 0;
         $scope.teamLoadData = [];
         if($scope.moduleProgressData == undefined) {
             return;
         }
-        $scope.saveStorageToLocalDb();
+        if(addCards) {
+            $scope.saveStorageToLocalDb();
+        }
 
         _.each($scope.moduleProgressData.module, function(moduleProgressItem) {
-            if($scope.filteredMG != $scope.allModuleGroups[0].id && moduleProgressItem.moduleGroup != $scope.filteredMG){
+            if(addCards && $scope.filteredMG != $scope.allModuleGroups[0].id && moduleProgressItem.moduleGroup != $scope.filteredMG){
                 return;
             }
-            if($scope.filteredVersion != $scope.allVersions[0].id) {
+            if(addCards && $scope.filteredVersion != $scope.allVersions[0].id) {
                 if($scope.filteredVersion == "Q1") {
                     if(!(moduleProgressItem.fixVersions == "2.0 January 2015" ||
                         moduleProgressItem.fixVersions == "3.0 February 2015" ||
@@ -194,10 +196,10 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
                     return;
                 }
             }
-            if($scope.filteredSme != $scope.allSMEs[0].id && moduleProgressItem.smename != $scope.filteredSme){
+            if(addCards && $scope.filteredSme != $scope.allSMEs[0].id && moduleProgressItem.smename != $scope.filteredSme){
                 return;
             }
-            if($scope.filteredTeam != $scope.allTeams[0].id&& moduleProgressItem.teamName != $scope.filteredTeam) {
+            if(addCards && $scope.filteredTeam != $scope.allTeams[0].id&& moduleProgressItem.teamName != $scope.filteredTeam) {
                 return;
             }
 
@@ -205,7 +207,7 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
                 moduleProgressItem.moduleResolution == $scope.RESOLUTION.OUTOFSCOPE.name) {
                 var cancelledEntity = $scope.total.getStatusByName($scope.STATUS.CANCELED.name);
                 processEntity(cancelledEntity, moduleProgressItem);
-                if(cancelledEntity.isChecked) {
+                if(addCards && cancelledEntity.isChecked) {
                     ProcessCards(moduleProgressItem, $scope.STATUS.CANCELED.name);
                 }
             }
@@ -214,14 +216,14 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
                 moduleProgressItem.pagescount < 1) {
                 var notApplicableEntity = $scope.total.getStatusByName($scope.STATUS.NOTAPPLICABLE.name);
                 processEntity(notApplicableEntity, moduleProgressItem);
-                if(notApplicableEntity.isChecked) {
+                if(addCards && notApplicableEntity.isChecked) {
                    ProcessCards(moduleProgressItem, $scope.STATUS.CANCELED.name);
                 }
             }
             else if(moduleProgressItem.status == $scope.STATUS.ACCEPTED.name) {
                 var acceptedEntity = $scope.total.getStatusByName($scope.STATUS.ACCEPTED.name);
                 processEntity(acceptedEntity, moduleProgressItem);
-                if(acceptedEntity.isChecked) {
+                if(addCards && acceptedEntity.isChecked) {
                     ProcessCards(moduleProgressItem, $scope.STATUS.ACCEPTED.name);
                 }
             }
@@ -229,21 +231,21 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
                 moduleProgressItem.status == $scope.STATUS.TESTINGINPROGRESS.name) {
                 var readyForQaEntity = $scope.total.getStatusByName($scope.STATUS.READYFORQA.name);
                 processEntity(readyForQaEntity, moduleProgressItem);
-                if(readyForQaEntity.isChecked) {
+                if(addCards && readyForQaEntity.isChecked) {
                     ProcessCards(moduleProgressItem, $scope.STATUS.READYFORQA.name);
                 }
             }
             else if(moduleProgressItem.status == $scope.STATUS.RESOLVED.name) {
                 var resolvedEntity = $scope.total.getStatusByName($scope.STATUS.RESOLVED.name);
                 processEntity(resolvedEntity, moduleProgressItem);
-                if(resolvedEntity.isChecked) {
+                if(addCards && resolvedEntity.isChecked) {
                   ProcessCards(moduleProgressItem, $scope.STATUS.RESOLVED.name);
                 }
             }
             else {
                 var inProgressEntity = $scope.total.getStatusByName($scope.STATUS.INPROGRESS.name);
                 processEntity(inProgressEntity, moduleProgressItem);
-                if(inProgressEntity.isChecked) {
+                if(addCards && inProgressEntity.isChecked) {
                     ProcessCards(moduleProgressItem, $scope.STATUS.INPROGRESS.name);
                 }
             }
@@ -382,7 +384,9 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
         var getModuleSuccess = function (data) {
             $scope.moduleProgressData = data;
             fillAllCombos();
+            $scope.processWithRowSpans(false);
             $scope.loadStorageFromLocalDb();
+            $scope.processWithRowSpans(true);
             loadingDfrd.resolve();
         };
 
@@ -412,7 +416,7 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
         $scope.total.cancelled.isChecked = $scope.total.all.isChecked;
         $scope.total.notApplicable.isChecked = $scope.total.all.isChecked;
 
-        $scope.processWithRowSpans();
+        $scope.processWithRowSpans(true);
     };
 
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
@@ -424,7 +428,7 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
         $scope.total.resetCounters();
         $scope.total.total = 0;
         $scope.total.pages = 0;
-        $scope.processWithRowSpans();
+        $scope.processWithRowSpans(true);
     };
 
     $scope.isUnknownExist = function(item)

@@ -10,21 +10,21 @@
                 <img width="16" height="16" alt="Conf" src="img/4.png"/>
                 <img width="16" height="16" alt="Conf" src="img/5.png"/> Priority</li>
             <li><br/></li>
-            <li><input type="checkbox" ng-model="showStreams" ng-change="processWithRowSpans()"> Streams</li>
-            <li><input type="checkbox" ng-model="showCards" ng-change="processWithRowSpans()"> Cards</li>
-            <li><input type="checkbox" ng-model="showModules" ng-change="processWithRowSpans()"> SME / Modules</li>
+            <li><input type="checkbox" ng-model="showStreams" ng-change="processWithRowSpans(true)"> Streams</li>
+            <li><input type="checkbox" ng-model="showCards" ng-change="processWithRowSpans(true)"> Cards</li>
+            <li><input type="checkbox" ng-model="showModules" ng-change="processWithRowSpans(true)"> SME / Modules</li>
             <li><br/></li>
             <li>Fix Version:<select class="form-control headerSelectWidth" ng-model="filteredVersion" class="headerSelectWidth" ng-options="version.name as version.name for version in allVersions" ng-change="filterModule()"></select></li>
             <li>SME:<select class="form-control headerSelectWidth" ng-model="filteredSme" class="headerSelectWidth" ng-options="sme.name as sme.name for sme in allSMEs" ng-change="filterModule()"></select></li>
             <li>Module Group:<select style="max-width: 250px !important;" class="form-control headerSelectWidth" ng-model="filteredMG" class="headerSelectWidth" ng-options="moduleGroup.name as moduleGroup.name for moduleGroup in allModuleGroups" ng-change="filterModule()"></select></li>
             <li>Team:<select class="form-control headerSelectWidth" ng-model="filteredTeam" class="headerSelectWidth" ng-options="team.name as team.name for team in allTeams" ng-change="filterModule()"></select></li>
             <li><br/></li>
-            <li><input type="checkbox" ng-model="total.inProgress.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-play"></span><strong> {{total.inProgress.count}}</strong>:In Progress</li>
-            <li class="readyForQA"><input type="checkbox" ng-model="total.readyForQA.isChecked" ng-change="processWithRowSpans()"> <span class="glyphicon glyphicon-th-list"></span><strong> {{total.readyForQA.count}}</strong>:Testing is in prog</li>
-            <li class="readyForAcceptance"><input type="checkbox" ng-model="total.resolved.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-check"></span><strong> {{total.resolved.count}}</strong>:Resolved</li>
-            <li class="accepted"><input type="checkbox" ng-model="total.accepted.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-star"></span><strong> {{total.accepted.count}}</strong>:Accepted</li>
-            <li class="cancelled"><input type="checkbox" ng-model="total.cancelled.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-ban-circle"></span><strong> {{total.cancelled.count}}</strong>:Out Of Scope</li>
-            <li class="cancelled"><input type="checkbox" ng-model="total.notApplicable.isChecked" ng-change="processWithRowSpans()"><span class="glyphicon glyphicon-ban-circle"></span><strong> {{total.notApplicable.count}}</strong>:Not Applicable</li>
+            <li><input type="checkbox" ng-model="total.inProgress.isChecked" ng-change="processWithRowSpans(true)"><span class="glyphicon glyphicon-play"></span><strong> {{total.inProgress.count}}</strong>:In Progress</li>
+            <li class="readyForQA"><input type="checkbox" ng-model="total.readyForQA.isChecked" ng-change="processWithRowSpans(true)"> <span class="glyphicon glyphicon-th-list"></span><strong> {{total.readyForQA.count}}</strong>:Testing is in prog</li>
+            <li class="readyForAcceptance"><input type="checkbox" ng-model="total.resolved.isChecked" ng-change="processWithRowSpans(true)"><span class="glyphicon glyphicon-check"></span><strong> {{total.resolved.count}}</strong>:Resolved</li>
+            <li class="accepted"><input type="checkbox" ng-model="total.accepted.isChecked" ng-change="processWithRowSpans(true)"><span class="glyphicon glyphicon-star"></span><strong> {{total.accepted.count}}</strong>:Accepted</li>
+            <li class="cancelled"><input type="checkbox" ng-model="total.cancelled.isChecked" ng-change="processWithRowSpans(true)"><span class="glyphicon glyphicon-ban-circle"></span><strong> {{total.cancelled.count}}</strong>:Out Of Scope</li>
+            <li class="cancelled"><input type="checkbox" ng-model="total.notApplicable.isChecked" ng-change="processWithRowSpans(true)"><span class="glyphicon glyphicon-ban-circle"></span><strong> {{total.notApplicable.count}}</strong>:Not Applicable</li>
             <li><br/></li>
             <li><input type="checkbox" ng-model="total.all.isChecked" ng-change="onSelectDeselectAll()"><span class="glyphicon glyphicon-shopping-cart"></span><strong> {{total.total}}</strong>:Total</li>
             <li><br/></li>

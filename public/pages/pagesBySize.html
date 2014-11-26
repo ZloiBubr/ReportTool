@@ -1,1 +1,25 @@
-<div id="container" style="min-width: 310px; height: 600px; margin: 0 auto" ng-controller="pagebysizeChartController"></div>
+<div ng-controller="pagebysizeChartController">
+    <div id="container" style="min-width: 310px; height: 600px; margin: 0 auto">
+
+    </div>
+    <div>
+        <table class="table table-bordered">
+            <thead>
+            <th>Size</th>
+            <th>Min, Hrs</th>
+            <th>Max, Hrs</th>
+            <th>Avg, Hrs</th>
+            <th>Pages</th>
+            </thead>
+            <tbody>
+            <tr ng-repeat="size in tabledata">
+                <td>{{size.name}}</td>
+                <td>{{size.min | number : 0}}</td>
+                <td>{{size.max | number : 0}}</td>
+                <td>{{size.avg | number : 0}}</td>
+                <td>{{size.count | number : 0}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
