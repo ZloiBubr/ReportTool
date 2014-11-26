@@ -43,7 +43,7 @@ exports.getCloudAppName = function(labels) {
             if(label == "CloudApp_ParentPage") {
                 continue;
             }
-            return labelsArray[i].substring(11);
+            return labelsArray[i].substring(9);
         }
     }
     return "CloudApp--";
