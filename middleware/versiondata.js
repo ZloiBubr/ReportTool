@@ -24,7 +24,7 @@ function parsePages(callback) {
 
     Version.find({numerical: VERSION.NUMBER}).exec(function(err, versions) {
         if(versions && versions.length > 0) {
-            versiondata.version.number = versions[0].number;
+            versiondata.version.number = versions[0].numerical;
             versiondata.version.name = versions[0].name;
             versiondata.version.updated = versions[0].updated;
         }
