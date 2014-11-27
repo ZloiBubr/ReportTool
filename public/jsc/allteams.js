@@ -52,7 +52,6 @@ function Teams() {
                 "Vladyslav Pilhui",
                 "Oleksandr Zhyltsov",
                 "Oleksii Suriadnyi",
-                "Roman Golovchenko",
                 "Serhiy Haponenko",
                 "Yevhenii Lomov",
                 "Ihor Rudchenko",
@@ -124,7 +123,6 @@ function Teams() {
                 "Vitali Podobed",
                 "Hleb Krotsik",
                 "Uladzimir Vysotski"
-
             ],
             testers: [
                 "Anna Novikova",
@@ -173,10 +171,10 @@ function Teams() {
         {
             id: "Elfish",
             name: "Elfish",
-            teamLead: "Serhiy Haponenko",
+            teamLead: "Roman Golovchenko",
             qaTeamLead: "",
             developers: [
-                "Serhiy Haponenko",
+                "Roman Golovchenko",
                 "Allaberdi Hojayev",
                 "Bohdan Sorokin",
                 "Yevhenii Koliesnik"
