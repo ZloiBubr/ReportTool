@@ -14,6 +14,7 @@ var progress = require('./routes/calcprogress');
 var wavedata = require('./routes/calcwave');
 var moduledata = require('./routes/calcmodule');
 var personaldata = require('./routes/personaldata');
+var versiondata = require('./routes/versiondata');
 var issuesDataRouter = require('./routes/issuesDataRouter');
 var http = require('http');
 var path = require('path');
@@ -90,6 +91,7 @@ app.get('/wavedata', wavedata.get);
 app.get('/moduledata', moduledata.get);
 app.get('/personaldata/:fromDate/:toDate', personaldata.get);
 app.get('/issuesdata', issuesDataRouter.get);
+app.get('/versiondata', versiondata.get);
 
 http.createServer(app).listen(config.get('port'), function () {
     log.info('Express server listening on port ' + config.get('port'));

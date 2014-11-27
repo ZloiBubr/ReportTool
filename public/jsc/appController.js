@@ -43,6 +43,7 @@ function appController($scope, $resource, $window) {
     $scope.statuses = $window.exports.statuses;
     $scope.STATUS = $window.exports.STATUS;
     $scope.RESOLUTION = $window.exports.RESOLUTION;
+    $scope.VERSION = $window.exports.VERSION;
 
     $scope.getPriorityNumber = $window.exports.getPriorityNumber;
 }

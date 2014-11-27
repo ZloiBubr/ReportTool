@@ -6,9 +6,12 @@ var config = require('../config');
 var log = require('../libs/log')(module);
 var Module = require('../models/module').Module;
 var Page = require('../models/page').Page;
+var Version = require('../models/Version').Version;
 var Issue = require('../models/issue').Issue;
 var _ = require('underscore');
 var async = require('async');
+
+var VERSION = require('../public/jsc/versions').VERSION;
 
 var JiraApi = require('jira').JiraApi;
 var response = null;
@@ -99,6 +102,10 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
         },
         //step 6
         function (callback) {
+            WriteVersion(callback);
+        },
+        //step 7
+        function (callback) {
             LogProgress("**** Update Finished ****");
             callback();
         }
@@ -115,6 +122,24 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
     );
     callback();
 };
+
+function WriteVersion(callback) {
+    Version.findOne({ numerical: VERSION.NUMBER }, function (err, version) {
+        if (err) {
+            callback(err);
+        }
+
+        if (!version) {
+            version = new Version();
+            version.numerical = VERSION.NUMBER;
+            version.name = VERSION.NAME;
+        }
+        version.updated = new Date(Date.now());
+        version.save(function (err, page) {
+            callback(err, page);
+        });
+    });
+}
 
 function Step1CollectModules(jira, callback) {
     var requestString = "project = PLEX-UXC AND issuetype = epic AND summary ~ Module AND NOT summary ~ automation AND NOT summary ~ screens ORDER BY key ASC";

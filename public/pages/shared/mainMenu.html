@@ -1,4 +1,4 @@
-<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation"  ng-controller="versionController">
         <div class="container-fluid">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
@@ -9,7 +9,7 @@
                 </button>
                 <a class="navbar-brand" href="#">PLEX-UXC</a>
             </div>
-
+            <p class="navbar-text navbar-right" ng-model="versionData.version">Last Update: {{versionData.version.updatedText}}</a></p>
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav" style="padding-left: 5%">
                     <li ui-route="/dashboard" ng-class="{active: $uiRoute}"><a  ui-sref="dashboard"><span class="glyphicon glyphicon-th-large" ></span> Dashboard</a></li>
