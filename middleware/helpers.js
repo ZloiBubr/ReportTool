@@ -60,6 +60,19 @@ exports.isParentPage = function(labels) {
     return false;
 };
 
+exports.getChecklistsProgress = function(item) {
+    if(!item.checklistCreated) {
+        return 0;
+    }
+    var count = 0;
+    for(var i=0; i<item.checklistCreated.length; i++) {
+        if(item.checklistCreated[i] == true) {
+            count++;
+        }
+    }
+    return count*100 / item.pages;
+};
+
 exports.getWaveName = function(labels) {
     var labelsArray = labels.split(',');
     for(var i=0; i<labelsArray.length; i++) {

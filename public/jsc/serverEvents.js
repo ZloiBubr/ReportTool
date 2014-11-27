@@ -4,17 +4,11 @@ if (!!window.EventSource) {
         var data = JSON.parse(e.data);
         if(data.page)
         {
-            $("#page_progress .bar").css({ width: data.page + '%' });
+            $("#page_progress_bar").css({ width: data.page + '%' });
         }
         else{
-            $("#issue_progress .bar").css({ width: data.issues + '%' });
+            $("#issue_progress_bar").css({ width: data.issues + '%' });
         }
-
-        //update progress bar in client
-
-//        if(percentage == '100') {
-//            window.location.href = "/";
-//        }
     }, false);
     source.addEventListener('logmessage', function(e) {
         var text = e.data;

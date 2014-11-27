@@ -86,6 +86,17 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
                 $scope.allModuleGroups.push({id: cloudAppItem.moduleGroupName, name: cloudAppItem.moduleGroupName});
             }
         });
+        $scope.allModuleGroups.sort(function (a, b) {
+            a = a.name;
+            b = b.name;
+            if (a == "All") {
+                return -1;
+            }
+            if (b == "All") {
+                return 1;
+            }
+            return a > b ? 1 : a < b ? -1 : 0;
+        });
     }
 
     function FillModulesCombo() {
@@ -104,6 +115,17 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
                 $scope.allModules.push({id: cloudAppItem.moduleName, name: cloudAppItem.moduleName});
             }
         });
+        $scope.allModules.sort(function (a, b) {
+            a = a.name;
+            b = b.name;
+            if (a == "All") {
+                return -1;
+            }
+            if (b == "All") {
+                return 1;
+            }
+            return a > b ? 1 : a < b ? -1 : 0;
+        });
     }
 
     function FillSmeCombo() {
@@ -118,6 +140,17 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
             if (!found) {
                 $scope.allSMEs.push({id: cloudAppItem.smeName, name: cloudAppItem.smeName});
             }
+        });
+        $scope.allSMEs.sort(function (a, b) {
+            a = a.name;
+            b = b.name;
+            if (a == "All") {
+                return -1;
+            }
+            if (b == "All") {
+                return 1;
+            }
+            return a > b ? 1 : a < b ? -1 : 0;
         });
     }
 
@@ -137,42 +170,6 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
                 $scope.allStreams.push({id: cloudAppItem.streamName, name: cloudAppItem.streamName});
             }
         });
-    }
-
-    function SortCombos() {
-        $scope.allModuleGroups.sort(function (a, b) {
-            a = a.name;
-            b = b.name;
-            if (a == "All") {
-                return -1;
-            }
-            if (b == "All") {
-                return 1;
-            }
-            return a > b ? 1 : a < b ? -1 : 0;
-        });
-        $scope.allModules.sort(function (a, b) {
-            a = a.name;
-            b = b.name;
-            if (a == "All") {
-                return -1;
-            }
-            if (b == "All") {
-                return 1;
-            }
-            return a > b ? 1 : a < b ? -1 : 0;
-        });
-        $scope.allSMEs.sort(function (a, b) {
-            a = a.name;
-            b = b.name;
-            if (a == "All") {
-                return -1;
-            }
-            if (b == "All") {
-                return 1;
-            }
-            return a > b ? 1 : a < b ? -1 : 0;
-        });
         $scope.allStreams.sort(function (a, b) {
             a = a.name;
             b = b.name;
@@ -184,6 +181,9 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
             }
             return a > b ? 1 : a < b ? -1 : 0;
         });
+    }
+
+    function SortCombos() {
         $scope.allVersions.sort(function (a, b) {
             a = a.name;
             b = b.name;
@@ -321,7 +321,9 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
             pages: cloudAppItem.pages,
             assignees: detailed ? cloudAppItem.assignees : [],
             devTimeSpent: cloudAppItem.devTimeSpent,
-            qaTimeSpent: cloudAppItem.qaTimeSpent
+            qaTimeSpent: cloudAppItem.qaTimeSpent,
+            testingProgress: cloudAppItem.testingProgress ? cloudAppItem.testingProgress : 0,
+            checklistsProgress: cloudAppItem.checklistsProgress ? cloudAppItem.checklistsProgress : 0
         };
         return card;
     }

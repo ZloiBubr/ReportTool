@@ -8,7 +8,7 @@ a {
 }
 
 table {
-    max-width: 2000px !important;
+    max-width: 4000px !important;
 }
  /*------------------------------------Common---------------------------*/
 .progress_no_top_line > td {
@@ -92,41 +92,13 @@ table {
     border-top: 1px solid #e5e5e5;
 }
 
-#page_progress,
-#issue_progress
-{
-    width: 218px;
-    background: #666;
-    color: #FF0000;
-    border: 1px solid #ccc;
-    height: 28px;
-}
-
-#page_progress .bar,
-#issue_progress .bar
-{
-    display: inline-block;
-    background: #3d3;
-    width: 0;
-    height: 28px;
-}
-
-#card_progress
+.card-progress
 {
     border: solid #cccccc 2px;
     border-radius: 5px;
     /* Dimensions */
     height: 10px;
-    background: #FF0000;
     margin-bottom: 0px !important;
-}
-
-#card_progress .bar
-{
-    display: block;
-    background: #3d3;
-    width: 0;
-    height: 6px;
 }
 
 .help-icon
@@ -245,6 +217,13 @@ tr th:last-child {
 }
 
 .disp-block {
-    display: block;
-    width: 100%;
+    display: inline-block;
+}
+
+section#sidebar {
+    float: left;
+    width: 250px;
+}
+section#content {
+    padding-left: 250px;
 }

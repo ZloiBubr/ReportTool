@@ -14,6 +14,8 @@ var schema = new Schema({
     assignee:               { type: String },
     blockers:               { type: String },
     progress:               { type: String },
+    testingProgress:        { type: String },
+    checklistCreated:       { type: Boolean },
     storyPoints:            { type: String },
     devFinished:            { type: String },
     qaFinished:             { type: String },
@@ -30,9 +32,9 @@ var schema = new Schema({
             dateChanged:    { type: Date },
             dateStarted:    { type: Date }
         }],
-    issues:[{
-        inward: {type: String},
-        issue: {type: Schema.Types.ObjectId, ref: 'Issue'}
+    issues: [{
+            inward: {type: String},
+            issue: {type: Schema.Types.ObjectId, ref: 'Issue'}
     }],
     created:                { type: String },
     updated:                { type: String }

@@ -433,6 +433,8 @@ function SavePage(jira, issue, callback) {
         page.epicKey = epicIssueMap[issue.key];
         page.created = issue.fields.created;
         page.updated = issue.fields.updated;
+        page.testingProgress = issue.fields.customfield_24700;
+        page.checklistCreated = issue.fields.customfield_24300 ? issue.fields.customfield_24300[0].value == 'yes' ? true : false : false;
         parseHistory(issue, page);
         calcWorklogFromIssue(issue, page);
         var queryString = util.format("project = PLEXUXC AND parent in (%s)", issue.key);

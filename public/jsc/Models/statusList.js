@@ -38,7 +38,6 @@ exports.statusEntity = function(status)
     this.isChecked = true;
     this.weight = status.value;
     this.cssIcon = status.icon || "";
-    this.pages = 0;
     this.count = 0;
 };
 
@@ -106,22 +105,6 @@ exports.statuses = function() {
         }
     }
     this.resetCounters = function(){
-        this.blocked.pages = 0;
-        this.open.pages = 0;
-        this.reopened.pages = 0;
-        this.deferred.pages = 0;
-        this.assigned.pages = 0;
-        this.inProgress.pages = 0;
-        this.codeReview.pages = 0;
-        this.readyForQA.pages = 0;
-        this.testingInProgress.pages = 0;
-        this.resolved.pages = 0;
-        this.accepted.pages = 0;
-        this.production.pages = 0;
-        this.closed.pages = 0;
-        this.cancelled.pages = 0;
-        this.notApplicable.pages = 0;
-
         this.blocked.count = 0;
         this.open.count = 0;
         this.reopened.count = 0;

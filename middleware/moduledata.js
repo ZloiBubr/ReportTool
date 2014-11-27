@@ -68,9 +68,25 @@ function parsePages(callback) {
         },
         function () {
             SortData(moduledata);
+            updateChecklistsProgress(moduledata);
             callback(moduledata);
         }
     ]);
+}
+
+function updateChecklistsProgress(moduledata) {
+    for(var i=0; i<moduledata.module.length; i++) {
+        var created = 0;
+        var total = 0;
+        var item = moduledata.module[i];
+        for(var j=0; j<item.checklistsProgress.length; j++) {
+            if(item.checklistsProgress[j] == true) {
+                created++;
+            }
+            total++;
+        }
+        moduledata.module[i].checklistsProgress = created*100 / total;
+    }
 }
 
 function putDataPoint(moduledata, module, page, count) {
@@ -78,6 +94,7 @@ function putDataPoint(moduledata, module, page, count) {
     var teamName = helpers.getTeamName(labels);
     var streamName = helpers.getStreamName(labels);
     var storyPoints, moduleGroup, progress, calcStoryPoints;
+    var isParentPage = page ? helpers.isParentPage(page.labels) : false;
     if(page) {
         storyPoints = page.storyPoints == null ? 0 : parseFloat(page.storyPoints);
         moduleGroup = helpers.getModuleGroupName(page.labels);
@@ -118,14 +135,16 @@ function putDataPoint(moduledata, module, page, count) {
             reportedSP: 0,
             summarySP: 0,
             teamName: teamName,
-            streamName: streamName
+            streamName: streamName,
+            testingProgress: isParentPage ? page.testingProgress : 0,
+            checklistsProgress: []
         };
         moduledata.module.push(moduled);
     }
 
     moduled.reportedSP += calcStoryPoints;
     moduled.summarySP += storyPoints;
-    moduled.progress = moduled.reportedSP*100/moduled.summarySP;
+    moduled.progress = moduled.summarySP > 0 ? moduled.reportedSP*100/moduled.summarySP : 0;
     moduled.pagescount = count;
 
     if(page) {
@@ -138,5 +157,9 @@ function putDataPoint(moduledata, module, page, count) {
         if(newStatus.weight < moduleStatus.weight){
             moduled.status = newStatus.name;
         }
+        if(isParentPage) {
+            moduled.testingProgress = page.testingProgress;
+        }
+        moduled.checklistsProgress.push(page.checklistCreated);
     }
 }

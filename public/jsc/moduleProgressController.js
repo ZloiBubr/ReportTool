@@ -276,7 +276,6 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
         }
     }
 
-
     function fillCards(teamobj, version, status, item) {
         var found = false;
         var cardName = $scope.showModules ? getCleanModuleName(item.name) : item.smename;
@@ -298,6 +297,8 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
                 card.priority = card.priority < priorityNumber ? card.priority : priorityNumber;
                 card.hasblockers |= item.hasblockers;
                 card.hasdeferred |= item.hasdeferred;
+                card.testingProgress = item.testingProgress ? (card.testingProgress + item.testingProgress)/2 : card.testingProgress;
+                card.checklistsProgress = item.checklistsProgress ? (card.checklistsProgress + item.checklistsProgress)/2 : card.checklistsProgress;
 
                 var oldStatus = $scope.total.getStatusByName(card.status);
                 var newStatus = $scope.total.getStatusByName(status);
@@ -319,7 +320,9 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
                 priority: priorityNumber,
                 status: status,
                 hasblockers: item.hasblockers,
-                hasdeferred: item.hasdeferred
+                hasdeferred: item.hasdeferred,
+                testingProgress: item.testingProgress ? item.testingProgress : 0,
+                checklistsProgress: item.checklistsProgress ? item.checklistsProgress : 0
             };
             version.cards.push(newCard);
         }
