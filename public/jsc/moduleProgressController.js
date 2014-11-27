@@ -298,7 +298,7 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
                 card.priority = card.priority < priorityNumber ? card.priority : priorityNumber;
                 card.hasblockers |= item.hasblockers;
                 card.hasdeferred |= item.hasdeferred;
-                card.cloudAppsCount++;
+                card.cloudAppsCount += item.pagescount;
                 card.summaryTestingProgress += item.testingProgress ? item.testingProgress : 0;
                 card.testingProgress = card.summaryTestingProgress / card.cloudAppsCount;
                 card.summaryChecklistsProgress += item.checklistsProgress ? item.checklistsProgress : 0;
@@ -329,7 +329,7 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
                 summaryTestingProgress: item.testingProgress ? item.testingProgress : 0,
                 checklistsProgress: item.checklistsProgress ? item.checklistsProgress : 0,
                 summaryChecklistsProgress: item.checklistsProgress ? item.checklistsProgress : 0,
-                cloudAppsCount: 1
+                cloudAppsCount: item.pagescount
             };
             version.cards.push(newCard);
         }
