@@ -231,15 +231,16 @@ section.sidebar{
 }
 section.sideCollapseButton{
     float: left;
-    font-size: 25px;
+    font-size: 30px;
     border: 1px solid #ddd;
-    width: 30px;
+    width: 37px;
     margin-left: 1px;
+    background-color: #d9edf7
 }
 
 section.contentShowSidebar {
     padding-left: 250px;
 }
 section.contentHideSidebar {
-    padding-left: 31px;
+    padding-left: 38px;
 }
