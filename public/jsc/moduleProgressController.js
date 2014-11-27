@@ -5,6 +5,7 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
     $scope.init = function () {
         $scope.common = {};
         $scope.dataLoad();
+        $scope.isShowSideBar = true;
         $scope.sortByDate = false;
         $scope.showTeamTable = true;
         $scope.showStreams = false;
@@ -426,6 +427,10 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
         $scope.total.notApplicable.isChecked = $scope.total.all.isChecked;
 
         $scope.processWithRowSpans(true);
+    };
+
+    $scope.onToggleSideBar = function(){
+        $scope.isShowSideBar = !$scope.isShowSideBar;
     };
 
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/

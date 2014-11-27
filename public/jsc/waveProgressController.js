@@ -9,6 +9,7 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
     $scope.init = function () {
         $scope.common = {};
         $scope.dataLoad();
+        $scope.isShowSideBar = true;
         $scope.showStreams = false;
         $scope.detailedView = false;
     };
@@ -371,6 +372,10 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
         $scope.total.production.isChecked = $scope.total.all.isChecked;
 
         $scope.processWithRowSpans(true);
+    };
+
+    $scope.onToggleSideBar = function(){
+        $scope.isShowSideBar = !$scope.isShowSideBar;
     };
 
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/

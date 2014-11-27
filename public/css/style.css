@@ -1,5 +1,5 @@
 body {
-    padding: 50px;
+    /*padding: 50px;*/
     font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
@@ -67,6 +67,11 @@ table {
 .no-padding a
 {
  padding: 0 !important;
+}
+
+.list-group-item .checkbox{
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
 .table-timesheet-hover > tbody > tr:hover > td,
@@ -220,10 +225,21 @@ tr th:last-child {
     display: inline-block;
 }
 
-section#sidebar {
+section.sidebar{
     float: left;
     width: 250px;
 }
-section#content {
+section.sideCollapseButton{
+    float: left;
+    font-size: 25px;
+    border: 1px solid #ddd;
+    width: 30px;
+    margin-left: 1px;
+}
+
+section.contentShowSidebar {
     padding-left: 250px;
+}
+section.contentHideSidebar {
+    padding-left: 31px;
 }

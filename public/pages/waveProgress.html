@@ -1,8 +1,8 @@
-<div ng-controller="waveProgressController">
-    <section id="sidebar">
+<div ng-controller="waveProgressController" >
+    <section class="sidebar" ng-show="isShowSideBar">
         <div class="panel panel-info">
             <div class="panel-heading">
-                <h3 class="panel-title">Legend and filters</h3>
+                <h3 class="panel-title">Legend and filters <span class="glyphicon glyphicon-resize-small btn-link pull-right" ng-click="onToggleSideBar()"></span></h3>
             </div>
             <ul class="list-unstyled">
                 <li class="list-group-item">
@@ -61,27 +61,32 @@
                     <div class="container"><select style="width: 150px" ng-model="filteredTeam" ng-options="team.name as team.name for team in allTeams" ng-change="filterTeam()"></select>Team</div>
                     <div class="container"><select style="width: 150px" ng-model="filteredStream" ng-options="team.name as team.name for team in allStreams" ng-change="filterModule()"></select>Stream</div>
                 </li>
-                <li class="list-group-item list-group-item-info"><input type="checkbox" ng-model="detailedView" ng-change="processWithRowSpans(true)"> Detailed View</li>
-                <li class="list-group-item"><input type="checkbox" ng-model="total.deferred.isChecked" ng-change="processWithRowSpans(true)"><span class="badge">{{total.deferred.count}}</span> Deferred</li>
-                <li class="list-group-item"><input type="checkbox" ng-model="total.open.isChecked" ng-change="processWithRowSpans(true)"><span class="badge">{{total.open.count}}</span> Open</li>
-                <li class="list-group-item"><input type="checkbox" ng-model="total.reopened.isChecked" ng-change="processWithRowSpans(true)"><span class="badge">{{total.reopened.count}}</span> Reopened</li>
-                <li class="list-group-item"><input type="checkbox" ng-model="total.assigned.isChecked" ng-change="processWithRowSpans(true)"><span class="badge">{{total.assigned.count}}</span> Assigned</li>
-                <li class="list-group-item"><input type="checkbox" ng-model="total.inProgress.isChecked" ng-change="processWithRowSpans(true)"><span class="badge">{{total.inProgress.count}}</span> In Progress</li>
-                <li class="list-group-item"><input type="checkbox" ng-model="total.codeReview.isChecked" ng-change="processWithRowSpans(true)"><span class="badge">{{total.codeReview.count}}</span> Code Review</li>
-                <li class="readyForQA list-group-item"><input type="checkbox" ng-model="total.readyForQA.isChecked" ng-change="processWithRowSpans(true)"><span class="badge">{{total.readyForQA.count}}</span> Ready for QA</li>
-                <li class="readyForQA list-group-item"><input type="checkbox" ng-model="total.testingInProgress.isChecked" ng-change="processWithRowSpans(true)"><span class="badge">{{total.testingInProgress.count}}</span> Testing In Progress</li>
-                <li class="blocked list-group-item"><input type="checkbox" ng-model="total.blocked.isChecked" ng-change="processWithRowSpans(true)"><span class="badge">{{total.blocked.count}}</span> Blocked</li>
-                <li class="readyForAcceptance list-group-item"><input type="checkbox" ng-model="total.resolved.isChecked" ng-change="processWithRowSpans(true)"><span class="badge">{{total.resolved.count}}</span> Resolved</li>
-                <li class="accepted list-group-item"><input type="checkbox" ng-model="total.accepted.isChecked" ng-change="processWithRowSpans(true)"><span class="badge">{{total.accepted.count}}</span> Accepted</li>
-                <li class="production list-group-item"><input type="checkbox" ng-model="total.production.isChecked" ng-change="processWithRowSpans(true)"></span><span class="badge">{{total.production.count}}</span> Production</li>
+                <li class="list-group-item list-group-item-info"><div class="checkbox"><label><input type="checkbox" ng-model="detailedView" ng-change="processWithRowSpans(true)"> Detailed View</label></div></li>
+                <li class="list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.deferred.isChecked" ng-change="processWithRowSpans(true)"> Deferred</label><span class="badge pull-right">{{total.deferred.count}}</span></div></li>
+                <li class="list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.open.isChecked" ng-change="processWithRowSpans(true)"> Open</label> <span class="badge pull-right">{{total.open.count}}</span></div></li>
+                <li class="list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.reopened.isChecked" ng-change="processWithRowSpans(true)"> Reopened</label><span class="badge pull-right">{{total.reopened.count}}</span></div></li>
+                <li class="list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.assigned.isChecked" ng-change="processWithRowSpans(true)"> Assigned</label> <span class="badge pull-right">{{total.assigned.count}}</span></div></li>
+                <li class="list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.inProgress.isChecked" ng-change="processWithRowSpans(true)"> In Progress</label> <span class="badge pull-right">{{total.inProgress.count}}</span></div></li>
+                <li class="list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.codeReview.isChecked" ng-change="processWithRowSpans(true)"> Code Review</label> <span class="badge pull-right">{{total.codeReview.count}}</span></div></li>
+                <li class="readyForQA list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.readyForQA.isChecked" ng-change="processWithRowSpans(true)"> Ready for QA</label> <span class="badge pull-right">{{total.readyForQA.count}}</span></div></li>
+                <li class="readyForQA list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.testingInProgress.isChecked" ng-change="processWithRowSpans(true)"> Testing In Progress</label><span class="badge pull-right">{{total.testingInProgress.count}}</span></div></li>
+                <li class="blocked list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.blocked.isChecked" ng-change="processWithRowSpans(true)"> Blocked</label><span class="badge pull-right">{{total.blocked.count}}</span></div></li>
+                <li class="readyForAcceptance list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.resolved.isChecked" ng-change="processWithRowSpans(true)"> Resolved</label><span class="badge pull-right">{{total.resolved.count}}</span></div></li>
+                <li class="accepted list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.accepted.isChecked" ng-change="processWithRowSpans(true)"> Accepted</label><span class="badge pull-right">{{total.accepted.count}}</span></div></li>
+                <li class="production list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.production.isChecked" ng-change="processWithRowSpans(true)"> Production</label></span><span class="badge pull-right">{{total.production.count}}</span></div></li>
                 <li class="list-group-item"></li>
-                <li class="list-group-item"><input type="checkbox" ng-model="total.all.isChecked" ng-change="onSelectDeselectAll()"><span class="badge">{{total.total}}</span> Total</li>
+                <li class="list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.all.isChecked" ng-change="onSelectDeselectAll()"> Total</label><span class="badge pull-right">{{total.total}}</span></div></li>
                 <li class="list-group-item"></li>
                 <li class="list-group-item"><label>Pages</label><span class="badge">{{total.pages}}</span></li>
             </ul>
             </div>
     </section>
-    <section id='content'>
+
+    <section class="sideCollapseButton" ng-show="!isShowSideBar">
+        <div><span class="btn-link"> <span class="glyphicon glyphicon-resize-full" ng-click="onToggleSideBar()"></span></span></div>
+    </section>
+
+    <section ng-class="{contentShowSidebar: isShowSideBar, contentHideSidebar: !isShowSideBar}">
         <table class="table table-bordered">
             <thead class="progressTableMainHeader">
                 <tr>
