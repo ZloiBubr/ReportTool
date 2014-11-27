@@ -54,14 +54,18 @@ function Teams() {
                 "Oleksii Suriadnyi",
                 "Roman Golovchenko",
                 "Serhiy Haponenko",
-                "Yevhenii Lomov"
+                "Yevhenii Lomov",
+                "Ihor Rudchenko",
+                "Andrii Savinov",
+                "Dmytro Petlia",
+                "Olena Ostroverkhova"
             ],
             testers: [
                 "Mila Botnar",
                 "Yuri Timchenko",
                 "Anastasia Kotenyova",
                 "Pavlo Golovashchenko",
-                "Svitlana Peleshenko",
+                "Oleksii Milman",
                 "Denys Pugachov"
             ]
         },
@@ -172,9 +176,15 @@ function Teams() {
             teamLead: "Serhiy Haponenko",
             qaTeamLead: "",
             developers: [
-                "Serhiy Haponenko"
+                "Serhiy Haponenko",
+                "Allaberdi Hojayev",
+                "Bohdan Sorokin",
+                "Yevhenii Koliesnik"
             ],
             testers: [
+                "Ivan Nalyvaiko",
+                "Oleksii Shchelkunov",
+                "Valeriia Karabut"
             ]
         },
         {
