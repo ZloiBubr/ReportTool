@@ -91,7 +91,7 @@
             <thead class="progressTableMainHeader">
             <tr>
                 <th>Teams</th>
-                <th ng-repeat="version in showVersions">{{version}}</th>
+                <th style="min-width: 150px" ng-repeat="version in showVersions">{{version}}</th>
             </tr>
             </thead>
             <tbody>
@@ -101,10 +101,10 @@
                         <div>{{team.name}}</div>
                     </td>
                     <td ng-repeat="version in team.versions">
-                        <div>
-                            <sup style="color: blue">{{version.done | number : 0}}/</sup>
-                            <sup style="color: darkred">{{version.total | number : 0}}</sup>
-                            <span style="font-style: italic">{{version.restSP | number : 0}}</span>
+                        <div class="disp-block">
+                            <sup class="disp-block" style="color: blue">{{version.done | number : 0}}/</sup>
+                            <sup class="disp-block" style="color: darkred">{{version.total | number : 0}}</sup>
+                            <h3 class="disp-block" style="font-style: italic">{{version.restSP | number : 0}}</h3>
                         </div>
                         <table class="table table-condensed" ng-if="showCards">
                             <tr ng-repeat = "card in version.cards">
@@ -116,37 +116,41 @@
                                     cancelled: card.status == 'Canceled',
                                     production: card.status == 'Production',
                                     'bg-info': true}" style="max-width: 150px; min-width: 150px; word-break: break-all">
-                                    <div class="progress card-progress">
-                                        <div class="progress-bar progress-bar-success progress-bar-striped"
-                                             role="progressbar"
-                                             aria-valuenow="0"
-                                             aria-valuemin="0"
-                                             aria-valuemax="100"
-                                             style="width: 0%" ng-style="{width: card.progress + '%'}">
+                                    <div class="disp-block">
+                                        <div class="progress card-progress disp-block" style="min-width: 43px">
+                                            <div class="progress-bar progress-bar-success progress-bar-striped"
+                                                 role="progressbar"
+                                                 aria-valuenow="0"
+                                                 aria-valuemin="0"
+                                                 aria-valuemax="100"
+                                                 style="width: 0%" ng-style="{width: card.progress + '%'}">
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="progress card-progress">
-                                        <div class="progress-bar progress-bar-info progress-bar-striped"
-                                             role="progressbar"
-                                             aria-valuenow="0"
-                                             aria-valuemin="0"
-                                             aria-valuemax="100"
-                                             style="width: 0%" ng-style="{width: card.checklistsProgress + '%'}">
+                                        <div class="progress card-progress disp-block" style="min-width: 43px">
+                                            <div class="progress-bar progress-bar-info progress-bar-striped"
+                                                 role="progressbar"
+                                                 aria-valuenow="0"
+                                                 aria-valuemin="0"
+                                                 aria-valuemax="100"
+                                                 style="width: 0%" ng-style="{width: card.checklistsProgress + '%'}">
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="progress card-progress">
-                                        <div class="progress-bar progress-bar-warning progress-bar-striped"
-                                             role="progressbar"
-                                             aria-valuenow="0"
-                                             aria-valuemin="0"
-                                             aria-valuemax="100"
-                                             style="width: 0%" ng-style="{width: card.testingProgress + '%'}">
+                                        <div class="progress card-progress disp-block" style="min-width: 43px">
+                                            <div class="progress-bar progress-bar-warning progress-bar-striped"
+                                                 role="progressbar"
+                                                 aria-valuenow="0"
+                                                 aria-valuemin="0"
+                                                 aria-valuemax="100"
+                                                 style="width: 0%" ng-style="{width: card.testingProgress + '%'}">
+                                            </div>
                                         </div>
                                     </div>
                                     <div>
-                                        <sup style="color: blue">{{card.reportedSP | number : 0}}/</sup>
-                                        <sup style="color: darkred">{{card.summarySP | number : 0}}</sup>
-                                        <span style="font-style: italic">{{card.restSP | number : 0}}</span>
+                                        <div class="disp-block" style="align-self: flex-end">
+                                            <sup class="disp-block" style="color: blue">{{card.reportedSP | number : 0}}/</sup>
+                                            <sup class="disp-block" style="color: darkred">{{card.summarySP | number : 0}}</sup>
+                                            <h3 class="disp-block" style="font-style: italic">{{card.restSP | number : 0}}</h3>
+                                        </div>
                                         <br/>
                                         <img ng-show="card.priority == 1" width="16" height="16" alt="Conf" src="img/1.png"/>
                                         <img ng-show="card.priority == 2" width="16" height="16" alt="Conf" src="img/2.png"/>
@@ -156,6 +160,7 @@
                                         <img ng-show="card.dueDateConfirmed" width="16" height="16" alt="Conf" src="img/duedate2.png"/>
                                         <img ng-show="card.hasblockers" width="16" height="16" alt="Conf" src="img/ban.png"/>
                                         <img ng-show="card.hasdeferred" width="16" height="16" alt="Conf" src="img/deffered.png"/>
+                                        <br/>
                                         <span style="font-style: italic">{{card.cloudAppsCount | number : 0}} CloudApps</span>
                                     </div>
                                     <a href="{{card.uri}}">{{card.name}}</a>
