@@ -85,7 +85,7 @@ function updateChecklistsProgress(moduledata) {
             }
             total++;
         }
-        moduledata.module[i].checklistsProgress = created*100 / total;
+        moduledata.module[i].checklistsProgress = total > 0 ? created*100 / total : 0;
     }
 }
 
@@ -136,7 +136,7 @@ function putDataPoint(moduledata, module, page, count) {
             summarySP: 0,
             teamName: teamName,
             streamName: streamName,
-            testingProgress: isParentPage ? page.testingProgress : 0,
+            testingProgress: isParentPage && page.testingProgress ? parseFloat(page.testingProgress) : 0.,
             checklistsProgress: []
         };
         moduledata.module.push(moduled);
@@ -144,7 +144,7 @@ function putDataPoint(moduledata, module, page, count) {
 
     moduled.reportedSP += calcStoryPoints;
     moduled.summarySP += storyPoints;
-    moduled.progress = moduled.summarySP > 0 ? moduled.reportedSP*100/moduled.summarySP : 0;
+    moduled.progress = moduled.summarySP > 0 ? moduled.reportedSP*100/moduled.summarySP : 0.;
     moduled.pagescount = count;
 
     if(page) {
@@ -158,7 +158,7 @@ function putDataPoint(moduledata, module, page, count) {
             moduled.status = newStatus.name;
         }
         if(isParentPage) {
-            moduled.testingProgress = page.testingProgress;
+            moduled.testingProgress = page.testingProgress ? parseFloat(page.testingProgress) : 0.;
         }
         moduled.checklistsProgress.push(page.checklistCreated);
     }

@@ -297,8 +297,11 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
                 card.priority = card.priority < priorityNumber ? card.priority : priorityNumber;
                 card.hasblockers |= item.hasblockers;
                 card.hasdeferred |= item.hasdeferred;
-                card.testingProgress = item.testingProgress ? (card.testingProgress + item.testingProgress)/2 : card.testingProgress;
-                card.checklistsProgress = item.checklistsProgress ? (card.checklistsProgress + item.checklistsProgress)/2 : card.checklistsProgress;
+                card.cloudAppsCount++;
+                card.summaryTestingProgress += item.testingProgress ? item.testingProgress : 0;
+                card.testingProgress = card.summaryTestingProgress / card.cloudAppsCount;
+                card.summaryChecklistsProgress += item.checklistsProgress ? item.checklistsProgress : 0;
+                card.checklistsProgress = item.checklistsProgress / card.cloudAppsCount;
 
                 var oldStatus = $scope.total.getStatusByName(card.status);
                 var newStatus = $scope.total.getStatusByName(status);
@@ -322,7 +325,10 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
                 hasblockers: item.hasblockers,
                 hasdeferred: item.hasdeferred,
                 testingProgress: item.testingProgress ? item.testingProgress : 0,
-                checklistsProgress: item.checklistsProgress ? item.checklistsProgress : 0
+                summaryTestingProgress: item.testingProgress ? item.testingProgress : 0,
+                checklistsProgress: item.checklistsProgress ? item.checklistsProgress : 0,
+                summaryChecklistsProgress: item.checklistsProgress ? item.checklistsProgress : 0,
+                cloudAppsCount: 1
             };
             version.cards.push(newCard);
         }

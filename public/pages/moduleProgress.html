@@ -66,7 +66,7 @@
                     <div class="container"><select style="width: 150px" ng-model="filteredVersion" ng-options="version.name as version.name for version in allVersions" ng-change="filterModule()"></select>Version</div>
                     <div class="container"><select style="width: 150px" ng-model="filteredSme" ng-options="sme.name as sme.name for sme in allSMEs" ng-change="filterModule()"></select>SME</div>
                     <div class="container"><select style="width: 150px" ng-model="filteredMG" ng-options="moduleGroup.name as moduleGroup.name for moduleGroup in allModuleGroups" ng-change="filterModule()"></select>Group</div>
-                    <div class="container"><select style="width: 150px" ng-model="filteredTeam" ng-options="team.name as team.name for team in allTeams" ng-change="filterTeam()"></select>Team</div>
+                    <div class="container"><select style="width: 150px" ng-model="filteredTeam" ng-options="team.name as team.name for team in allTeams" ng-change="filterModule()"></select>Team</div>
                 </li>
                 <li class="list-group-item"><input type="checkbox" ng-model="total.inProgress.isChecked" ng-change="processWithRowSpans(true)"><span class="badge">{{total.inProgress.count}}</span>In Progress</li>
                 <li class="readyForQA list-group-item"><input type="checkbox" ng-model="total.readyForQA.isChecked" ng-change="processWithRowSpans(true)"><span class="badge">{{total.readyForQA.count}}</span>Testing is in prog</li>
@@ -151,6 +151,7 @@
                                         <img ng-show="card.dueDateConfirmed" width="16" height="16" alt="Conf" src="img/duedate2.png"/>
                                         <img ng-show="card.hasblockers" width="16" height="16" alt="Conf" src="img/ban.png"/>
                                         <img ng-show="card.hasdeferred" width="16" height="16" alt="Conf" src="img/deffered.png"/>
+                                        <span style="font-style: italic">{{card.cloudAppsCount | number : 0}} CloudApps</span>
                                     </div>
                                     <a href="{{card.uri}}">{{card.name}}</a>
                                 </td>
