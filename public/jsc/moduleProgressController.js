@@ -302,7 +302,7 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
                 card.summaryTestingProgress += item.testingProgress ? item.testingProgress : 0;
                 card.testingProgress = card.summaryTestingProgress / card.cloudAppsCount;
                 card.summaryChecklistsProgress += item.checklistsProgress ? item.checklistsProgress : 0;
-                card.checklistsProgress = item.checklistsProgress / card.cloudAppsCount;
+                card.checklistsProgress = card.summaryChecklistsProgress / card.cloudAppsCount;
 
                 var oldStatus = $scope.total.getStatusByName(card.status);
                 var newStatus = $scope.total.getStatusByName(status);
