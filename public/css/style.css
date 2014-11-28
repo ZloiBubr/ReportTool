@@ -174,7 +174,7 @@ table {
     border-width: 1px !important;
 }
 
-table {
+.cards-table {
     border-collapse: separate;
     border-spacing: 0 5px;
 }

@@ -103,7 +103,7 @@
                             <br/>
                             <span style="color: #737373">Cards:{{status.cards.length | number : 0}}</span>
                         </div>
-                        <table class="table table-condensed">
+                        <table class="table table-condensed cards-table">
                             <tr  ng-repeat = "card in status.cards">
                                 <td ng-class="{
                                     blocked: card.status == 'Blocked',

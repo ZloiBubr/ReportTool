@@ -106,7 +106,7 @@
                             <sup class="disp-block" style="color: darkred">{{version.total | number : 0}}</sup>
                             <h3 class="disp-block" style="font-style: italic">{{version.restSP | number : 0}}</h3>
                         </div>
-                        <table class="table table-condensed" ng-if="showCards">
+                        <table class="table table-condensed cards-table" ng-if="showCards">
                             <tr ng-repeat = "card in version.cards">
                                 <td ng-class="{
                                     blocked: card.status == 'Blocked',
