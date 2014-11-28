@@ -16,15 +16,15 @@
             <tr ng-repeat="dateGroup in progressData.dates">
                 <td class="vcenter" style="padding-bottom: 28px;"><strong>{{dateGroup.date | date:'yyyy-MM-dd'}}</strong>
                 </td>
-                <td colspan="4" class="progress_table_no_end_line">
+                <td colspan="4">
                     <table class="table" ng-repeat="team in dateGroup.teams | filter: teamFilter">
                         <tbody>
                         <tr class="progress_no_top_line">
                             <td class="progress_fixed_width vcenter help-icon" tooltip-placement="left"  tooltip-html-unsafe="{{getReportMembersMissing(team)}}">{{team.name}}</td>
                             <td class="progress_table_no_end_line">
-                                <table class="table table-striped">
+                                <table class="table table-striped table-bordered">
                                     <thead>
-                                    <tr>
+                                    <tr class="bg-info">
                                         <th>User</th>
                                         <th>Key</th>
                                         <th>Progress SP</th>
