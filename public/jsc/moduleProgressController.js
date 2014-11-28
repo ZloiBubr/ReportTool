@@ -290,6 +290,7 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
         for(var i=0; i<version.cards.length; i++) {
             var card = version.cards[i];
             if(card.name == cardName) {
+                card.modulesCount++;
                 card.reportedSP += item.reportedSP;
                 card.summarySP += item.summarySP;
                 card.restSP = card.summarySP - card.reportedSP;
@@ -300,9 +301,9 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
                 card.hasdeferred |= item.hasdeferred;
                 card.cloudAppsCount += item.pagescount;
                 card.summaryTestingProgress += item.testingProgress ? item.testingProgress : 0;
-                card.testingProgress = card.summaryTestingProgress / card.cloudAppsCount;
+                card.testingProgress = card.summaryTestingProgress / card.modulesCount;
                 card.summaryChecklistsProgress += item.checklistsProgress ? item.checklistsProgress : 0;
-                card.checklistsProgress = card.summaryChecklistsProgress / card.cloudAppsCount;
+                card.checklistsProgress = card.summaryChecklistsProgress / card.modulesCount;
 
                 var oldStatus = $scope.total.getStatusByName(card.status);
                 var newStatus = $scope.total.getStatusByName(status);
@@ -329,7 +330,8 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
                 summaryTestingProgress: item.testingProgress ? item.testingProgress : 0,
                 checklistsProgress: item.checklistsProgress ? item.checklistsProgress : 0,
                 summaryChecklistsProgress: item.checklistsProgress ? item.checklistsProgress : 0,
-                cloudAppsCount: item.pagescount
+                cloudAppsCount: item.pagescount,
+                modulesCount: 1
             };
             version.cards.push(newCard);
         }
