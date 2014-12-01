@@ -142,7 +142,6 @@ function Teams() {
             qaTeamLead: "Katsiaryna Kuchko",
             developers: [
                 "Valentine Zhuck",
-                "Maryna Furman",
                 "Siarhei Zhalezka",
                 "Viachaslau Anufryiuk",
                 "Yury Yamoryk",
@@ -157,7 +156,9 @@ function Teams() {
                 "Siarhei Bahdanovich",
                 "Andrei Lysenka",
                 "Aleh Dukel",
-                "Ivan Yanchuk"
+                "Ivan Yanchuk",
+                "Kanstantsin Ldou",
+                "Katsiaryna Zeliankova"
             ],
             testers: [
                 "Iryna Koush",
@@ -217,6 +218,7 @@ exports.OldDevelopers = function oldDevelopers(name) {
         name == "Mariya Babich" ||
         name == "Katsiaryna Sasina" ||
         name == "aliaksei_labachou aliaksei_labachou" ||
+        name == "Maryna Furman" ||
         name == undefined) {
         return true;
     }
