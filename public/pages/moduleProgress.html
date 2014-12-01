@@ -63,10 +63,10 @@
                 <li class="list-group-item list-group-item-info"><div class="checkbox"><label><input type="checkbox" ng-model="showCards" ng-change="processWithRowSpans(true)"> Cards</label></div></li>
                 <li class="list-group-item list-group-item-info"><div class="checkbox"><label><input type="checkbox" ng-model="showModules" ng-change="processWithRowSpans(true)"> SME / Modules</label></div></li>
                 <li class="list-group-item">
-                    <div class="container"><select style="width: 150px" ng-model="filteredVersion" ng-options="version.name as version.name for version in allVersions" ng-change="filterModule()"></select>Version</div>
-                    <div class="container"><select style="width: 150px" ng-model="filteredSme" ng-options="sme.name as sme.name for sme in allSMEs" ng-change="filterModule()"></select>SME</div>
-                    <div class="container"><select style="width: 150px" ng-model="filteredMG" ng-options="moduleGroup.name as moduleGroup.name for moduleGroup in allModuleGroups" ng-change="filterModule()"></select>Group</div>
-                    <div class="container"><select style="width: 150px" ng-model="filteredTeam" ng-options="team.name as team.name for team in allTeams" ng-change="filterModule()"></select>Team</div>
+                    <div><select style="width: 150px" ng-model="filteredVersion" ng-options="version.name as version.name for version in allVersions" ng-change="filterModule()"></select>Version</div>
+                    <div><select style="width: 150px" ng-model="filteredSme" ng-options="sme.name as sme.name for sme in allSMEs" ng-change="filterModule()"></select>SME</div>
+                    <div><select style="width: 150px" ng-model="filteredMG" ng-options="moduleGroup.name as moduleGroup.name for moduleGroup in allModuleGroups" ng-change="filterModule()"></select>Group</div>
+                    <div><select style="width: 150px" ng-model="filteredTeam" ng-options="team.name as team.name for team in allTeams" ng-change="filterModule()"></select>Team</div>
                 </li>
                 <li class="list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.inProgress.isChecked" ng-change="processWithRowSpans(true)">In Progress</label><span class="badge pull-right">{{total.inProgress.count}}</span></div></li>
                 <li class="readyForQA list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.readyForQA.isChecked" ng-change="processWithRowSpans(true)">Testing is in prog</label><span class="badge pull-right">{{total.readyForQA.count}}</span></div></li>

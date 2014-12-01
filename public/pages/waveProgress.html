@@ -54,12 +54,12 @@
                     </div>
                 </li>
                 <li class="list-group-item">
-                    <div class="container"><select style="width: 150px" ng-model="filteredVersion" ng-options="version.name as version.name for version in allVersions" ng-change="filterModule()"></select>Version</div>
-                    <div class="container"><select style="width: 150px" ng-model="filteredSme" ng-options="sme.name as sme.name for sme in allSMEs" ng-change="filterModule()"></select>SME</div>
-                    <div class="container"><select style="width: 150px" ng-model="filteredMG" ng-options="moduleGroup.name as moduleGroup.name for moduleGroup in allModuleGroups" ng-change="filterModule()"></select>Group</div>
-                    <div class="container"><select style="width: 150px" ng-model="filteredM" ng-options="module.name as module.name for module in allModules" ng-change="filterModule()"></select>Module</div>
-                    <div class="container"><select style="width: 150px" ng-model="filteredTeam" ng-options="team.name as team.name for team in allTeams" ng-change="filterTeam()"></select>Team</div>
-                    <div class="container"><select style="width: 150px" ng-model="filteredStream" ng-options="team.name as team.name for team in allStreams" ng-change="filterModule()"></select>Stream</div>
+                    <div><select style="width: 150px" ng-model="filteredVersion" ng-options="version.name as version.name for version in allVersions" ng-change="filterModule()"></select>Version</div>
+                    <div><select style="width: 150px" ng-model="filteredSme" ng-options="sme.name as sme.name for sme in allSMEs" ng-change="filterModule()"></select>SME</div>
+                    <div><select style="width: 150px" ng-model="filteredMG" ng-options="moduleGroup.name as moduleGroup.name for moduleGroup in allModuleGroups" ng-change="filterModule()"></select>Group</div>
+                    <div><select style="width: 150px" ng-model="filteredM" ng-options="module.name as module.name for module in allModules" ng-change="filterModule()"></select>Module</div>
+                    <div><select style="width: 150px" ng-model="filteredTeam" ng-options="team.name as team.name for team in allTeams" ng-change="filterTeam()"></select>Team</div>
+                    <div><select style="width: 150px" ng-model="filteredStream" ng-options="team.name as team.name for team in allStreams" ng-change="filterModule()"></select>Stream</div>
                 </li>
                 <li class="list-group-item list-group-item-info"><div class="checkbox"><label><input type="checkbox" ng-model="detailedView" ng-change="processWithRowSpans(true)"> Detailed View</label></div></li>
                 <li class="list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.deferred.isChecked" ng-change="processWithRowSpans(true)"> Deferred</label><span class="badge pull-right">{{total.deferred.count}}</span></div></li>
