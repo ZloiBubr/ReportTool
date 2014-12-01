@@ -102,23 +102,24 @@ function Step1CollectIssues(jira, params, callback) {
 
 function ProcessPageFromJira(jira, params, issue, callback) {
     var loopError = 3;
-    var updateLabels = params.labelsToAdd || params.labelsToDelete;
-    var addWatcher = params.watchersToAdd;
-    var deleteWatcher = params.watchersToDelete;
-    var updateAssignee = params.assigneeName;
-    var updatePriority = params.priorityName;
+    var addLabels = params.labelsToAdd && (params.labelsToAdd != "");
+    var deleteLabels = params.labelsToDelete && (params.labelsToDelete != "");
+    var addWatcher = params.watchersToAdd && (params.watchersToAdd != "");
+    var deleteWatcher = params.watchersToDelete && (params.watchersToDelete != "");
+    var updateAssignee = params.assigneeName && (params.assigneeName != "");
+    var updatePriority = params.priorityName && (params.priorityName != "");
 
     async.whilst(function() {
             return loopError-- > 0;
         },
         function(callback) {
-            var issueUpdate = updateLabels ?
+            var issueUpdate = addLabels || deleteLabels ?
                 {fields: {labels: issue.fields.labels}} :
                 updateAssignee ?
                 {fields: {assignee: { name: params.assigneeName}}} :
                 updatePriority ?
                 {fields: {priority: { name: params.priorityName}}} : {};
-            if(updateLabels) {
+            if(addLabels) {
                 var exists = false;
                 for(var j=0; j < issueUpdate.fields.labels.length; j++) {
                     if(params.labelsToAdd == issueUpdate.fields.labels[j]) {
@@ -129,6 +130,8 @@ function ProcessPageFromJira(jira, params, issue, callback) {
                 if(!exists) {
                     issueUpdate.fields.labels.push(params.labelsToAdd);
                 }
+            }
+            if(deleteLabels) {
                 for(var j=0; j < issueUpdate.fields.labels.length; j++) {
                     if(params.labelsToDelete == issueUpdate.fields.labels[j]) {
                         issueUpdate.fields.labels.splice(j,1);
@@ -136,7 +139,7 @@ function ProcessPageFromJira(jira, params, issue, callback) {
                     }
                 }
             }
-            if(updateLabels || updateAssignee || updatePriority) {
+            if(addLabels || deleteLabels || updateAssignee || updatePriority) {
                 jira.updateIssue(issue.key, issueUpdate, function (error) {
                     if (error) {
                         writeToClient("Update issue error happened!", error);
