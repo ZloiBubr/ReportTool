@@ -19,7 +19,7 @@ function getNextSunday(d) {
 }
 
 function parsePages(callback) {
-    var velocity = { data: []};
+    var velocity = { data: [], years: []};
     for (var k = 0; k < velocity.data.length; k++) {
         var team = velocity.data[k];
         team.data = [];
@@ -56,6 +56,25 @@ function parsePages(callback) {
                 team.data[l].y = Math.round(team.data[l].y*10)/10;
             }
         }
+        velocity.years.sort(function(a,b) {
+            var aa = a.name;
+            var bb = b.name;
+            return aa > bb ? 1 : aa < bb ? -1 : 0;
+        });
+        for (var k = 0; k < velocity.years.length; k++) {
+            var year = velocity.years[k];
+            year.teams.sort(function (a, b) {
+                var aa = a.name;
+                var bb = b.name;
+                if(aa == "Total") {
+                    return 1;
+                }
+                if(bb == "Total") {
+                    return -1;
+                }
+                return aa > bb ? 1 : aa < bb ? -1 : 0;
+            });
+        }
         callback(err, velocity);
     })
 }
@@ -84,4 +103,47 @@ function putDataPoint(velocity, teamName, date, calcStoryPoints) {
     if (!found) {
         teamObj.data.push({ x: date, y: calcStoryPoints });
     }
+    processMonthlyData(velocity, teamName, date, calcStoryPoints);
+}
+
+function processMonthlyData(velocity, teamName, date, calcStoryPoints) {
+    if(teamName == "--") {
+        return;
+    }
+
+    var year = (new Date(date)).getUTCFullYear();
+    var month = (new Date(date)).getUTCMonth();
+
+    var teamObj = null;
+    var yearObj = null;
+
+    //team
+    for (var k = 0; k < velocity.years.length; k++) {
+        if (velocity.years[k].name == year) {
+            yearObj = velocity.years[k];
+            break;
+        }
+    }
+    if(!yearObj) {
+        yearObj = {
+            name: year,
+            teams: []
+        };
+        velocity.years.push(yearObj);
+    }
+    //year
+    for (var l = 0; l < yearObj.teams.length; l++) {
+        if (yearObj.teams[l].name == teamName) {
+            teamObj = yearObj.teams[l];
+            break;
+        }
+    }
+    if (!teamObj) {
+        teamObj = {
+            name: teamName,
+            months: [0,0,0,0,0,0,0,0,0,0,0,0]
+        };
+        yearObj.teams.push(teamObj);
+    }
+    teamObj.months[month] += calcStoryPoints;
 }
