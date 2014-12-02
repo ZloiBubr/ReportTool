@@ -33,14 +33,14 @@ function parsePages(callback) {
             for (var j = 0; j < page.progressHistory.length; j++) {
                 var history = page.progressHistory[j];
                 var date = new Date(Date.parse(history.dateChanged));
-                date.setHours(12, 0, 0, 0);
-                date = getNextSunday(date.getTime()).getTime();
+                var norm_date = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+                norm_date = getNextSunday(norm_date.getTime()).getTime();
                 var from = parseInt(history.progressFrom);
                 var to = history.progressTo == null || history.progressTo == '' ? 0 : parseInt(history.progressTo);
                 var progress = to - from;
                 var calcStoryPoints = storyPoints * progress / 100;
-                putDataPoint(velocity, teamName, date, calcStoryPoints);
-                putDataPoint(velocity, "Total", date, calcStoryPoints);
+                putDataPoint(velocity, teamName, date, norm_date, calcStoryPoints);
+                putDataPoint(velocity, "Total", date, norm_date, calcStoryPoints);
             }
         }
 
@@ -79,7 +79,7 @@ function parsePages(callback) {
     })
 }
 
-function putDataPoint(velocity, teamName, date, calcStoryPoints) {
+function putDataPoint(velocity, teamName, date, norm_date, calcStoryPoints) {
     var teamObj = null;
     for (var k = 0; k < velocity.data.length; k++) {
         if (velocity.data[k].name == teamName) {
@@ -94,14 +94,14 @@ function putDataPoint(velocity, teamName, date, calcStoryPoints) {
     var found = false;
     for (var l = 0; l < teamObj.data.length; l++) {
         var teamData = teamObj.data[l];
-        if ((teamData.x - date) == 0) {
+        if ((teamData.x - norm_date) == 0) {
             found = true;
             teamData.y += calcStoryPoints;
             break;
         }
     }
     if (!found) {
-        teamObj.data.push({ x: date, y: calcStoryPoints });
+        teamObj.data.push({ x: norm_date, y: calcStoryPoints });
     }
     processMonthlyData(velocity, teamName, date, calcStoryPoints);
 }
