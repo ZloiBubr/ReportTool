@@ -40,7 +40,6 @@
     <!-- Main Controllers/Routers -->
     <script type="text/javascript" src="/jsc/appController.js"></script>
     <script type="text/javascript" src="/jsc/router.js"></script>
-    <script type="text/javascript" src="/jsc/versions.js"></script>
     <!-- Controllers -->
     <script type="text/javascript" src="/jsc/velocityChartController.js"></script>
     <script type="text/javascript" src="/jsc/progressTableController.js"></script>
@@ -62,6 +61,7 @@
 </script>
     <script type="text/javascript" src="/jsc/allteams.js"></script>
     <script type="text/javascript" src="/jsc/Models/statusList.js"></script>
+    <script type="text/javascript" src="/jsc/versions.js"></script>
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -75,9 +75,9 @@
     <link rel="apple-touch-icon-precomposed" href="/ico/ios/apple-touch-icon-precomposed.png">
     <link rel="shortcut icon" href="/ico/favicon.png">
 </head>
-<body>
 <header ng-include="'pages/shared/mainMenu.html'">
 </header>
+<body>
 <section ui-view>
 </section>
 <footer>
@@ -85,4 +85,12 @@
 </footer>
 
 </body>
+<script type="text/javascript">
+    $(window).on('load', function() {
+        $('body').css({"padding-top": $(".navbar").height() + 60 + "px"});
+    });
+    $(window).on('resize', function() {
+        $('body').css({"padding-top": $(".navbar").height() + 10 + "px"});
+    });
+</script>
 </html>

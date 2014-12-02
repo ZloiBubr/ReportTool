@@ -1,5 +1,4 @@
 body {
-    /*padding: 50px;*/
     font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
@@ -203,3 +202,4 @@ section.contentShowSidebar {
 section.contentHideSidebar {
     padding-left: 38px;
 }
+
