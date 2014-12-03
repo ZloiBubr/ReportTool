@@ -72,7 +72,7 @@ function Step1CollectIssues(jira, params, callback) {
             return loopError-- > 0;
         },
         function(callback) {
-            jira.searchJira(params.jqlQuery, { fields: ["summary", "labels", "assignee", "priority"] }, function (error, issues) {
+            jira.searchJira(params.jqlQuery, { fields: ["summary", "labels", "assignee", "priority", "customfield_10002"] }, function (error, issues) {
                 if (error) {
                     callback(error);
                 }
@@ -102,12 +102,14 @@ function Step1CollectIssues(jira, params, callback) {
 
 function ProcessPageFromJira(jira, params, issue, callback) {
     var loopError = 3;
-    var addLabels = params.labelsToAdd && (params.labelsToAdd != "");
-    var deleteLabels = params.labelsToDelete && (params.labelsToDelete != "");
-    var addWatcher = params.watchersToAdd && (params.watchersToAdd != "");
-    var deleteWatcher = params.watchersToDelete && (params.watchersToDelete != "");
-    var updateAssignee = params.assigneeName && (params.assigneeName != "");
-    var updatePriority = params.priorityName && (params.priorityName != "");
+    var addLabels = params.labelsToAdd != null && params.labelsToAdd != "";
+    var deleteLabels = params.labelsToDelete != null  && params.labelsToDelete != "";
+    var addWatcher = params.watchersToAdd != null  && params.watchersToAdd != "";
+    var deleteWatcher = params.watchersToDelete != null  && params.watchersToDelete != "";
+    var updateAssignee = params.assigneeName != null  && params.assigneeName != "";
+    var updatePriority = params.priorityName != null  && params.priorityName != "";
+    var addEpics = params.epicsToAdd != null  && params.epicsToAdd != "";
+    var deleteEpics = params.epicsToDelete != null  && params.epicsToDelete != "";
 
     async.whilst(function() {
             return loopError-- > 0;
@@ -118,7 +120,10 @@ function ProcessPageFromJira(jira, params, issue, callback) {
                 updateAssignee ?
                 {fields: {assignee: { name: params.assigneeName}}} :
                 updatePriority ?
-                {fields: {priority: { name: params.priorityName}}} : {};
+                {fields: {priority: { name: params.priorityName}}} :
+                addEpics || deleteEpics ?
+                {fields: {customfield_10002: issue.fields.customfield_10002}} :
+                {};
             if(addLabels) {
                 var exists = false;
                 for(var j=0; j < issueUpdate.fields.labels.length; j++) {
@@ -139,7 +144,27 @@ function ProcessPageFromJira(jira, params, issue, callback) {
                     }
                 }
             }
-            if(addLabels || deleteLabels || updateAssignee || updatePriority) {
+            if(addEpics) {
+                var exists = false;
+                for(var j=0; j < issueUpdate.fields.customfield_10002.length; j++) {
+                    if(params.epicsToAdd == issueUpdate.fields.customfield_10002[j]) {
+                        exists = true;
+                        break;
+                    }
+                }
+                if(!exists) {
+                    issueUpdate.fields.customfield_10002.push(params.epicsToAdd);
+                }
+            }
+            if(deleteEpics) {
+                for(var j=0; j < issueUpdate.fields.customfield_10002.length; j++) {
+                    if(params.epicsToDelete == issueUpdate.fields.customfield_10002[j]) {
+                        issueUpdate.fields.customfield_10002.splice(j,1);
+                        break;
+                    }
+                }
+            }
+            if(addLabels || deleteLabels || updateAssignee || updatePriority || addEpics || deleteEpics) {
                 jira.updateIssue(issue.key, issueUpdate, function (error) {
                     if (error) {
                         writeToClient("Update issue error happened!", error);

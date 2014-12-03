@@ -32,6 +32,8 @@
                        ng-disabled="labelstodelete.length > 0 ||
                        watcherstoadd.length > 0 ||
                        watcherstodelete.length > 0 ||
+                       epicstoadd.length > 0 ||
+                       epicstodelete.length > 0 ||
                        assigneename.length > 0 ||
                        priorityname.length > 0"
                        type="text" class="form-control" id="input-label-add" placeholder="Label">
@@ -45,6 +47,8 @@
                        ng-disabled="labelstoadd.length > 0 ||
                        watcherstoadd.length > 0 ||
                        watcherstodelete.length > 0 ||
+                       epicstoadd.length > 0 ||
+                       epicstodelete.length > 0 ||
                        assigneename.length > 0 ||
                        priorityname.length > 0"
                        type="text" class="form-control" id="input-label-delete" placeholder="Label">
@@ -58,6 +62,8 @@
                        ng-disabled="labelstoadd.length > 0 ||
                        labelstodelete.length > 0 ||
                        watcherstodelete.length > 0 ||
+                       epicstoadd.length > 0 ||
+                       epicstodelete.length > 0 ||
                        assigneename.length > 0 ||
                        priorityname.length > 0"
                        type="text" class="form-control" id="input-label-wadd" placeholder="Watcher name">
@@ -71,6 +77,8 @@
                        ng-disabled="labelstoadd.length > 0 ||
                        watcherstoadd.length > 0 ||
                        labelstodelete.length > 0 ||
+                       epicstoadd.length > 0 ||
+                       epicstodelete.length > 0 ||
                        assigneename.length > 0 ||
                        priorityname.length > 0"
                        type="text" class="form-control" id="input-label-wdelete" placeholder="Watcher name">
@@ -84,6 +92,8 @@
                        ng-disabled="labelstoadd.length > 0 ||
                        watcherstoadd.length > 0 ||
                        labelstodelete.length > 0 ||
+                       epicstoadd.length > 0 ||
+                       epicstodelete.length > 0 ||
                        watcherstodelete.length > 0 ||
                        priorityname.length > 0"
                        type="text" class="form-control" id="input-label-assignee" placeholder="Assignee name">
@@ -97,9 +107,41 @@
                        ng-disabled="labelstoadd.length > 0 ||
                        watcherstoadd.length > 0 ||
                        labelstodelete.length > 0 ||
+                       epicstoadd.length > 0 ||
+                       epicstodelete.length > 0 ||
                        assigneename.length > 0 ||
                        watcherstodelete.length > 0"
                        type="text" class="form-control" id="input-label-priority" placeholder="Priority name">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-lg-2" for="input-label-epicadd">Add Epic/Theme:</label>
+            <div class="col-lg-3">
+                <input name="epicstoadd" ng-model="epicstoadd"
+                       ng-disabled="labelstoadd.length > 0 ||
+                       labelstodelete.length > 0 ||
+                       watcherstoadd.length > 0 ||
+                       watcherstodelete.length > 0 ||
+                       assigneename.length > 0 ||
+                       epicstodelete.length > 0 ||
+                       priorityname.length > 0"
+                       type="text" class="form-control" id="input-label-epicadd" placeholder="Epic/Theme name">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-lg-2" for="input-label-epicdelete">Delete Epic/Theme:</label>
+            <div class="col-lg-3">
+                <input name="epicstodelete" ng-model="epicstodelete"
+                       ng-disabled="labelstoadd.length > 0 ||
+                       watcherstoadd.length > 0 ||
+                       watcherstodelete.length > 0 ||
+                       labelstodelete.length > 0 ||
+                       epicstoadd.length > 0 ||
+                       assigneename.length > 0 ||
+                       priorityname.length > 0"
+                       type="text" class="form-control" id="input-label-epicdelete" placeholder="Epic/Theme name">
             </div>
         </div>
 
