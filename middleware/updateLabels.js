@@ -116,13 +116,13 @@ function ProcessPageFromJira(jira, params, issue, callback) {
         },
         function(callback) {
             var issueUpdate = addLabels || deleteLabels ?
-                {fields: {labels: issue.fields.labels}} :
+                {fields: {labels: issue.fields.labels ? issue.fields.labels : []}} :
                 updateAssignee ?
                 {fields: {assignee: { name: params.assigneeName}}} :
                 updatePriority ?
                 {fields: {priority: { name: params.priorityName}}} :
                 addEpics || deleteEpics ?
-                {fields: {customfield_10002: issue.fields.customfield_10002}} :
+                {fields: {customfield_10002: issue.fields.customfield_10002 ? issue.fields.customfield_10002 : []}} :
                 {};
             if(addLabels) {
                 var exists = false;
