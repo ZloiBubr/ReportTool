@@ -22,6 +22,6 @@ exports.post = function (req, res) {
     res.send({});
 };
 
-exports.rememberResponse = function(res) {
-    updateLabels.rememberResponse(res);
+exports.rememberResponse = function(req, res) {
+    updateLabels.rememberResponse(req, res);
 };

@@ -3,10 +3,10 @@
  */
 var mongoose = require('./../libs/mongoose');
 
-exports.Clear = function (callback) {
+exports.Clear = function (res, callback) {
     var db = mongoose.connection.db;
     db.dropDatabase(function (err) {
-        callback(err);
+        callback(err, res);
     });
-    callback();
+    callback(null, res);
 };

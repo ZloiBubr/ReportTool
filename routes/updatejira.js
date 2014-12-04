@@ -16,6 +16,6 @@ exports.post = function (req, res) {
     res.send({});
 };
 
-exports.rememberResponse = function(res) {
-    jiraProvider.rememberResponse(res);
+exports.rememberResponse = function(req, res) {
+    jiraProvider.rememberResponse(req, res);
 };

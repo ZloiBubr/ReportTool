@@ -1,11 +1,10 @@
-var util = require('util');
 var config = require('../config');
 var log = require('../libs/log')(module);
 var _ = require('underscore');
 var async = require('async');
+var sessionsupport = require('../middleware/sessionsupport');
 
 var JiraApi = require('jira').JiraApi;
-var response = null;
 var updateInProgress = false;
 
 exports.processItems = function (params, callback) {
@@ -43,24 +42,20 @@ exports.processItems = function (params, callback) {
     callback();
 };
 
-exports.rememberResponse = function (res) {
-    response = res;
+exports.rememberResponse = function (req, res) {
+    sessionsupport.setResponseObj('updateLabels', req, res);
 };
 
 var writeToClient = function (text, error) {
-    if(response && error == null) {
-        response.write("event: logmessage\n");
-        response.write('data: ' + text + '\n\n');
-        log.info(text);
-    }
     if (error) {
         log.error(text);
         log.error(error);
-        if (response) {
-            response.write("event: errmessage\n");
-            var errorText = error == null ? "not evaluated" : error.message == null ? error : error.message;
-            response.write("data: " + text + ", reason - " + errorText + "\n\n");
-        }
+        var errorText = error == null ? "not evaluated" : error.message == null ? error : error.message;
+        sessionsupport.notifySubscribers('updateLabels', "errmessage", text + ", reason - " + errorText);
+    }
+    else {
+        sessionsupport.notifySubscribers('updateLabels', "logmessage", text);
+        log.info(text);
     }
 };
 

@@ -10,11 +10,11 @@ var Version = require('../models/Version').Version;
 var Issue = require('../models/issue').Issue;
 var _ = require('underscore');
 var async = require('async');
+var sessionsupport = require('../middleware/sessionsupport');
 
 var VERSION = require('../public/jsc/versions').VERSION;
 
 var JiraApi = require('jira').JiraApi;
-var response = null;
 
 var epicsList = [];
 var issuesList = [];
@@ -22,37 +22,28 @@ var epicIssueMap = {};
 var linkedIssueUniqList = [];
 var updateInProgress = false;
 
-exports.rememberResponse = function (res) {
-    response = res;
+exports.rememberResponse = function (req, res) {
+    sessionsupport.setResponseObj('updateDb', req, res);
     UpdateProgress(0, "page");
     UpdateProgress(0, "issues");
 };
 
 var UpdateProgress = function (progress, type) {
-    if(response != null) {
-        response.write("event: progress\n");
-        response.write('data: {"' + type + '":' + progress.toString() + '}\n\n');
-    }
+    sessionsupport.notifySubscribers('updateDb', "progress", "{" + type + '":' + progress.toString() + "}");
     if (progress > 0) {
         LogProgress("**********" + type + " Progress " + progress.toString() + "% **********");
     }
 };
 
 var LogProgress = function (text, error) {
-    if (response && error == null) {
-        response.write("event: logmessage\n");
-        response.write("data: " + text + "\n\n");
-    }
     if (error) {
+        var errorText = error == null ? "not evaluated" : error.message == null ? error : error.message;
+        sessionsupport.notifySubscribers('updateDb', "errmessage", text + ", reason - " + errorText);
         log.error(text);
         log.error(error);
-        if (response) {
-            response.write("event: errmessage\n");
-            var errorText = error == null ? "not evaluated" : error.message == null ? error : error.message;
-            response.write("data: " + text + ", reason - " + errorText + "\n\n");
-        }
     }
     else {
+        sessionsupport.notifySubscribers('updateDb', "logmessage", text);
         log.info(text);
     }
 };
