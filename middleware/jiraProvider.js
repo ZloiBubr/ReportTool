@@ -29,7 +29,7 @@ exports.rememberResponse = function (req, res) {
 };
 
 var UpdateProgress = function (progress, type) {
-    sessionsupport.notifySubscribers('updateDb', "progress", "{" + type + '":' + progress.toString() + "}");
+    sessionsupport.notifySubscribers('updateDb', "progress", '{"' + type + '":' + progress.toString() + "}");
     if (progress > 0) {
         LogProgress("**********" + type + " Progress " + progress.toString() + "% **********");
     }
