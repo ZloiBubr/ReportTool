@@ -90,31 +90,40 @@ function putDataPoint(cloudAppData, module, page) {
     }
 
     var labels = module._doc.labels != null ? module._doc.labels : "";
+
     var teamName = helpers.getTeamName(page.labels);
+    if(teamName == "" || teamName == "--") {
+        var tname = helpers.getTeamName(labels);
+        if(tname != "--") {
+            teamName = tname;
+        }
+    }
     var streamName = helpers.getStreamName(page.labels);
-    var isParentPage = helpers.isParentPage(page.labels);
-    if(teamName == "") {
-        teamName = helpers.getTeamName(labels);
+    if(streamName == "" || streamName == "--") {
+        var sname = helpers.getStreamName(labels);
+        if(sname != "--") {
+            streamName = sname;
+        }
     }
-    if(streamName == "") {
-        streamName = helpers.getStreamName(labels);
-    }
+
     var smeName = module.assignee;
     var moduleGroupName = helpers.getModuleGroupName(page.labels);
     var cloudAppName = helpers.getCloudAppName(page.labels);
-    var fixVersions = module.fixVersions;
-    var moduleName = helpers.getModuleName(page.labels);
+    var moduleName = module.summary;
+
     var priority = module.priority;
     var dueDateConfirmed = helpers.getDueDateConfirmed(labels);
+    var isParentPage = helpers.isParentPage(page.labels);
+    var fixVersions = module.fixVersions;
 
     var timeSpent = helpers.getTimeSpent(page);
 
-    var storyPoints = page.storyPoints == null ? 0 : parseFloat(page.storyPoints);
-    var progress = page.progress == null ? 0 : parseInt(page.progress);
-    if(progress == 1) {
-        progress = 0;
+    var storyPoints = page.storyPoints == null ? 0. : parseFloat(page.storyPoints);
+    var progress = page.progress == null ? 0. : parseInt(page.progress);
+    if(progress == 1.) {
+        progress = 0.;
     }
-    var calcStoryPoints = storyPoints * progress / 100;
+    var calcStoryPoints = storyPoints * progress / 100.;
 
     var status = helpers.updateStatus(page.status, page.resolution);
     var fullUri = initUri + "CloudApp_" + cloudAppName + ") AND 'Epic Link' = " + module.key;
@@ -122,12 +131,12 @@ function putDataPoint(cloudAppData, module, page) {
     for(var i=0; i<cloudAppData.cloudApp.length; i++) {
         if(cloudAppData.cloudApp[i].name == cloudAppName &&
         cloudAppData.cloudApp[i].moduleGroupName == moduleGroupName &&
-        cloudAppData.cloudApp[i].moduleSummary == module.name &&
+        cloudAppData.cloudApp[i].moduleName == module.summary &&
         cloudAppData.cloudApp[i].fixVersions == fixVersions) {
             cloudApp = cloudAppData.cloudApp[i];
             cloudApp.reportedSP += calcStoryPoints;
             cloudApp.summarySP += storyPoints;
-            cloudApp.progress = cloudApp.reportedSP*100/cloudApp.summarySP;
+            cloudApp.progress = cloudApp.reportedSP*100./cloudApp.summarySP;
             cloudApp.pages++;
             cloudApp.devTimeSpent += timeSpent.devTimeSpent;
             cloudApp.qaTimeSpent += timeSpent.qaTimeSpent;
@@ -171,7 +180,6 @@ function putDataPoint(cloudAppData, module, page) {
             smeName: smeName,
             moduleGroupName: moduleGroupName,
             moduleName: moduleName,
-            moduleSummary: module.name,
             fixVersions: fixVersions,
             priority: priority,
             pages: 1,
@@ -180,7 +188,7 @@ function putDataPoint(cloudAppData, module, page) {
             devTimeSpent: timeSpent.devTimeSpent,
             qaTimeSpent: timeSpent.qaTimeSpent,
             assignees: [smeName, page.assignee],
-            testingProgress: isParentPage ? page.testingProgress : 0,
+            testingProgress: isParentPage ? page.testingProgress : 0.,
             checklistsProgress: [page.checklistCreated]
         };
         cloudAppData.cloudApp.push(cloudApp);

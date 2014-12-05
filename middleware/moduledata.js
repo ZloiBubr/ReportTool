@@ -96,14 +96,14 @@ function putDataPoint(moduledata, module, page, count) {
     var storyPoints, moduleGroup, progress, calcStoryPoints;
     var isParentPage = page ? helpers.isParentPage(page.labels) : false;
     if(page) {
-        storyPoints = page.storyPoints == null ? 0 : parseFloat(page.storyPoints);
+        storyPoints = page.storyPoints == null ? 0. : parseFloat(page.storyPoints);
         moduleGroup = helpers.getModuleGroupName(page.labels);
-        progress = page.progress == null ? 0 : parseInt(page.progress);
-        calcStoryPoints = storyPoints * progress / 100;
+        progress = page.progress == null ? 0. : parseInt(page.progress);
+        calcStoryPoints = storyPoints * progress / 100.;
     }
     else {
-        storyPoints = 0;
-        calcStoryPoints = 0;
+        storyPoints = 0.;
+        calcStoryPoints = 0.;
         moduleGroup = "Unknown Module Group";
     }
 
@@ -131,20 +131,21 @@ function putDataPoint(moduledata, module, page, count) {
             fixVersions: module.fixVersions,
             dueDateConfirmed: helpers.getDueDateConfirmed(labels),
             priority: module.priority,
-            progress: 0,
-            reportedSP: 0,
-            summarySP: 0,
+            progress: 0.,
+            reportedSP: 0.,
+            summarySP: 0.,
             teamName: teamName,
             streamName: streamName,
             testingProgress: isParentPage && page.testingProgress ? parseFloat(page.testingProgress) : 0.,
-            checklistsProgress: []
+            checklistsProgress: [],
+            cloudApps: []
         };
         moduledata.module.push(moduled);
     }
 
     moduled.reportedSP += calcStoryPoints;
     moduled.summarySP += storyPoints;
-    moduled.progress = moduled.summarySP > 0 ? moduled.reportedSP*100/moduled.summarySP : 0.;
+    moduled.progress = moduled.summarySP > 0. ? moduled.reportedSP*100/moduled.summarySP : 0.;
     moduled.pagescount = count;
 
     if(page) {
@@ -161,5 +162,19 @@ function putDataPoint(moduledata, module, page, count) {
             moduled.testingProgress = page.testingProgress ? parseFloat(page.testingProgress) : 0.;
         }
         moduled.checklistsProgress.push(page.checklistCreated);
+        addCloudApp(moduled, helpers.getCloudAppName(page.labels));
+    }
+}
+
+function addCloudApp(module, cloudAppName) {
+    var found = false;
+    for(var i=0; i<module.cloudApps.length; i++) {
+        if(module.cloudApps[i] == cloudAppName) {
+            found = true;
+            break;
+        }
+    }
+    if(!found) {
+        module.cloudApps.push(cloudAppName);
     }
 }

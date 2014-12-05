@@ -317,7 +317,7 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
             status: cloudAppItem.status,
             uri: cloudAppItem.uri,
             dueDateConfirmed: cloudAppItem.dueDateConfirmed,
-            progress: cloudAppItem.summarySP > 0 ? Math.floor(cloudAppItem.reportedSP*100/cloudAppItem.summarySP) : 0,
+            progress: cloudAppItem.progress,
             priority: priorityNumber,
             pages: cloudAppItem.pages,
             assignees: detailed ? cloudAppItem.assignees : [],

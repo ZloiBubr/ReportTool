@@ -92,7 +92,7 @@ exports.getStreamName = function(labels) {
             return labelsArray[i].substring(6);
         }
     }
-    return "";
+    return "--";
 };
 
 exports.getDueDateConfirmed = function(labels) {
