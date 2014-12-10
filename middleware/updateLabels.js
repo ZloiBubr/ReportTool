@@ -163,7 +163,7 @@ function ProcessPageFromJira(jira, params, issue, callback) {
                 jira.updateIssue(issue.key, issueUpdate, function (error) {
                     if (error) {
                         writeToClient("Update issue error happened!", error);
-                        writeToClient("Restarting Loop for: "+labelsData.key, error);
+                        writeToClient("Restarting Loop for: "+issue.key, error);
                     }
                     else {
                         loopError = 0;

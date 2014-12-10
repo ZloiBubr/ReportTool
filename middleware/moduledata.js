@@ -138,7 +138,12 @@ function putDataPoint(moduledata, module, page, count) {
             streamName: streamName,
             testingProgress: isParentPage && page.testingProgress ? parseFloat(page.testingProgress) : 0.,
             checklistsProgress: [],
-            cloudApps: []
+            cloudApps: [],
+            devFinishDate: module.devfinish,
+            qaFinishDate: module.qafinish,
+            acceptanceFinishDate: module.accfinish,
+            customerCompleteDate: module.cusfinish,
+            acceptanceStatus: []
         };
         moduledata.module.push(moduled);
     }
@@ -160,6 +165,7 @@ function putDataPoint(moduledata, module, page, count) {
         }
         if(isParentPage) {
             moduled.testingProgress = page.testingProgress ? parseFloat(page.testingProgress) : 0.;
+            moduled.acceptanceStatus.push(page.acceptanceStatus);
         }
         moduled.checklistsProgress.push(page.checklistCreated);
         addCloudApp(moduled, helpers.getCloudAppName(page.labels));
