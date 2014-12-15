@@ -11,6 +11,7 @@ var Issue = require('../models/issue').Issue;
 var _ = require('underscore');
 var async = require('async');
 var sessionsupport = require('../middleware/sessionsupport');
+var helpers = require('../middleware/helpers');
 
 var VERSION = require('../public/jsc/versions').VERSION;
 
@@ -479,6 +480,12 @@ function SavePage(jira, issue, callback) {
             if (subtasks != null) {
                 async.eachSeries(subtasks.issues, function (subtask, callback) {
                         if (subtask != null) {
+                            if(helpers.isParentPage(page.labels) && subtask.fields.summary.indexOf('PLEX-Acceptance') > -1) {
+                                page.devfinish = subtask.fields.customfield_24500 ? new Date(epic.fields.customfield_24500) : null;
+                                page.qafinish = subtask.fields.customfield_24501 ? new Date(epic.fields.customfield_24501) : null;
+                                page.accfinish = subtask.fields.customfield_24502 ? new Date(epic.fields.customfield_24502) : null;
+                                page.cusfinish = subtask.fields.customfield_24503 ? new Date(epic.fields.customfield_24503) : null;
+                            }
                             calcWorklogFromIssue(subtask, page);
                             if(subtask.fields.summary.indexOf("PLEX-Acceptance") > -1) {
                                 if(subtask.fields.status.name == "Closed") {

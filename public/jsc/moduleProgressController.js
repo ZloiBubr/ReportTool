@@ -236,6 +236,14 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
                     ProcessCards(moduleProgressItem, $scope.STATUS.READYFORQA.name);
                 }
             }
+            else if(moduleProgressItem.status == $scope.STATUS.RESOLVED.name &&
+                moduleProgressItem.moduleStatus == $scope.STATUS.CLOSED.name) {
+                var productionEntity = $scope.total.getStatusByName($scope.STATUS.PRODUCTION.name);
+                processEntity(productionEntity, moduleProgressItem);
+                if(addCards && productionEntity.isChecked) {
+                    ProcessCards(moduleProgressItem, $scope.STATUS.PRODUCTION.name);
+                }
+            }
             else if(moduleProgressItem.status == $scope.STATUS.RESOLVED.name) {
                 var resolvedEntity = $scope.total.getStatusByName($scope.STATUS.RESOLVED.name);
                 processEntity(resolvedEntity, moduleProgressItem);
@@ -429,6 +437,7 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
         $scope.total.readyForQA.isChecked = $scope.total.all.isChecked;
         $scope.total.cancelled.isChecked = $scope.total.all.isChecked;
         $scope.total.notApplicable.isChecked = $scope.total.all.isChecked;
+        $scope.total.production.isChecked = $scope.total.all.isChecked;
 
         $scope.processWithRowSpans(true);
     };

@@ -6,6 +6,7 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
         $scope.common = {};
         $scope.dataLoad();
         $scope.isShowSideBar = true;
+        $scope.detailedView = false;
         $scope.moduleDueData = [];
     };
 
@@ -16,6 +17,7 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
     $scope.dataLoad = function () {
         $scope.filteredSme = $scope.allSMEs[0].id;
         $scope.filteredMG = $scope.allModuleGroups[0].id;
+        $scope.filteredM = $scope.allModules[0].id;
         $scope.filteredTeam = $scope.allTeams[0].id;
         $scope.filteredVersion = $scope.allVersions[0].id;
         $scope.isTotalWasCalculated = false;
@@ -46,9 +48,16 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
         var runDate = startDate;
         while(runDate < new Date(2015, 08, 30)) {
             runDate = getNextSunday(runDate);
-            $scope.showWeeks.push({date: runDate.toDateString(), text: ''});
+            $scope.showWeeks.push({date: getHeaderDate(runDate), text: ''});
             runDate.setDate(runDate.getDate()+7);
         }
+    }
+
+    function getHeaderDate(date) {
+        var result = date.toDateString();
+        result = result.substr(4);
+        result = result.substr(0, result.length - 5);
+        return result;
     }
 
     function FillVersionsCombo() {
@@ -81,6 +90,36 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
             }
         });
     }
+
+    function FillModulesCombo() {
+        $scope.allModules = [{id: "All", name: "All"}];
+        _.each($scope.moduleProgressData.module, function(module){
+            if($scope.filteredMG != $scope.allModuleGroups[0].id && module.moduleGroupName != $scope.filteredMG){
+                return;
+            }
+            var found = false;
+            _.each($scope.allModules, function (module) {
+                if (module.name == module.moduleName) {
+                    found = true;
+                }
+            });
+            if (!found) {
+                $scope.allModules.push({id: module.moduleName, name: module.name});
+            }
+        });
+        $scope.allModules.sort(function (a, b) {
+            a = a.name;
+            b = b.name;
+            if (a == "All") {
+                return -1;
+            }
+            if (b == "All") {
+                return 1;
+            }
+            return a > b ? 1 : a < b ? -1 : 0;
+        });
+    }
+
 
     function FillSmeCombo() {
         _.each($scope.moduleProgressData.module, function (item) {
@@ -143,6 +182,7 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
     function fillAllCombos() {
         FillVersionsCombo();
         FillGroupsCombo();
+        FillModulesCombo();
         FillSmeCombo();
         SortCombos();
         fillWeeksArray();
@@ -161,6 +201,9 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
 
         _.each($scope.moduleProgressData.module, function(moduleProgressItem) {
             if(addCards && $scope.filteredMG != $scope.allModuleGroups[0].id && moduleProgressItem.moduleGroup != $scope.filteredMG){
+                return;
+            }
+            if(addCards && $scope.filteredM != $scope.allModules[0].id && moduleProgressItem.name != $scope.filteredM){
                 return;
             }
             if(addCards && $scope.filteredVersion != $scope.allVersions[0].id) {
@@ -228,6 +271,14 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
                     ProcessCards(moduleProgressItem, $scope.STATUS.READYFORQA.name);
                 }
             }
+            else if(moduleProgressItem.status == $scope.STATUS.RESOLVED.name &&
+                moduleProgressItem.moduleStatus == $scope.STATUS.CLOSED.name) {
+                var productionEntity = $scope.total.getStatusByName($scope.STATUS.PRODUCTION.name);
+                processEntity(productionEntity, moduleProgressItem);
+                if(addCards && productionEntity.isChecked) {
+                    ProcessCards(moduleProgressItem, $scope.STATUS.PRODUCTION.name);
+                }
+            }
             else if(moduleProgressItem.status == $scope.STATUS.RESOLVED.name) {
                 var resolvedEntity = $scope.total.getStatusByName($scope.STATUS.RESOLVED.name);
                 processEntity(resolvedEntity, moduleProgressItem);
@@ -251,96 +302,149 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
         $scope.isTotalWasCalculated = true;
     };
 
+    function getDevItemColor(date, acceptanceStatus) {
+        var color = 'blue';
+        if (isDevStatus(acceptanceStatus)) {
+            var developmentFinishDate = new Date(date);
+            if (developmentFinishDate > new Date(Date.now())) {
+                color = 'red';
+            }
+            else {
+                developmentFinishDate.setDate(developmentFinishDate.getDate() + 7);
+                if (developmentFinishDate > new Date(Date.now())) {
+                    color = 'yellow';
+                }
+            }
+        }
+        else if (isQAAcceptedProdStatus(acceptanceStatus)) {
+            color = 'green';
+        }
+        return color;
+    }
+
+    function getQAItemColor(date, acceptanceStatus) {
+        var color = 'blue';
+        if (isDevQAStatus(acceptanceStatus)) {
+            var qaFinishDate = new Date(date);
+            if (qaFinishDate > new Date(Date.now())) {
+                color = 'red';
+            }
+            else {
+                qaFinishDate.setDate(qaFinishDate.getDate() + 7);
+                if (qaFinishDate > new Date(Date.now())) {
+                    color = 'yellow';
+                }
+            }
+        }
+        else if (isQAProdStatus(acceptanceStatus)) {
+            color = 'green';
+        }
+        return color;
+    }
+
+    function getAcceptanceItemColor(date, acceptanceStatus) {
+        var color = 'blue';
+        if (isDevQAResolvedStatus(acceptanceStatus)) {
+            var acceptanceFinishDate = new Date(date);
+            if (acceptanceFinishDate > new Date(Date.now())) {
+                color = 'red';
+            }
+            else {
+                acceptanceFinishDate.setDate(acceptanceFinishDate.getDate() + 7);
+                if (acceptanceFinishDate > new Date(Date.now())) {
+                    color = 'yellow';
+                }
+            }
+        }
+        else if (isAcceptedProdStatus(acceptanceStatus)) {
+            color = 'green';
+        }
+        return color;
+    }
+
+    function getCompletionItemColor(date, acceptanceStatus, status) {
+        var color = 'blue';
+        if (isDevQAResolvedStatus(acceptanceStatus) || status != $scope.STATUS.CLOSED.name) {
+            var completeDate = new Date(date);
+            if (completeDate > new Date(Date.now())) {
+                color = 'red';
+            }
+            else {
+                completeDate.setDate(completeDate.getDate() + 7);
+                if (completeDate > new Date(Date.now())) {
+                    color = 'yellow';
+                }
+            }
+        }
+        else if (isClosedStatus(acceptanceStatus) && status == $scope.STATUS.CLOSED.name) {
+            color = 'green';
+        }
+        return color;
+    }
+
     function ProcessCards(moduleProgressItem, status) {
+        var rowItem;
+        if($scope.detailedView) {
+            var cloudApps = moduleProgressItem.cloudApps;
+            for(var i=0; i < cloudApps.length; i++) {
+                var item = cloudApps[i];
+                var uri = 'https://jira.epam.com/jira/issues/?jql=project%20%3D%20PLEX-UXC%20and%20issuetype%20%3D%20story%20and%20labels%20in%20(CloudApp_' + item.name + ')';
+                rowItem = getRowItem(
+                    item.name,
+                    uri,
+                    item.devFinishDate,
+                    item.qaFinishDate,
+                    item.acceptanceFinishDate,
+                    item.customerCompleteDate,
+                    [item.acceptanceStatus],
+                    item.cloudAppStatus,
+                    status
+                );
+                $scope.moduleDueData.push(rowItem);
+            }
+        }
+        else {
+            rowItem = getRowItem(
+                moduleProgressItem.name,
+                moduleProgressItem.uri,
+                moduleProgressItem.devFinishDate,
+                moduleProgressItem.qaFinishDate,
+                moduleProgressItem.acceptanceFinishDate,
+                moduleProgressItem.customerCompleteDate,
+                moduleProgressItem.acceptanceStatus,
+                moduleProgressItem.moduleStatus,
+                status);
+            $scope.moduleDueData.push(rowItem);
+        }
+    }
+
+    function getRowItem(name, uri, devFinishDate, qaFinishDate, acceptanceFinishDate, customerCompleteDate, acceptanceStatus, moduleStatus, status) {
         var moduleItem = {
-            name: moduleProgressItem.name,
+            name: name,
             status: status,
-            weeks: []
+            weeks: [],
+            uri: uri
         };
-        var devDate = getNextSunday(new Date(moduleProgressItem.devFinishDate)).toDateString();
-        var qaDate = getNextSunday(new Date(moduleProgressItem.qaFinishDate)).toDateString();
-        var acceptanceDate = getNextSunday(new Date(moduleProgressItem.acceptanceFinishDate)).toDateString();
-        var completionDate = getNextSunday(new Date(moduleProgressItem.customerCompleteDate)).toDateString();
+        var devDate = getHeaderDate(getNextSunday(new Date(devFinishDate)));
+        var qaDate = getHeaderDate(getNextSunday(new Date(qaFinishDate)));
+        var acceptanceDate = getHeaderDate(getNextSunday(new Date(acceptanceFinishDate)));
+        var completionDate = getHeaderDate(getNextSunday(new Date(customerCompleteDate)));
         for(var i=0; i<$scope.showWeeks.length; i++) {
             var weekItem = {date: $scope.showWeeks[i], items: []};
             if($scope.showWeeks[i].date == devDate) {
-                var color = 'blue';
-                if(isDevStatus(moduleProgressItem)) {
-                    var developmentFinishDate = new Date(moduleProgressItem.devFinishDate);
-                    if(developmentFinishDate > new Date(Date.now())) {
-                        color = 'red';
-                    }
-                    else {
-                        developmentFinishDate.setDate(developmentFinishDate.getDate() + 7);
-                        if (developmentFinishDate > new Date(Date.now())) {
-                            color = 'yellow';
-                        }
-                    }
-                }
-                else if(isQAAcceptedProdStatus(moduleProgressItem)) {
-                    color = 'green';
-                }
-
+                var color = getDevItemColor(devFinishDate, acceptanceStatus);
                 weekItem.items.push({text: 'D', color: color});
             }
             if($scope.showWeeks[i].date == qaDate) {
-                var color = 'blue';
-                if(isDevQAStatus(moduleProgressItem)) {
-                    var qaFinishDate = new Date(moduleProgressItem.qaFinishDate);
-                    if(qaFinishDate > new Date(Date.now())) {
-                        color = 'red';
-                    }
-                    else {
-                        qaFinishDate.setDate(qaFinishDate.getDate() + 7);
-                        if (qaFinishDate > new Date(Date.now())) {
-                            color = 'yellow';
-                        }
-                    }
-                }
-                else if(isQAProdStatus(moduleProgressItem)) {
-                    color = 'green';
-                }
-
+                var color = getQAItemColor(qaFinishDate, acceptanceStatus);
                 weekItem.items.push({text: 'Q', color: color});
             }
             if($scope.showWeeks[i].date == acceptanceDate) {
-                var color = 'blue';
-                if(isDevQAResolvedStatus(moduleProgressItem)) {
-                    var acceptanceFinishDate = new Date(moduleProgressItem.acceptanceFinishDate);
-                    if(acceptanceFinishDate > new Date(Date.now())) {
-                        color = 'red';
-                    }
-                    else {
-                        acceptanceFinishDate.setDate(acceptanceFinishDate.getDate() + 7);
-                        if (acceptanceFinishDate > new Date(Date.now())) {
-                            color = 'yellow';
-                        }
-                    }
-                }
-                else if(isAcceptedProdStatus(moduleProgressItem)) {
-                    color = 'green';
-                }
-
+                var color = getAcceptanceItemColor(acceptanceFinishDate, acceptanceStatus);
                 weekItem.items.push({text: 'A', color: color});
             }
             if($scope.showWeeks[i].date == completionDate) {
-                var color = 'blue';
-                if(isDevQAResolvedStatus(moduleProgressItem) || moduleProgressItem.moduleStatus != $scope.STATUS.CLOSED.name) {
-                    var completeDate = new Date(moduleProgressItem.customerCompleteDate);
-                    if(completeDate > new Date(Date.now())) {
-                        color = 'red';
-                    }
-                    else {
-                        completeDate.setDate(completeDate.getDate() + 7);
-                        if (completeDate > new Date(Date.now())) {
-                            color = 'yellow';
-                        }
-                    }
-                }
-                else if(isClosedStatus(moduleProgressItem) && moduleProgressItem.moduleStatus == $scope.STATUS.CLOSED.name) {
-                    color = 'green';
-                }
-
+                var color = getCompletionItemColor(customerCompleteDate, acceptanceStatus, moduleStatus);
                 weekItem.items.push({text: 'P', color: color});
             }
 
@@ -348,12 +452,12 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
 
             moduleItem.weeks.push(weekItem);
         }
-        $scope.moduleDueData.push(moduleItem);
+        return moduleItem;
     }
 
-    function isDevStatus(item) {
-        for(var i=0; i<item.acceptanceStatus.length; i++) {
-            var status = item.acceptanceStatus[i];
+    function isDevStatus(acceptanceStatus) {
+        for(var i=0; i < acceptanceStatus.length; i++) {
+            var status = acceptanceStatus[i];
             if(status == $scope.STATUS.DEFERRED.name ||
                 status == $scope.STATUS.OPEN.name ||
                 status == $scope.STATUS.BLOCKED.name ||
@@ -367,9 +471,9 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
         return false;
     }
 
-    function isDevQAStatus(item) {
-        for(var i=0; i<item.acceptanceStatus.length; i++) {
-            var status = item.acceptanceStatus[i];
+    function isDevQAStatus(acceptanceStatus) {
+        for(var i=0; i < acceptanceStatus.length; i++) {
+            var status = acceptanceStatus[i];
             if(status == $scope.STATUS.DEFERRED.name ||
                 status == $scope.STATUS.OPEN.name ||
                 status == $scope.STATUS.BLOCKED.name ||
@@ -385,9 +489,9 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
         return false;
     }
 
-    function isQAAcceptedProdStatus(item) {
-        for(var i=0; i<item.acceptanceStatus.length; i++) {
-            var status = item.acceptanceStatus[i];
+    function isQAAcceptedProdStatus(acceptanceStatus) {
+        for(var i=0; i < acceptanceStatus.length; i++) {
+            var status = acceptanceStatus[i];
             if(status != $scope.STATUS.READYFORQA.name &&
                 status != $scope.STATUS.TESTINGINPROGRESS.name &&
                 status != $scope.STATUS.RESOLVED.name &&
@@ -399,9 +503,9 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
         return true;
     }
 
-    function isQAProdStatus(item) {
-        for(var i=0; i<item.acceptanceStatus.length; i++) {
-            var status = item.acceptanceStatus[i];
+    function isQAProdStatus(acceptanceStatus) {
+        for(var i=0; i < acceptanceStatus.length; i++) {
+            var status = acceptanceStatus[i];
             if(status != $scope.STATUS.RESOLVED.name &&
                 status != $scope.STATUS.ACCEPTED.name &&
                 status != $scope.STATUS.PRODUCTION.name) {
@@ -411,9 +515,9 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
         return true;
     }
 
-    function isAcceptedProdStatus(item) {
-        for(var i=0; i<item.acceptanceStatus.length; i++) {
-            var status = item.acceptanceStatus[i];
+    function isAcceptedProdStatus(acceptanceStatus) {
+        for(var i=0; i < acceptanceStatus.length; i++) {
+            var status = acceptanceStatus[i];
             if(status != $scope.STATUS.ACCEPTED.name &&
                 status != $scope.STATUS.PRODUCTION.name) {
                 return false;
@@ -422,9 +526,9 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
         return true;
     }
 
-    function isClosedStatus(item) {
-        for(var i=0; i<item.acceptanceStatus.length; i++) {
-            var status = item.acceptanceStatus[i];
+    function isClosedStatus(acceptanceStatus) {
+        for(var i=0; i < acceptanceStatus.length; i++) {
+            var status = acceptanceStatus[i];
             if(status != $scope.STATUS.CLOSED.name) {
                 return false;
             }
@@ -432,9 +536,9 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
         return true;
     }
 
-    function isDevQAResolvedStatus(item) {
-        for(var i=0; i<item.acceptanceStatus.length; i++) {
-            var status = item.acceptanceStatus[i];
+    function isDevQAResolvedStatus(acceptanceStatus) {
+        for(var i=0; i < acceptanceStatus.length; i++) {
+            var status = acceptanceStatus[i];
             if(status == $scope.STATUS.DEFERRED.name ||
                 status == $scope.STATUS.OPEN.name ||
                 status == $scope.STATUS.BLOCKED.name ||
@@ -500,6 +604,7 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
         $scope.total.readyForQA.isChecked = $scope.total.all.isChecked;
         $scope.total.cancelled.isChecked = $scope.total.all.isChecked;
         $scope.total.notApplicable.isChecked = $scope.total.all.isChecked;
+        $scope.total.production.isChecked = $scope.total.all.isChecked;
 
         $scope.processWithRowSpans(true);
     };
@@ -528,9 +633,11 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
     $scope.saveStorageToLocalDb = function() {
         // save session
         var storage = {
+            detailedView: $scope.detailedView,
             filteredVersion: $scope.filteredVersion,
             filteredSme: $scope.filteredSme,
             filteredMG: $scope.filteredMG,
+            filteredM: $scope.filteredM,
             filteredTeam: $scope.filteredTeam,
             total_inProgress_isChecked: $scope.total.inProgress.isChecked,
             total_readyForQA_isChecked: $scope.total.readyForQA.isChecked,
@@ -549,9 +656,11 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
         {
             try {
                 var storage = localStorageService.get('moduleTargetsController');
+                $scope.detailedView = storage.detailedView;
                 $scope.filteredVersion = storage.filteredVersion;
                 $scope.filteredSme = storage.filteredSme;
                 $scope.filteredMG = storage.filteredMG;
+                $scope.filteredM = storage.filteredM;
                 $scope.filteredTeam = storage.filteredTeam;
                 $scope.total.inProgress.isChecked = storage.total_inProgress_isChecked;
                 $scope.total.readyForQA.isChecked = storage.total_readyForQA_isChecked;

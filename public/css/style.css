@@ -206,3 +206,22 @@ section.contentHideSidebar {
     padding-left: 38px;
 }
 
+.completion-red {
+    background-color: #ff0000;
+    color: #ffffff;
+}
+
+.completion-yellow {
+    background-color: #ffff00;
+    color: brown;
+}
+
+.completion-green {
+    background-color: lightgreen;
+    color: green;
+}
+
+.completion-blue {
+    background-color: #b8ecff;
+    color: #050e80;
+}

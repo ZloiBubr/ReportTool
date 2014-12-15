@@ -168,19 +168,31 @@ function putDataPoint(moduledata, module, page, count) {
             moduled.acceptanceStatus.push(page.acceptanceStatus);
         }
         moduled.checklistsProgress.push(page.checklistCreated);
-        addCloudApp(moduled, helpers.getCloudAppName(page.labels));
+        addCloudApp(moduled, page);
     }
 }
 
-function addCloudApp(module, cloudAppName) {
+function addCloudApp(module, page) {
     var found = false;
+    if(!helpers.isParentPage(page.labels)) {
+        return;
+    }
+    var cloudAppName = helpers.getCloudAppName(page.labels);
     for(var i=0; i<module.cloudApps.length; i++) {
-        if(module.cloudApps[i] == cloudAppName) {
+        if(module.cloudApps[i].name == cloudAppName) {
             found = true;
             break;
         }
     }
     if(!found) {
-        module.cloudApps.push(cloudAppName);
+        module.cloudApps.push({
+            name: cloudAppName,
+            devFinishDate: page.devfinish,
+            qaFinishDate: page.qafinish,
+            acceptanceFinishDate: page.accfinish,
+            customerCompleteDate: page.cusfinish,
+            cloudAppStatus: page.status,
+            acceptanceStatus: page.acceptanceStatus
+        });
     }
 }
