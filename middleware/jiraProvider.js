@@ -481,10 +481,10 @@ function SavePage(jira, issue, callback) {
                 async.eachSeries(subtasks.issues, function (subtask, callback) {
                         if (subtask != null) {
                             if(helpers.isParentPage(page.labels) && subtask.fields.summary.indexOf('PLEX-Acceptance') > -1) {
-                                page.devfinish = subtask.fields.customfield_24500 ? new Date(epic.fields.customfield_24500) : null;
-                                page.qafinish = subtask.fields.customfield_24501 ? new Date(epic.fields.customfield_24501) : null;
-                                page.accfinish = subtask.fields.customfield_24502 ? new Date(epic.fields.customfield_24502) : null;
-                                page.cusfinish = subtask.fields.customfield_24503 ? new Date(epic.fields.customfield_24503) : null;
+                                page.devfinish = subtask.fields.customfield_24500 ? new Date(subtask.fields.customfield_24500) : null;
+                                page.qafinish = subtask.fields.customfield_24501 ? new Date(subtask.fields.customfield_24501) : null;
+                                page.accfinish = subtask.fields.customfield_24502 ? new Date(subtask.fields.customfield_24502) : null;
+                                page.cusfinish = subtask.fields.customfield_24503 ? new Date(subtask.fields.customfield_24503) : null;
                             }
                             calcWorklogFromIssue(subtask, page);
                             if(subtask.fields.summary.indexOf("PLEX-Acceptance") > -1) {
