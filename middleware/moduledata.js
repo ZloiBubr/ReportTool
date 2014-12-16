@@ -174,9 +174,6 @@ function putDataPoint(moduledata, module, page, count) {
 
 function addCloudApp(module, page) {
     var found = false;
-    if(!helpers.isParentPage(page.labels)) {
-        return;
-    }
     var cloudAppName = helpers.getCloudAppName(page.labels);
     for(var i=0; i<module.cloudApps.length; i++) {
         if(module.cloudApps[i].name == cloudAppName) {
@@ -185,14 +182,19 @@ function addCloudApp(module, page) {
         }
     }
     if(!found) {
-        module.cloudApps.push({
+        var cloudApp = {
             name: cloudAppName,
-            devFinishDate: page.devfinish,
-            qaFinishDate: page.qafinish,
-            acceptanceFinishDate: page.accfinish,
-            customerCompleteDate: page.cusfinish,
-            cloudAppStatus: page.status,
-            acceptanceStatus: page.acceptanceStatus
-        });
+            cloudAppStatus: page.status
+        };
+        module.cloudApps.push(cloudApp);
+    }
+    if(helpers.isParentPage(page.labels)) {
+        var cloudApp = module.cloudApps[module.cloudApps.length-1];
+        cloudApp.devFinishDate = page.devfinish;
+        cloudApp.qaFinishDate = page.qafinish;
+        cloudApp.acceptanceFinishDate = page.accfinish;
+        cloudApp.customerCompleteDate = page.cusfinish;
+        cloudApp.acceptanceStatus = page.acceptanceStatus;
+        cloudApp.cloudAppStatus = page.status;
     }
 }

@@ -351,7 +351,7 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
     function getAcceptanceItemColor(date, status, acceptanceStatus) {
         var color = 'blue';
         var today = new Date(Date.now());
-        if (isDevQAResolvedStatus(status)) {
+        if (isDevQAStatus(status)) {
             var acceptanceFinishDate = new Date(date);
             if (acceptanceFinishDate < today) {
                 color = 'red';
@@ -372,7 +372,7 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
     function getCompletionItemColor(date, status, acceptanceStatus, moduleStatus) {
         var color = 'blue';
         var today = new Date(Date.now());
-        if (moduleStatus != $scope.STATUS.CLOSED.name) {
+        if (moduleStatus != $scope.STATUS.CLOSED.name && moduleStatus != $scope.STATUS.PRODUCTION.name) {
             var completeDate = new Date(date);
             if (completeDate < today) {
                 color = 'red';
@@ -384,7 +384,7 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
                 }
             }
         }
-        else if (moduleStatus == $scope.STATUS.CLOSED.name) {
+        else if (moduleStatus == $scope.STATUS.CLOSED.name || moduleStatus == $scope.STATUS.PRODUCTION.name) {
             color = 'green';
         }
         return color;
@@ -404,10 +404,10 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
                     item.qaFinishDate,
                     item.acceptanceFinishDate,
                     item.customerCompleteDate,
-                    [item.acceptanceStatus],
+                    item.acceptanceStatus,
                     item.cloudAppStatus,
                     item.cloudAppStatus,
-                    status
+                    item.acceptanceStatus
                 );
                 $scope.moduleDueData.push(rowItem);
             }
@@ -420,7 +420,7 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
                 moduleProgressItem.qaFinishDate,
                 moduleProgressItem.acceptanceFinishDate,
                 moduleProgressItem.customerCompleteDate,
-                moduleProgressItem.acceptanceStatus,
+                calcAcceptanceStatus(moduleProgressItem.acceptanceStatus),
                 moduleProgressItem.moduleStatus,
                 moduleProgressItem.status,
                 status);
@@ -450,11 +450,11 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
                 weekItem.items.push({text: 'Q', color: color});
             }
             if($scope.showWeeks[i].date == acceptanceDate) {
-                var color = getAcceptanceItemColor(acceptanceFinishDate, caclulatedStatus, calcAcceptanceStatus(acceptanceStatus));
+                var color = getAcceptanceItemColor(acceptanceFinishDate, caclulatedStatus, acceptanceStatus);
                 weekItem.items.push({text: 'A', color: color});
             }
             if($scope.showWeeks[i].date == completionDate) {
-                var color = getCompletionItemColor(customerCompleteDate, caclulatedStatus, calcAcceptanceStatus(acceptanceStatus), moduleStatus);
+                var color = getCompletionItemColor(customerCompleteDate, caclulatedStatus, acceptanceStatus, moduleStatus);
                 weekItem.items.push({text: 'P', color: color});
             }
 
@@ -515,6 +515,7 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
             status != $scope.STATUS.TESTINGINPROGRESS.name &&
             status != $scope.STATUS.RESOLVED.name &&
             status != $scope.STATUS.ACCEPTED.name &&
+            status != $scope.STATUS.CLOSED.name &&
             status != $scope.STATUS.PRODUCTION.name) {
             return false;
         }
@@ -524,6 +525,7 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
     function isQAProdStatus(status) {
         if(status != $scope.STATUS.RESOLVED.name &&
             status != $scope.STATUS.ACCEPTED.name &&
+            status != $scope.STATUS.CLOSED.name &&
             status != $scope.STATUS.PRODUCTION.name) {
             return false;
         }
@@ -531,11 +533,13 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
     }
 
     function isAcceptedProdStatus(status) {
-        if(status != $scope.STATUS.ACCEPTED.name &&
-            status != $scope.STATUS.PRODUCTION.name) {
-            return false;
+        if(status == $scope.STATUS.ACCEPTED.name ||
+            status == $scope.STATUS.RESOLVED.name ||
+            status == $scope.STATUS.CLOSED.name ||
+            status == $scope.STATUS.PRODUCTION.name) {
+            return true;
         }
-        return true;
+        return false;
     }
 
     function isClosedStatus(status) {
