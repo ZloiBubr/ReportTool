@@ -225,3 +225,11 @@ section.contentHideSidebar {
     background-color: #b8ecff;
     color: #050e80;
 }
+
+.end-of-year {
+    background-color: #f7f0da;
+}
+
+.current-week {
+    background-color: #d5e4cc;
+}

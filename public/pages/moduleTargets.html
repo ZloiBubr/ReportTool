@@ -54,7 +54,10 @@
                             production: module.status == 'Production'}">
                     <a href="{{module.uri}}">{{module.name}}</a>
                 </td>
-                <td ng-repeat="weekdata in module.weeks">
+                <td ng-repeat="weekdata in module.weeks" ng-class="{
+                'end-of-year': weekdata.date == 'Dec 28 2014',
+                'current-week': weekdata.date == getCurrentWeek()
+                }">
                     <table>
                         <tbody>
                         <tr>

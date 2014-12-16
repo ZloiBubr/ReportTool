@@ -48,17 +48,21 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
         var runDate = startDate;
         while(runDate < new Date(2015, 08, 30)) {
             runDate = getNextSunday(runDate);
-            $scope.showWeeks.push({date: getHeaderDate(runDate), text: ''});
+            $scope.showWeeks.push({date: $scope.getHeaderDate(runDate), text: ''});
             runDate.setDate(runDate.getDate()+7);
         }
     }
 
-    function getHeaderDate(date) {
+    $scope.getHeaderDate = function(date) {
         var result = date.toDateString();
         result = result.substr(4);
-        result = result.substr(0, result.length - 5);
+        //result = result.substr(0, result.length - 5);
         return result;
-    }
+    };
+
+    $scope.getCurrentWeek = function() {
+        return $scope.getHeaderDate(getNextSunday(new Date(Date.now())));
+    };
 
     function FillVersionsCombo() {
         //fill in Versions combo
@@ -306,12 +310,12 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
         var color = 'blue';
         if (isDevStatus(acceptanceStatus)) {
             var developmentFinishDate = new Date(date);
-            if (developmentFinishDate > new Date(Date.now())) {
+            if (developmentFinishDate < new Date(Date.now())) {
                 color = 'red';
             }
             else {
                 developmentFinishDate.setDate(developmentFinishDate.getDate() + 7);
-                if (developmentFinishDate > new Date(Date.now())) {
+                if (developmentFinishDate < new Date(Date.now())) {
                     color = 'yellow';
                 }
             }
@@ -326,12 +330,12 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
         var color = 'blue';
         if (isDevQAStatus(acceptanceStatus)) {
             var qaFinishDate = new Date(date);
-            if (qaFinishDate > new Date(Date.now())) {
+            if (qaFinishDate < new Date(Date.now())) {
                 color = 'red';
             }
             else {
                 qaFinishDate.setDate(qaFinishDate.getDate() + 7);
-                if (qaFinishDate > new Date(Date.now())) {
+                if (qaFinishDate < new Date(Date.now())) {
                     color = 'yellow';
                 }
             }
@@ -346,12 +350,12 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
         var color = 'blue';
         if (isDevQAResolvedStatus(acceptanceStatus)) {
             var acceptanceFinishDate = new Date(date);
-            if (acceptanceFinishDate > new Date(Date.now())) {
+            if (acceptanceFinishDate < new Date(Date.now())) {
                 color = 'red';
             }
             else {
                 acceptanceFinishDate.setDate(acceptanceFinishDate.getDate() + 7);
-                if (acceptanceFinishDate > new Date(Date.now())) {
+                if (acceptanceFinishDate < new Date(Date.now())) {
                     color = 'yellow';
                 }
             }
@@ -366,12 +370,12 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
         var color = 'blue';
         if (isDevQAResolvedStatus(acceptanceStatus) || status != $scope.STATUS.CLOSED.name) {
             var completeDate = new Date(date);
-            if (completeDate > new Date(Date.now())) {
+            if (completeDate < new Date(Date.now())) {
                 color = 'red';
             }
             else {
                 completeDate.setDate(completeDate.getDate() + 7);
-                if (completeDate > new Date(Date.now())) {
+                if (completeDate < new Date(Date.now())) {
                     color = 'yellow';
                 }
             }
@@ -425,12 +429,12 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
             weeks: [],
             uri: uri
         };
-        var devDate = getHeaderDate(getNextSunday(new Date(devFinishDate)));
-        var qaDate = getHeaderDate(getNextSunday(new Date(qaFinishDate)));
-        var acceptanceDate = getHeaderDate(getNextSunday(new Date(acceptanceFinishDate)));
-        var completionDate = getHeaderDate(getNextSunday(new Date(customerCompleteDate)));
+        var devDate = $scope.getHeaderDate(getNextSunday(new Date(devFinishDate)));
+        var qaDate = $scope.getHeaderDate(getNextSunday(new Date(qaFinishDate)));
+        var acceptanceDate = $scope.getHeaderDate(getNextSunday(new Date(acceptanceFinishDate)));
+        var completionDate = $scope.getHeaderDate(getNextSunday(new Date(customerCompleteDate)));
         for(var i=0; i<$scope.showWeeks.length; i++) {
-            var weekItem = {date: $scope.showWeeks[i], items: []};
+            var weekItem = {date: $scope.showWeeks[i].date, items: []};
             if($scope.showWeeks[i].date == devDate) {
                 var color = getDevItemColor(devFinishDate, acceptanceStatus);
                 weekItem.items.push({text: 'D', color: color});

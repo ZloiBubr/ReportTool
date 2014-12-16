@@ -473,7 +473,15 @@ function SavePage(jira, issue, callback) {
         parseHistory(issue, page);
         calcWorklogFromIssue(issue, page);
         var queryString = util.format("project = PLEXUXC AND parent in (%s)", issue.key);
-        jira.searchJira(queryString, { fields: ["summary", "worklog", "status"] }, function (error, subtasks) {
+        jira.searchJira(queryString, { fields: [
+            "summary",
+            "worklog",
+            "status",
+            "customfield_24500", //dev finish date
+            "customfield_24501", //qa finish date
+            "customfield_24502", //estimated acceptance date
+            "customfield_24503"  //customer complete date
+        ] }, function (error, subtasks) {
             if (error) {
                 callback(error);
             }
