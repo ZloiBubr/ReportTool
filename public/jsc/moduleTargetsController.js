@@ -275,7 +275,7 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
                     ProcessCards(moduleProgressItem, $scope.STATUS.READYFORQA.name);
                 }
             }
-            else if(moduleProgressItem.status == $scope.STATUS.RESOLVED.name &&
+            else if(moduleProgressItem.status == $scope.STATUS.PRODUCTION.name &&
                 moduleProgressItem.moduleStatus == $scope.STATUS.CLOSED.name) {
                 var productionEntity = $scope.total.getStatusByName($scope.STATUS.PRODUCTION.name);
                 processEntity(productionEntity, moduleProgressItem);
@@ -306,81 +306,85 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
         $scope.isTotalWasCalculated = true;
     };
 
-    function getDevItemColor(date, acceptanceStatus) {
+    function getDevItemColor(date, status) {
         var color = 'blue';
-        if (isDevStatus(acceptanceStatus)) {
+        var today = new Date(Date.now());
+        if (isDevStatus(status)) {
             var developmentFinishDate = new Date(date);
-            if (developmentFinishDate < new Date(Date.now())) {
+            if (developmentFinishDate < today) {
                 color = 'red';
             }
             else {
-                developmentFinishDate.setDate(developmentFinishDate.getDate() + 7);
-                if (developmentFinishDate < new Date(Date.now())) {
+                today.setDate(today.getDate() + 7);
+                if (developmentFinishDate < today) {
                     color = 'yellow';
                 }
             }
         }
-        else if (isQAAcceptedProdStatus(acceptanceStatus)) {
+        else if (isQAAcceptedProdStatus(status)) {
             color = 'green';
         }
         return color;
     }
 
-    function getQAItemColor(date, acceptanceStatus) {
+    function getQAItemColor(date, status) {
         var color = 'blue';
-        if (isDevQAStatus(acceptanceStatus)) {
+        var today = new Date(Date.now());
+        if (isDevQAStatus(status)) {
             var qaFinishDate = new Date(date);
-            if (qaFinishDate < new Date(Date.now())) {
+            if (qaFinishDate < today) {
                 color = 'red';
             }
             else {
-                qaFinishDate.setDate(qaFinishDate.getDate() + 7);
-                if (qaFinishDate < new Date(Date.now())) {
+                today.setDate(today.getDate() + 7);
+                if (qaFinishDate < today) {
                     color = 'yellow';
                 }
             }
         }
-        else if (isQAProdStatus(acceptanceStatus)) {
+        else if (isQAProdStatus(status)) {
             color = 'green';
         }
         return color;
     }
 
-    function getAcceptanceItemColor(date, acceptanceStatus) {
+    function getAcceptanceItemColor(date, status, acceptanceStatus) {
         var color = 'blue';
-        if (isDevQAResolvedStatus(acceptanceStatus)) {
+        var today = new Date(Date.now());
+        if (isDevQAResolvedStatus(status)) {
             var acceptanceFinishDate = new Date(date);
-            if (acceptanceFinishDate < new Date(Date.now())) {
+            if (acceptanceFinishDate < today) {
                 color = 'red';
             }
             else {
-                acceptanceFinishDate.setDate(acceptanceFinishDate.getDate() + 7);
-                if (acceptanceFinishDate < new Date(Date.now())) {
+                today.setDate(today.getDate() + 7);
+                if (acceptanceFinishDate < today) {
                     color = 'yellow';
                 }
             }
         }
-        else if (isAcceptedProdStatus(acceptanceStatus)) {
+        else if (isAcceptedProdStatus(status)) {
             color = 'green';
         }
         return color;
     }
 
-    function getCompletionItemColor(date, acceptanceStatus, status) {
+    function getCompletionItemColor(date, status, acceptanceStatus, moduleStatus) {
         var color = 'blue';
-        if (isDevQAResolvedStatus(acceptanceStatus) || status != $scope.STATUS.CLOSED.name) {
+        var today = new Date(Date.now());
+        if (moduleStatus != $scope.STATUS.CLOSED.name) {
             var completeDate = new Date(date);
-            if (completeDate < new Date(Date.now())) {
+            if (completeDate < today) {
                 color = 'red';
             }
             else {
-                completeDate.setDate(completeDate.getDate() + 7);
-                if (completeDate < new Date(Date.now())) {
+                today.setDate(today.getDate() + 7);
+                if (completeDate < today) {
                     color = 'yellow';
                 }
             }
         }
-        else if (isClosedStatus(acceptanceStatus) && status == $scope.STATUS.CLOSED.name) {
+        else if (moduleStatus == $scope.STATUS.CLOSED.name) {
             color = 'green';
         }
         return color;
@@ -402,6 +406,7 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
                     item.customerCompleteDate,
                     [item.acceptanceStatus],
                     item.cloudAppStatus,
+                    item.cloudAppStatus,
                     status
                 );
                 $scope.moduleDueData.push(rowItem);
@@ -417,12 +422,13 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
                 moduleProgressItem.customerCompleteDate,
                 moduleProgressItem.acceptanceStatus,
                 moduleProgressItem.moduleStatus,
+                moduleProgressItem.status,
                 status);
             $scope.moduleDueData.push(rowItem);
         }
     }
 
-    function getRowItem(name, uri, devFinishDate, qaFinishDate, acceptanceFinishDate, customerCompleteDate, acceptanceStatus, moduleStatus, status) {
+    function getRowItem(name, uri, devFinishDate, qaFinishDate, acceptanceFinishDate, customerCompleteDate, acceptanceStatus, moduleStatus, caclulatedStatus, status) {
         var moduleItem = {
             name: name,
             status: status,
@@ -436,19 +442,19 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
         for(var i=0; i<$scope.showWeeks.length; i++) {
             var weekItem = {date: $scope.showWeeks[i].date, items: []};
             if($scope.showWeeks[i].date == devDate) {
-                var color = getDevItemColor(devFinishDate, acceptanceStatus);
+                var color = getDevItemColor(devFinishDate, caclulatedStatus);
                 weekItem.items.push({text: 'D', color: color});
             }
             if($scope.showWeeks[i].date == qaDate) {
-                var color = getQAItemColor(qaFinishDate, acceptanceStatus);
+                var color = getQAItemColor(qaFinishDate, caclulatedStatus);
                 weekItem.items.push({text: 'Q', color: color});
             }
             if($scope.showWeeks[i].date == acceptanceDate) {
-                var color = getAcceptanceItemColor(acceptanceFinishDate, acceptanceStatus);
+                var color = getAcceptanceItemColor(acceptanceFinishDate, caclulatedStatus, calcAcceptanceStatus(acceptanceStatus));
                 weekItem.items.push({text: 'A', color: color});
             }
             if($scope.showWeeks[i].date == completionDate) {
-                var color = getCompletionItemColor(customerCompleteDate, acceptanceStatus, moduleStatus);
+                var color = getCompletionItemColor(customerCompleteDate, caclulatedStatus, calcAcceptanceStatus(acceptanceStatus), moduleStatus);
                 weekItem.items.push({text: 'P', color: color});
             }
 
@@ -459,102 +465,99 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
         return moduleItem;
     }
 
-    function isDevStatus(acceptanceStatus) {
-        for(var i=0; i < acceptanceStatus.length; i++) {
-            var status = acceptanceStatus[i];
-            if(status == $scope.STATUS.DEFERRED.name ||
-                status == $scope.STATUS.OPEN.name ||
-                status == $scope.STATUS.BLOCKED.name ||
-                status == $scope.STATUS.REOPENED.name ||
-                status == $scope.STATUS.ASSIGNED.name ||
-                status == $scope.STATUS.INPROGRESS.name ||
-                status == $scope.STATUS.CODEREVIEW.name) {
-                return true;
+    function calcAcceptanceStatus(acceptanceArray) {
+        if(acceptanceArray.length < 1) {
+            return $scope.STATUS.OPEN.name;
+        }
+        if(acceptanceArray.length == 1) {
+            return acceptanceArray[0];
+        }
+        var result = acceptanceArray[0];
+        for(var i=1; i < acceptanceArray.length; i++) {
+            var status1 = $scope.total.getStatusByName(result);
+            var status2 = $scope.total.getStatusByName(acceptanceArray[i]);
+            if(status2.weight < status1.weight) {
+                result = status2.name;
             }
+        }
+    }
+
+    function isDevStatus(status) {
+        if(status == $scope.STATUS.DEFERRED.name ||
+            status == $scope.STATUS.OPEN.name ||
+            status == $scope.STATUS.BLOCKED.name ||
+            status == $scope.STATUS.REOPENED.name ||
+            status == $scope.STATUS.ASSIGNED.name ||
+            status == $scope.STATUS.INPROGRESS.name ||
+            status == $scope.STATUS.CODEREVIEW.name) {
+            return true;
         }
         return false;
     }
 
-    function isDevQAStatus(acceptanceStatus) {
-        for(var i=0; i < acceptanceStatus.length; i++) {
-            var status = acceptanceStatus[i];
-            if(status == $scope.STATUS.DEFERRED.name ||
-                status == $scope.STATUS.OPEN.name ||
-                status == $scope.STATUS.BLOCKED.name ||
-                status == $scope.STATUS.REOPENED.name ||
-                status == $scope.STATUS.ASSIGNED.name ||
-                status == $scope.STATUS.INPROGRESS.name ||
-                status == $scope.STATUS.CODEREVIEW.name ||
-                status == $scope.STATUS.READYFORQA.name ||
-                status == $scope.STATUS.TESTINGINPROGRESS.name) {
-                return true;
-            }
+    function isDevQAStatus(status) {
+        if(status == $scope.STATUS.DEFERRED.name ||
+            status == $scope.STATUS.OPEN.name ||
+            status == $scope.STATUS.BLOCKED.name ||
+            status == $scope.STATUS.REOPENED.name ||
+            status == $scope.STATUS.ASSIGNED.name ||
+            status == $scope.STATUS.INPROGRESS.name ||
+            status == $scope.STATUS.CODEREVIEW.name ||
+            status == $scope.STATUS.READYFORQA.name ||
+            status == $scope.STATUS.TESTINGINPROGRESS.name) {
+            return true;
         }
         return false;
     }
 
-    function isQAAcceptedProdStatus(acceptanceStatus) {
-        for(var i=0; i < acceptanceStatus.length; i++) {
-            var status = acceptanceStatus[i];
-            if(status != $scope.STATUS.READYFORQA.name &&
-                status != $scope.STATUS.TESTINGINPROGRESS.name &&
-                status != $scope.STATUS.RESOLVED.name &&
-                status != $scope.STATUS.ACCEPTED.name &&
-                status != $scope.STATUS.PRODUCTION.name) {
-                return false;
-            }
+    function isQAAcceptedProdStatus(status) {
+        if(status != $scope.STATUS.READYFORQA.name &&
+            status != $scope.STATUS.TESTINGINPROGRESS.name &&
+            status != $scope.STATUS.RESOLVED.name &&
+            status != $scope.STATUS.ACCEPTED.name &&
+            status != $scope.STATUS.PRODUCTION.name) {
+            return false;
         }
         return true;
     }
 
-    function isQAProdStatus(acceptanceStatus) {
-        for(var i=0; i < acceptanceStatus.length; i++) {
-            var status = acceptanceStatus[i];
-            if(status != $scope.STATUS.RESOLVED.name &&
-                status != $scope.STATUS.ACCEPTED.name &&
-                status != $scope.STATUS.PRODUCTION.name) {
-                return false;
-            }
+    function isQAProdStatus(status) {
+        if(status != $scope.STATUS.RESOLVED.name &&
+            status != $scope.STATUS.ACCEPTED.name &&
+            status != $scope.STATUS.PRODUCTION.name) {
+            return false;
         }
         return true;
     }
 
-    function isAcceptedProdStatus(acceptanceStatus) {
-        for(var i=0; i < acceptanceStatus.length; i++) {
-            var status = acceptanceStatus[i];
-            if(status != $scope.STATUS.ACCEPTED.name &&
-                status != $scope.STATUS.PRODUCTION.name) {
-                return false;
-            }
+    function isAcceptedProdStatus(status) {
+        if(status != $scope.STATUS.ACCEPTED.name &&
+            status != $scope.STATUS.PRODUCTION.name) {
+            return false;
         }
         return true;
     }
 
-    function isClosedStatus(acceptanceStatus) {
-        for(var i=0; i < acceptanceStatus.length; i++) {
-            var status = acceptanceStatus[i];
-            if(status != $scope.STATUS.CLOSED.name) {
-                return false;
-            }
+    function isClosedStatus(status) {
+        if(status == $scope.STATUS.CLOSED.name ||
+            status == $scope.STATUS.PRODUCTION.name) {
+            return true;
         }
-        return true;
+        return false;
     }
 
-    function isDevQAResolvedStatus(acceptanceStatus) {
-        for(var i=0; i < acceptanceStatus.length; i++) {
-            var status = acceptanceStatus[i];
-            if(status == $scope.STATUS.DEFERRED.name ||
-                status == $scope.STATUS.OPEN.name ||
-                status == $scope.STATUS.BLOCKED.name ||
-                status == $scope.STATUS.REOPENED.name ||
-                status == $scope.STATUS.ASSIGNED.name ||
-                status == $scope.STATUS.INPROGRESS.name ||
-                status == $scope.STATUS.CODEREVIEW.name ||
-                status == $scope.STATUS.READYFORQA.name ||
-                status == $scope.STATUS.TESTINGINPROGRESS.name ||
-                status == $scope.STATUS.RESOLVED.name) {
-                return true;
-            }
+    function isDevQAResolvedStatus(status) {
+        if(status == $scope.STATUS.DEFERRED.name ||
+            status == $scope.STATUS.OPEN.name ||
+            status == $scope.STATUS.BLOCKED.name ||
+            status == $scope.STATUS.REOPENED.name ||
+            status == $scope.STATUS.ASSIGNED.name ||
+            status == $scope.STATUS.INPROGRESS.name ||
+            status == $scope.STATUS.CODEREVIEW.name ||
+            status == $scope.STATUS.READYFORQA.name ||
+            status == $scope.STATUS.TESTINGINPROGRESS.name ||
+            status == $scope.STATUS.RESOLVED.name) {
+            return true;
         }
         return false;
     }

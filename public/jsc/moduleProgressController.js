@@ -236,7 +236,7 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
                     ProcessCards(moduleProgressItem, $scope.STATUS.READYFORQA.name);
                 }
             }
-            else if(moduleProgressItem.status == $scope.STATUS.RESOLVED.name &&
+            else if(moduleProgressItem.status == $scope.STATUS.PRODUCTION.name &&
                 moduleProgressItem.moduleStatus == $scope.STATUS.CLOSED.name) {
                 var productionEntity = $scope.total.getStatusByName($scope.STATUS.PRODUCTION.name);
                 processEntity(productionEntity, moduleProgressItem);
