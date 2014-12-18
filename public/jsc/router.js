@@ -49,6 +49,10 @@ myApp.config(function($stateProvider, $urlRouterProvider) {
             url: "/moduleProgress",
             templateUrl: "pages/moduleProgress.html"
         })
+        .state('moduleTargets' , {
+            url: "/moduleTargets",
+            templateUrl: "pages/moduleTargets.html"
+        })
         .state('updateFromJira', {
             url: "/updateFromJira",
             templateUrl: "pages/updateFromJira.html"

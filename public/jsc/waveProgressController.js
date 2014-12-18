@@ -336,10 +336,10 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
         var getCloudAppSuccess = function (data) {
             $scope.cloudAppData = data;
             fillAllCombos();
-            $scope.processWithRowSpans(false);
+//            $scope.processWithRowSpans(false);
             $scope.loadStorageFromLocalDb();
             FillStreamsCombo();
-            $scope.processWithRowSpans(true);
+            $scope.filterModule();
             loadingDfrd.resolve();
         };
 

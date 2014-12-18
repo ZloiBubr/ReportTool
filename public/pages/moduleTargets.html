@@ -1,0 +1,78 @@
+<div ng-controller="moduleTargetsController">
+    <section class="sidebar" ng-show="isShowSideBar">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">Legend and filters <span class="glyphicon glyphicon-resize-small btn-link pull-right" ng-click="onToggleSideBar()"></span></h3>
+            </div>
+            <ul class="list-unstyled">
+                <li class="list-group-item">D = EPAM Dev Complete</li>
+                <li class="list-group-item">Q = EPAM QA Complete</li>
+                <li class="list-group-item">A = Plex Acceptance Complete</li>
+                <li class="list-group-item">P = Production Ready</li>
+                <li class="list-group-item list-group-item-info"><div class="checkbox"><label><input type="checkbox" ng-model="detailedView" ng-change="processWithRowSpans(true)">Cloud App View</label></div></li>
+                <li class="list-group-item">
+                    <div><select style="width: 150px" ng-model="filteredVersion" ng-options="version.name as version.name for version in allVersions" ng-change="filterModule()"></select>Version</div>
+                    <div><select style="width: 150px" ng-model="filteredSme" ng-options="sme.name as sme.name for sme in allSMEs" ng-change="filterModule()"></select>SME</div>
+                    <div><select style="width: 150px" ng-model="filteredMG" ng-options="moduleGroup.name as moduleGroup.name for moduleGroup in allModuleGroups" ng-change="filterModule()"></select>Group</div>
+                    <div><select style="width: 150px" ng-model="filteredM" ng-options="module.name as module.name for module in allModules" ng-change="filterModule()"></select>Module</div>
+                    <div><select style="width: 150px" ng-model="filteredTeam" ng-options="team.name as team.name for team in allTeams" ng-change="filterModule()"></select>Team</div>
+                </li>
+                <li class="list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.inProgress.isChecked" ng-change="processWithRowSpans(true)">In Progress</label><span class="badge pull-right">{{total.inProgress.count}}</span></div></li>
+                <li class="readyForQA list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.readyForQA.isChecked" ng-change="processWithRowSpans(true)">Testing in progress</label><span class="badge pull-right">{{total.readyForQA.count}}</span></div></li>
+                <li class="readyForAcceptance list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.resolved.isChecked" ng-change="processWithRowSpans(true)">Resolved</label><span class="badge pull-right">{{total.resolved.count}}</span></div></li>
+                <li class="accepted list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.accepted.isChecked" ng-change="processWithRowSpans(true)">Accepted</label><span class="badge pull-right">{{total.accepted.count}}</span></div></li>
+                <li class="cancelled list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.cancelled.isChecked" ng-change="processWithRowSpans(true)">Out Of Scope</label><span class="badge pull-right">{{total.cancelled.count}}</span></div></li>
+                <li class="cancelled list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.notApplicable.isChecked" ng-change="processWithRowSpans(true)">Not Applicable</label><span class="badge pull-right">{{total.notApplicable.count}}</span></div></li>
+                <li class="production list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.production.isChecked" ng-change="processWithRowSpans(true)">Production</label><span class="badge pull-right">{{total.production.count}}</span></div></li>
+                <li class="list-group-item"></li>
+                <li class="list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.all.isChecked" ng-change="onSelectDeselectAll()">Total</label><span class="badge pull-right">{{total.total}}</span></div></li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="sideCollapseButton" ng-show="!isShowSideBar">
+        <div><span class="btn-link"> <span class="glyphicon glyphicon-resize-full" ng-click="onToggleSideBar()"></span></span></div>
+    </section>
+
+    <section ng-class="{contentShowSidebar: isShowSideBar, contentHideSidebar: !isShowSideBar}">
+        <table class="table table-bordered">
+            <thead class="bg-info">
+            <tr>
+                <th ng-show="detailedView" style="min-width: 450px">Cloud App Name</th>
+                <th ng-show="!detailedView" style="min-width: 450px">Module Name</th>
+                <th class="week-header" ng-repeat="week in showWeeks">{{week.date}}</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat = "module in moduleDueData">
+                <td ng-class="{
+                            blocked: module.status == 'Blocked',
+                            accepted: module.status == 'Accepted',
+                            readyForAcceptance: module.status == 'Resolved',
+                            readyForQA: module.status == 'Ready for QA' || module.status == 'Testing in Progress',
+                            cancelled: module.status == 'Canceled',
+                            production: module.status == 'Production' || module.status == 'Closed'}">
+                    <a href="{{module.uri}}">{{module.name}}</a>
+                </td>
+                <td ng-repeat="weekdata in module.weeks" ng-class="{
+                'end-of-year': weekdata.date == 'Dec 28 2014',
+                'current-week': weekdata.date == getCurrentWeek()
+                }">
+                    <table>
+                        <tbody>
+                        <tr>
+                            <td ng-repeat="item in weekdata.items" ng-class="{
+                                'completion-red': item.color == 'red',
+                                'completion-yellow': item.color == 'yellow',
+                                'completion-green': item.color == 'green',
+                                'completion-blue': item.color == 'blue'
+                                }">{{item.text}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</div>

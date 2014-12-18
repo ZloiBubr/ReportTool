@@ -11,6 +11,7 @@ var Issue = require('../models/issue').Issue;
 var _ = require('underscore');
 var async = require('async');
 var sessionsupport = require('../middleware/sessionsupport');
+var helpers = require('../middleware/helpers');
 
 var VERSION = require('../public/jsc/versions').VERSION;
 
@@ -145,7 +146,21 @@ function Step1CollectModules(jira, callback) {
             return loopError;
         },
         function(callback) {
-        jira.searchJira(requestString, { fields: ["summary", "duedate", "assignee", "status", "resolution", "labels", "fixVersions", "priority"] }, function (error, epics) {
+        jira.searchJira(requestString, {
+            fields: [
+                "summary",
+                "duedate",
+                "assignee",
+                "status",
+                "resolution",
+                "labels",
+                "fixVersions",
+                "priority",
+                "customfield_24500", //dev finish date
+                "customfield_24501", //qa finish date
+                "customfield_24502", //estimated acceptance date
+                "customfield_24503"  //customer complete date
+            ] }, function (error, epics) {
             if (error) {
                 callback(error);
             }
@@ -158,6 +173,10 @@ function Step1CollectModules(jira, callback) {
                             module.key = epic.key;
                             module.summary = epic.fields.summary;
                             module.duedate = epic.fields.duedate == null ? null : new Date(epic.fields.duedate);
+                            module.devfinish = epic.fields.customfield_24500 == null ? null : new Date(epic.fields.customfield_24500);
+                            module.qafinish = epic.fields.customfield_24501 == null ? null : new Date(epic.fields.customfield_24501);
+                            module.accfinish = epic.fields.customfield_24502 == null ? null : new Date(epic.fields.customfield_24502);
+                            module.cusfinish = epic.fields.customfield_24503 == null ? null : new Date(epic.fields.customfield_24503);
                             module.assignee = epic.fields.assignee == null ? "Unassigned" : epic.fields.assignee.name;
                             module.status = epic.fields.status.name;
                             module.resolution = epic.fields.resolution == null ? "" : epic.fields.resolution.name;
@@ -454,17 +473,33 @@ function SavePage(jira, issue, callback) {
         parseHistory(issue, page);
         calcWorklogFromIssue(issue, page);
         var queryString = util.format("project = PLEXUXC AND parent in (%s)", issue.key);
-        jira.searchJira(queryString, { fields: ["summary", "worklog", "status"] }, function (error, subtasks) {
+        jira.searchJira(queryString, { fields: [
+            "summary",
+            "worklog",
+            "status",
+            "customfield_24500", //dev finish date
+            "customfield_24501", //qa finish date
+            "customfield_24502", //estimated acceptance date
+            "customfield_24503"  //customer complete date
+        ] }, function (error, subtasks) {
             if (error) {
                 callback(error);
             }
             if (subtasks != null) {
                 async.eachSeries(subtasks.issues, function (subtask, callback) {
                         if (subtask != null) {
+                            if(helpers.isParentPage(page.labels) && subtask.fields.summary.indexOf('PLEX-Acceptance') > -1) {
+                                page.devfinish = subtask.fields.customfield_24500 ? new Date(subtask.fields.customfield_24500) : null;
+                                page.qafinish = subtask.fields.customfield_24501 ? new Date(subtask.fields.customfield_24501) : null;
+                                page.accfinish = subtask.fields.customfield_24502 ? new Date(subtask.fields.customfield_24502) : null;
+                                page.cusfinish = subtask.fields.customfield_24503 ? new Date(subtask.fields.customfield_24503) : null;
+                            }
                             calcWorklogFromIssue(subtask, page);
-                            if(subtask.fields.summary.indexOf("PLEX-Acceptance") > -1 &&
-                                subtask.fields.status.name == "Closed") {
-                                page.status = "Production";
+                            if(subtask.fields.summary.indexOf("PLEX-Acceptance") > -1) {
+                                if(subtask.fields.status.name == "Closed") {
+                                    page.status = "Production";
+                                }
+                                page.acceptanceStatus = subtask.fields.status.name;
                             }
                             callback();
                         }

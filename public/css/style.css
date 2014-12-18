@@ -183,6 +183,9 @@ table {
     margin: 0px;
 }
 
+.week-header {
+}
+
 section.sidebar{
     float: left;
     width: 250px;
@@ -203,3 +206,29 @@ section.contentHideSidebar {
     padding-left: 38px;
 }
 
+.completion-red {
+    background-color: #ff0000;
+    color: #ffffff;
+}
+
+.completion-yellow {
+    background-color: #ffff00;
+    color: brown;
+}
+
+.completion-green {
+    background-color: lightgreen;
+    color: green;
+}
+
+.completion-blue {
+    color: #050e80;
+}
+
+.end-of-year {
+    background-color: #f7f0da;
+}
+
+.current-week {
+    background-color: #d5e4cc;
+}

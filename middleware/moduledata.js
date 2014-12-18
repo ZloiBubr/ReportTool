@@ -138,7 +138,12 @@ function putDataPoint(moduledata, module, page, count) {
             streamName: streamName,
             testingProgress: isParentPage && page.testingProgress ? parseFloat(page.testingProgress) : 0.,
             checklistsProgress: [],
-            cloudApps: []
+            cloudApps: [],
+            devFinishDate: module.devfinish,
+            qaFinishDate: module.qafinish,
+            acceptanceFinishDate: module.accfinish,
+            customerCompleteDate: module.cusfinish,
+            acceptanceStatus: []
         };
         moduledata.module.push(moduled);
     }
@@ -160,21 +165,36 @@ function putDataPoint(moduledata, module, page, count) {
         }
         if(isParentPage) {
             moduled.testingProgress = page.testingProgress ? parseFloat(page.testingProgress) : 0.;
+            moduled.acceptanceStatus.push(page.acceptanceStatus);
         }
         moduled.checklistsProgress.push(page.checklistCreated);
-        addCloudApp(moduled, helpers.getCloudAppName(page.labels));
+        addCloudApp(moduled, page);
     }
 }
 
-function addCloudApp(module, cloudAppName) {
+function addCloudApp(module, page) {
     var found = false;
+    var cloudAppName = helpers.getCloudAppName(page.labels);
     for(var i=0; i<module.cloudApps.length; i++) {
-        if(module.cloudApps[i] == cloudAppName) {
+        if(module.cloudApps[i].name == cloudAppName) {
             found = true;
             break;
         }
     }
     if(!found) {
-        module.cloudApps.push(cloudAppName);
+        var cloudApp = {
+            name: cloudAppName,
+            cloudAppStatus: page.status
+        };
+        module.cloudApps.push(cloudApp);
+    }
+    if(helpers.isParentPage(page.labels)) {
+        var cloudApp = module.cloudApps[module.cloudApps.length-1];
+        cloudApp.devFinishDate = page.devfinish;
+        cloudApp.qaFinishDate = page.qafinish;
+        cloudApp.acceptanceFinishDate = page.accfinish;
+        cloudApp.customerCompleteDate = page.cusfinish;
+        cloudApp.acceptanceStatus = page.acceptanceStatus;
+        cloudApp.cloudAppStatus = page.status;
     }
 }
