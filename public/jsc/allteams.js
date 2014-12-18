@@ -158,7 +158,8 @@ function Teams() {
                 "Aleh Dukel",
                 "Ivan Yanchuk",
                 "Kanstantsin Ldou",
-                "Katsiaryna Zeliankova"
+                "Katsiaryna Zeliankova",
+                "Mikhail Kelbas"
             ],
             testers: [
                 "Iryna Koush",
