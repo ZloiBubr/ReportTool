@@ -23,6 +23,7 @@
         "underscore": "*",
         "connect": "*",
         "cookie": "*",
-        "nodemailer": "*"
+        "nodemailer": "*",
+        "oauth":"*"
     }
 }

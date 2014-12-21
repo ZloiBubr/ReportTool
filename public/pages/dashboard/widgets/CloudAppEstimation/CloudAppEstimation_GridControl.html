@@ -19,10 +19,7 @@
             <td style="width: 100px">{{module.summarySP - module.reportedSP | number:1}}</td>
             <td style="width: 100px">{{module.devLeftWorkDays | number:1}}</td>
             <td style="width: 150px">
-                <div class="input-group">
-                    <span class="input-group-addon">auto:{{module.qaLeftWorkDays | number:1}}</span>
-                    <input type="number" class="form-control" ng-model="module.qaLeftCustomDays" ng-change="onRecalc()"/>
-                </div>
+                    <span >auto:{{module.qaLeftWorkDays | number:1}}</span>
             </td>
             <td ng-class="module.done ? 'accepted' : dateEqualColor(module.duedate, module.endDevDate)"><span tooltip-placement="bottom" tooltip-html-unsafe="{{daysDiff(module.duedate, module.endDevDate)}}">{{module.endDevDate | date: 'M/d/yyyy'}}</span></td>
             <td ng-class="module.done ? 'accepted' : dateEqualColor(module.duedate, module.endQADate)"><span tooltip-placement="bottom" tooltip-html-unsafe="{{daysDiff(module.duedate, module.endQADate)}}">{{module.endQADate | date: 'M/d/yyyy'}}</span></td>

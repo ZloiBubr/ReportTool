@@ -89,15 +89,15 @@ function CloudAppEstimationController($scope, $resource, $window, $filter, local
             }), function(item){return [item.duedate, $scope.getPriorityNumber(item.priority)].join("_");});
 
             if(restored_model) {
-                _.each($scope.estimation.streams[streamItem].modules, function (moduleItem) {
-                    var module = _.find(storage.streams[streamItem].modules,function(storModuleItem){
-                        return storModuleItem.key === moduleItem.key;
-                    });
-
-                    if(!_.isUndefined(module) && _.isNumber(module.qaLeftCustomDays)){
-                        moduleItem.qaLeftCustomDays = module.qaLeftCustomDays;
-                    }
-                });
+//                _.each($scope.estimation.streams[streamItem].modules, function (moduleItem) {
+//                    var module = _.find(storage.streams[streamItem].modules,function(storModuleItem){
+//                        return storModuleItem.key === moduleItem.key;
+//                    });
+//
+//                    if(!_.isUndefined(module) && _.isNumber(module.qaLeftCustomDays)){
+//                        moduleItem.qaLeftCustomDays = module.qaLeftCustomDays;
+//                    }
+//                });
             }
         });
 
@@ -145,7 +145,8 @@ function CloudAppEstimationController($scope, $resource, $window, $filter, local
             var previousDevModuleEndDate, previousQAModuleEndDate;
             _.each($scope.estimation.streams[streamItem].modules, function(moduleItem){
                 moduleItem.devLeftWorkDays = ((moduleItem.summarySP - moduleItem.reportedSP) / $scope.estimation.dayDevSpVelocity) / $scope.estimation.streams[streamItem].devCapacity;
-                moduleItem.qaLeftWorkDays = ((moduleItem.summarySP - moduleItem.reportedSP) / $scope.estimation.dayQaSpVelocity) / $scope.estimation.streams[streamItem].qaCapacity;
+                var factorQaReady = 0.6*(moduleItem.checklistsProgress/100) + 0.4*(moduleItem.testingProgress/100);
+                moduleItem.qaLeftWorkDays = ((moduleItem.summarySP - (moduleItem.summarySP*factorQaReady)) / $scope.estimation.dayQaSpVelocity) / $scope.estimation.streams[streamItem].qaCapacity;
 
                 // apply risk
                 moduleItem.devLeftWorkDays = _.isUndefined($scope.estimation.devRisk) || $scope.estimation.devRisk == 0 ? moduleItem.devLeftWorkDays : moduleItem.devLeftWorkDays * $scope.estimation.devRisk;
