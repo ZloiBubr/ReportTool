@@ -23,6 +23,7 @@ function Teams() {
                 "Aliaksey Rahatka",
                 "Pavel Kastsiuk",
                 "Juliana Stolnik",
+		        "Volha Viktarava",
                 "Artsiom Kazlou"
             ],
             testers: [
@@ -31,6 +32,9 @@ function Teams() {
                 "Hanna Prykhodzka",
                 "Kseniya Kavalchuk",
                 "Yuliya Tukaila",
+		        "Aliaksei Huliayeu",
+		        "Artsiom Yesis",
+		        "Siarhei Shyshparonak",
                 "Aliaksandra Kutynka"
             ]
         },
@@ -57,7 +61,8 @@ function Teams() {
                 "Ihor Rudchenko",
                 "Andrii Savinov",
                 "Dmytro Petlia",
-                "Olena Ostroverkhova"
+                "Olena Ostroverkhova",
+		        "Volodymyr Osmak"
             ],
             testers: [
                 "Mila Botnar",
@@ -65,6 +70,7 @@ function Teams() {
                 "Anastasia Kotenyova",
                 "Pavlo Golovashchenko",
                 "Oleksii Milman",
+		        "Svitlana Andrieieva",
                 "Denys Pugachov"
             ]
         },
@@ -89,8 +95,8 @@ function Teams() {
                 "Anton Kratenok",
                 "Siarhei Maksimau1",
                 "Dzmitry Chapurok",
-                "Evgeny Sinitsyn",
-                "Dzmitry Salodki"
+		        "Pavel Davidouski",
+                "Evgeny Sinitsyn"                
             ],
             testers: [
                 "Aliaksei Burnosenka",
@@ -98,6 +104,9 @@ function Teams() {
                 "Eugeny Okulik",
                 "Yuliya Kalasouskaya",
                 "Hanna Maskalenka",
+		        "Kiryl Kozubouski",
+		        "Mikhail Naskalau",
+		        "Nataliya Shmakava",
                 "Valiantsina Krautsevich"
             ]
         },
@@ -110,7 +119,7 @@ function Teams() {
             developers: [
                 "Pavel Naumenka",
                 "Sergei Kulick",
-                "Volha Shandrokha",
+                "Ilya Huchok",
                 "Aliaksandr Rusak",
                 "Andrei Kasak",
                 "Andrei Krasnou",
@@ -119,8 +128,7 @@ function Teams() {
                 "Dzmitry Isachenka",
                 "Eugen Surovets",
                 "Katsiaryna Tsalabanava",
-                "Kate Tsalabanava",
-                "Vitali Podobed",
+                "Andrii Prykhodko",
                 "Hleb Krotsik",
                 "Uladzimir Vysotski"
             ],
@@ -130,6 +138,7 @@ function Teams() {
                 "Igor Andros",
                 "Maria Sobal",
                 "Yuliya Karnatsevich",
+                "Nastassia Dziadkova",
                 "Iryna Kutsko",
                 "Natalya Krestelyova"
             ]
@@ -142,7 +151,6 @@ function Teams() {
             qaTeamLead: "Katsiaryna Kuchko",
             developers: [
                 "Valentine Zhuck",
-                "Siarhei Zhalezka",
                 "Viachaslau Anufryiuk",
                 "Yury Yamoryk",
                 "Aliaksandr Kladau",
@@ -158,15 +166,17 @@ function Teams() {
                 "Aleh Dukel",
                 "Ivan Yanchuk",
                 "Kanstantsin Ldou",
-                "Katsiaryna Zeliankova",
-                "Mikhail Kelbas"
+                "Siarhei Nikitsin",
+		        "Mikhail Kelbas",
+                "Katsiaryna Zeliankova"
             ],
             testers: [
-                "Iryna Koush",
+                "Iryna Malets",
                 "Maryia Kireyeva",
                 "Iryna Shuliak",
                 "Liudmila Barshcheuskaya",
                 "Iryna Razorionova",
+		        "Volha Shymanovich",
                 "Katsiaryna Kuchko"
             ]
         },
@@ -179,6 +189,8 @@ function Teams() {
                 "Roman Golovchenko",
                 "Allaberdi Hojayev",
                 "Bohdan Sorokin",
+		        "Ivan Manzhos",
+		        "Oleh Vinnikov",
                 "Yevhenii Koliesnik"
             ],
             testers: [
@@ -192,13 +204,10 @@ function Teams() {
             name: "Automation",
             teamLead: "Aliaksandr Basau",
             developers: [
-                "Nadzeya Mishurava",
                 "Viachaslau Naimovich",
                 "Vitali Sonchyk",
-                "Katsiaryna Firsava",
                 "Katsiaryna Kulbitskaya",
-                "Maryia Kashtanava",
-                "Rustam Allanazarau"
+                "Maryia Kashtanava"               
             ]
         }
     ]
@@ -220,6 +229,12 @@ exports.OldDevelopers = function oldDevelopers(name) {
         name == "Katsiaryna Sasina" ||
         name == "aliaksei_labachou aliaksei_labachou" ||
         name == "Maryna Furman" ||
+ 	    name == "Dzmitry Salodki" ||
+	    name == "Volha Shandrokha" ||
+ 	    name == "Kate Tsalabanava" ||
+ 	    name == "Vitali Podobed" ||
+ 	    name == "Siarhei Zhalezka" ||
+ 	    name == "Maryna Furman" ||
         name == undefined) {
         return true;
     }
