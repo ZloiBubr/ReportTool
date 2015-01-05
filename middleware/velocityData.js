@@ -151,7 +151,7 @@ function AdjustProjection(velocity) {
 
 function AddProjection(maximumBurn, velocity) {
     var monthAgo = new Date(Date.now());
-    monthAgo.setMonth(monthAgo.getMonth()-1);
+    monthAgo.setMonth(monthAgo.getMonth()-3);
     var monthAgoMsc = monthAgo.getTime();
     var sum = 0.0;
     var projectedBurn = null;
@@ -177,7 +177,7 @@ function AddProjection(maximumBurn, velocity) {
     while(pointDate < projectEnd) {
         var pointDateMsc = pointDate.getTime();
         projectedBurn.data.push({x:pointDateMsc, y:pointValue, tooltip: ""});
-        pointValue -= sum;
+        pointValue -= sum/3.;
         pointDate.setMonth(pointDate.getMonth()+1);
     }
 }
