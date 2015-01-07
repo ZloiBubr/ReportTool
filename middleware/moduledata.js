@@ -100,6 +100,10 @@ function putDataPoint(moduledata, module, page, count) {
         moduleGroup = helpers.getModuleGroupName(page.labels);
         progress = page.progress == null ? 0. : parseInt(page.progress);
         calcStoryPoints = storyPoints * progress / 100.;
+        var teamNameP = helpers.getTeamName(page.labels);
+        if(teamNameP != "" && teamNameP != "--") {
+            teamName = teamNameP;
+        }
     }
     else {
         storyPoints = 0.;
@@ -112,7 +116,7 @@ function putDataPoint(moduledata, module, page, count) {
     //module
     var moduled;
     for (var k = 0; k < moduledata.module.length; k++) {
-        if (moduledata.module[k].key == module.key) {
+        if (moduledata.module[k].key == module.key && moduledata.module[k].teamName == teamName) {
             moduled = moduledata.module[k];
             break;
         }

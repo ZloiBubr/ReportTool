@@ -141,9 +141,9 @@ function putDataPoint(cloudAppData, module, page) {
             cloudApp.devTimeSpent += timeSpent.devTimeSpent;
             cloudApp.qaTimeSpent += timeSpent.qaTimeSpent;
             cloudApp.checklistsProgress.push(page.checklistCreated);
+            cloudApp.teamName = teamName;
+            cloudApp.streamName = streamName;
             if(isParentPage) {
-                cloudApp.teamName = teamName;
-                cloudApp.streamName = streamName;
                 cloudApp.testingProgress = page.testingProgress;
             }
 
