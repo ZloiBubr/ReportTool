@@ -19,16 +19,7 @@ function cloudAppData() {
 }
 
 function chartData() {
-    this.data = [
-        {
-            data: [],
-            name: "Development Time"
-        },
-        {
-            data: [],
-            name: "QA Time"
-        }
-    ];
+    this.data = [];
 }
 
 function parsePages(callback) {
@@ -90,22 +81,41 @@ function copyCloudAppData(chartdata, cloudappdata) {
             !cloudApp.dateQAFinished) {
             continue;
         }
-        for (var k = 0; k < chartdata.data.length; k++) {
-            var size = chartdata.data[k];
-            if (size.name == 'Development Time') {
-                size.data.push({
-                    x: cloudApp.dateQAFinished,
-                    y: cloudApp.storyPoints > 0 ? cloudApp.devTimeSpent/cloudApp.storyPoints : 0,
-                    tooltip: cloudApp.name + ' - ' + cloudApp.devTimeSpent.toFixed(2) + 'h - ' + cloudApp.storyPoints + 'SP - ' + cloudApp.teamName });
-            }
-            if (size.name == 'QA Time') {
-                size.data.push({
-                    x: cloudApp.dateQAFinished,
-                    y: cloudApp.storyPoints > 0 ? cloudApp.qaTimeSpent/cloudApp.storyPoints : 0,
-                    tooltip: cloudApp.name + ' - ' + cloudApp.qaTimeSpent.toFixed(2) + 'h - ' + cloudApp.storyPoints + 'SP - ' + cloudApp.teamName });
-            }
+        var size = getSizeData(chartdata, 'Development Time Total');
+        size.data.push({
+            x: cloudApp.dateQAFinished,
+            y: cloudApp.storyPoints > 0 ? cloudApp.devTimeSpent/cloudApp.storyPoints : 0,
+            tooltip: cloudApp.name + ' - ' + cloudApp.devTimeSpent.toFixed(2) + 'h - ' + cloudApp.storyPoints + 'SP - ' + cloudApp.teamName });
+        size = getSizeData(chartdata, 'QA Time Total');
+        size.data.push({
+            x: cloudApp.dateQAFinished,
+            y: cloudApp.storyPoints > 0 ? cloudApp.qaTimeSpent/cloudApp.storyPoints : 0,
+            tooltip: cloudApp.name + ' - ' + cloudApp.qaTimeSpent.toFixed(2) + 'h - ' + cloudApp.storyPoints + 'SP - ' + cloudApp.teamName });
+        if(cloudApp.teamName != '--') {
+            size = getSizeData(chartdata, 'Dev Time ' + cloudApp.teamName);
+            size.data.push({
+                x: cloudApp.dateQAFinished,
+                y: cloudApp.storyPoints > 0 ? cloudApp.devTimeSpent/cloudApp.storyPoints : 0,
+                tooltip: cloudApp.name + ' - ' + cloudApp.devTimeSpent.toFixed(2) + 'h - ' + cloudApp.storyPoints + 'SP - ' + cloudApp.teamName });
+            size = getSizeData(chartdata, 'QA Time ' + cloudApp.teamName);
+            size.data.push({
+                x: cloudApp.dateQAFinished,
+                y: cloudApp.storyPoints > 0 ? cloudApp.qaTimeSpent/cloudApp.storyPoints : 0,
+                tooltip: cloudApp.name + ' - ' + cloudApp.qaTimeSpent.toFixed(2) + 'h - ' + cloudApp.storyPoints + 'SP - ' + cloudApp.teamName });
         }
     }
+}
+
+function getSizeData(chartdata, sizeName) {
+    for (var k = 0; k < chartdata.data.length; k++) {
+        var size = chartdata.data[k];
+        if (size.name == sizeName) {
+            return size;
+        }
+    }
+    var newSize = { data: [], name: sizeName, visible: sizeName == 'Development Time Total' || sizeName == 'QA Time Total' ? true : false};
+    chartdata.data.push(newSize);
+    return newSize;
 }
 
 function putDataPoint(cloudAppData, module, page) {

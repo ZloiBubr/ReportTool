@@ -22,27 +22,33 @@ function pagebysizeModel() {
     this.data = [
         {
             data: [],
-            name: "XXXLDev"
+            name: "XXXLDev",
+            visible: false
         },
         {
             data: [],
-            name: "XXLDev"
+            name: "XXLDev",
+            visible: false
         },
         {
             data: [],
-            name: "ExtraLargeDev"
+            name: "ExtraLargeDev",
+            visible: false
         },
         {
             data: [],
-            name: "LargePlusDev"
+            name: "LargePlusDev",
+            visible: false
         },
         {
             data: [],
-            name: "LargeDev"
+            name: "LargeDev",
+            visible: false
         },
         {
             data: [],
-            name: "MediumDev"
+            name: "MediumDev",
+            visible: false
         },
         {
             data: [],

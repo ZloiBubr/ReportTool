@@ -136,6 +136,9 @@ function putDataPoint(cloudAppData, module, page) {
             cloudApp = cloudAppData.cloudApp[i];
             cloudApp.reportedSP += calcStoryPoints;
             cloudApp.summarySP += storyPoints;
+            if(storyPoints > 30) {
+                cloudApp.xxl = true;
+            }
             cloudApp.progress = cloudApp.reportedSP*100./cloudApp.summarySP;
             cloudApp.pages++;
             cloudApp.devTimeSpent += timeSpent.devTimeSpent;
@@ -172,6 +175,7 @@ function putDataPoint(cloudAppData, module, page) {
             progress: progress,
             reportedSP: calcStoryPoints,
             summarySP: storyPoints,
+            xxl: storyPoints > 30,
             name: cloudAppName,
             status: status,
             resolution: page.resolution,

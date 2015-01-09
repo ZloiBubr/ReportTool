@@ -138,6 +138,7 @@ function putDataPoint(moduledata, module, page, count) {
             progress: 0.,
             reportedSP: 0.,
             summarySP: 0.,
+            xxl: false,
             teamName: teamName,
             streamName: streamName,
             testingProgress: isParentPage && page.testingProgress ? parseFloat(page.testingProgress) : 0.,
@@ -154,6 +155,9 @@ function putDataPoint(moduledata, module, page, count) {
 
     moduled.reportedSP += calcStoryPoints;
     moduled.summarySP += storyPoints;
+    if(storyPoints > 30) {
+        moduled.xxl = true;
+    }
     moduled.progress = moduled.summarySP > 0. ? moduled.reportedSP*100/moduled.summarySP : 0.;
     moduled.pagescount = count;
 

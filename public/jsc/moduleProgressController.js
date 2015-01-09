@@ -313,7 +313,9 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
                 card.testingProgress = card.summaryTestingProgress / card.modulesCount;
                 card.summaryChecklistsProgress += item.checklistsProgress ? item.checklistsProgress : 0;
                 card.checklistsProgress = card.summaryChecklistsProgress / card.modulesCount;
-
+                if(item.xxl) {
+                    card.xxl = true;
+                }
                 var oldStatus = $scope.total.getStatusByName(card.status);
                 var newStatus = $scope.total.getStatusByName(status);
                 if(newStatus.weight < oldStatus.weight){
@@ -341,7 +343,8 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
                 summaryChecklistsProgress: item.checklistsProgress ? item.checklistsProgress : 0,
                 cloudAppsCount: item.cloudApps.length,
                 pagesCount: item.pagescount,
-                modulesCount: 1
+                modulesCount: 1,
+                xxl: item.xxl
             };
             version.cards.push(newCard);
         }

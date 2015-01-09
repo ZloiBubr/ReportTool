@@ -23,6 +23,9 @@
                         <img width="16" height="16" alt="Conf" src="img/5.png"/> Priority
                     </div>
                     <div>
+                        <img width="16" height="16" alt="XXL" src="img/xxl.png" /> Has XXL or XXXL pages
+                    </div>
+                    <div>
                         Development %
                         <div class="progress card-progress">
                             <div class="progress-bar progress-bar-success progress-bar-striped"
@@ -161,6 +164,7 @@
                                         <img ng-show="card.dueDateConfirmed" width="16" height="16" alt="Conf" src="img/duedate2.png"/>
                                         <img ng-show="card.hasblockers" width="16" height="16" alt="Conf" src="img/ban.png"/>
                                         <img ng-show="card.hasdeferred" width="16" height="16" alt="Conf" src="img/deffered.png"/>
+                                        <img ng-show="card.xxl" width="16" height="16" alt="Conf" src="img/xxl.png"/>
                                         <br/>
                                         <span style="font-style: italic">{{card.cloudAppsCount | number : 0}} CloudApps</span>
                                     </div>

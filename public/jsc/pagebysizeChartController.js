@@ -81,6 +81,7 @@ function pagebysizeChartController($scope, $resource, $window) {
                     name: itemSeries.name + ':trend',
                     type: 'line',
                     marker: { enabled: false },
+                    visible: itemSeries.name == 'SmallDev' ? true : false,
                     data: (function() {
                         return itemSeries.data.length > 1 ? fitData(itemSeries.data).data : itemSeries.data;
                     })()

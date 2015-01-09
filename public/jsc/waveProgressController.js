@@ -324,7 +324,8 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
             devTimeSpent: cloudAppItem.devTimeSpent,
             qaTimeSpent: cloudAppItem.qaTimeSpent,
             testingProgress: cloudAppItem.testingProgress ? cloudAppItem.testingProgress : 0,
-            checklistsProgress: cloudAppItem.checklistsProgress ? cloudAppItem.checklistsProgress : 0
+            checklistsProgress: cloudAppItem.checklistsProgress ? cloudAppItem.checklistsProgress : 0,
+            xxl: cloudAppItem.xxl
         };
         return card;
     }

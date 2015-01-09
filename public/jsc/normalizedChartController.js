@@ -80,6 +80,7 @@ function normalizedChartController($scope, $resource, $window) {
                     name: itemSeries.name + ':trend',
                     type: 'line',
                     marker: { enabled: false },
+                    visible: itemSeries.name == 'Development Time Total' || itemSeries.name == 'QA Time Total' ? true : false,
                     data: (function() {
                         return itemSeries.data.length > 1 ? fitData(itemSeries.data).data : itemSeries.data;
                     })()
