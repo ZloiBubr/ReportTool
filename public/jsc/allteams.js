@@ -226,6 +226,7 @@ exports.OldDevelopers = function oldDevelopers(name) {
         name == "Dmytro Komar" ||
         name == "Aliaksei Labachou" ||
         name == "Mariya Babich" ||
+		name == "mariya_babich mariya_babich" ||
         name == "Katsiaryna Sasina" ||
         name == "aliaksei_labachou aliaksei_labachou" ||
         name == "Maryna Furman" ||
