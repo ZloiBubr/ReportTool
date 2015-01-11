@@ -8,6 +8,8 @@ exports.getTeamName = function (labels) {
         var label = labelsArray[i];
         if(label.indexOf("Team") == 0) {
             return labelsArray[i].substring(4);
+        } else if (label == "Automation") {
+            return "Automation";
         }
     }
     return "--";

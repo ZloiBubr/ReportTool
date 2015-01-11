@@ -40,7 +40,10 @@ function parsePages(callback) {
                 var progress = to - from;
                 var calcStoryPoints = storyPoints * progress / 100;
                 putDataPoint(velocity, teamName, date, norm_date, calcStoryPoints);
-                putDataPoint(velocity, "Total", date, norm_date, calcStoryPoints);
+
+                if (teamName != "Automation") {
+                    putDataPoint(velocity, "Total", date, norm_date, calcStoryPoints);
+                };
             }
         }
 

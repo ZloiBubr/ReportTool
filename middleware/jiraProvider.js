@@ -67,11 +67,17 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
             LogProgress("**** Step 1: collect modules");
             Step1CollectModules(jira, callback);
         },
-        //step 2
+        //step 2-1
         function (callback) {
-            LogProgress("**** Step 2: collect pages");
+            LogProgress("**** Step 2-1: collect pages");
             //grab pages list
             Step2CollectPages(jira, full, callback);
+        },
+        //step 2-2
+        function (callback) {
+            LogProgress("**** Step 2-2: collect automation stories");
+            //grab automation pages list
+            Step2CollectAutomationStories(jira, full, callback);
         },
         //step 3
         function (callback) {
@@ -223,6 +229,55 @@ function Step2CollectPages(jira, full, callback) {
         },
         function (err) {
             callback(err);
+        }
+    );
+}
+
+function Step2CollectAutomationStories(jira, full, callback) {
+    var queryString = "project = PLEXUXC AND issuetype = Story AND ((labels in (Automation) AND status not in (Open)) OR ('Epic Link' = 'Automation test data fixing'))";
+
+    if(!full) {
+        queryString += " AND updated > -3d";
+    }
+
+    var loopError = true;
+    async.whilst(function() {
+            return loopError;
+        },
+        function(callback) {
+            LogProgress("**** collect automation stories");
+            jira.searchJira(queryString, { fields: ["summary"] }, function (error, stories) {
+                if (error) {
+                    LogProgress("Collect automation stories error happened!", error);
+                    LogProgress("Restarting Loop", error);
+                    callback();
+                }
+                if (stories != null) {
+                    async.eachSeries(stories.issues, function (story, callback) {
+                            issuesList.push(story.key);
+                            //epicIssueMap[story.key] = moduleKey;
+                            callback();
+                        },
+                        function (err) {
+                            if (err) {
+                                LogProgress("Restarting Loop for: "+story.key, err);
+                            }
+                            else {
+                                loopError = false;
+                            }
+                            callback();
+                        }
+                    );
+                }
+                else {
+                    loopError = false;
+                    callback();
+                }
+            });
+        },
+        function(err) {
+            LogProgress("Automation Stories Collected");
+            callback();
         }
     );
 }

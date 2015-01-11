@@ -200,7 +200,7 @@ function Teams() {
             ]
         },
         {
-            id: "TeamAutomation",
+            id: "Automation",
             name: "Automation",
             teamLead: "Aliaksandr Basau",
             developers: [
