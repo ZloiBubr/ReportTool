@@ -236,6 +236,10 @@ exports.OldDevelopers = function oldDevelopers(name) {
  	    name == "Vitali Podobed" ||
  	    name == "Siarhei Zhalezka" ||
  	    name == "Maryna Furman" ||
+ 	    name == "Aliaksandr Basau" ||
+ 	    name == "Katsiaryna Firsava" ||
+ 	    name == "Rustam Allanazarau" ||
+ 	    name == "Nadzeya Mishurava" ||
         name == undefined) {
         return true;
     }
