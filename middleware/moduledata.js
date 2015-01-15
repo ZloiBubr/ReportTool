@@ -7,14 +7,17 @@ var Module = require('../models/module').Module;
 var Page = require('../models/page').Page;
 var log = require('../libs/log')(module);
 var async = require('async');
+var cache = require('node_cache');
 var _ = require('underscore');
 var statusExport = require('../public/jsc/models/statusList');
 var statusList = new statusExport.statuses();
 
 exports.getData = function (req, res) {
-    parsePages(function (moduledata) {
-        res.json(moduledata);
-    });
+    cache.getData("module",function(setterCallback){
+        parsePages(function (moduledata) {
+            setterCallback(moduledata);
+        });
+    }, function(value){res.json(value);});
 };
 
 function moduleData() {
