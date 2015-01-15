@@ -6,14 +6,17 @@ var Page = require('../models/page').Page;
 var log = require('../libs/log')(module);
 var async = require('async');
 var _ = require('underscore');
-
+var cache = require('node_cache');
 var statusExport = require('../public/jsc/Models/statusList');
 var statusList = new statusExport.statuses();
 
 exports.getData = function (req, res) {
-    parsePages(function (cloudAppData) {
-        res.json(cloudAppData);
-    });
+
+    cache.getData("waveData",function(setterCallback){
+        parsePages(function (data) {
+            setterCallback(data);
+        });
+    }, function(value){res.json(value);});
 };
 
 function cloudAppData() {

@@ -10,6 +10,7 @@ var Version = require('../models/Version').Version;
 var Issue = require('../models/issue').Issue;
 var _ = require('underscore');
 var async = require('async');
+var cache = require('node_cache');
 var sessionsupport = require('../middleware/sessionsupport');
 var helpers = require('../middleware/helpers');
 
@@ -105,6 +106,7 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
         //step 7
         function (callback) {
             LogProgress("**** Update Finished ****");
+            cache.clearAllData();
             callback();
         }
     ],

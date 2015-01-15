@@ -4,12 +4,15 @@ var Module = require('../models/module').Module;
 var Page = require('../models/page').Page;
 var log = require('../libs/log')(module);
 var helpers = require('../middleware/helpers');
+var cache = require('node_cache');
 
 exports.getData = function (req, res) {
-    parsePages(function (err, progress) {
-        if (err) throw err;
-        res.json(progress);
-    });
+    cache.getData("progressData",function(setterCallback){
+        parsePages(function (err, data) {
+            if (err) throw err;
+            setterCallback(data);
+        });
+    }, function(value){res.json(value);});
 };
 
 function sortData(progress) {

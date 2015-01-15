@@ -13,9 +13,9 @@ var statusExport = require('../public/jsc/models/statusList');
 var statusList = new statusExport.statuses();
 
 exports.getData = function (req, res) {
-    cache.getData("module",function(setterCallback){
-        parsePages(function (moduledata) {
-            setterCallback(moduledata);
+    cache.getData("moduleData",function(setterCallback){
+        parsePages(function (data) {
+            setterCallback(data);
         });
     }, function(value){res.json(value);});
 };

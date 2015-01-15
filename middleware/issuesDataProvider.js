@@ -10,17 +10,19 @@ var log = require('../libs/log')(module);
 var helpers = require('../middleware/helpers');
 
 var _ = require('underscore');
-
+var cache = require('node_cache');
 var statusExport = require('../public/jsc/Models/statusList');
 var statusList = new statusExport.statuses();
 
 
 
 exports.getData = function (req, res) {
-    parsePages(function (err, personaldata) {
-        if (err) throw err;
-        res.json(personaldata);
-    });
+    cache.getData("issueData",function(setterCallback){
+        parsePages(function (err, data) {
+            if (err) throw err;
+            setterCallback(data);
+        });
+    }, function(value){res.json(value);});
 };
 
 function parsePages(callback) {

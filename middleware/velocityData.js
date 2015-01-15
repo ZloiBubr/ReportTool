@@ -4,11 +4,15 @@ var Page = require('../models/page').Page;
 var log = require('../libs/log')(module);
 var async = require('async');
 var _ = require('underscore');
+var cache = require('node_cache');
 
 exports.getData = function (req, res) {
-    parsePages(function (velocity) {
-        res.json(velocity);
-    });
+
+    cache.getData("velocityData",function(setterCallback){
+        parsePages(function (data) {
+            setterCallback(data);
+        });
+    }, function(value){res.json(value);});
 };
 
 function parsePages(callback) {
