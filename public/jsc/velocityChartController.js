@@ -25,6 +25,33 @@ function velocityChartController($scope, $resource, $window) {
     };
 
     $scope.initCharts = function () {
+        $('#stacked_container').highcharts({
+            chart: {
+                type: 'bar'
+            },
+            title: {
+                text: 'Distribution by page status'
+            },
+            xAxis: {
+                categories: ['Pages']
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Total pages distribution'
+                }
+            },
+            legend: {
+                reversed: true
+            },
+            plotOptions: {
+                series: {
+                    stacking: 'normal'
+                }
+            },
+            series: $scope.distributionoData.data
+        });
+
         $('#container').highcharts({
             chart: {
                 type: 'line',
@@ -89,6 +116,7 @@ function velocityChartController($scope, $resource, $window) {
         var loadingDfrd = $.Deferred();
         var getChartSuccess = function (data) {
             $scope.chartsData = data;
+            $scope.distributionoData = data.distribution;
             loadingDfrd.resolve();
         };
 

@@ -5,6 +5,8 @@ var log = require('../libs/log')(module);
 var async = require('async');
 var _ = require('underscore');
 var cache = require('node_cache');
+var helpers = require('../middleware/helpers');
+var STATUS = require('../public/jsc/models/statusList').STATUS;
 
 exports.getData = function (req, res) {
 
@@ -29,7 +31,51 @@ function parsePages(callback) {
         {
             data: [],
             name: "Projected burn"
-        }]
+        }],
+        distribution: {
+            data: [
+                {
+                    name: STATUS.CLOSED.name,
+                    data: [0]
+                },
+                {
+                    name: STATUS.RESOLVED.name,
+                    data: [0]
+                },
+                {
+                    name: STATUS.TESTINGINPROGRESS.name,
+                    data: [0]
+                },
+                {
+                    name: STATUS.READYFORQA.name,
+                    data: [0]
+                },
+                {
+                    name: STATUS.CODEREVIEW.name,
+                    data: [0]
+                },
+                {
+                    name: STATUS.REOPENED.name,
+                    data: [0]
+                },
+                {
+                    name: STATUS.BLOCKED.name,
+                    data: [0]
+                },
+                {
+                    name: STATUS.INPROGRESS.name,
+                    data: [0]
+                },
+                {
+                    name: STATUS.OPEN.name,
+                    data: [0]
+                },
+                {
+                    name: STATUS.DEFERRED.name,
+                    data: [0]
+                }
+            ]
+        }
     };
     var maximumBurn = 0.0;
     async.series([
@@ -78,6 +124,9 @@ function parsePages(callback) {
                                                         }
                                                         putDataPoint(velocity, "Planned burn", date, storyPoints, tooltip);
                                                     }
+                                                }
+                                                if(!ignore) {
+                                                    addStackedData(velocity, status);
                                                 }
                                                 callback();
                                             },
@@ -216,6 +265,15 @@ function SortData(velocity) {
             b = new Date(b.x);
             return a > b ? 1 : a < b ? -1 : 0;
         });
+    }
+}
+
+function addStackedData(velocity, status) {
+    for(var i=0; i<velocity.distribution.data.length; i++) {
+        if(velocity.distribution.data[i].name == status) {
+            velocity.distribution.data[i].data[0]++;
+            break;
+        }
     }
 }
 
