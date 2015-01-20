@@ -31,6 +31,21 @@ function parsePages(callback) {
         {
             data: [],
             name: "Projected burn"
+        },
+        {
+            data: [],
+            name: "Planned burn core",
+            visible: false
+        },
+        {
+            data: [],
+            name: "Actual burn core",
+            visible: false
+        },
+        {
+            data: [],
+            name: "Projected burn core",
+            visible: false
         }],
         distribution: {
             data: [
@@ -78,6 +93,7 @@ function parsePages(callback) {
         }
     };
     var maximumBurn = 0.0;
+    var maximumBurnCore = 0.0;
     async.series([
         function (callback) {
             Module.find({}).exec(function(err, modules) {
@@ -110,6 +126,9 @@ function parsePages(callback) {
                                                     var calcStoryPoints = storyPoints * progress / 100;
 
                                                     putDataPoint(velocity, "Actual burn", date, calcStoryPoints, "");
+                                                    if(module.fixVersions != "8.0 Final") {
+                                                        putDataPoint(velocity, "Actual burn core", date, calcStoryPoints, "");
+                                                    }
                                                 }
                                                 if(module.duedate != null) {
                                                     if(!ignore) {
@@ -123,6 +142,10 @@ function parsePages(callback) {
                                                             modulesAdded.push(module.summary);
                                                         }
                                                         putDataPoint(velocity, "Planned burn", date, storyPoints, tooltip);
+                                                        if(module.fixVersions != "8.0 Final") {
+                                                            maximumBurnCore += storyPoints;
+                                                            putDataPoint(velocity, "Planned burn core", date, storyPoints, tooltip);
+                                                        }
                                                     }
                                                 }
                                                 if(!ignore) {
@@ -153,28 +176,35 @@ function parsePages(callback) {
             var date = new Date("January 1, 2014 00:00:00");
             date = date.getTime();
             putDataPoint(velocity, "Planned burn", date, 0.0);
+            putDataPoint(velocity, "Planned burn core", date, 0.0);
             SortData(velocity);
-            AddProjection(maximumBurn, velocity);
-            SumData(maximumBurn, velocity);
-            AdjustProjection(velocity);
+            AddProjection(true, maximumBurn, velocity);
+            AddProjection(false, maximumBurnCore, velocity);
+            SumData(true, maximumBurn, velocity);
+            SumData(false, maximumBurnCore, velocity);
+            AdjustProjection(true, velocity);
+            AdjustProjection(false, velocity);
             callback(velocity);
         }
     ]);
 }
 
-function AdjustProjection(velocity) {
+function AdjustProjection(isCore, velocity) {
     var lastValue = 0.0;
+    var actualName = isCore ? "Actual burn" : "Actual burn core";
+    var projectedName = isCore ? "Projected burn" : "Projected burn core";
 
     for (var k = 0; k < velocity.data.length; k++) {
         var burn = velocity.data[k];
-        if (burn.name == "Actual burn") {
+        if (burn.name == actualName) {
             lastValue = burn.data.length > 0 ? burn.data[burn.data.length-1].y : lastValue;
+            break;
         }
     }
 
     for (var k = 0; k < velocity.data.length; k++) {
         var burn = velocity.data[k];
-        if(burn.name == "Projected burn") {
+        if(burn.name == projectedName) {
             for (var l = 0; l < burn.data.length-1; l++) {
                 var delta = burn.data[l].y - burn.data[l+1].y;
                 if(l==0) {
@@ -198,11 +228,14 @@ function AdjustProjection(velocity) {
             if(negativeIndex < burn.data.length) {
                 burn.data = burn.data.slice(0, negativeIndex + 1);
             }
+            break;
         }
     }
 }
 
-function AddProjection(maximumBurn, velocity) {
+function AddProjection(isCore, maximumBurn, velocity) {
+    var actualName = isCore ? "Actual burn" : "Actual burn core";
+    var projectedName = isCore ? "Projected burn" : "Projected burn core";
     var monthAgo = new Date(Date.now());
     monthAgo.setMonth(monthAgo.getMonth()-3);
     var monthAgoMsc = monthAgo.getTime();
@@ -211,14 +244,14 @@ function AddProjection(maximumBurn, velocity) {
 
     for (var k = 0; k < velocity.data.length; k++) {
         var burn = velocity.data[k];
-        if(burn.name == "Actual burn") {
+        if(burn.name == actualName) {
             for (var l = 0; l < burn.data.length; l++) {
                 if(burn.data[l].x > monthAgoMsc) {
                     sum += burn.data[l].y;
                 }
             }
         }
-        if(burn.name == "Projected burn") {
+        if(burn.name == projectedName) {
             projectedBurn = burn;
         }
     }
@@ -235,10 +268,11 @@ function AddProjection(maximumBurn, velocity) {
     }
 }
 
-function SumData(maximumBurn, velocity) {
+function SumData(isCore, maximumBurn, velocity) {
+    var burnsList = isCore ? ["Planned burn", "Actual burn"] : ["Planned burn core", "Actual burn core"];
     for (var k = 0; k < velocity.data.length; k++) {
         var burn = velocity.data[k];
-        if(burn.name == "Projected burn") {
+        if(burn.name != burnsList[0] && burn.name != burnsList[1]) {
             continue;
         }
         for (var l = 0; l < burn.data.length - 1; l++) {
@@ -247,7 +281,7 @@ function SumData(maximumBurn, velocity) {
     }
     for (var k = 0; k < velocity.data.length; k++) {
         var burn = velocity.data[k];
-        if(burn.name == "Projected burn") {
+        if(burn.name != burnsList[0] && burn.name != burnsList[1]) {
             continue;
         }
         for (var l = 0; l < burn.data.length; l++) {
@@ -287,7 +321,7 @@ function putDataPoint(velocity, burnName, date, calcStoryPoints, tooltip) {
                 if ((burnData.x - date) == 0) {
                     found = true;
                     burnData.y += calcStoryPoints;
-                    if(burn.name == "Planned burn") {
+                    if(burn.name == "Planned burn" || burn.name == "Planned burn core") {
                         burnData.tooltip += tooltip == "" ? "" : "," + tooltip;
                     }
                     return;
