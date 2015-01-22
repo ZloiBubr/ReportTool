@@ -10,7 +10,7 @@ exports.STATUS = {
     TESTINGINPROGRESS: { value: 8, name: "Testing in Progress", icon: "glyphicon glyphicon-road"},
     RESOLVED: { value: 9, name: "Resolved", icon: "glyphicon glyphicon-check"},
     CLOSED: { value: 10, name: "Closed", icon: "glyphicon glyphicon-star"},
-    PRODUCTION: { value: 11, name: "Production", icon: "glyphicon glyphicon-star"},
+    PRODUCTION: { value: 11, name: "Development Complete", icon: "glyphicon glyphicon-star"},
     ACCEPTED: { value: 12, name: "Accepted", icon: "glyphicon glyphicon-star"},
     CANCELED: { value: 13, name: "Canceled", icon: "glyphicon glyphicon-ban-circle"},
     NOTAPPLICABLE: { value: 14, name: "Not Applicable", icon: "glyphicon glyphicon-ban-circle"}
