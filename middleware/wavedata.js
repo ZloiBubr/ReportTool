@@ -9,6 +9,7 @@ var _ = require('underscore');
 var cache = require('node_cache');
 var statusExport = require('../public/jsc/Models/statusList');
 var statusList = new statusExport.statuses();
+var STATUS = require('../public/jsc/models/statusList').STATUS;
 
 exports.getData = function (req, res) {
 
@@ -128,6 +129,9 @@ function putDataPoint(cloudAppData, module, page) {
     }
     var calcStoryPoints = storyPoints * progress / 100.;
 
+    if(page.status == "Production") {
+        page.status = STATUS.PRODUCTION.name;
+    }
     var status = helpers.updateStatus(page.status, page.resolution);
     var fullUri = initUri + "CloudApp_" + cloudAppName + ") AND 'Epic Link' = " + module.key;
     var cloudApp;
