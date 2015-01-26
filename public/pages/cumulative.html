@@ -1,6 +1,8 @@
-<div id="stacked_container" style="min-width: 310px; height: 200px;" ng-controller="velocityChartController"></div>
-<div id="container" style="min-width: 310px; height: 600px;" ng-controller="velocityChartController"></div>
-<div>
-    <button class="label label-primary" onclick="window.location.href='/#/updateFromJira'">Update from JIRA</button>
-    <button class="label label-danger" onclick="window.location.href='/#/updateJiraLabels'">Mass JIRA update</button>
+<div ng-controller="velocityChartController">
+    <div id="stacked_container" style="min-width: 310px; height: 200px;"></div>
+    <div id="container" style="min-width: 310px; height: 600px;"></div>
+    <div>
+        <button class="label label-primary" onclick="window.location.href='/#/updateFromJira'">Update from JIRA</button>
+        <button class="label label-danger" onclick="window.location.href='/#/updateJiraLabels'">Mass JIRA update</button>
+    </div>
 </div>
