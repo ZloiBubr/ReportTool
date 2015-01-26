@@ -11,12 +11,16 @@ function velocityChartController($scope, $resource,$modal, $window) {
     /* ------------------------------------------------------ Init/Reinit -------------------------------*/
     $scope.init = function () {
         $scope.common = {};
+        $scope.isExtendView = false;
+        $scope.extendModel = { data:[] };
+        $scope.currentDate = new Date();
 
         $scope.dataLoad();
     };
 
     $scope.reInit = function () {
-        $scope.dataLoad();
+        //$scope.dataLoad();
+        $scope.initCharts();
     };
 
     $scope.dataLoad = function () {
@@ -25,20 +29,25 @@ function velocityChartController($scope, $resource,$modal, $window) {
     };
 
     $scope.initCharts = function () {
+
+        if($scope.isExtendView){
+
+        }
+
         $('#stacked_container').highcharts({
             chart: {
                 type: 'bar'
             },
             title: {
-                text: 'Distribution by page status'
+                text: $scope.isExtendView ? 'Distribution by pages and SP status' : 'Distribution by page status'
             },
             xAxis: {
-                categories: ['Pages']
+                categories: $scope.isExtendView ? ['Pages','SP'] : ['Pages']
             },
             yAxis: {
                 min: 0,
                 title: {
-                    text: 'Total pages distribution'
+                    text: $scope.isExtendView ? 'Total pages and SP distribution' : 'Total pages distribution'
                 }
             },
             legend: {
@@ -49,7 +58,7 @@ function velocityChartController($scope, $resource,$modal, $window) {
                     stacking: 'normal'
                 }
             },
-            series: $scope.distributionoData.data
+            series: $scope.isExtendView ? $scope.distributionoData.data : $scope.shortModel.data
         });
 
         $('#container').highcharts({
@@ -117,6 +126,14 @@ function velocityChartController($scope, $resource,$modal, $window) {
         var getChartSuccess = function (data) {
             $scope.chartsData = data;
             $scope.distributionoData = data.distribution;
+            $scope.shortModel = {data:[]};
+            _.forEach($scope.distributionoData.data, function(item){
+                $scope.shortModel.data.push({
+                    name: item.name,
+                    data: [item.data[0]]
+                });
+            })
+
             loadingDfrd.resolve();
         };
 
@@ -133,19 +150,11 @@ function velocityChartController($scope, $resource,$modal, $window) {
         var modalInstance = $modal.open({
             templateUrl: '/pages/modal/copyPasteModal.html',
             controller: copyPasteModalController,
-            size: "sm"//,
-//            resolve: {
-//                item: function () {
-//                    return item;
-//                }
-//            }
+            size: "sm"
         });
     };
 
     /* ------------------------------------------- DOM/Angular events --------------------------------------*/
-    $scope.searchIssues = function () {
-        $scope.reInit();
-    };
 
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
     $scope.init();
@@ -154,11 +163,8 @@ function velocityChartController($scope, $resource,$modal, $window) {
 function copyPasteModalController($scope, $window, $modalInstance) {
 
     function copyFunc(ev){
-        console.log('copy event');
-        // you can set clipboard data here, e.g.
         var table_txt = document.getElementById('copyStackedTable').outerHTML;
         ev.clipboardData.setData('text', table_txt);
-        // you need to prevent default behaviour here, otherwise browser will overwrite your content with currently selected
         ev.preventDefault();
 
         $scope.unsubscribeCopyHandler();

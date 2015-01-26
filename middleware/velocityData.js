@@ -51,43 +51,43 @@ function parsePages(callback) {
             data: [
                 {
                     name: STATUS.CLOSED.name,
-                    data: [0]
+                    data: [0,0]
                 },
                 {
                     name: STATUS.RESOLVED.name,
-                    data: [0]
+                    data: [0,0]
                 },
                 {
                     name: STATUS.TESTINGINPROGRESS.name,
-                    data: [0]
+                    data: [0,0]
                 },
                 {
                     name: STATUS.READYFORQA.name,
-                    data: [0]
+                    data: [0,0]
                 },
                 {
                     name: STATUS.CODEREVIEW.name,
-                    data: [0]
+                    data: [0,0]
                 },
                 {
                     name: STATUS.REOPENED.name,
-                    data: [0]
+                    data: [0,0]
                 },
                 {
                     name: STATUS.BLOCKED.name,
-                    data: [0]
+                    data: [0,0]
                 },
                 {
                     name: STATUS.INPROGRESS.name,
-                    data: [0]
+                    data: [0,0]
                 },
                 {
                     name: STATUS.OPEN.name,
-                    data: [0]
+                    data: [0,0]
                 },
                 {
                     name: STATUS.DEFERRED.name,
-                    data: [0]
+                    data: [0,0]
                 }
             ]
         }
@@ -107,7 +107,6 @@ function parsePages(callback) {
                                                 var status = page.status;
                                                 var resolution = page.resolution;
                                                 var ignore = status == "Closed" && (resolution == "Out of Scope" || resolution == "Rejected" || resolution == "Canceled");
-
                                                 for (var j = 0; j < page.progressHistory.length; j++) {
                                                     var history = page.progressHistory[j];
                                                     var date = new Date(Date.parse(history.dateChanged));
@@ -149,7 +148,7 @@ function parsePages(callback) {
                                                     }
                                                 }
                                                 if(!ignore) {
-                                                    addStackedData(velocity, status);
+                                                    addStackedData(velocity, status, storyPoints);
                                                 }
                                                 callback();
                                             },
@@ -302,10 +301,11 @@ function SortData(velocity) {
     }
 }
 
-function addStackedData(velocity, status) {
+function addStackedData(velocity, status, storyPoints) {
     for(var i=0; i<velocity.distribution.data.length; i++) {
         if(velocity.distribution.data[i].name == status) {
             velocity.distribution.data[i].data[0]++;
+            velocity.distribution.data[i].data[1]+=storyPoints||0;
             break;
         }
     }
