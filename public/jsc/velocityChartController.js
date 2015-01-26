@@ -5,7 +5,7 @@
  * Time: 21:51
  * To change this template use File | Settings | File Templates.
  */
-function velocityChartController($scope, $resource, $window) {
+function velocityChartController($scope, $resource,$modal, $window) {
     var velocitySeriesResource = $resource('/velocitydata');
 
     /* ------------------------------------------------------ Init/Reinit -------------------------------*/
@@ -129,6 +129,19 @@ function velocityChartController($scope, $resource, $window) {
         return loadingDfrd.promise();
     };
 
+    $scope.onCopyModalShow = function(){
+        var modalInstance = $modal.open({
+            templateUrl: '/pages/modal/copyPasteModal.html',
+            controller: copyPasteModalController,
+            size: "sm"//,
+//            resolve: {
+//                item: function () {
+//                    return item;
+//                }
+//            }
+        });
+    };
+
     /* ------------------------------------------- DOM/Angular events --------------------------------------*/
     $scope.searchIssues = function () {
         $scope.reInit();
@@ -136,5 +149,35 @@ function velocityChartController($scope, $resource, $window) {
 
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
     $scope.init();
+}
+
+function copyPasteModalController($scope, $window, $modalInstance) {
+
+    function copyFunc(ev){
+        console.log('copy event');
+        // you can set clipboard data here, e.g.
+        var table_txt = document.getElementById('copyStackedTable').outerHTML;
+        ev.clipboardData.setData('text', table_txt);
+        // you need to prevent default behaviour here, otherwise browser will overwrite your content with currently selected
+        ev.preventDefault();
+
+        $scope.unsubscribeCopyHandler();
+        $scope.cancel();
+    }
+
+
+    $scope.cancel = function (){
+        $modalInstance.close();
+    };
+
+    $scope.unsubscribeCopyHandler = function(){
+        $window.removeEventListener('copy', copyFunc);
+    };
+
+    $scope.subscribeCopyHandler = function(){
+        $window.addEventListener('copy', copyFunc);
+    };
+
+    $scope.subscribeCopyHandler();
 }
 

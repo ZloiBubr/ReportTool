@@ -1,4 +1,11 @@
 <div ng-controller="velocityChartController">
+    <div><button type="button" class="btn btn-link" ng-click="onCopyModalShow()"><span class="glyphicon glyphicon-copy"></span>Copy distribution data</button>
+        <table id="copyStackedTable" style="display: none">
+            <tr>
+                <td ng-repeat="item in distributionoData.data.slice().reverse()">{{item.data[0]}}</td>
+            </tr>
+        </table>
+    </div>
     <div id="stacked_container" style="min-width: 310px; height: 200px;"></div>
     <div id="container" style="min-width: 310px; height: 600px;"></div>
     <div>
