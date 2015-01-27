@@ -1,5 +1,6 @@
 <div ng-controller="velocityChartController">
     <div id="stacked_container" style="min-width: 310px; height: 200px;"></div>
+    <div id="stacked_container_sp" style="min-width: 310px; height: 200px;" ng-show="isExtendView"></div>
     <div id="container" style="min-width: 310px; height: 600px;"></div>
     <div>
         <button class="label label-primary" style="float: left" onclick="window.location.href='/#/updateFromJira'">Update from JIRA</button>

@@ -106,7 +106,8 @@ function parsePages(callback) {
                                                 var storyPoints = page.storyPoints == null ? 0 : parseFloat(page.storyPoints);
                                                 var status = page.status;
                                                 var resolution = page.resolution;
-                                                var ignore = status == "Closed" && (resolution == "Out of Scope" || resolution == "Rejected" || resolution == "Canceled");
+                                                var ignore = !helpers.isActive(status, resolution);
+
                                                 for (var j = 0; j < page.progressHistory.length; j++) {
                                                     var history = page.progressHistory[j];
                                                     var date = new Date(Date.parse(history.dateChanged));

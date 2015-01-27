@@ -5,7 +5,7 @@
  * Time: 21:51
  * To change this template use File | Settings | File Templates.
  */
-function velocityChartController($scope, $resource,$modal, $window) {
+function velocityChartController($scope, $resource, $modal, $timeout, $window) {
     var velocitySeriesResource = $resource('/velocitydata');
 
     /* ------------------------------------------------------ Init/Reinit -------------------------------*/
@@ -19,8 +19,9 @@ function velocityChartController($scope, $resource,$modal, $window) {
     };
 
     $scope.reInit = function () {
-        //$scope.dataLoad();
+        $timeout(function () {
         $scope.initCharts();
+        });
     };
 
     $scope.dataLoad = function () {
@@ -29,25 +30,22 @@ function velocityChartController($scope, $resource,$modal, $window) {
     };
 
     $scope.initCharts = function () {
-
-        if($scope.isExtendView){
-
-        }
+        var totalClosedResult = getClosedAmount();
 
         $('#stacked_container').highcharts({
             chart: {
                 type: 'bar'
             },
             title: {
-                text: $scope.isExtendView ? 'Distribution by pages and SP status' : 'Distribution by page status'
+                text: 'Distribution by page status, closed ' + totalClosedResult.pages.closed + ' from ' + totalClosedResult.pages.totalNotClosed + ' or ' + totalClosedResult.pages.closedPercents + '%'
             },
             xAxis: {
-                categories: $scope.isExtendView ? ['Pages','SP'] : ['Pages']
+                categories: ['Pages']
             },
             yAxis: {
                 min: 0,
                 title: {
-                    text: $scope.isExtendView ? 'Total pages and SP distribution' : 'Total pages distribution'
+                    text: 'Total pages distribution'
                 }
             },
             legend: {
@@ -58,8 +56,37 @@ function velocityChartController($scope, $resource,$modal, $window) {
                     stacking: 'normal'
                 }
             },
-            series: $scope.isExtendView ? $scope.distributionoData.data : $scope.shortModel.data
+            series: $scope.pagesModel.data
         });
+
+         if($scope.isExtendView){
+            $('#stacked_container_sp').highcharts({
+                chart: {
+                    type: 'bar'
+                },
+                title: {
+                    text: 'Distribution by SP status, closed ' + totalClosedResult.sp.closed + ' from ' + totalClosedResult.sp.totalNotClosed + ' or ' + totalClosedResult.sp.closedPercents + '%'
+                },
+                xAxis: {
+                    categories: ['SP']
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Total SP distribution'
+                    }
+                },
+                legend: {
+                    reversed: true
+                },
+                plotOptions: {
+                    series: {
+                        stacking: 'normal'
+                    }
+                },
+                series: $scope.spModel.data
+            });
+        }
 
         $('#container').highcharts({
             chart: {
@@ -116,6 +143,8 @@ function velocityChartController($scope, $resource,$modal, $window) {
             },
             series: $scope.chartsData.data
         });
+
+
     };
 
 
@@ -125,12 +154,21 @@ function velocityChartController($scope, $resource,$modal, $window) {
         var loadingDfrd = $.Deferred();
         var getChartSuccess = function (data) {
             $scope.chartsData = data;
+
             $scope.distributionoData = data.distribution;
-            $scope.shortModel = {data:[]};
+
+            $scope.pagesModel = {data:[]};
+            $scope.spModel = {data:[]};
+
             _.forEach($scope.distributionoData.data, function(item){
-                $scope.shortModel.data.push({
+                $scope.pagesModel.data.push({
                     name: item.name,
                     data: [item.data[0]]
+                });
+
+                $scope.spModel.data.push({
+                    name: item.name,
+                    data: [item.data[1]]
                 });
             })
 
@@ -153,6 +191,37 @@ function velocityChartController($scope, $resource,$modal, $window) {
             size: "sm"
         });
     };
+
+    function getClosedAmount(){
+        var result = {
+            pages:{
+                totalNotClosed: 0,
+                closed: 0,
+                closedPercents: 0
+            },
+            sp:{
+                totalNotClosed: 0,
+                closed: 0,
+                closedPercents: 0
+            }
+        };
+
+        for(var i=0; i<$scope.distributionoData.data.length; i++)
+        {
+            if($scope.distributionoData.data[i].name == "Closed"){
+                result.pages.closed = $scope.distributionoData.data[i].data[0];
+                result.sp.closed = $scope.distributionoData.data[i].data[1];
+                continue;
+            }
+
+            result.pages.totalNotClosed += $scope.distributionoData.data[i].data[0];
+            result.sp.totalNotClosed += $scope.distributionoData.data[i].data[1];
+        }
+
+        result.pages.closedPercents = ((result.pages.closed * 100) / result.pages.totalNotClosed).toFixed(1);
+        result.sp.closedPercents = ((result.sp.closed * 100) / result.sp.totalNotClosed).toFixed(1);
+        return result;
+    }
 
     /* ------------------------------------------- DOM/Angular events --------------------------------------*/
 
