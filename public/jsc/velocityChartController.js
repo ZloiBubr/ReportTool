@@ -37,7 +37,7 @@ function velocityChartController($scope, $resource, $modal, $timeout, $window) {
                 type: 'bar'
             },
             title: {
-                text: 'Distribution by page status, closed ' + totalClosedResult.pages.closed + ' from ' + totalClosedResult.pages.totalNotClosed + ' or ' + totalClosedResult.pages.closedPercents + '%'
+                text: 'Distribution by page status, closed ' + totalClosedResult.pages.closed + ' from ' + totalClosedResult.pages.total + ' or ' + totalClosedResult.pages.closedPercents + '%'
             },
             xAxis: {
                 categories: ['Pages']
@@ -65,7 +65,7 @@ function velocityChartController($scope, $resource, $modal, $timeout, $window) {
                     type: 'bar'
                 },
                 title: {
-                    text: 'Distribution by SP status, closed ' + totalClosedResult.sp.closed + ' from ' + totalClosedResult.sp.totalNotClosed + ' or ' + totalClosedResult.sp.closedPercents + '%'
+                    text: 'Distribution by SP status, closed ' + totalClosedResult.sp.closed + ' from ' + totalClosedResult.sp.total + ' or ' + totalClosedResult.sp.closedPercents + '%'
                 },
                 xAxis: {
                     categories: ['SP']
@@ -195,12 +195,12 @@ function velocityChartController($scope, $resource, $modal, $timeout, $window) {
     function getClosedAmount(){
         var result = {
             pages:{
-                totalNotClosed: 0,
+                total: 0,
                 closed: 0,
                 closedPercents: 0
             },
             sp:{
-                totalNotClosed: 0,
+                total: 0,
                 closed: 0,
                 closedPercents: 0
             }
@@ -211,15 +211,14 @@ function velocityChartController($scope, $resource, $modal, $timeout, $window) {
             if($scope.distributionoData.data[i].name == "Closed"){
                 result.pages.closed = $scope.distributionoData.data[i].data[0];
                 result.sp.closed = $scope.distributionoData.data[i].data[1];
-                continue;
             }
 
-            result.pages.totalNotClosed += $scope.distributionoData.data[i].data[0];
-            result.sp.totalNotClosed += $scope.distributionoData.data[i].data[1];
+            result.pages.total += $scope.distributionoData.data[i].data[0];
+            result.sp.total += $scope.distributionoData.data[i].data[1];
         }
 
-        result.pages.closedPercents = ((result.pages.closed * 100) / result.pages.totalNotClosed).toFixed(1);
-        result.sp.closedPercents = ((result.sp.closed * 100) / result.sp.totalNotClosed).toFixed(1);
+        result.pages.closedPercents = ((result.pages.closed * 100) / result.pages.total).toFixed(1);
+        result.sp.closedPercents = ((result.sp.closed * 100) / result.sp.total).toFixed(1);
         return result;
     }
 
