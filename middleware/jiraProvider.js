@@ -653,7 +653,7 @@ function parseHistory(issue, page) {
 
 function calcWorklogFromIssue(issue, page) {
     if (issue.fields.worklog) {
-        for (var i = 0; i < issue.fields.worklog.total; i++) {
+        for (var i = 0; i < issue.fields.worklog.worklogs.length; i++) {
             var worklog = issue.fields.worklog.worklogs[i];
             var author = worklog.author.displayName;
             var timeSpent = worklog.timeSpentSeconds / 3600;
