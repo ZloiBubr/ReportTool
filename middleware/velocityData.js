@@ -50,6 +50,10 @@ function parsePages(callback) {
         distribution: {
             data: [
                 {
+                    name: STATUS.PRODUCTION.name,
+                    data: [0,0]
+                },
+                {
                     name: STATUS.CLOSED.name,
                     data: [0,0]
                 },
@@ -79,6 +83,10 @@ function parsePages(callback) {
                 },
                 {
                     name: STATUS.INPROGRESS.name,
+                    data: [0,0]
+                },
+                {
+                    name: STATUS.ASSIGNED.name,
                     data: [0,0]
                 },
                 {
@@ -303,12 +311,17 @@ function SortData(velocity) {
 }
 
 function addStackedData(velocity, status, storyPoints) {
+    var added = false;
     for(var i=0; i<velocity.distribution.data.length; i++) {
         if(velocity.distribution.data[i].name == status) {
             velocity.distribution.data[i].data[0]++;
             velocity.distribution.data[i].data[1]+=storyPoints||0;
+            added = true;
             break;
         }
+    }
+    if(!added) {
+        log.info(status + ':' + storyPoints);
     }
 }
 

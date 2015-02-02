@@ -208,9 +208,10 @@ function velocityChartController($scope, $resource, $modal, $timeout, $window) {
 
         for(var i=0; i<$scope.distributionoData.data.length; i++)
         {
-            if($scope.distributionoData.data[i].name == "Closed"){
-                result.pages.closed = $scope.distributionoData.data[i].data[0];
-                result.sp.closed = $scope.distributionoData.data[i].data[1];
+            if($scope.distributionoData.data[i].name == $scope.STATUS.CLOSED.name ||
+                $scope.distributionoData.data[i].name == $scope.STATUS.PRODUCTION.name){
+                result.pages.closed += $scope.distributionoData.data[i].data[0];
+                result.sp.closed += $scope.distributionoData.data[i].data[1];
             }
 
             result.pages.total += $scope.distributionoData.data[i].data[0];
