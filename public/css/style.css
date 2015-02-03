@@ -98,11 +98,9 @@ table {
 
 .card-progress
 {
-    border: solid #cccccc 1px;
-    border-radius: 1px;
-    /* Dimensions */
-    height: 10px;
-    margin-b: 0px !important;
+    height: 5px;
+    width: 130px;
+    margin: 5px !important;
 }
 
 .help-icon
@@ -231,4 +229,108 @@ section.contentHideSidebar {
 
 .current-week {
     background-color: #d5e4cc;
+}
+
+.card-full {
+    position: relative;
+    min-height: 100px;
+    width: 150px;
+    margin-bottom: 15px;
+}
+
+.card-high {
+    min-height: 350px !important;
+}
+
+.card-module {
+    min-height: 150px !important;
+}
+
+.card-background-hover {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    min-height: 100px;
+    width: 150px;
+    border-radius: 5px;
+    box-shadow: 3px 3px 5px #888888;
+}
+
+.card-content {
+    position: absolute;
+    left: 5px;
+    top: 0px;
+    z-index: 99;
+}
+
+.cards-column {
+    list-style-type: none;
+    padding: 0;
+}
+
+.card-size {
+    background-color: rgb(118, 162, 250);
+    color: rgb(255, 255, 255);
+    border: 2px solid #eff;
+    min-width: 16px;
+    text-align: center;
+    float: left;
+}
+
+.card-pages {
+    background-color: rgb(10, 176, 108);
+    color: rgb(250, 255, 255);
+    border: 2px solid #fdffff;
+    min-width: 16px;
+    text-align: center;
+    float: left;
+}
+
+.card-left {
+    text-align: center;
+    font-style: italic;
+    font-size: xx-large;
+    position: absolute;
+    bottom: 10px;
+    right: 16px;
+}
+
+.card-icon {
+    float: right;
+    height: 20px;
+    width: 20px;
+    margin: 2px;
+}
+
+.card-icons {
+    position: absolute;
+    z-index: 99;
+    bottom: -10px;
+    margin-right: -16px;
+    width: 150px;
+    height: 25px;
+    float: right;
+}
+
+.card-link {
+    word-wrap: break-word;
+    max-width: 135px;
+    display: block;
+}
+
+.total-size {
+    background-color: rgb(118, 162, 250);
+    color: rgb(255, 255, 255);
+    border: 2px solid #6078ff;
+    text-align: center;
+    padding: 2px;
+}
+
+.total-comments {
+    color: rgb(164, 164, 164);
+}
+
+.total-left {
+    font-style: italic;
+    font-size: x-large;
 }
