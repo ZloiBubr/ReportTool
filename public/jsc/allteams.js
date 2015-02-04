@@ -59,10 +59,8 @@ function Teams() {
                 "Serhiy Haponenko",
                 "Yevhenii Lomov",
                 "Ihor Rudchenko",
-                "Andrii Savinov",
-                "Dmytro Petlia",
-                "Olena Ostroverkhova",
-		        "Volodymyr Osmak"
+		        "Volodymyr Osmak",
+                "Allaberdi Hojayev"
             ],
             testers: [
                 "Mila Botnar",
@@ -187,11 +185,11 @@ function Teams() {
             qaTeamLead: "",
             developers: [
                 "Roman Golovchenko",
-                "Allaberdi Hojayev",
                 "Bohdan Sorokin",
 		        "Ivan Manzhos",
 		        "Oleh Vinnikov",
-                "Yevhenii Koliesnik"
+                "Andrii Savinov",
+                "Olena Ostroverkhova"
             ],
             testers: [
                 "Ivan Nalyvaiko",
@@ -236,6 +234,12 @@ exports.OldDevelopers = function oldDevelopers(name) {
  	    name == "Vitali Podobed" ||
  	    name == "Siarhei Zhalezka" ||
  	    name == "Maryna Furman" ||
+ 	    name == "Aliaksandr Basau" ||
+ 	    name == "Katsiaryna Firsava" ||
+ 	    name == "Rustam Allanazarau" ||
+ 	    name == "Nadzeya Mishurava" ||
+        name == "Yevhenii Koliesnik" ||
+        name == "Dmytro Petlia" ||
         name == undefined) {
         return true;
     }

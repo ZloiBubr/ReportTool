@@ -10,10 +10,12 @@ var Version = require('../models/Version').Version;
 var Issue = require('../models/issue').Issue;
 var _ = require('underscore');
 var async = require('async');
+var cache = require('node_cache');
 var sessionsupport = require('../middleware/sessionsupport');
 var helpers = require('../middleware/helpers');
 
 var VERSION = require('../public/jsc/versions').VERSION;
+var STATUS = require('../public/jsc/models/statusList').STATUS;
 
 var JiraApi = require('jira').JiraApi;
 
@@ -105,6 +107,7 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
         //step 7
         function (callback) {
             LogProgress("**** Update Finished ****");
+            cache.clearAllData();
             callback();
         }
     ],
@@ -551,8 +554,8 @@ function SavePage(jira, issue, callback) {
                             }
                             calcWorklogFromIssue(subtask, page);
                             if(subtask.fields.summary.indexOf("PLEX-Acceptance") > -1) {
-                                if(subtask.fields.status.name == "Closed") {
-                                    page.status = "Production";
+                                if(subtask.fields.status.name == STATUS.CLOSED.name) {
+                                    page.status = STATUS.PRODUCTION.name;
                                 }
                                 page.acceptanceStatus = subtask.fields.status.name;
                             }
@@ -626,11 +629,11 @@ function ParseFinishDates(item, page, created) {
         var from = item.fromString;
         var to = item.toString;
 
-        if (from == "In Progress" && to == "Ready for QA" && page.devFinished == null ||
-            from == "Code Review" && to == "Ready for QA" && page.devFinished == null) {
+        if (from == STATUS.INPROGRESS.name && to == STATUS.READYFORQA.name && page.devFinished == null ||
+            from == STATUS.CODEREVIEW.name && to == STATUS.READYFORQA.name && page.devFinished == null) {
             page.devFinished = created;
         }
-        if (from == "Testing in Progress" && to == "Resolved") {
+        if (from == STATUS.TESTINGINPROGRESS.name && to == STATUS.RESOLVED.name) {
             page.qaFinished = created;
         }
     }
@@ -650,7 +653,7 @@ function parseHistory(issue, page) {
 
 function calcWorklogFromIssue(issue, page) {
     if (issue.fields.worklog) {
-        for (var i = 0; i < issue.fields.worklog.total; i++) {
+        for (var i = 0; i < issue.fields.worklog.worklogs.length; i++) {
             var worklog = issue.fields.worklog.worklogs[i];
             var author = worklog.author.displayName;
             var timeSpent = worklog.timeSpentSeconds / 3600;

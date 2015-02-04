@@ -4,11 +4,17 @@ var Page = require('../models/page').Page;
 var log = require('../libs/log')(module);
 var async = require('async');
 var _ = require('underscore');
+var cache = require('node_cache');
+var helpers = require('../middleware/helpers');
+var STATUS = require('../public/jsc/models/statusList').STATUS;
 
 exports.getData = function (req, res) {
-    parsePages(function (velocity) {
-        res.json(velocity);
-    });
+
+    cache.getData("velocityData",function(setterCallback){
+        parsePages(function (data) {
+            setterCallback(data);
+        });
+    }, function(value){res.json(value);});
 };
 
 function parsePages(callback) {
@@ -25,9 +31,77 @@ function parsePages(callback) {
         {
             data: [],
             name: "Projected burn"
-        }]
+        },
+        {
+            data: [],
+            name: "Planned burn core",
+            visible: false
+        },
+        {
+            data: [],
+            name: "Actual burn core",
+            visible: false
+        },
+        {
+            data: [],
+            name: "Projected burn core",
+            visible: false
+        }],
+        distribution: {
+            data: [
+                {
+                    name: STATUS.PRODUCTION.name,
+                    data: [0,0]
+                },
+                {
+                    name: STATUS.CLOSED.name,
+                    data: [0,0]
+                },
+                {
+                    name: STATUS.RESOLVED.name,
+                    data: [0,0]
+                },
+                {
+                    name: STATUS.TESTINGINPROGRESS.name,
+                    data: [0,0]
+                },
+                {
+                    name: STATUS.READYFORQA.name,
+                    data: [0,0]
+                },
+                {
+                    name: STATUS.CODEREVIEW.name,
+                    data: [0,0]
+                },
+                {
+                    name: STATUS.REOPENED.name,
+                    data: [0,0]
+                },
+                {
+                    name: STATUS.BLOCKED.name,
+                    data: [0,0]
+                },
+                {
+                    name: STATUS.INPROGRESS.name,
+                    data: [0,0]
+                },
+                {
+                    name: STATUS.ASSIGNED.name,
+                    data: [0,0]
+                },
+                {
+                    name: STATUS.OPEN.name,
+                    data: [0,0]
+                },
+                {
+                    name: STATUS.DEFERRED.name,
+                    data: [0,0]
+                }
+            ]
+        }
     };
     var maximumBurn = 0.0;
+    var maximumBurnCore = 0.0;
     async.series([
         function (callback) {
             Module.find({}).exec(function(err, modules) {
@@ -40,7 +114,7 @@ function parsePages(callback) {
                                                 var storyPoints = page.storyPoints == null ? 0 : parseFloat(page.storyPoints);
                                                 var status = page.status;
                                                 var resolution = page.resolution;
-                                                var ignore = status == "Closed" && (resolution == "Out of Scope" || resolution == "Rejected" || resolution == "Canceled");
+                                                var ignore = !helpers.isActive(status, resolution);
 
                                                 for (var j = 0; j < page.progressHistory.length; j++) {
                                                     var history = page.progressHistory[j];
@@ -60,6 +134,9 @@ function parsePages(callback) {
                                                     var calcStoryPoints = storyPoints * progress / 100;
 
                                                     putDataPoint(velocity, "Actual burn", date, calcStoryPoints, "");
+                                                    if(module.fixVersions != "8.0 Final") {
+                                                        putDataPoint(velocity, "Actual burn core", date, calcStoryPoints, "");
+                                                    }
                                                 }
                                                 if(module.duedate != null) {
                                                     if(!ignore) {
@@ -73,7 +150,14 @@ function parsePages(callback) {
                                                             modulesAdded.push(module.summary);
                                                         }
                                                         putDataPoint(velocity, "Planned burn", date, storyPoints, tooltip);
+                                                        if(module.fixVersions != "8.0 Final") {
+                                                            maximumBurnCore += storyPoints;
+                                                            putDataPoint(velocity, "Planned burn core", date, storyPoints, tooltip);
+                                                        }
                                                     }
+                                                }
+                                                if(!ignore) {
+                                                    addStackedData(velocity, status, storyPoints);
                                                 }
                                                 callback();
                                             },
@@ -100,28 +184,35 @@ function parsePages(callback) {
             var date = new Date("January 1, 2014 00:00:00");
             date = date.getTime();
             putDataPoint(velocity, "Planned burn", date, 0.0);
+            putDataPoint(velocity, "Planned burn core", date, 0.0);
             SortData(velocity);
-            AddProjection(maximumBurn, velocity);
-            SumData(maximumBurn, velocity);
-            AdjustProjection(velocity);
+            AddProjection(true, maximumBurn, velocity);
+            AddProjection(false, maximumBurnCore, velocity);
+            SumData(true, maximumBurn, velocity);
+            SumData(false, maximumBurnCore, velocity);
+            AdjustProjection(true, velocity);
+            AdjustProjection(false, velocity);
             callback(velocity);
         }
     ]);
 }
 
-function AdjustProjection(velocity) {
+function AdjustProjection(isCore, velocity) {
     var lastValue = 0.0;
+    var actualName = isCore ? "Actual burn" : "Actual burn core";
+    var projectedName = isCore ? "Projected burn" : "Projected burn core";
 
     for (var k = 0; k < velocity.data.length; k++) {
         var burn = velocity.data[k];
-        if (burn.name == "Actual burn") {
+        if (burn.name == actualName) {
             lastValue = burn.data.length > 0 ? burn.data[burn.data.length-1].y : lastValue;
+            break;
         }
     }
 
     for (var k = 0; k < velocity.data.length; k++) {
         var burn = velocity.data[k];
-        if(burn.name == "Projected burn") {
+        if(burn.name == projectedName) {
             for (var l = 0; l < burn.data.length-1; l++) {
                 var delta = burn.data[l].y - burn.data[l+1].y;
                 if(l==0) {
@@ -145,11 +236,14 @@ function AdjustProjection(velocity) {
             if(negativeIndex < burn.data.length) {
                 burn.data = burn.data.slice(0, negativeIndex + 1);
             }
+            break;
         }
     }
 }
 
-function AddProjection(maximumBurn, velocity) {
+function AddProjection(isCore, maximumBurn, velocity) {
+    var actualName = isCore ? "Actual burn" : "Actual burn core";
+    var projectedName = isCore ? "Projected burn" : "Projected burn core";
     var monthAgo = new Date(Date.now());
     monthAgo.setMonth(monthAgo.getMonth()-3);
     var monthAgoMsc = monthAgo.getTime();
@@ -158,14 +252,14 @@ function AddProjection(maximumBurn, velocity) {
 
     for (var k = 0; k < velocity.data.length; k++) {
         var burn = velocity.data[k];
-        if(burn.name == "Actual burn") {
+        if(burn.name == actualName) {
             for (var l = 0; l < burn.data.length; l++) {
                 if(burn.data[l].x > monthAgoMsc) {
                     sum += burn.data[l].y;
                 }
             }
         }
-        if(burn.name == "Projected burn") {
+        if(burn.name == projectedName) {
             projectedBurn = burn;
         }
     }
@@ -182,10 +276,11 @@ function AddProjection(maximumBurn, velocity) {
     }
 }
 
-function SumData(maximumBurn, velocity) {
+function SumData(isCore, maximumBurn, velocity) {
+    var burnsList = isCore ? ["Planned burn", "Actual burn"] : ["Planned burn core", "Actual burn core"];
     for (var k = 0; k < velocity.data.length; k++) {
         var burn = velocity.data[k];
-        if(burn.name == "Projected burn") {
+        if(burn.name != burnsList[0] && burn.name != burnsList[1]) {
             continue;
         }
         for (var l = 0; l < burn.data.length - 1; l++) {
@@ -194,7 +289,7 @@ function SumData(maximumBurn, velocity) {
     }
     for (var k = 0; k < velocity.data.length; k++) {
         var burn = velocity.data[k];
-        if(burn.name == "Projected burn") {
+        if(burn.name != burnsList[0] && burn.name != burnsList[1]) {
             continue;
         }
         for (var l = 0; l < burn.data.length; l++) {
@@ -215,6 +310,21 @@ function SortData(velocity) {
     }
 }
 
+function addStackedData(velocity, status, storyPoints) {
+    var added = false;
+    for(var i=0; i<velocity.distribution.data.length; i++) {
+        if(velocity.distribution.data[i].name == status) {
+            velocity.distribution.data[i].data[0]++;
+            velocity.distribution.data[i].data[1]+=storyPoints||0;
+            added = true;
+            break;
+        }
+    }
+    if(!added) {
+        log.info(status + ':' + storyPoints);
+    }
+}
+
 function putDataPoint(velocity, burnName, date, calcStoryPoints, tooltip) {
     for (var k = 0; k < velocity.data.length; k++) {
         var burn = velocity.data[k];
@@ -225,7 +335,7 @@ function putDataPoint(velocity, burnName, date, calcStoryPoints, tooltip) {
                 if ((burnData.x - date) == 0) {
                     found = true;
                     burnData.y += calcStoryPoints;
-                    if(burn.name == "Planned burn") {
+                    if(burn.name == "Planned burn" || burn.name == "Planned burn core") {
                         burnData.tooltip += tooltip == "" ? "" : "," + tooltip;
                     }
                     return;

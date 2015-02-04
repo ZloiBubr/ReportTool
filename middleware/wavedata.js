@@ -6,14 +6,18 @@ var Page = require('../models/page').Page;
 var log = require('../libs/log')(module);
 var async = require('async');
 var _ = require('underscore');
-
+var cache = require('node_cache');
 var statusExport = require('../public/jsc/Models/statusList');
 var statusList = new statusExport.statuses();
+var STATUS = require('../public/jsc/models/statusList').STATUS;
 
 exports.getData = function (req, res) {
-    parsePages(function (cloudAppData) {
-        res.json(cloudAppData);
-    });
+
+    cache.getData("waveData",function(setterCallback){
+        parsePages(function (data) {
+            setterCallback(data);
+        });
+    }, function(value){res.json(value);});
 };
 
 function cloudAppData() {
@@ -125,6 +129,9 @@ function putDataPoint(cloudAppData, module, page) {
     }
     var calcStoryPoints = storyPoints * progress / 100.;
 
+    if(page.status == "Production") {
+        page.status = STATUS.PRODUCTION.name;
+    }
     var status = helpers.updateStatus(page.status, page.resolution);
     var fullUri = initUri + "CloudApp_" + cloudAppName + ") AND 'Epic Link' = " + module.key;
     var cloudApp;

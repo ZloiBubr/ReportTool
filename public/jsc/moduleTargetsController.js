@@ -413,18 +413,26 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
             }
         }
         else {
-            rowItem = getRowItem(
-                moduleProgressItem.name,
-                moduleProgressItem.uri,
-                moduleProgressItem.devFinishDate,
-                moduleProgressItem.qaFinishDate,
-                moduleProgressItem.acceptanceFinishDate,
-                moduleProgressItem.customerCompleteDate,
-                calcAcceptanceStatus(moduleProgressItem.acceptanceStatus),
-                moduleProgressItem.moduleStatus,
-                moduleProgressItem.status,
-                status);
-            $scope.moduleDueData.push(rowItem);
+            var found = false;
+            for(var i=0; i<$scope.moduleDueData.length; i++) {
+                if($scope.moduleDueData[i].name == moduleProgressItem.name) {
+                    found = true;
+                }
+            }
+            if(!found) {
+                rowItem = getRowItem(
+                    moduleProgressItem.name,
+                    moduleProgressItem.uri,
+                    moduleProgressItem.devFinishDate,
+                    moduleProgressItem.qaFinishDate,
+                    moduleProgressItem.acceptanceFinishDate,
+                    moduleProgressItem.customerCompleteDate,
+                    calcAcceptanceStatus(moduleProgressItem.acceptanceStatus),
+                    moduleProgressItem.moduleStatus,
+                    moduleProgressItem.status,
+                    status);
+                $scope.moduleDueData.push(rowItem);
+            }
         }
     }
 

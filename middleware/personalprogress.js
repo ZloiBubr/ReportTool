@@ -51,7 +51,7 @@ function parsePages(fromDate, toDate, callback) {
     async.each(teamsModel.teams, function (team, teamCallback) {
         async.each(team.developers, function (developer, developerCallback) {
 
-            Page.find({progressHistory: {$elemMatch: {person: developer.name, dateStarted: {$gte: teamsModel.startDate, $lte: teamsModel.endDate}}}},
+            Page.find({progressHistory: {$elemMatch: {person: developer.name, dateChanged: {$gte: teamsModel.startDate, $lte: teamsModel.endDate}}}},
                 function(err, ProgressPages){
                     Page.find({worklogHistory: {$elemMatch: {person: developer.name, dateStarted: {$gte: teamsModel.startDate, $lte: teamsModel.endDate}}}},
                         function (err, workLogPages) {

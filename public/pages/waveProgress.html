@@ -76,7 +76,7 @@
                 <li class="blocked list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.blocked.isChecked" ng-change="processWithRowSpans(true)"> Blocked</label><span class="badge pull-right">{{total.blocked.count}}</span></div></li>
                 <li class="readyForAcceptance list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.resolved.isChecked" ng-change="processWithRowSpans(true)"> Resolved</label><span class="badge pull-right">{{total.resolved.count}}</span></div></li>
                 <li class="accepted list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.accepted.isChecked" ng-change="processWithRowSpans(true)"> Accepted</label><span class="badge pull-right">{{total.accepted.count}}</span></div></li>
-                <li class="production list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.production.isChecked" ng-change="processWithRowSpans(true)"> Production</label></span><span class="badge pull-right">{{total.production.count}}</span></div></li>
+                <li class="production list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.production.isChecked" ng-change="processWithRowSpans(true)"> Dev Complete</label></span><span class="badge pull-right">{{total.production.count}}</span></div></li>
                 <li class="list-group-item"></li>
                 <li class="list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.all.isChecked" ng-change="onSelectDeselectAll()"> Total</label><span class="badge pull-right">{{total.total}}</span></div></li>
                 <li class="list-group-item"></li>
@@ -100,80 +100,78 @@
                 <tr>
                     <td ng-repeat="status in cloudAppCards.statuses">
                         <div class="disp-block">
-                            <sup class="disp-block"  style="color: blue">{{status.totalReported | number : 0}}/</sup>
-                            <sup class="disp-block"  style="color: darkred">{{status.totalRequired | number : 0}}</sup>
-                            <h3 class="disp-block"  style="font-style: italic">{{status.totalLeft | number : 0}}</h3>
+                            <div class="total-size disp-block">{{status.totalRequired | number : 0}}</div>
+                            <div class="total-left disp-block" title="Left Story Points to Implement">{{status.totalLeft | number : 0}}</div>
                             <br/>
-                            <span style="color: #737373">Cards:{{status.cards.length | number : 0}}</span>
+                            <div class="total-comments disp-block">Cards:{{status.cards.length | number : 0}}</div>
                         </div>
-                        <table class="table table-condensed cards-table">
-                            <tr  ng-repeat = "card in status.cards">
-                                <td ng-class="{
+                        <ul class="cards-column">
+                            <li  ng-repeat = "card in status.cards" class="card-full" ng-class="{'card-high': detailedView}">
+                                <div class="card-background-hover" ng-class="{
                                     blocked: card.status == 'Blocked',
                                     accepted: card.status == 'Accepted',
                                     readyForAcceptance: card.status == 'Resolved',
                                     readyForQA: card.status == 'Ready for QA' || card.status == 'Testing in Progress',
                                     cancelled: card.status == 'Canceled',
-                                    production: card.status == 'Production',
-                                    'bg-info': true}" style="max-width: 150px; min-width: 150px; word-break: break-all">
-                                    <div class="disp-block">
-                                        <div class="progress card-progress disp-block" style="min-width: 43px">
-                                            <div class="progress-bar progress-bar-success progress-bar-striped"
-                                                 role="progressbar"
-                                                 aria-valuenow="0"
-                                                 aria-valuemin="0"
-                                                 aria-valuemax="100"
-                                                 style="width: 0%" ng-style="{width: card.progress + '%'}">
-                                            </div>
-                                        </div>
-                                        <div class="progress card-progress disp-block" style="min-width: 43px">
-                                            <div class="progress-bar progress-bar-info progress-bar-striped"
-                                                 role="progressbar"
-                                                 aria-valuenow="0"
-                                                 aria-valuemin="0"
-                                                 aria-valuemax="100"
-                                                 style="width: 0%" ng-style="{width: card.checklistsProgress + '%'}">
-                                            </div>
-                                        </div>
-                                        <div class="progress card-progress disp-block" style="min-width: 43px">
-                                            <div class="progress-bar progress-bar-warning progress-bar-striped"
-                                                 role="progressbar"
-                                                 aria-valuenow="0"
-                                                 aria-valuemin="0"
-                                                 aria-valuemax="100"
-                                                 style="width: 0%" ng-style="{width: card.testingProgress + '%'}">
-                                            </div>
+                                    production: card.status == 'Development Complete',
+                                    'bg-info': true,
+                                    'card-high': detailedView}"> </div>
+                                <div class="card-content">
+                                    <div class="progress card-progress" title="Development progress">
+                                        <div class="progress-bar progress-bar-success progress-bar-striped"
+                                             role="progressbar"
+                                             aria-valuenow="0"
+                                             aria-valuemin="0"
+                                             aria-valuemax="100"
+                                             style="width: 0%" ng-style="{width: card.progress + '%'}">
                                         </div>
                                     </div>
-                                    <div class="disp-block">
-                                        <div class="disp-block" style="align-self: flex-end">
-                                            <sup class="disp-block"  style="color: blue">{{card.reportedSP | number : 0}}/</sup>
-                                            <sup class="disp-block"  style="color: darkred">{{card.summarySP | number : 0}}</sup>
-                                            <h3 class="disp-block"  style="font-style: italic">{{card.restSP | number : 0}}</h3>
+                                    <div class="progress card-progress" title="Checklists progress">
+                                        <div class="progress-bar progress-bar-info progress-bar-striped"
+                                             role="progressbar"
+                                             aria-valuenow="0"
+                                             aria-valuemin="0"
+                                             aria-valuemax="100"
+                                             style="width: 0%" ng-style="{width: card.checklistsProgress + '%'}">
                                         </div>
-                                        <br/>
-                                        <img ng-show="card.priority == 1" width="16" height="16" alt="Conf" src="img/1.png"/>
-                                        <img ng-show="card.priority == 2" width="16" height="16" alt="Conf" src="img/2.png"/>
-                                        <img ng-show="card.priority == 3" width="16" height="16" alt="Conf" src="img/3.png"/>
-                                        <img ng-show="card.priority == 4" width="16" height="16" alt="Conf" src="img/4.png"/>
-                                        <img ng-show="card.priority == 5" width="16" height="16" alt="Conf" src="img/5.png"/>
-                                        <img ng-show="card.dueDateConfirmed" width="16" height="16" alt="Conf" src="img/duedate2.png"/>
-                                        <img ng-show="card.status == exports.STATUS.BLOCKED.name" width="16" height="16" alt="Conf" src="img/ban.png"/>
-                                        <img ng-show="card.status == exports.STATUS.DEFERRED.name" width="16" height="16" alt="Conf" src="img/deffered.png"/>
-                                        <img ng-show="card.xxl" width="16" height="16" alt="Conf" src="img/xxl.png"/>
-                                        <span style="font-style: italic">{{card.pages | number : 0}} Pages</span>
                                     </div>
-                                    <a class="disp-block" href="{{card.uri}}">{{card.name}}</a>
-                                    <div  ng-show="detailedView" ng-repeat="assignee in card.assignees">
-                                        <div ng-if="$first"><img width="16" height="16" alt="Conf" src="img/person2.png"/>{{assignee}}</div>
-                                        <div ng-if="!$first"><img width="16" height="16" alt="Conf" src="img/person.png"/>{{assignee}}</div>
+                                    <div class="progress card-progress" title="QA progress">
+                                        <div class="progress-bar progress-bar-warning progress-bar-striped"
+                                             role="progressbar"
+                                             aria-valuenow="0"
+                                             aria-valuemin="0"
+                                             aria-valuemax="100"
+                                             style="width: 0%" ng-style="{width: card.testingProgress + '%'}">
+                                        </div>
                                     </div>
-                                    <div ng-show="detailedView"><img width="16" height="16" alt="Conf" src="img/clockblue.png"/>{{card.devTimeSpent | number : 0}}hrs</div>
-                                    <div ng-show="detailedView"><img width="16" height="16" alt="Conf" src="img/clockred.png"/>{{card.qaTimeSpent | number : 0}}hrs</div>
-                                    <div ng-show="detailedView"><img width="16" height="16" alt="Conf" src="img/clocksp.png"/>{{(card.qaTimeSpent+card.devTimeSpent)/card.summarySP | number : 0}}hrs per SP</div>
-                                </td>
-                            </tr>
-                        </table>
+                                    <a class="card-link" href="{{card.uri}}">{{card.name}}</a>
+                                    <div ng-show="detailedView">
+                                        <div ng-repeat="assignee in card.assignees">
+                                            <div ng-if="$first" title="{{assignee}}"><img width="16" height="16" alt="Conf" src="img/person2.png"/>{{assignee}}</div>
+                                            <div ng-if="!$first" title="{{assignee}}"><img width="16" height="16" alt="Conf" src="img/person.png"/>{{assignee}}</div>
+                                        </div>
+                                        <div class="disp-block"><img width="16" height="16" alt="Conf" src="img/clockblue.png" title="Development spent hours"/>{{card.devTimeSpent | number : 0}}</div>
+                                        <div class="disp-block"><img width="16" height="16" alt="Conf" src="img/clockred.png" title="QA spent hours"/>{{card.qaTimeSpent | number : 0}}</div>
+                                        <div class="disp-block"><img width="16" height="16" alt="Conf" src="img/clocksp.png" title="Hours spent per Story Point"/>{{(card.qaTimeSpent+card.devTimeSpent)/card.summarySP | number : 0}}</div>
+                                        <div><img width="16" height="16" alt="Conf" src="img/module.png" title="Module Name"/>{{card.moduleName}}</div>
+                                    </div>
+                                </div>
+                                <div class="card-left" title="Left Story Points to Implement">{{card.restSP | number : 0}}</div>
+                                <div class="card-icons">
+                                    <img class="card-icon" title="Priority Blocker" ng-show="card.priority == 1" width="20" height="20" alt="Conf" src="img/1.png"/>
+                                    <img class="card-icon" title="Priority Critical" ng-show="card.priority == 2" width="20" height="20" alt="Conf" src="img/2.png"/>
+                                    <img class="card-icon" title="Priority Major" ng-show="card.priority == 3" width="20" height="20" alt="Conf" src="img/3.png"/>
+                                    <img class="card-icon" title="Priority Minor" ng-show="card.priority == 4" width="20" height="20" alt="Conf" src="img/4.png"/>
+                                    <img class="card-icon" title="Priority Trivial" ng-show="card.priority == 5" width="20" height="20" alt="Conf" src="img/5.png"/>
+                                    <img class="card-icon" title="Due Date confirmed" ng-show="card.dueDateConfirmed" width="20" height="20" alt="Conf" src="img/duedate2.png"/>
+                                    <img class="card-icon" title="Blocked" ng-show="card.status == exports.STATUS.BLOCKED.name" width="20" height="20" alt="Conf" src="img/ban.png"/>
+                                    <img class="card-icon" title="Deferred" ng-show="card.status == exports.STATUS.DEFERRED.name" width="20" height="20" alt="Conf" src="img/deffered.png"/>
+                                    <img class="card-icon" title="Has XXL or XXXL pages" ng-show="card.xxl" width="20" height="20" alt="Conf" src="img/xxl.png"/>
+                                    <div class="card-size" title="Story Points">{{card.summarySP | number : 0}}</div>
+                                    <div class="card-pages" title="Pages">{{card.pages | number : 0}}</div>
+                                </div>
+                            </li>
+                        </ul>
                     </td>
                 </tr>
             </tbody>

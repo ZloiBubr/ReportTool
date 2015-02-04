@@ -7,11 +7,16 @@ var statusExport = require('../public/jsc/Models/statusList');
 var statusList = new statusExport.statuses();
 var async = require('async');
 var _ = require('underscore');
+var cache = require('node_cache');
 
 exports.getData = function (req, res) {
-    parsePages(function (data) {
-        res.json(data);
-    });
+
+    cache.getData("normalizedData",function(setterCallback){
+        parsePages(function (data) {
+            setterCallback(data);
+        });
+    }, function(value){res.json(value);});
+
 };
 
 function cloudAppData() {

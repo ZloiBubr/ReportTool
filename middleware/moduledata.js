@@ -7,14 +7,17 @@ var Module = require('../models/module').Module;
 var Page = require('../models/page').Page;
 var log = require('../libs/log')(module);
 var async = require('async');
+var cache = require('node_cache');
 var _ = require('underscore');
 var statusExport = require('../public/jsc/models/statusList');
 var statusList = new statusExport.statuses();
 
 exports.getData = function (req, res) {
-    parsePages(function (moduledata) {
-        res.json(moduledata);
-    });
+    cache.getData("moduleData",function(setterCallback){
+        parsePages(function (data) {
+            setterCallback(data);
+        });
+    }, function(value){res.json(value);});
 };
 
 function moduleData() {
@@ -178,10 +181,18 @@ function putDataPoint(moduledata, module, page, count) {
         moduled.checklistsProgress.push(page.checklistCreated);
         addCloudApp(moduled, page);
     }
+    if(moduled.status == "Production") {
+        moduled.status = STATUS.PRODUCTION.name;
+    }
 }
 
 function addCloudApp(module, page) {
     var found = false;
+    var status = page.status;
+    if(status == "Production") {
+        status = STATUS.PRODUCTION.name;
+    }
+
     var cloudAppName = helpers.getCloudAppName(page.labels);
     for(var i=0; i<module.cloudApps.length; i++) {
         if(module.cloudApps[i].name == cloudAppName) {
@@ -192,7 +203,7 @@ function addCloudApp(module, page) {
     if(!found) {
         var cloudApp = {
             name: cloudAppName,
-            cloudAppStatus: page.status
+            cloudAppStatus: status
         };
         module.cloudApps.push(cloudApp);
     }
@@ -203,6 +214,6 @@ function addCloudApp(module, page) {
         cloudApp.acceptanceFinishDate = page.accfinish;
         cloudApp.customerCompleteDate = page.cusfinish;
         cloudApp.acceptanceStatus = page.acceptanceStatus;
-        cloudApp.cloudAppStatus = page.status;
+        cloudApp.cloudAppStatus = status;
     }
 }

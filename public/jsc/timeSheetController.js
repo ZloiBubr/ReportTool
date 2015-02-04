@@ -64,7 +64,6 @@ function timeSheetController($scope, $resource, $window, $filter, $modal,  $sce)
     };
 
     $scope.onCellClick = function(item) {
-
         var modalInstance = $modal.open({
             templateUrl: '/pages/modal/timeSheetPageModal.html',
             controller: timeSheetPageModalController,
