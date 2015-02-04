@@ -65,5 +65,9 @@ myApp.config(function($stateProvider, $urlRouterProvider) {
             url: "/page/:id",
             templateUrl: "pages/page.html"
         })
+        .state('acceptanceStatistics', {
+            url: "/acceptanceStatistics",
+            templateUrl: "pages/acceptanceStatistics.html"
+        })
 
 });

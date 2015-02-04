@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<div ng-controller="acceptanceStatisticsController">
+    <table class="table table-striped table-timesheet-hover no-padding">
+        <thead class="progressTableMainHeader">
+        <tr>
+            <th>
+                Leader
+            </th>
+            <th>
+                 Current
+            </th>
+            <th>
+                1-15 Days Past Due
+            </th>
+            <th>
+                16-30 Days Past Due
+            </th>
+            <th>
+                31-45 Days Past Due
+            </th>
+            <th>
+                46-60 Days Past Due
+            </th>
+            <th>
+                Total
+            </th>
+        </tr>
+        </thead>
+
+        <tbody style="height: 100px;">
+            <tr ng-repeat="cloudApp in cloudApps">
+                <td>{{cloudApp.leader}}</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tbody>
+
+        <tfoot>
+        <tr>
+            <td>Totals:</td>
+        </tr>
+        </tfoot>
+    </table>
+</div>
+</body>
+</html>

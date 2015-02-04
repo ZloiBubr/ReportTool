@@ -13,6 +13,7 @@ var wavedata = require('../routes/calcwave');
 var moduledata = require('../routes/calcmodule');
 var personaldata = require('../routes/personaldata');
 var versiondata = require('../routes/versiondata');
+var acceptanceStatistics = require('../routes/acceptanceStatistics');
 var issuesDataRouter = require('../routes/issuesDataRouter');
 var ClearDB = require('../middleware/createDb').Clear;
 
@@ -35,6 +36,8 @@ router.get('/moduledata', moduledata.get);
 router.get('/personaldata/:fromDate/:toDate', personaldata.get);
 router.get('/issuesdata', issuesDataRouter.get);
 router.get('/versiondata', versiondata.get);
+router.get('/acceptanceStatistics', acceptanceStatistics.get);
+
 router.get('/update_progress', function (req, res) {
     req.socket.setTimeout(1000 * 60 * 10);
     res.writeHead(200, {'Content-Type': 'text/event-stream'});
