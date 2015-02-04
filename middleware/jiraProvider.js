@@ -22,9 +22,10 @@ var JiraApi = require('jira').JiraApi;
 
 var epicsList = [];
 var issuesList = [];
-var acceptanceTasks = [];
+var acceptanceTasks = {};
 var epicIssueMap = {};
 var linkedIssueUniqList = [];
+var pagesProgress = 0;
 var updateInProgress = false;
 
 exports.rememberResponse = function (req, res) {
@@ -81,7 +82,8 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
         function (callback) {
             LogProgress("**** Step 2-2: collect automation stories");
             //grab automation pages list
-            Step2CollectAutomationStories(jira, full, callback);
+           // Step2CollectAutomationStories(jira, full, callback);
+            callback();
         },
         //step 3
         function (callback) {
@@ -153,7 +155,7 @@ function WriteVersion(callback) {
 
 function Step1CollectModules(jira, callback) {
     //var requestString = "project = PLEX-UXC AND issuetype = epic AND summary ~ Module AND NOT summary ~ automation AND NOT summary ~ screens ORDER BY key ASC";
-    var requestString = "project = PLEX-UXC AND key = PLEXUXC-9243"; // for debug
+    var requestString = "project = PLEX-UXC AND key = PLEXUXC-17040"; // for debug
     epicsList = [];
 
     UpdateProgress(0, "page");
@@ -266,6 +268,7 @@ function Step2CollectAutomationStories(jira, full, callback) {
                 }
                 if (stories != null) {
                     async.eachSeries(stories.issues, function (story, callback) {
+                            pagesProgress++;
                             issuesList.push(story.key);
                             //epicIssueMap[story.key] = moduleKey;
                             callback();
@@ -300,7 +303,7 @@ function Step3ProcessPages(jira, callback) {
     linkedIssueUniqList = {};
 
     async.eachLimit(issuesList, 10, function (issueKey, callback) {
-            var currentProgress = Math.floor((++counter * 100) / issuesList.length);
+            var currentProgress = Math.floor((++counter * 100) / pagesProgress);
             if (lastProgress != currentProgress) {
                 lastProgress = currentProgress;
                 UpdateProgress(currentProgress, "page");
@@ -317,12 +320,14 @@ function Step4ProcessCloudApps(jira, callback) {
     var counter = 0;
     var lastProgress = 0;
 
-    async.eachLimit(acceptanceTasks, 10, function (acceptanceTask, callback) {
-            var currentProgress = Math.floor((++counter * 100) / issuesList.length);
+    async.eachLimit(Object.keys(acceptanceTasks), 10, function (acceptanceTaskKey, callback) {
+            var currentProgress = Math.floor((++counter * 100) / pagesProgress);
+            var acceptanceTask = acceptanceTasks[acceptanceTaskKey];
             if (lastProgress != currentProgress) {
                 lastProgress = currentProgress;
                 UpdateProgress(currentProgress, "page");
             }
+
             ProcessAcceptanceTasksFromJira(jira, acceptanceTask, counter, callback)
         },
         function (err) {
@@ -342,7 +347,7 @@ function Step5ProcessBlockers(jira, callback) {
                 UpdateProgress(currentProgress, "issues");
             }
             var linkedIssue = linkedIssueUniqList[linkedIssueKey];
-            ProcessBlockersFromJira(jira, linkedIssue, callback);
+            ProcessBlockersFromJira(jira, linkedIssue, counter, callback);
         },
         function (err) {
             callback();
@@ -371,22 +376,22 @@ function CollectPagesFromJira(jira, full, moduleKey, callback) {
 
                     _.each(stories.issues, function (story){
                         issuesList.push(story.key);
+                        pagesProgress++;
                         epicIssueMap[story.key] = moduleKey;
 
                         if(story.fields && story.fields.subtasks && story.fields.subtasks.length > 0){
                             for(var i=0;i<story.fields.subtasks.length;i++){
                                 if(story.fields.subtasks[i].fields && story.fields.subtasks[i].fields.summary.toLowerCase().indexOf("plex-acceptance") != -1){
-                                    acceptanceTasks[story.fields.subtasks[i].key] = {
+                                    acceptanceTasks[story.key] = {
                                         id: story.fields.subtasks[i].id,
                                         key: story.fields.subtasks[i].key
                                     };
+                                    pagesProgress++;
                                 }
                             }
                         }
                     });
-                }
 
-                else {
                     loopError = false;
                     callback();
                 }
@@ -458,7 +463,7 @@ function ProcessAcceptanceTasksFromJira(jira, acceptanceTasks, counter, callback
             });
         },
         function(err) {
-            LogProgress(counter + ":" + linkedIssue.linkedIssueKey + " : Issue Collected");
+            LogProgress(counter + ":" + acceptanceTasks.key + " : Acceptance Task Collected");
             callback();
         }
     );
@@ -495,8 +500,10 @@ function MapLinkedIssues(issue, dbPage) {
 
 function MapAcceptanceTasks(issue, dbPage) {
     var acceptanceTask = acceptanceTasks[issue.key];
-    acceptanceTask.epicKey = dbPage.epicKey;
-    acceptanceTask.parentPageId = dbPage._id;
+    if(acceptanceTask) {
+        acceptanceTask.epicKey = dbPage.epicKey;
+        acceptanceTask.parentPageId = dbPage._id;
+    }
 }
 
 function ProcessBlockersFromJira(jira, linkedIssue, counter, callback) {
@@ -523,18 +530,18 @@ function ProcessBlockersFromJira(jira, linkedIssue, counter, callback) {
         },
         function(err) {
             LogProgress(counter + ":" + linkedIssue.linkedIssueKey + " : Issue Collected");
-            callback();
+            callback(err);
         }
     );
 }
 function SaveAcceptanceTask(jiraAcceptanceTask, mapAcceptanceTask, callback) {
-    Issue.findOne({key: mapAcceptanceTask.key}, function (err, dbIssue) {
+        CloudApp.findOne({key: mapAcceptanceTask.key}, function (err, dbIssue) {
         if (err) {
             callback(err);
         }
 
         if (!dbIssue) {
-            dbIssue = new Issue();
+            dbIssue = new CloudApp();
         }
 
         dbIssue.key = jiraAcceptanceTask.key;
@@ -547,6 +554,11 @@ function SaveAcceptanceTask(jiraAcceptanceTask, mapAcceptanceTask, callback) {
 
         dbIssue.created = jiraAcceptanceTask.fields.created;
         dbIssue.updated = jiraAcceptanceTask.fields.updated;
+
+        dbIssue.dev_complete = jiraAcceptanceTask.fields.customfield_24500;
+        dbIssue.qa_complete= jiraAcceptanceTask.fields.customfield_24501;
+        dbIssue.sme_complete = jiraAcceptanceTask.fields.customfield_24502;
+        dbIssue.plex_complete = jiraAcceptanceTask.fields.customfield_24503;
 
         dbIssue.labels = jiraAcceptanceTask.fields.labels;
         if (jiraAcceptanceTask.fields.assignee != null)

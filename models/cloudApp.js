@@ -25,6 +25,15 @@ var schema = new Schema({
     created:                { type: String },
     updated:                { type: String },
 
+    dev_complete:           { type: String },
+    qa_complete:            { type: String },
+    sme_complete:           { type: String },
+    plex_complete:          { type: String },
+
+    updated:                { type: String },
+    updated:                { type: String },
+    updated:                { type: String },
+
     epicKey: {type: String},
     _parentPage:{ type: Schema.Types.ObjectId, ref: 'Page'}
 });
