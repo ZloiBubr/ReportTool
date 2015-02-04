@@ -3,22 +3,112 @@
  */
 
 var mongoose = require('../libs/mongoose');
+var CloudApp = require('../models/cloudApp').CloudApp;
+var DelayStatistic = require('../models/leaderDelayStatisticViewModel').DelayStatistic;
+var LeaderDelayStatisticVm = require('../models/leaderDelayStatisticViewModel').LeaderDelayStatisticVm;
 
 exports.getCloudApps = function (req, res) {
-
-    var cloudApps = { cloudApps : [
-        {leader: "Mike Breckle", cloudAppName: "Supplies", dueDate: "2015-01-10"},
-        {leader: "Jon Demski", cloudAppName: "Supplies and Customers", dueDate: "2014-12-31"},
-        {leader: "Mike Breckle", cloudAppName: "Receiving", dueDate: "2015-01-10"},
-        {leader: "Mike Breckle", cloudAppName: "Receiving and Purchasing", dueDate: "2014-10-31"},
-        {leader: "Jon Demski", cloudAppName: "Finalizing", dueDate: "2015-9-31"},
-        {leader: "Jon Demski", cloudAppName: "Supplies", dueDate: "2015-01-10"}
-    ]};
-
-    res.json(cloudApps);
+    loadCloudApps(function (result) {
+        res.json(result);
+    })
 };
 
-function getLeaderAcceptanceStatistics() {
-
+function loadCloudApps(callback) {
+    CloudApp.find({}, function (err, cloudApps) {
+        if (err) throw err;
+        var result = { result : getLeaderDelayStatisticVms(cloudApps) };
+        callback(result);
+    });
 }
+
+function getLeaderDelayStatisticVms(cloudApps) {
+    var viewModels = [];
+    var delayRanges = getDelayDayRanges();
+    var allLeader = getAllLeaders(cloudApps);
+    for(var j = 0; j <  allLeader.length; j++){
+        var delayStatistics = [];
+        var leaderName = allLeader[j];
+
+        for (var i = 0; i < delayRanges.length; i++){
+            var delayStatistic = getStatisticByLeaderAndRange(leaderName, delayRanges[i], cloudApps);
+            delayStatistics.push(delayStatistic);
+        }
+
+        var leaderDelayStatisticVm = new LeaderDelayStatisticVm({ assignee: leaderName, delayStatistics: delayStatistics });
+        viewModels.push(leaderDelayStatisticVm);
+    }
+
+    return viewModels;
+}
+
+function getAllLeaders(cloudApps) {
+    var leaders = [];
+
+    if (!cloudApps || cloudApps.length < 1) {
+        return leaders;
+    }
+
+    for (var i = 0; i < cloudApps.length; i++){
+        var leaderName = cloudApps[i].assignee;
+        if (!IsLeaderInArray(leaders, leaderName)){
+            leaders.push(leaderName);
+        }else{
+            continue;
+        }
+    }
+
+    return leaders;
+}
+
+function getDelayDayRanges() {
+    return [
+        {
+            minRangeValue : 1,
+            maxRangeValue: 15
+        },
+        {
+            minRangeValue : 16,
+            maxRangeValue: 30
+        },
+        {
+            minRangeValue : 31,
+            maxRangeValue: 46
+        },
+        {
+            minRangeValue : 46,
+            maxRangeValue: 60
+        },
+        {
+            minRangeValue : 61,
+            maxRangeValue: 100000
+        },
+    ];
+}
+
+function getStatisticByLeaderAndRange(leaderName, range, cloudApps){
+    var delayStatistic = new DelayStatistic({minRangeValue: range.minRangeValue, maxRangeValue: range.maxRangeValue});
+    for (var i = 0; i < cloudApps.length; i++){
+        var delayInDay = 20;
+        if (cloudApps[i].assignee === leaderName){
+            if (delayInDay >= range.minRangeValue && delayInDay <= range.maxRangeValue) {
+                delayStatistic.cloudApps.push(cloudApps[i]);
+            }
+        }
+    }
+
+    delayStatistic.cloudAppCount = delayStatistic.cloudApps.length;
+
+    return delayStatistic;
+}
+
+function IsLeaderInArray(arr, leaderName) {
+    for (var i = 0; i < arr.length; i++){
+        if (leaderName == arr[i]){
+            return true;
+        }
+    }
+
+    return false;
+}
+
 
