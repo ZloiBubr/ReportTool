@@ -86,7 +86,6 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
             LogProgress("**** Step 2-2: collect automation stories");
             //grab automation pages list
             Step2CollectAutomationStories(jira, full, callback);
-            callback();
         },
         //step 3
         function (callback) {
@@ -390,7 +389,10 @@ function CollectPagesFromJira(jira, full, moduleKey, callback) {
                             }
                         }
                     });
-
+                    loopError = false;
+                    callback();
+                }
+                else{
                     loopError = false;
                     callback();
                 }
