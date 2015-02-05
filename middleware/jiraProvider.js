@@ -25,8 +25,11 @@ var issuesList = [];
 var acceptanceTasks = {};
 var epicIssueMap = {};
 var linkedIssueUniqList = [];
-var pagesProgress = 0;
+var pagesProgressCount = 0;
 var updateInProgress = false;
+
+var progressCounter = 0;
+var lastProgress = 0;
 
 exports.rememberResponse = function (req, res) {
     sessionsupport.setResponseObj('updateDb', req, res);
@@ -82,7 +85,7 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
         function (callback) {
             LogProgress("**** Step 2-2: collect automation stories");
             //grab automation pages list
-           // Step2CollectAutomationStories(jira, full, callback);
+            Step2CollectAutomationStories(jira, full, callback);
             callback();
         },
         //step 3
@@ -154,9 +157,9 @@ function WriteVersion(callback) {
 }
 
 function Step1CollectModules(jira, callback) {
-    //var requestString = "project = PLEX-UXC AND issuetype = epic AND summary ~ Module AND NOT summary ~ automation AND NOT summary ~ screens ORDER BY key ASC";
+    var requestString = "project = PLEX-UXC AND issuetype = epic AND summary ~ Module AND NOT summary ~ automation AND NOT summary ~ screens ORDER BY key ASC";
     //var requestString = "project = PLEX-UXC AND key = PLEXUXC-17040"; // for debug
-    var requestString = "project = PLEX-UXC AND key = PLEXUXC-17340"; // for debug
+    //var requestString = "project = PLEX-UXC AND key = PLEXUXC-17340"; // for debug
     epicsList = [];
 
     UpdateProgress(0, "page");
@@ -269,7 +272,7 @@ function Step2CollectAutomationStories(jira, full, callback) {
                 }
                 if (stories != null) {
                     async.eachSeries(stories.issues, function (story, callback) {
-                            pagesProgress++;
+                            pagesProgressCount++;
                             issuesList.push(story.key);
                             //epicIssueMap[story.key] = moduleKey;
                             callback();
@@ -299,17 +302,15 @@ function Step2CollectAutomationStories(jira, full, callback) {
 }
 
 function Step3ProcessPages(jira, callback) {
-    var counter = 0;
-    var lastProgress = 0;
     linkedIssueUniqList = {};
 
     async.eachLimit(issuesList, 10, function (issueKey, callback) {
-            var currentProgress = Math.floor((++counter * 100) / pagesProgress);
+            var currentProgress = Math.floor((++progressCounter * 100) / pagesProgressCount);
             if (lastProgress != currentProgress) {
                 lastProgress = currentProgress;
                 UpdateProgress(currentProgress, "page");
             }
-            ProcessPageFromJira(jira, issueKey, counter, callback);
+            ProcessPageFromJira(jira, issueKey, progressCounter, callback);
         },
         function (err) {
             callback();
@@ -318,18 +319,15 @@ function Step3ProcessPages(jira, callback) {
 }
 
 function Step4ProcessCloudApps(jira, callback) {
-    var counter = 0;
-    var lastProgress = 0;
-
     async.eachLimit(Object.keys(acceptanceTasks), 10, function (acceptanceTaskKey, callback) {
-            var currentProgress = Math.floor((++counter * 100) / pagesProgress);
+            var currentProgress = Math.floor((++progressCounter * 100) / pagesProgressCount);
             var acceptanceTask = acceptanceTasks[acceptanceTaskKey];
             if (lastProgress != currentProgress) {
                 lastProgress = currentProgress;
                 UpdateProgress(currentProgress, "page");
             }
 
-            ProcessAcceptanceTasksFromJira(jira, acceptanceTask, counter, callback)
+            ProcessAcceptanceTasksFromJira(jira, acceptanceTask, progressCounter, callback)
         },
         function (err) {
             callback();
@@ -377,7 +375,7 @@ function CollectPagesFromJira(jira, full, moduleKey, callback) {
 
                     _.each(stories.issues, function (story){
                         issuesList.push(story.key);
-                        pagesProgress++;
+                        pagesProgressCount++;
                         epicIssueMap[story.key] = moduleKey;
 
                         if(story.fields && story.fields.subtasks && story.fields.subtasks.length > 0){
@@ -387,7 +385,7 @@ function CollectPagesFromJira(jira, full, moduleKey, callback) {
                                         id: story.fields.subtasks[i].id,
                                         key: story.fields.subtasks[i].key
                                     };
-                                    pagesProgress++;
+                                    pagesProgressCount++;
                                 }
                             }
                         }

@@ -111,7 +111,7 @@ function acceptanceStatisticsController($scope, $resource) {
     };
 
     var getJiraLink = function (cloudApps) {
-        if (!cloudApps || cloudApps.length < 1) return "";
+        if (!cloudApps || cloudApps.length < 1) return "javascript:void(0)";
 
         var params = "key=" + cloudApps.join(" or key=");
         var link = baseUrl + params;

@@ -6,6 +6,7 @@ var mongoose = require('../libs/mongoose');
 var CloudApp = require('../models/cloudApp').CloudApp;
 var DelayStatistic = require('../models/leaderDelayStatisticViewModel').DelayStatistic;
 var LeaderDelayStatisticVm = require('../models/leaderDelayStatisticViewModel').LeaderDelayStatisticVm;
+var STATUS = require('../public/jsc/models/statusList').STATUS;
 
 exports.getCloudApps = function (req, res) {
     loadCloudApps(function (result) {
@@ -14,7 +15,7 @@ exports.getCloudApps = function (req, res) {
 };
 
 function loadCloudApps(callback) {
-    CloudApp.find({}, function (err, cloudApps) {
+    CloudApp.find({status: {$nin:[STATUS.CLOSED.name, STATUS.ACCEPTED.name]}}, function (err, cloudApps) {
         if (err) throw err;
         var result = { result : getLeaderDelayStatisticVms(cloudApps) };
         callback(result);
