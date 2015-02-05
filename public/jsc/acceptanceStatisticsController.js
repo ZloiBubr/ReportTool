@@ -1,7 +1,18 @@
 function acceptanceStatisticsController($scope, $resource) {
     var resource = $resource('/acceptanceStatistics');
+    var baseUrl = "https://jira.epam.com/jira/issues/?filter=-4&jql=";
 
     $scope.init = function () {
+        $scope.total = {
+            totalCurrent: 0,
+            totalWithFirstRange : 0,
+            totalWithSecondRange : 0,
+            totalWithThirdRange : 0,
+            totalWithFourthRange : 0,
+            totalWithFifthRange : 0,
+            commonTotal : getCommonTotal
+        };
+
         $scope.loadData();
     }
 
@@ -12,17 +23,10 @@ function acceptanceStatisticsController($scope, $resource) {
             var statistics = [];
             var result = data.result;
 
-            $scope.total = {
-                totalWithFirstRange : 0,
-                totalWithSecondRange : 0,
-                totalWithThirdRange : 0,
-                totalWithFourthRange : 0,
-                totalWithFifthRange : 0
-            };
-
             for (var i = 0; i < result.length; i++){
                 var statistic = getLeaderStatistic(result[i]);
 
+                $scope.total.totalCurrent += statistic.currentRangeAppCount;
                 $scope.total.totalWithFirstRange += statistic.firstRangeAppCount;
                 $scope.total.totalWithSecondRange += statistic.secondRangeAppCount;
                 $scope.total.totalWithThirdRange += statistic.thirdRangeAppCount;
@@ -31,7 +35,6 @@ function acceptanceStatisticsController($scope, $resource) {
 
                 statistics.push(statistic);
             }
-
 
             $scope.statistics = statistics;
 
@@ -47,6 +50,7 @@ function acceptanceStatisticsController($scope, $resource) {
     }
 
     var getLeaderStatistic  = function (leaderStatistic) {
+        var delayStatisticWithCurrent = getDelayStatisticWithRange(leaderStatistic, 0, 0);
         var delayStatisticWithFirstRange = getDelayStatisticWithRange(leaderStatistic, 1, 15);
         var delayStatisticWithSecondRange = getDelayStatisticWithRange(leaderStatistic, 16, 30);
         var delayStatisticWithThirdRange = getDelayStatisticWithRange(leaderStatistic, 31, 45);
@@ -55,12 +59,14 @@ function acceptanceStatisticsController($scope, $resource) {
 
         var statistic = {};
         statistic.leader = leaderStatistic.leader;
+        statistic.currentRangeAppCount = delayStatisticWithCurrent.cloudApps.length;
         statistic.firstRangeAppCount = delayStatisticWithFirstRange.cloudApps.length;
         statistic.secondRangeAppCount = delayStatisticWithSecondRange.cloudApps.length;
         statistic.thirdRangeAppCount = delayStatisticWithThirdRange.cloudApps.length;
         statistic.fourthRangeAppCount = delayStatisticWithFourthRange.cloudApps.length;
         statistic.fifthRangeAppCount = delayStatisticWithFifthRange.cloudApps.length;
 
+        statistic.currentRangeJiraLink = getJiraLink(delayStatisticWithCurrent.cloudApps);
         statistic.firstRangeJiraLink = getJiraLink(delayStatisticWithFirstRange.cloudApps);
         statistic.secondRangeJiraLink = getJiraLink(delayStatisticWithSecondRange.cloudApps);
         statistic.thirdRangeJiraLink = getJiraLink(delayStatisticWithThirdRange.cloudApps);
@@ -68,7 +74,13 @@ function acceptanceStatisticsController($scope, $resource) {
         statistic.fifthRangeJiraLink = getJiraLink(delayStatisticWithFifthRange.cloudApps);
 
         statistic.total = function (){
-            var total = statistic.firstRangeAppCount + statistic.secondRangeAppCount + statistic.thirdRangeAppCount + statistic.fourthRangeAppCount + statistic.fifthRangeAppCount;
+            var total = statistic.currentRangeAppCount;
+            total += statistic.firstRangeAppCount;
+            total += statistic.secondRangeAppCount;
+            total += statistic.thirdRangeAppCount;
+            total += statistic.fourthRangeAppCount;
+            total += statistic.fifthRangeAppCount;
+
             return total;
         }
 
@@ -87,10 +99,23 @@ function acceptanceStatisticsController($scope, $resource) {
         return {};
     }
 
+    var getCommonTotal = function () {
+        var total = $scope.total.totalCurrent;
+        total += $scope.total.totalWithFirstRange;
+        total += $scope.total.totalWithSecondRange;
+        total += $scope.total.totalWithThirdRange;
+        total += $scope.total.totalWithFourthRange;
+        total += $scope.total.totalWithFifthRange;
+
+        return total;
+    };
+
     var getJiraLink = function (cloudApps) {
+        if (!cloudApps || cloudApps.length < 1) return "";
 
-
-        return "#";
+        var params = "key=" + cloudApps.join(" or key=");
+        var link = baseUrl + params;
+        return link;
     }
 
     $scope.init();

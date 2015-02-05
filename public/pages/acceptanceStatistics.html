@@ -38,7 +38,11 @@
         <tbody style="height: 100px;">
             <tr ng-repeat="statistic in statistics">
                 <td>{{statistic.leader}}</td>
-                <td></td>
+                <td>
+                    <a href="{{statistic.currentRangeJiraLink}}">
+                        {{statistic.currentRangeAppCount}}
+                    </a>
+                </td>
                 <td>
                     <a href="{{statistic.firstRangeJiraLink}}">
                         {{statistic.firstRangeAppCount}}
@@ -72,12 +76,13 @@
         <tfoot>
         <tr>
             <td>Totals:</td>
-            <td></td>
+            <td>{{total.totalCurrent}}</td>
             <td>{{total.totalWithFirstRange}}</td>
             <td>{{total.totalWithSecondRange}}</td>
             <td>{{total.totalWithThirdRange}}</td>
             <td>{{total.totalWithFourthRange}}</td>
             <td>{{total.totalWithFifthRange}}</td>
+            <td>{{total.commonTotal()}}</td>
 
         </tr>
         </tfoot>

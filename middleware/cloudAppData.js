@@ -63,6 +63,10 @@ function getAllLeaders(cloudApps) {
 function getDelayDayRanges() {
     return [
         {
+            minRangeValue : 0,//Current
+            maxRangeValue: 0
+        },
+        {
             minRangeValue : 1,
             maxRangeValue: 15
         },
@@ -88,10 +92,10 @@ function getDelayDayRanges() {
 function getStatisticByLeaderAndRange(leaderName, range, cloudApps){
     var delayStatistic = new DelayStatistic({minRangeValue: range.minRangeValue, maxRangeValue: range.maxRangeValue});
     for (var i = 0; i < cloudApps.length; i++){
-        var delayInDay = 20;
+        var delayInDay = getDayDiff(cloudApps[i].sme_complete);
         if (cloudApps[i].assignee === leaderName){
             if (delayInDay >= range.minRangeValue && delayInDay <= range.maxRangeValue) {
-                delayStatistic.cloudApps.push({ key: cloudApps[i].key});
+                delayStatistic.cloudApps.push(cloudApps[i].key);
             }
         }
     }
@@ -109,6 +113,14 @@ function IsLeaderInArray(arr, leaderName) {
     }
 
     return false;
+}
+
+function getDayDiff(dueDate) {
+    var date1 = Date.now();
+    var date2 = new Date(dueDate);
+    var timeDiff = Math.abs(date2.getTime() - date1);
+    var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    return diffDays;
 }
 
 
