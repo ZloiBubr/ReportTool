@@ -36,7 +36,9 @@ function getLeaderDelayStatisticVms(cloudApps) {
         }
 
         var leaderDelayStatisticVm = new LeaderDelayStatisticVm({ assignee: leaderName, delayStatistics: delayStatistics });
-        viewModels.push(leaderDelayStatisticVm);
+        if (checkLeaderDelayStatisticsOnZero(leaderDelayStatisticVm.cloudAppDelayStatistics)) {
+            viewModels.push(leaderDelayStatisticVm);
+        }
     }
 
     return viewModels;
@@ -109,6 +111,16 @@ function getStatisticByLeaderAndRange(leaderName, range, cloudApps){
 function IsLeaderInArray(arr, leaderName) {
     for (var i = 0; i < arr.length; i++){
         if (leaderName == arr[i]){
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function checkLeaderDelayStatisticsOnZero(delayStatistics) {
+    for (var i = 0; i < delayStatistics.length; i++){
+        if (delayStatistics[i].cloudApps && delayStatistics[i].cloudApps.length > 0){
             return true;
         }
     }

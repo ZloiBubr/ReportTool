@@ -1,6 +1,6 @@
 <div ng-controller="acceptanceStatisticsController" class="container">
     <div class="row">
-    <table class="table table-striped table-timesheet-hover no-padding col-lg-12">
+    <table class="table table-striped table-timesheet-hover no-padding col-lg-12 table-bordered center-align">
         <thead class="progressTableMainHeader">
         <tr>
             <th>
@@ -33,32 +33,32 @@
             <tr ng-repeat="statistic in statistics">
                 <td>{{statistic.leader}}</td>
                 <td>
-                    <a href="{{statistic.currentRangeJiraLink}}">
+                    <a href="{{statistic.currentRangeJiraLink}}" ng-if="statistic.currentRangeAppCount != 0">
                         {{statistic.currentRangeAppCount}}
                     </a>
                 </td>
                 <td>
-                    <a href="{{statistic.firstRangeJiraLink}}">
+                    <a href="{{statistic.firstRangeJiraLink}}" ng-if="statistic.firstRangeAppCount != 0">
                         {{statistic.firstRangeAppCount}}
                     </a>
                 </td>
                 <td>
-                    <a href="{{statistic.secondRangeJiraLink}}">
+                    <a href="{{statistic.secondRangeJiraLink}}" ng-if="statistic.secondRangeAppCount != 0">
                         {{statistic.secondRangeAppCount}}
                     </a>
                 </td>
                 <td>
-                    <a href="{{statistic.thirdRangeJiraLink}}">
+                    <a href="{{statistic.thirdRangeJiraLink}}" ng-if="statistic.thirdRangeAppCount != 0">
                         {{statistic.thirdRangeAppCount}}
                     </a>
                 </td>
                 <td>
-                    <a href="{{statistic.fourthRangeJiraLink}}">
+                    <a href="{{statistic.fourthRangeJiraLink}}" ng-if="statistic.fourthRangeAppCount != 0">
                         {{statistic.fourthRangeAppCount}}
                     </a>
                 </td>
                 <td>
-                    <a href="{{statistic.fifthRangeJiraLink}}">
+                    <a href="{{statistic.fifthRangeJiraLink}}" ng-if="statistic.fifthRangeAppCount != 0">
                         {{statistic.fifthRangeAppCount}}
                     </a>
                 </td>
