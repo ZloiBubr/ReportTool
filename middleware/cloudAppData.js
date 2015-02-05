@@ -72,7 +72,7 @@ function getDelayDayRanges() {
         },
         {
             minRangeValue : 31,
-            maxRangeValue: 46
+            maxRangeValue: 45
         },
         {
             minRangeValue : 46,
@@ -80,7 +80,7 @@ function getDelayDayRanges() {
         },
         {
             minRangeValue : 61,
-            maxRangeValue: 100000
+            maxRangeValue: 10000
         },
     ];
 }
@@ -91,7 +91,7 @@ function getStatisticByLeaderAndRange(leaderName, range, cloudApps){
         var delayInDay = 20;
         if (cloudApps[i].assignee === leaderName){
             if (delayInDay >= range.minRangeValue && delayInDay <= range.maxRangeValue) {
-                delayStatistic.cloudApps.push(cloudApps[i]);
+                delayStatistic.cloudApps.push({ key: cloudApps[i].key});
             }
         }
     }

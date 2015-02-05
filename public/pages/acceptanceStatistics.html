@@ -28,6 +28,8 @@
                 46-60 Days Past Due
             </th>
             <th>
+                60 Days Past Due</th>
+            <th>
                 Total
             </th>
         </tr>
@@ -35,19 +37,48 @@
 
         <tbody style="height: 100px;">
             <tr ng-repeat="statistic in statistics">
-                <td>{{cloudApp.leader}}</td>
+                <td>{{statistic.leader}}</td>
                 <td></td>
-                <td>{{firstRangeAppCount}}</td>
-                <td>{{secondRangeAppCount}}</td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td>
+                    <a href="{{statistic.firstRangeJiraLink}}">
+                        {{statistic.firstRangeAppCount}}
+                    </a>
+                </td>
+                <td>
+                    <a href="{{statistic.secondRangeJiraLink}}">
+                        {{statistic.secondRangeAppCount}}
+                    </a>
+                </td>
+                <td>
+                    <a href="{{statistic.thirdRangeJiraLink}}">
+                        {{statistic.thirdRangeAppCount}}
+                    </a>
+                </td>
+                <td>
+                    <a href="{{statistic.fourthRangeJiraLink}}">
+                        {{statistic.fourthRangeAppCount}}
+                    </a>
+                </td>
+                <td>
+                    <a href="{{statistic.fifthRangeJiraLink}}">
+                        {{statistic.fifthRangeAppCount}}
+                    </a>
+                </td>
+
+                <td>{{statistic.total()}}</td>
             </tr>
         </tbody>
 
         <tfoot>
         <tr>
             <td>Totals:</td>
+            <td></td>
+            <td>{{total.totalWithFirstRange}}</td>
+            <td>{{total.totalWithSecondRange}}</td>
+            <td>{{total.totalWithThirdRange}}</td>
+            <td>{{total.totalWithFourthRange}}</td>
+            <td>{{total.totalWithFifthRange}}</td>
+
         </tr>
         </tfoot>
     </table>
