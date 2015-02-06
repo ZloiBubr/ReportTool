@@ -20,7 +20,7 @@ exports.getCloudApps = function (req, res) {
 };
 
 function parsePages(callback) {
-    CloudApp.find({status: {$nin:[STATUS.CLOSED.name, STATUS.ACCEPTED.name]}}, function (err, cloudApps) {
+    CloudApp.find({status: {$nin:[STATUS.CLOSED.name, STATUS.RESOLVED.name]}}, function (err, cloudApps) {
         if (err) throw err;
         var result = { result : getLeaderDelayStatisticVms(cloudApps) };
         callback(err,result);
