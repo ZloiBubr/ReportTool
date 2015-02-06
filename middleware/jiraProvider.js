@@ -560,6 +560,7 @@ function SaveAcceptanceTask(jiraAcceptanceTask, mapAcceptanceTask, callback) {
         dbIssue.qa_complete= jiraAcceptanceTask.fields.customfield_24501;
         dbIssue.sme_complete = jiraAcceptanceTask.fields.customfield_24502;
         dbIssue.plex_complete = jiraAcceptanceTask.fields.customfield_24503;
+        dbIssue.duedate = jiraAcceptanceTask.fields.duedate;
 
         dbIssue.labels = jiraAcceptanceTask.fields.labels;
         if (jiraAcceptanceTask.fields.assignee != null)
