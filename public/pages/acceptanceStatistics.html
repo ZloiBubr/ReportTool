@@ -7,6 +7,9 @@
                 Leader
             </th>
             <th>
+                Unspecified Date
+            </th>
+            <th>
                  Current
             </th>
             <th>
@@ -32,6 +35,11 @@
         <tbody style="height: 100px;">
             <tr ng-repeat="statistic in statistics">
                 <td>{{statistic.leader}}</td>
+                <td>
+                    <a href="{{statistic.notAssignedDueJiraLink}}" ng-if="statistic.notAssignedDueAppCount != 0">
+                        {{statistic.notAssignedDueAppCount}}
+                    </a>
+                </td>
                 <td>
                     <a href="{{statistic.currentRangeJiraLink}}" ng-if="statistic.currentRangeAppCount != 0">
                         {{statistic.currentRangeAppCount}}
@@ -70,6 +78,7 @@
         <tfoot>
         <tr>
             <td>Totals:</td>
+            <td>{{total.totalUnspecifiedDate}}</td>
             <td>{{total.totalCurrent}}</td>
             <td>{{total.totalWithFirstRange}}</td>
             <td>{{total.totalWithSecondRange}}</td>

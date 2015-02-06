@@ -4,6 +4,7 @@ function acceptanceStatisticsController($scope, $resource) {
 
     $scope.init = function () {
         $scope.total = {
+            totalUnspecifiedDate: 0,
             totalCurrent: 0,
             totalWithFirstRange : 0,
             totalWithSecondRange : 0,
@@ -26,6 +27,7 @@ function acceptanceStatisticsController($scope, $resource) {
             for (var i = 0; i < result.length; i++){
                 var statistic = getLeaderStatistic(result[i]);
 
+                $scope.total.totalUnspecifiedDate += statistic.notAssignedDueAppCount;
                 $scope.total.totalCurrent += statistic.currentRangeAppCount;
                 $scope.total.totalWithFirstRange += statistic.firstRangeAppCount;
                 $scope.total.totalWithSecondRange += statistic.secondRangeAppCount;
@@ -50,7 +52,8 @@ function acceptanceStatisticsController($scope, $resource) {
     }
 
     var getLeaderStatistic  = function (leaderStatistic) {
-        var delayStatisticWithCurrent = getDelayStatisticWithRange(leaderStatistic, 0, 0);
+        var statisticWithNotAssignedDue = getDelayStatisticWithRange(leaderStatistic, null, null);
+        var delayStatisticWithCurrent = getDelayStatisticWithRange(leaderStatistic, -99999, 0);
         var delayStatisticWithFirstRange = getDelayStatisticWithRange(leaderStatistic, 1, 15);
         var delayStatisticWithSecondRange = getDelayStatisticWithRange(leaderStatistic, 16, 30);
         var delayStatisticWithThirdRange = getDelayStatisticWithRange(leaderStatistic, 31, 45);
@@ -59,6 +62,7 @@ function acceptanceStatisticsController($scope, $resource) {
 
         var statistic = {};
         statistic.leader = leaderStatistic.leader;
+        statistic.notAssignedDueAppCount = statisticWithNotAssignedDue.cloudApps.length;
         statistic.currentRangeAppCount = delayStatisticWithCurrent.cloudApps.length;
         statistic.firstRangeAppCount = delayStatisticWithFirstRange.cloudApps.length;
         statistic.secondRangeAppCount = delayStatisticWithSecondRange.cloudApps.length;
@@ -66,6 +70,7 @@ function acceptanceStatisticsController($scope, $resource) {
         statistic.fourthRangeAppCount = delayStatisticWithFourthRange.cloudApps.length;
         statistic.fifthRangeAppCount = delayStatisticWithFifthRange.cloudApps.length;
 
+        statistic.notAssignedDueJiraLink = getJiraLink(statisticWithNotAssignedDue.cloudApps);
         statistic.currentRangeJiraLink = getJiraLink(delayStatisticWithCurrent.cloudApps);
         statistic.firstRangeJiraLink = getJiraLink(delayStatisticWithFirstRange.cloudApps);
         statistic.secondRangeJiraLink = getJiraLink(delayStatisticWithSecondRange.cloudApps);
@@ -75,6 +80,7 @@ function acceptanceStatisticsController($scope, $resource) {
 
         statistic.total = function (){
             var total = statistic.currentRangeAppCount;
+            total += statistic.notAssignedDueAppCount;
             total += statistic.firstRangeAppCount;
             total += statistic.secondRangeAppCount;
             total += statistic.thirdRangeAppCount;
@@ -91,6 +97,14 @@ function acceptanceStatisticsController($scope, $resource) {
         var delayStatistics = leaderStatistic.cloudAppDelayStatistics;
 
         for (var i = 0; i < delayStatistics.length; i++){
+            if ((min === null || max === null) && (delayStatistics[i].minRangeValue === null || delayStatistics[i].maxRangeValue === null)) {
+                return delayStatistics[i];
+            }
+
+            if (delayStatistics[i].minRangeValue === null || delayStatistics[i].maxRangeValue === null) {
+                continue;
+            }
+
             if (delayStatistics[i].minRangeValue >= min && delayStatistics[i].maxRangeValue <= max) {
                 return delayStatistics[i];
             }
@@ -101,6 +115,7 @@ function acceptanceStatisticsController($scope, $resource) {
 
     var getCommonTotal = function () {
         var total = $scope.total.totalCurrent;
+        total += $scope.total.totalUnspecifiedDate;
         total += $scope.total.totalWithFirstRange;
         total += $scope.total.totalWithSecondRange;
         total += $scope.total.totalWithThirdRange;

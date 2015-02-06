@@ -9,8 +9,7 @@ exports.LeaderDelayStatisticVm = function (options) {
 
 exports.DelayStatistic = function (options) {
     options = options || {};
-    this.minRangeValue = options.minRangeValue || 0;
-    this.maxRangeValue = options.maxRangeValue || 0;
-    this.cloudAppCount = options.cloudApps ? options.cloudApps.length : 0;
+    this.minRangeValue = options.minRangeValue;
+    this.maxRangeValue = options.maxRangeValue;
     this.cloudApps = options.cloudApps || [];
 }
