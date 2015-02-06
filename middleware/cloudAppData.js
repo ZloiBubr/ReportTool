@@ -6,19 +6,24 @@ var mongoose = require('../libs/mongoose');
 var CloudApp = require('../models/cloudApp').CloudApp;
 var DelayStatistic = require('../models/leaderDelayStatisticViewModel').DelayStatistic;
 var LeaderDelayStatisticVm = require('../models/leaderDelayStatisticViewModel').LeaderDelayStatisticVm;
+var cache = require('node_cache');
 var STATUS = require('../public/jsc/models/statusList').STATUS;
 
 exports.getCloudApps = function (req, res) {
-    loadCloudApps(function (result) {
-        res.json(result);
-    })
+
+    cache.getData("cloudAppData",function(setterCallback){
+        parsePages(function (err, data) {
+            if (err) throw err;
+            setterCallback(data);
+        });
+    }, function(value){res.json(value);});
 };
 
-function loadCloudApps(callback) {
+function parsePages(callback) {
     CloudApp.find({status: {$nin:[STATUS.CLOSED.name, STATUS.ACCEPTED.name]}}, function (err, cloudApps) {
         if (err) throw err;
         var result = { result : getLeaderDelayStatisticVms(cloudApps) };
-        callback(result);
+        callback(err,result);
     });
 }
 
