@@ -29,10 +29,7 @@ var schema = new Schema({
     qa_complete:            { type: String },
     sme_complete:           { type: String },
     plex_complete:          { type: String },
-
-    updated:                { type: String },
-    updated:                { type: String },
-    updated:                { type: String },
+    duedate:                { type: String },
 
     epicKey: {type: String},
     _parentPage:{ type: Schema.Types.ObjectId, ref: 'Page'}
