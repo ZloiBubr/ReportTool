@@ -32,7 +32,9 @@ var schema = new Schema({
     duedate:                { type: String },
 
     epicKey: {type: String},
-    _parentPage:{ type: Schema.Types.ObjectId, ref: 'Page'}
+
+    _parentPage:{ type: Schema.Types.ObjectId, ref: 'Page'},
+    _epic:{ type: Schema.Types.ObjectId, ref: 'Module'}
 });
 
 exports.CloudApp = mongoose.model('CloudApp', schema);

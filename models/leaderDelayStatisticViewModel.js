@@ -4,6 +4,7 @@
 
 exports.LeaderDelayStatisticVm = function (options) {
     this.leader = options.assignee || "";
+    this.SME = options.SME || "";
     this.cloudAppDelayStatistics = options.delayStatistics || [];
 }
 

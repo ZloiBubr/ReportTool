@@ -20,7 +20,7 @@ var STATUS = require('../public/jsc/models/statusList').STATUS;
 
 var JiraApi = require('jira').JiraApi;
 
-var epicsList = [];
+var epicsList = {};
 var issuesList = [];
 var acceptanceTasks = {};
 var epicIssueMap = {};
@@ -156,9 +156,9 @@ function WriteVersion(callback) {
 }
 
 function Step1CollectModules(jira, callback) {
-    var requestString = "project = PLEX-UXC AND issuetype = epic AND summary ~ Module AND NOT summary ~ automation AND NOT summary ~ screens ORDER BY key ASC";
+    //var requestString = "project = PLEX-UXC AND issuetype = epic AND summary ~ Module AND NOT summary ~ automation AND NOT summary ~ screens ORDER BY key ASC";
     //var requestString = "project = PLEX-UXC AND key = PLEXUXC-17040"; // for debug
-    //var requestString = "project = PLEX-UXC AND key = PLEXUXC-17340"; // for debug
+    var requestString = "project = PLEX-UXC AND key = PLEXUXC-17340"; // for debug
     epicsList = [];
 
     UpdateProgress(0, "page");
@@ -206,8 +206,8 @@ function Step1CollectModules(jira, callback) {
                             module.labels = epic.fields.labels;
                             module.fixVersions = epic.fields.fixVersions && epic.fields.fixVersions.length > 0 ? epic.fields.fixVersions[0].name : "";
                             module.priority = epic.fields.priority.name;
-                            module.save(function () {
-                                epicsList.push(epic.key);
+                            module.save(function (err, moduleDb) {
+                                epicsList[epic.key] = {id: moduleDb._id, key: epic.key};
                                 LogProgress(epic.key + " : " + " Module Collected");
                                 callback();
                             })
@@ -217,7 +217,7 @@ function Step1CollectModules(jira, callback) {
                         if (err) {
                             LogProgress("Collect modules error happened!", err);
                         }
-                        LogProgress(epicsList.length + " : " + " Modules Collected");
+                        LogProgress(Object.keys(epicsList).length + " : " + " Modules Collected");
                         if(err == null) {
                             loopError = false;
                         }
@@ -241,7 +241,7 @@ function Step2CollectPages(jira, full, callback) {
     issuesList = [];
     epicIssueMap = {};
 
-    async.eachLimit(epicsList, 10, function (epic, callback) {
+    async.eachLimit(Object.keys(epicsList), 10, function (epic, callback) {
             CollectPagesFromJira(jira, full, epic, callback);
         },
         function (err) {
@@ -353,21 +353,21 @@ function Step5ProcessBlockers(jira, callback) {
     );
 }
 
-function CollectPagesFromJira(jira, full, moduleKey, callback) {
+function CollectPagesFromJira(jira, full, epicKey, callback) {
     var queryString = full ?
-        util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s)", moduleKey) :
-        util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s) AND updated > -3d", moduleKey);
+        util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s)", epicKey) :
+        util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s) AND updated > -3d", epicKey);
 
     var loopError = true;
     async.whilst(function() {
             return loopError;
         },
         function(callback) {
-            LogProgress("**** collect pages for module: " + moduleKey);
+            LogProgress("**** collect pages for module: " + epicKey);
             jira.searchJira(queryString, { fields: ["summary","subtasks"] }, function (error, stories) {
                 if (error) {
                     LogProgress("Collect pages error happened!", error);
-                    LogProgress("Restarting Loop for: "+moduleKey, error);
+                    LogProgress("Restarting Loop for: "+epicKey, error);
                     callback();
                 }
                 if (stories != null) {
@@ -375,7 +375,7 @@ function CollectPagesFromJira(jira, full, moduleKey, callback) {
                     _.each(stories.issues, function (story){
                         issuesList.push(story.key);
                         pagesProgressCount++;
-                        epicIssueMap[story.key] = moduleKey;
+                        epicIssueMap[story.key] = epicKey;
 
                         if(story.fields && story.fields.subtasks && story.fields.subtasks.length > 0){
                             for(var i=0;i<story.fields.subtasks.length;i++){
@@ -399,7 +399,7 @@ function CollectPagesFromJira(jira, full, moduleKey, callback) {
             });
         },
         function(err) {
-            LogProgress(moduleKey + " : " + " : Page Collected");
+            LogProgress(epicKey + " : " + " : Page Collected");
             callback();
         }
     );
@@ -504,6 +504,7 @@ function MapAcceptanceTasks(issue, dbPage) {
     if(acceptanceTask) {
         acceptanceTask.epicKey = dbPage.epicKey;
         acceptanceTask.parentPageId = dbPage._id;
+        acceptanceTask.epicId = epicsList[dbPage.epicKey].id;
     }
 }
 
@@ -566,10 +567,11 @@ function SaveAcceptanceTask(jiraAcceptanceTask, mapAcceptanceTask, callback) {
         if (jiraAcceptanceTask.fields.assignee != null)
             dbIssue.assignee = jiraAcceptanceTask.fields.assignee.displayName;
 
-        dbIssue._parentPage = mapAcceptanceTask.parentPageId;
         dbIssue.epicKey = mapAcceptanceTask.epicKey;
+        dbIssue._parentPage = mapAcceptanceTask.parentPageId;
+        dbIssue._epic = mapAcceptanceTask.epicId;
 
-        dbIssue.save(function (err) {
+            dbIssue.save(function (err) {
             callback(err);
         });
     });
