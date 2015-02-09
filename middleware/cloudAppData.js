@@ -20,7 +20,7 @@ exports.getCloudApps = function (req, res) {
 };
 
 function parsePages(callback) {
-    CloudApp.find({status: {$nin:[STATUS.CLOSED.name, STATUS.RESOLVED.name]}}, function (err, cloudApps) {
+    CloudApp.find({status: {$in:[STATUS.ASSIGNED.name, STATUS.REOPENED.name, STATUS.INPROGRESS.name, STATUS.BLOCKED.name]}}, function (err, cloudApps) {//find({status: {$nin:[STATUS.CLOSED.name, STATUS.RESOLVED.name]}}, ...)
         if (err) throw err;
         var result = { result : getLeaderDelayStatisticVms(cloudApps) };
         callback(err,result);
@@ -104,14 +104,17 @@ function getDelayDayRanges() {
 function getStatisticByLeaderAndRange(leaderName, range, cloudApps){
     var delayStatistic = new DelayStatistic({minRangeValue: range.minRangeValue, maxRangeValue: range.maxRangeValue});
     for (var i = 0; i < cloudApps.length; i++){
-        var delayInDay = getDayDiff(cloudApps[i].sme_complete);
+        var delayInDay = getDayDiff(cloudApps[i].duedate);
 
         if (cloudApps[i].assignee === leaderName) {
-            if (delayInDay == null && range.minRangeValue == null){
-                delayStatistic.cloudApps.push(cloudApps[i].key);
+            if (delayInDay != null && range.minRangeValue != null && range.maxRangeValue != null) {
+                if (delayInDay >= range.minRangeValue && delayInDay <= range.maxRangeValue) {
+                    delayStatistic.cloudApps.push(cloudApps[i].key);
+                    continue;
+                }
             }
 
-            if (delayInDay >= range.minRangeValue && delayInDay <= range.maxRangeValue) {
+            if (delayInDay == null && range.minRangeValue == null && range.maxRangeValue == null) {
                 delayStatistic.cloudApps.push(cloudApps[i].key);
             }
         }
