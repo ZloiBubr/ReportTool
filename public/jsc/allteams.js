@@ -148,7 +148,6 @@ function Teams() {
             teamLead: "Valentine Zhuck",
             qaTeamLead: "Katsiaryna Kuchko",
             developers: [
-                "Valentine Zhuck",
                 "Viachaslau Anufryiuk",
                 "Yury Yamoryk",
                 "Aliaksandr Kladau",
@@ -164,9 +163,7 @@ function Teams() {
                 "Aleh Dukel",
                 "Ivan Yanchuk",
                 "Kanstantsin Ldou",
-                "Siarhei Nikitsin",
-		        "Mikhail Kelbas",
-                "Katsiaryna Zeliankova"
+		        "Mikhail Kelbas"
             ],
             testers: [
                 "Iryna Malets",
@@ -240,6 +237,9 @@ exports.OldDevelopers = function oldDevelopers(name) {
  	    name == "Nadzeya Mishurava" ||
         name == "Yevhenii Koliesnik" ||
         name == "Dmytro Petlia" ||
+        name == "Siarhei Nikitsin" ||
+        name == "Valentine Zhuck" ||
+        name == "Katsiaryna Zeliankova" ||
         name == undefined) {
         return true;
     }
