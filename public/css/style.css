@@ -343,3 +343,7 @@ section.contentHideSidebar {
     font-style: italic;
     font-size: x-large;
 }
+
+table.center-align td {
+    text-align: center;
+}

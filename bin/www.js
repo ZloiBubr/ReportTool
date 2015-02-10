@@ -25,8 +25,7 @@ process.on
         // email log to developer
         console.log("EMAILING ERROR");
         var mailer = require('../libs/mailer');
-        mailer.sendMail("NODE SERVER CRASHED", log);
-
+        mailer.sendMail( process.env.COMPUTERNAME + "_" + process.env.USERNAME + " > NODE SERVER CRASHED:", log);
 
         // If we exit straight away, the write log and send email operations wont have time to run
         setTimeout
