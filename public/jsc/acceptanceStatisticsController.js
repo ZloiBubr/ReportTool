@@ -3,6 +3,18 @@ function acceptanceStatisticsController($scope, $resource) {
     var baseUrl = "https://jira.epam.com/jira/issues/?filter=-4&jql=";
 
     $scope.init = function () {
+        $scope.isOnlySmeMode = true;
+        $scope.loadData().done($scope.prepareData);
+    };
+
+
+    $scope.reinit = function(){
+        $scope.prepareData()
+    };
+
+    $scope.prepareData  = function (){
+        var statistics = [];
+        var smeAcceptanceData = [];
         $scope.total = {
             totalUnspecifiedDate: 0,
             totalCurrent: 0,
@@ -13,33 +25,48 @@ function acceptanceStatisticsController($scope, $resource) {
             totalWithFifthRange : 0,
             commonTotal : getCommonTotal
         };
+        if($scope.isOnlySmeMode) {
+            var groupedbySme = _.groupBy( $scope.smeAcceptanceData, function (item) {
+                return item.SME;
+            });
 
-        $scope.loadData();
-    }
+            _.each(groupedbySme, function(leadersArrayItem){
+                var groupedSmeItem = jQuery.extend(true, {}, leadersArrayItem[0]);
+                for(var i=1; i<leadersArrayItem.length;i++){
+                        for(var l=0; l< leadersArrayItem[i].cloudAppDelayStatistics.length; l++){
+                            var cloudappItem = leadersArrayItem[i].cloudAppDelayStatistics[l];
+                            groupedSmeItem.cloudAppDelayStatistics[l].cloudApps.push.apply(groupedSmeItem.cloudAppDelayStatistics[l].cloudApps,cloudappItem.cloudApps);
+                        }
+                    }
+                smeAcceptanceData.push(groupedSmeItem);
+            });
+        }
+        else{
+            smeAcceptanceData =  $scope.smeAcceptanceData;
+        }
+
+        for (var i = 0; i <  smeAcceptanceData.length; i++){
+            var statistic = getLeaderStatistic( smeAcceptanceData[i]);
+
+            $scope.total.totalUnspecifiedDate += statistic.notAssignedDueAppCount;
+            $scope.total.totalCurrent += statistic.currentRangeAppCount;
+            $scope.total.totalWithFirstRange += statistic.firstRangeAppCount;
+            $scope.total.totalWithSecondRange += statistic.secondRangeAppCount;
+            $scope.total.totalWithThirdRange += statistic.thirdRangeAppCount;
+            $scope.total.totalWithFourthRange += statistic.fourthRangeAppCount;
+            $scope.total.totalWithFifthRange += statistic.fifthRangeAppCount;
+
+            statistics.push(statistic);
+        }
+
+        $scope.statistics = statistics;
+    };
 
     $scope.loadData = function () {
         var deferred = $.Deferred();
 
         var successCallback = function (data) {
-            var statistics = [];
-            var result = data.result;
-
-            for (var i = 0; i < result.length; i++){
-                var statistic = getLeaderStatistic(result[i]);
-
-                $scope.total.totalUnspecifiedDate += statistic.notAssignedDueAppCount;
-                $scope.total.totalCurrent += statistic.currentRangeAppCount;
-                $scope.total.totalWithFirstRange += statistic.firstRangeAppCount;
-                $scope.total.totalWithSecondRange += statistic.secondRangeAppCount;
-                $scope.total.totalWithThirdRange += statistic.thirdRangeAppCount;
-                $scope.total.totalWithFourthRange += statistic.fourthRangeAppCount;
-                $scope.total.totalWithFifthRange += statistic.fifthRangeAppCount;
-
-                statistics.push(statistic);
-            }
-
-            $scope.statistics = statistics;
-
+            $scope.smeAcceptanceData = data.result;
             deferred.resolve();
         };
 
@@ -49,6 +76,7 @@ function acceptanceStatisticsController($scope, $resource) {
         };
 
         resource.get(successCallback, errorCallback);
+        return deferred.promise();
     }
 
     var getLeaderStatistic  = function (leaderStatistic) {
@@ -61,7 +89,7 @@ function acceptanceStatisticsController($scope, $resource) {
         var delayStatisticWithFifthRange = getDelayStatisticWithRange(leaderStatistic, 61, 10000);
 
         var statistic = {};
-        statistic.leader = leaderStatistic.leader;
+        statistic.leader = $scope.isOnlySmeMode ? leaderStatistic.SME :leaderStatistic.leader;
         statistic.notAssignedDueAppCount = statisticWithNotAssignedDue.cloudApps.length;
         statistic.currentRangeAppCount = delayStatisticWithCurrent.cloudApps.length;
         statistic.firstRangeAppCount = delayStatisticWithFirstRange.cloudApps.length;
