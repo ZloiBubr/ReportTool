@@ -95,6 +95,8 @@ exports.updateJiraInfo = function (full, jiraUser, jiraPassword, callback) {
         },
         //step 5
         function (callback) {
+            // clear cache to not wait for other issues collected
+            cache.clearAllData();
             // process linked issues pages
             LogProgress("**** Step 4: process acceptance tasks");
             Step4ProcessCloudApps(jira, callback);
