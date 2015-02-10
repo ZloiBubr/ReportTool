@@ -133,7 +133,7 @@ function putDataPoint(moduledata, module, page, count) {
             moduleGroup: moduleGroup,
             moduleStatus: module.status,
             moduleResolution: module.resolution,
-            status: page ? helpers.updateStatus(page.status, page.resolution) : STATUS.CANCELED.name,
+            status: page ? helpers.updateStatus(page) : STATUS.CANCELED.name,
             uri: initUri + module.key,
             fixVersions: module.fixVersions,
             dueDateConfirmed: helpers.getDueDateConfirmed(labels),
@@ -169,7 +169,7 @@ function putDataPoint(moduledata, module, page, count) {
         moduled.hasdeferred = page.status == STATUS.DEFERRED.name;
 
         var moduleStatus = statusList.getStatusByName(moduled.status);
-        var newStatus = statusList.getStatusByName(helpers.updateStatus(page.status, page.resolution));
+        var newStatus = statusList.getStatusByName(helpers.updateStatus(page));
 
         if(newStatus.weight < moduleStatus.weight){
             moduled.status = newStatus.name;

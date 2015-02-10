@@ -88,6 +88,7 @@ function updateChecklistsProgress(cloudappdata) {
 
 function putDataPoint(cloudAppData, module, page) {
     var initUri = "https://jira.epam.com/jira/issues/?jql=project = PLEX-UXC and issuetype = Story and labels in (";
+    var acceptanceUri = "https://jira.epam.com/jira/browse/" + page.acceptanceKey;
 
     if(!helpers.isActive(page.status, page.resolution)) {
         return;
@@ -132,7 +133,7 @@ function putDataPoint(cloudAppData, module, page) {
     if(page.status == "Production") {
         page.status = STATUS.PRODUCTION.name;
     }
-    var status = helpers.updateStatus(page.status, page.resolution);
+    var status = helpers.updateStatus(page);
     var fullUri = initUri + "CloudApp_" + cloudAppName + ") AND 'Epic Link' = " + module.key;
     var cloudApp;
     for(var i=0; i<cloudAppData.cloudApp.length; i++) {
@@ -155,6 +156,13 @@ function putDataPoint(cloudAppData, module, page) {
             cloudApp.streamName = streamName;
             if(isParentPage) {
                 cloudApp.testingProgress = page.testingProgress;
+                cloudApp.devfinish = page.devfinish;
+                cloudApp.qafinish = page.qafinish;
+                cloudApp.accfinish = page.accfinish;
+                cloudApp.cusfinish = page.cusfinish;
+                cloudApp.pmhfinish = page.pmhfinish;
+                cloudApp.lafinish = page.lafinish;
+                cloudApp.acceptanceUri = acceptanceUri;
             }
 
             var found = false;

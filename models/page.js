@@ -39,10 +39,13 @@ var schema = new Schema({
     created:                { type: String },
     updated:                { type: String },
     acceptanceStatus:       { type: String },
+    acceptanceKey:          { type: String },
     devfinish:              { type: Date},
     qafinish:               { type: Date},
     accfinish:              { type: Date},
-    cusfinish:              { type: Date}
+    cusfinish:              { type: Date},
+    pmhfinish:              { type: Date},
+    lafinish:               { type: Date}
 });
 
 exports.Page = mongoose.model('Page', schema);

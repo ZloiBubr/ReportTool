@@ -113,7 +113,7 @@
                                     readyForAcceptance: card.status == 'Resolved',
                                     readyForQA: card.status == 'Ready for QA' || card.status == 'Testing in Progress',
                                     cancelled: card.status == 'Canceled',
-                                    production: card.status == 'Development Complete',
+                                    production: card.status == 'Ready for PM Handoff',
                                     'bg-info': true,
                                     'card-high': detailedView}"> </div>
                                 <div class="card-content">
@@ -154,6 +154,9 @@
                                         <div class="disp-block"><img width="16" height="16" alt="Conf" src="img/clockred.png" title="QA spent hours"/>{{card.qaTimeSpent | number : 0}}</div>
                                         <div class="disp-block"><img width="16" height="16" alt="Conf" src="img/clocksp.png" title="Hours spent per Story Point"/>{{(card.qaTimeSpent+card.devTimeSpent)/card.summarySP | number : 0}}</div>
                                         <div><img width="16" height="16" alt="Conf" src="img/module.png" title="Module Name"/>{{card.moduleName}}</div>
+                                        <div><img width="16" height="16" alt="Conf" src="img/date.png" title="Ready for PM Handoff"/>{{card.cusfinish}}</div>
+                                        <div><img width="16" height="16" alt="Conf" src="img/date.png" title="PM Review"/>{{card.pmhfinish}}</div>
+                                        <div><img width="16" height="16" alt="Conf" src="img/date.png" title="LA Ready"/>{{card.lafinish}}</div>
                                     </div>
                                 </div>
                                 <div class="card-left" title="Left Story Points to Implement">{{card.restSP | number : 0}}</div>
@@ -169,6 +172,7 @@
                                     <img class="card-icon" title="Has XXL or XXXL pages" ng-show="card.xxl" width="20" height="20" alt="Conf" src="img/xxl.png"/>
                                     <div class="card-size" title="Story Points">{{card.summarySP | number : 0}}</div>
                                     <div class="card-pages" title="Pages">{{card.pages | number : 0}}</div>
+                                    <div class="card-acceptance" title="Acceptance Task"><a href="{{card.acceptanceUri}}">A</a></div>
                                 </div>
                             </li>
                         </ul>

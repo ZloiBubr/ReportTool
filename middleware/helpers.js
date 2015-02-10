@@ -117,22 +117,28 @@ exports.isActive = function(status, resolution) {
     resolution == RESOLUTION.CANCELED.name));
 };
 
-exports.updateStatus = function(status, resolution) {
-    var newStatus = status;
-    if(status == STATUS.CLOSED.name && (
-        resolution == RESOLUTION.DONE.name ||
-        resolution == RESOLUTION.FIXED.name ||
-        resolution == RESOLUTION.IMPLEMENTED.name
+exports.updateStatus = function(page) {
+    var newStatus = page.status;
+    if(page.status == STATUS.CLOSED.name && (
+        page.resolution == RESOLUTION.DONE.name ||
+        page.resolution == RESOLUTION.FIXED.name ||
+        page.resolution == RESOLUTION.IMPLEMENTED.name
         )) {
         newStatus = STATUS.ACCEPTED.name;
     }
-    if(status == STATUS.CLOSED.name && (
-        resolution == RESOLUTION.CANCELED.name ||
-        resolution == RESOLUTION.REJECTED.name ||
-        resolution == RESOLUTION.OUTOFSCOPE.name ||
-        resolution == RESOLUTION.OBSOLETE.name
+    if(page.status == STATUS.CLOSED.name && (
+        page.resolution == RESOLUTION.CANCELED.name ||
+        page.resolution == RESOLUTION.REJECTED.name ||
+        page.resolution == RESOLUTION.OUTOFSCOPE.name ||
+        page.resolution == RESOLUTION.OBSOLETE.name
         )) {
         newStatus = STATUS.CANCELED.name;
+    }
+    if(page.pmhfinish != undefined) {
+        newStatus = STATUS.PMREVIEW.name;
+    }
+    if(page.lafinish != undefined) {
+        newStatus = STATUS.LAREADY.name;
     }
     return newStatus;
 };

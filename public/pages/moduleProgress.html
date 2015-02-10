@@ -119,7 +119,7 @@
                                     readyForAcceptance: card.status == 'Resolved',
                                     readyForQA: card.status == 'Ready for QA' || card.status == 'Testing in Progress',
                                     cancelled: card.status == 'Canceled',
-                                    production: card.status == 'Development Complete',
+                                    production: card.status == 'Ready for PM Handoff',
                                     'bg-info': true}"> </div>
                                 <div class="card-content card-module">
                                     <div class="progress card-progress" title="Development progress">

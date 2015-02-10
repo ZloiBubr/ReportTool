@@ -10,10 +10,12 @@ exports.STATUS = {
     TESTINGINPROGRESS: { value: 8, name: "Testing in Progress", icon: "glyphicon glyphicon-road"},
     RESOLVED: { value: 9, name: "Resolved", icon: "glyphicon glyphicon-check"},
     CLOSED: { value: 10, name: "Closed", icon: "glyphicon glyphicon-star"},
-    PRODUCTION: { value: 11, name: "Development Complete", icon: "glyphicon glyphicon-star"},
-    ACCEPTED: { value: 12, name: "Accepted", icon: "glyphicon glyphicon-star"},
-    CANCELED: { value: 13, name: "Canceled", icon: "glyphicon glyphicon-ban-circle"},
-    NOTAPPLICABLE: { value: 14, name: "Not Applicable", icon: "glyphicon glyphicon-ban-circle"}
+    PRODUCTION: { value: 11, name: "Ready for PM Handoff", icon: "glyphicon glyphicon-star"},
+    PMREVIEW: { value: 12, name: "PM Review", icon: "glyphicon glyphicon-star"},
+    LAREADY: { value: 13, name: "LA Ready", icon: "glyphicon glyphicon-star"},
+    ACCEPTED: { value: 14, name: "Accepted", icon: "glyphicon glyphicon-star"},
+    CANCELED: { value: 15, name: "Canceled", icon: "glyphicon glyphicon-ban-circle"},
+    NOTAPPLICABLE: { value: 16, name: "Not Applicable", icon: "glyphicon glyphicon-ban-circle"}
 };
 
 exports.RESOLUTION = {

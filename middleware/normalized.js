@@ -135,7 +135,7 @@ function putDataPoint(cloudAppData, module, page) {
 
     var timeSpent = helpers.getTimeSpent(page);
 
-    var status = helpers.updateStatus(page.status, page.resolution);
+    var status = helpers.updateStatus(page);
     var cloudApp;
     for(var i=0; i<cloudAppData.cloudApp.length; i++) {
         if(cloudAppData.cloudApp[i].name == cloudAppName &&

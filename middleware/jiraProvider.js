@@ -538,7 +538,9 @@ function SavePage(jira, issue, callback) {
             "customfield_24500", //dev finish date
             "customfield_24501", //qa finish date
             "customfield_24502", //estimated acceptance date
-            "customfield_24503"  //customer complete date
+            "customfield_24503", //plex dev complete date
+            "customfield_24900", //pm hanfoff complete date
+            "customfield_24901"  //la ready date
         ] }, function (error, subtasks) {
             if (error) {
                 callback(error);
@@ -551,6 +553,8 @@ function SavePage(jira, issue, callback) {
                                 page.qafinish = subtask.fields.customfield_24501 ? new Date(subtask.fields.customfield_24501) : null;
                                 page.accfinish = subtask.fields.customfield_24502 ? new Date(subtask.fields.customfield_24502) : null;
                                 page.cusfinish = subtask.fields.customfield_24503 ? new Date(subtask.fields.customfield_24503) : null;
+                                page.pmhfinish = subtask.fields.customfield_24900 ? new Date(subtask.fields.customfield_24900) : null;
+                                page.lafinish = subtask.fields.customfield_24901 ? new Date(subtask.fields.customfield_24901) : null;
                             }
                             calcWorklogFromIssue(subtask, page);
                             if(subtask.fields.summary.indexOf("PLEX-Acceptance") > -1) {
@@ -558,6 +562,7 @@ function SavePage(jira, issue, callback) {
                                     page.status = STATUS.PRODUCTION.name;
                                 }
                                 page.acceptanceStatus = subtask.fields.status.name;
+                                page.acceptanceKey = subtask.key;
                             }
                             callback();
                         }

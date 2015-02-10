@@ -51,7 +51,7 @@
                             readyForAcceptance: module.status == 'Resolved',
                             readyForQA: module.status == 'Ready for QA' || module.status == 'Testing in Progress',
                             cancelled: module.status == 'Canceled',
-                            production: module.status == 'Development Complete' || module.status == 'Closed'}">
+                            production: module.status == 'Ready for PM Handoff' || module.status == 'Closed'}">
                     <a href="{{module.uri}}">{{module.name}}</a>
                 </td>
                 <td ng-repeat="weekdata in module.weeks" ng-class="{

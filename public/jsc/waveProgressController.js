@@ -53,7 +53,9 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
             {name: $scope.STATUS.TESTINGINPROGRESS.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
             {name: $scope.STATUS.RESOLVED.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
             {name: $scope.STATUS.ACCEPTED.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
-            {name: $scope.STATUS.PRODUCTION.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 }
+            {name: $scope.STATUS.PRODUCTION.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
+            {name: $scope.STATUS.PMREVIEW.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
+            {name: $scope.STATUS.LAREADY.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 }
         ];
         $scope.cloudAppCards = [];
     };
@@ -294,7 +296,7 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
                         }
                     }
                     if(!found) {
-                        $scope.cloudAppCards.statuses[$scope.cloudAppCards.statuses.length-1].cards.push(getCard(cloudAppItem));
+                        $scope.cloudAppCards.statuses[$scope.cloudAppCards.statuses.length-1].cards.push(getCard($scope.detailedView,cloudAppItem));
                     }
                 }
                 if(!$scope.isTotalWasCalculated) {
@@ -326,7 +328,11 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
             testingProgress: cloudAppItem.testingProgress ? cloudAppItem.testingProgress : 0,
             checklistsProgress: cloudAppItem.checklistsProgress ? cloudAppItem.checklistsProgress : 0,
             xxl: cloudAppItem.xxl,
-            moduleName: cloudAppItem.moduleName
+            moduleName: cloudAppItem.moduleName,
+            acceptanceUri: cloudAppItem.acceptanceUri,
+            cusfinish: cloudAppItem.cusfinish ? new Date(cloudAppItem.cusfinish).toDateString() : undefined,
+            pmhfinish: cloudAppItem.pmhfinish ? new Date(cloudAppItem.pmhfinish).toDateString() : undefined,
+            lafinish: cloudAppItem.lafinish ? new Date(cloudAppItem.lafinish).toDateString() : undefined
         };
         return card;
     }
