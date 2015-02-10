@@ -8,7 +8,7 @@
                     <span class="icon-bar"></span>
                 </button>
             </div>
-            <p class="navbar-text navbar-right" ng-model="versionData.version">Last Update: {{versionData.version.updatedText}}</a></p>
+            <p class="navbar-text navbar-right" ng-model="versionData.version">{{versionData.version.updatedText}}</a></p>
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav" style="padding-left: 5%">
                     <li ui-route="/dashboard" ng-class="{active: $uiRoute}"><a  ui-sref="dashboard"><span class="glyphicon glyphicon-th-large" ></span> Dashboard</a></li>
@@ -21,7 +21,7 @@
                     <li ui-route="/moduleProgress" ng-class="{active: $uiRoute}"><a ui-sref="moduleProgress">Modules</a></li>
                     <li ui-route="/moduleTargets" ng-class="{active: $uiRoute}"><a ui-sref="moduleTargets">Completion</a></li>
                     <li ui-route="/timeSheet2week" ng-class="{active: $uiRoute}"><a ui-sref="timeSheet2week">TimeSheet</a></li>
-                    <li ui-route="/acceptanceStatistics" ng-class="{active: $uiRoute}"><a ui-sref="acceptanceStatistics">Acceptance Statistics</a></li>
+                    <li ui-route="/acceptanceStatistics" ng-class="{active: $uiRoute}"><a ui-sref="acceptanceStatistics">Acceptance</a></li>
 
                     <!--<li ui-route="/timeSheet2week" class="dropdown">-->
                         <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown">TimeSheet<b class="caret"></b></a>-->
