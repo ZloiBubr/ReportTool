@@ -116,7 +116,7 @@ function getStatisticByLeaderAndRange(leaderName, range, cloudApps){
             if (delayInDay != null && range.minRangeValue != null && range.maxRangeValue != null) {
                 if (delayInDay >= range.minRangeValue && delayInDay <= range.maxRangeValue) {
                     delayStatistic.cloudApps.push(cloudApps[i].key);
-                    if(!_.isEmpty(cloudApps[i]._epic.assignee)){
+                    if(leaderName && !_.isEmpty(cloudApps[i]._epic.assignee)){
                         SME = SME || cloudApps[i]._epic.assignee;
                     }
 
