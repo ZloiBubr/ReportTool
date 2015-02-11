@@ -38,7 +38,7 @@
         </thead>
 
         <tbody style="height: 100px;">
-            <tr ng-repeat="statistic in statistics">
+            <tr ng-repeat="statistic in statistics | orderBy : 'leader' ">
                 <td>{{statistic.leader}}</td>
                 <td>
                     <a href="{{statistic.notAssignedDueJiraLink}}" ng-if="statistic.notAssignedDueAppCount != 0">
