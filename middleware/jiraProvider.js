@@ -666,22 +666,20 @@ function SavePage(jira, issue, callback) {
             if (subtasks != null) {
                 async.eachSeries(subtasks.issues, function (subtask, callback) {
                         if (subtask != null) {
-                            if(helpers.isParentPage(page.labels) && subtask.fields.summary.indexOf('PLEX-Acceptance') > -1) {
+                            if(subtask.fields.summary.indexOf('PLEX-Acceptance') > -1) {
                                 page.devfinish = subtask.fields.customfield_24500 ? new Date(subtask.fields.customfield_24500) : null;
                                 page.qafinish = subtask.fields.customfield_24501 ? new Date(subtask.fields.customfield_24501) : null;
                                 page.accfinish = subtask.fields.customfield_24502 ? new Date(subtask.fields.customfield_24502) : null;
                                 page.cusfinish = subtask.fields.customfield_24503 ? new Date(subtask.fields.customfield_24503) : null;
                                 page.pmhfinish = subtask.fields.customfield_24900 ? new Date(subtask.fields.customfield_24900) : null;
                                 page.lafinish = subtask.fields.customfield_24901 ? new Date(subtask.fields.customfield_24901) : null;
-                            }
-                            calcWorklogFromIssue(subtask, page);
-                            if(subtask.fields.summary.indexOf("PLEX-Acceptance") > -1) {
                                 if(subtask.fields.status.name == STATUS.CLOSED.name) {
                                     page.status = STATUS.PRODUCTION.name;
                                 }
                                 page.acceptanceStatus = subtask.fields.status.name;
                                 page.acceptanceKey = subtask.key;
                             }
+                            calcWorklogFromIssue(subtask, page);
                             callback();
                         }
                     },
