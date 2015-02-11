@@ -208,8 +208,9 @@ function putDataPoint(cloudAppData, module, page) {
             qaTimeSpent: timeSpent.qaTimeSpent,
             assignees: [smeName, page.assignee],
             testingProgress: isParentPage ? page.testingProgress : 0.,
-            checklistsProgress: [page.checklistCreated]
-        };
+            checklistsProgress: [page.checklistCreated],
+            acceptanceUri: acceptanceUri
+    };
         cloudAppData.cloudApp.push(cloudApp);
     }
 }
