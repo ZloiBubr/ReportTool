@@ -147,9 +147,10 @@
                                     <a class="card-link" href="{{card.uri}}">{{card.name}}</a>
                                     <div ng-show="detailedView">
                                         <div ng-repeat="assignee in card.assignees">
-                                            <div ng-if="$first" title="{{assignee}}"><img width="16" height="16" alt="Conf" src="img/person2.png"/>{{assignee}}</div>
-                                            <div ng-if="!$first" title="{{assignee}}"><img width="16" height="16" alt="Conf" src="img/person.png"/>{{assignee}}</div>
+                                            <div ng-if="$first" title="SME"><img width="16" height="16" alt="Conf" src="img/person2.png"/>{{assignee}}</div>
+                                            <div ng-if="!$first" title="Assignee"><img width="16" height="16" alt="Conf" src="img/person.png"/>{{assignee}}</div>
                                         </div>
+                                        <div title="Acceptance Assignee"><img width="16" height="16" alt="Conf" src="img/person3.png"/>{{card.acceptanceAssignee}}</div>
                                         <div class="disp-block"><img width="16" height="16" alt="Conf" src="img/clockblue.png" title="Development spent hours"/>{{card.devTimeSpent | number : 0}}</div>
                                         <div class="disp-block"><img width="16" height="16" alt="Conf" src="img/clockred.png" title="QA spent hours"/>{{card.qaTimeSpent | number : 0}}</div>
                                         <div class="disp-block"><img width="16" height="16" alt="Conf" src="img/clocksp.png" title="Hours spent per Story Point"/>{{(card.qaTimeSpent+card.devTimeSpent)/card.summarySP | number : 0}}</div>

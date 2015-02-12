@@ -330,6 +330,7 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
             xxl: cloudAppItem.xxl,
             moduleName: cloudAppItem.moduleName,
             acceptanceUri: cloudAppItem.acceptanceUri,
+            acceptanceAssignee: cloudAppItem.acceptanceAssignee,
             cusfinish: cloudAppItem.cusfinish ? new Date(cloudAppItem.cusfinish).toDateString() : undefined,
             pmhfinish: cloudAppItem.pmhfinish ? new Date(cloudAppItem.pmhfinish).toDateString() : undefined,
             lafinish: cloudAppItem.lafinish ? new Date(cloudAppItem.lafinish).toDateString() : undefined

@@ -40,6 +40,7 @@ var schema = new Schema({
     updated:                { type: String },
     acceptanceStatus:       { type: String },
     acceptanceKey:          { type: String },
+    acceptanceAssignee:     { type: String },
     devfinish:              { type: Date},
     qafinish:               { type: Date},
     accfinish:              { type: Date},

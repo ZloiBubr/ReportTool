@@ -651,6 +651,7 @@ function SavePage(jira, issue, callback) {
         var queryString = util.format("project = PLEXUXC AND parent in (%s)", issue.key);
         jira.searchJira(queryString, { fields: [
             "summary",
+            "assignee",
             "worklog",
             "status",
             "customfield_24500", //dev finish date
@@ -678,6 +679,7 @@ function SavePage(jira, issue, callback) {
                                 }
                                 page.acceptanceStatus = subtask.fields.status.name;
                                 page.acceptanceKey = subtask.key;
+                                page.acceptanceAssignee = subtask.fields.assignee ? subtask.fields.assignee.name : "";
                             }
                             calcWorklogFromIssue(subtask, page);
                             callback();

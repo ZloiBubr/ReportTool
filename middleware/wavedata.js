@@ -163,6 +163,7 @@ function putDataPoint(cloudAppData, module, page) {
                 cloudApp.pmhfinish = page.pmhfinish;
                 cloudApp.lafinish = page.lafinish;
                 cloudApp.acceptanceUri = acceptanceUri;
+                cloudApp.acceptanceAssignee = page.acceptanceAssignee;
             }
 
             var found = false;
@@ -209,7 +210,8 @@ function putDataPoint(cloudAppData, module, page) {
             assignees: [smeName, page.assignee],
             testingProgress: isParentPage ? page.testingProgress : 0.,
             checklistsProgress: [page.checklistCreated],
-            acceptanceUri: acceptanceUri
+            acceptanceUri: acceptanceUri,
+            acceptanceAssignee: page.acceptanceAssignee
     };
         cloudAppData.cloudApp.push(cloudApp);
     }
