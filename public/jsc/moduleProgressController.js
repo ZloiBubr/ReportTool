@@ -287,7 +287,7 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
 
     function fillCards(teamobj, version, status, item) {
         var found = false;
-        var cardName = $scope.showModules ? getCleanModuleName(item.name) : item.smename;
+        var cardName = $scope.showModules ? item.name : item.smename;
 
         var initUri = "https://jira.epam.com/jira/issues/?jql=project%20%3D%20PLEX-UXC%20and%20issuetype%20%3D%20epic%20and%20assignee%20%3D%20";
         var endUri = version.name == "" ?"%20and%20fixVersion%20is%20EMPTY" : "%20and%20fixVersion%20%3D%20%22" + version.name + "%22";
@@ -374,21 +374,6 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
             teamObj = newTeam;
         }
         return teamObj;
-    }
-
-    function getCleanModuleName(moduleName) {
-        var index = moduleName.indexOf("Module");
-        if(index < 0) {
-            return moduleName;
-        }
-
-        var prefix = "";
-        var index2 = moduleName.indexOf("Phase");
-        if(index2 > 0) {
-            prefix = "P" + moduleName.substring(index2+6, index2+8);
-        }
-
-        return prefix + " " + moduleName.substring(0,index);
     }
 
     function processEntity(entity, moduleProgressItem) {
