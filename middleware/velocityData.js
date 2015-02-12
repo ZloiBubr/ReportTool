@@ -50,6 +50,14 @@ function parsePages(callback) {
         distribution: {
             data: [
                 {
+                    name: STATUS.PMREVIEW.name,
+                    data: [0,0]
+                },
+                {
+                    name: STATUS.LAREADY.name,
+                    data: [0,0]
+                },
+                {
                     name: STATUS.PRODUCTION.name,
                     data: [0,0]
                 },
