@@ -16,11 +16,14 @@
 
     <div>
         <table id="copyStackedTable" style="display: none">
-            <tr>
+            <tr ng-repeat = "(key,val) in distributionByTeam" >
                 <td style="border: solid gray thin">{{currentDate | date:'yyyy-MM-dd'}}</td>
-                <td style="border: solid gray thin" ng-repeat="item in distributionoData.data.slice().reverse()">{{item.data[0]}}</td>
-                <td></td>
-                <td style="border: solid gray thin" ng-repeat="item in distributionoData.data.slice().reverse()">{{item.data[1]}}</td>
+                <td style="border: solid gray thin">{{key}}</td>
+                <td style="border: solid gray thin" ng-repeat="item in val.distribution.data">{{item.data[1]}}</td>
+            </tr>
+            <tr>
+                <td colspan="2">Total:</td>
+                <td style="border: solid gray thin" ng-repeat="item in distributionoData.data">{{item.data[1]}}</td>
             </tr>
         </table>
     </div>

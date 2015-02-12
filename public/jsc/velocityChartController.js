@@ -156,6 +156,7 @@ function velocityChartController($scope, $resource, $modal, $timeout, $window) {
             $scope.chartsData = data;
 
             $scope.distributionoData = data.distribution;
+            $scope.distributionByTeam = data.distributionByTeam;
 
             $scope.pagesModel = {data:[]};
             $scope.spModel = {data:[]};
@@ -170,7 +171,7 @@ function velocityChartController($scope, $resource, $modal, $timeout, $window) {
                     name: item.name,
                     data: [item.data[1]]
                 });
-            })
+            });
 
             loadingDfrd.resolve();
         };

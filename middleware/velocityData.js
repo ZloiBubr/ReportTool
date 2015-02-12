@@ -17,38 +17,9 @@ exports.getData = function (req, res) {
     }, function(value){res.json(value);});
 };
 
-function parsePages(callback) {
-    var velocity = {
-        data: [
-        {
-            data: [],
-            name: "Planned burn"
-        },
-        {
-            data: [],
-            name: "Actual burn"
-        },
-        {
-            data: [],
-            name: "Projected burn"
-        },
-        {
-            data: [],
-            name: "Planned burn core",
-            visible: false
-        },
-        {
-            data: [],
-            name: "Actual burn core",
-            visible: false
-        },
-        {
-            data: [],
-            name: "Projected burn core",
-            visible: false
-        }],
-        distribution: {
-            data: [
+
+function distribution (){
+    this.data =  [
                 {
                     name: STATUS.PMREVIEW.name,
                     data: [0,0]
@@ -105,9 +76,45 @@ function parsePages(callback) {
                     name: STATUS.DEFERRED.name,
                     data: [0,0]
                 }
-            ]
-        }
+            ];
+}
+
+function parsePages(callback) {
+
+    var velocity = {
+        data: [
+        {
+            data: [],
+            name: "Planned burn"
+        },
+        {
+            data: [],
+            name: "Actual burn"
+        },
+        {
+            data: [],
+            name: "Projected burn"
+        },
+        {
+            data: [],
+            name: "Planned burn core",
+            visible: false
+        },
+        {
+            data: [],
+            name: "Actual burn core",
+            visible: false
+        },
+        {
+            data: [],
+            name: "Projected burn core",
+            visible: false
+        }],
+        
+        distribution: new distribution(),
+        distributionByTeam: {}
     };
+
     var maximumBurn = 0.0;
     var maximumBurnCore = 0.0;
     async.series([
@@ -165,7 +172,7 @@ function parsePages(callback) {
                                                     }
                                                 }
                                                 if(!ignore) {
-                                                    addStackedData(velocity, status, storyPoints);
+                                                    addStackedData(velocity, status, storyPoints, helpers.getTeamName(page.labels));
                                                 }
                                                 callback();
                                             },
@@ -318,16 +325,24 @@ function SortData(velocity) {
     }
 }
 
-function addStackedData(velocity, status, storyPoints) {
+function addStackedData(velocity, status, storyPoints, teamName) {
     var added = false;
+
+    var team = velocity.distributionByTeam[teamName == "--"? "NoTeam" : teamName] = velocity.distributionByTeam[teamName == "--"? "NoTeam" : teamName] || {distribution: new distribution()};
+
     for(var i=0; i<velocity.distribution.data.length; i++) {
-        if(velocity.distribution.data[i].name == status) {
+        if (velocity.distribution.data[i].name == status) {
             velocity.distribution.data[i].data[0]++;
-            velocity.distribution.data[i].data[1]+=storyPoints||0;
+            velocity.distribution.data[i].data[1] += storyPoints || 0;
+
+            team.distribution.data[i].data[0]++;
+            team.distribution.data[i].data[1] += storyPoints || 0;
+
             added = true;
             break;
         }
     }
+
     if(!added) {
         log.info(status + ':' + storyPoints);
     }
