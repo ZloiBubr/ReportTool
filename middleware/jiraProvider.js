@@ -658,8 +658,8 @@ function SavePage(jira, issue, callback) {
             "customfield_24501", //qa finish date
             "customfield_24502", //estimated acceptance date
             "customfield_24503", //plex dev complete date
-            "customfield_24900", //pm hanfoff complete date
-            "customfield_24901"  //la ready date
+            "customfield_25900", //pm hanfoff complete date
+            "customfield_25901"  //la ready date
         ] }, function (error, subtasks) {
             if (error) {
                 callback(error);
@@ -672,8 +672,8 @@ function SavePage(jira, issue, callback) {
                                 page.qafinish = subtask.fields.customfield_24501 ? new Date(subtask.fields.customfield_24501) : null;
                                 page.accfinish = subtask.fields.customfield_24502 ? new Date(subtask.fields.customfield_24502) : null;
                                 page.cusfinish = subtask.fields.customfield_24503 ? new Date(subtask.fields.customfield_24503) : null;
-                                page.pmhfinish = subtask.fields.customfield_24900 ? new Date(subtask.fields.customfield_24900) : null;
-                                page.lafinish = subtask.fields.customfield_24901 ? new Date(subtask.fields.customfield_24901) : null;
+                                page.pmhfinish = subtask.fields.customfield_25900 ? new Date(subtask.fields.customfield_25900) : null;
+                                page.lafinish = subtask.fields.customfield_25901 ? new Date(subtask.fields.customfield_25901) : null;
                                 if(subtask.fields.status.name == STATUS.CLOSED.name) {
                                     page.status = STATUS.PRODUCTION.name;
                                 }
