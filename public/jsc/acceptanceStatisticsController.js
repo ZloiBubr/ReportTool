@@ -26,18 +26,29 @@ function acceptanceStatisticsController($scope, $resource) {
             commonTotal : getCommonTotal
         };
         if($scope.isOnlySmeMode) {
-            var groupedbySme = _.groupBy( $scope.smeAcceptanceData, function (item) {
+            var emptyLeaderVm = jQuery.extend(true, {},_.find($scope.smeAcceptanceData, function (item) {
+                if (item.leader === "") return item;
+            }));
+
+            var groupedbySme = _.groupBy($scope.smeAcceptanceData, function (item) {
                 return item.SME;
             });
 
+            addSmeFromEmptyVm(emptyLeaderVm, groupedbySme);
+
             _.each(groupedbySme, function(leadersArrayItem){
                 var groupedSmeItem = jQuery.extend(true, {}, leadersArrayItem[0]);
+
+                if (groupedSmeItem.SME === "") return false;
+
                 for(var i=1; i<leadersArrayItem.length;i++){
-                        for(var l=0; l< leadersArrayItem[i].cloudAppDelayStatistics.length; l++){
-                            var cloudappItem = leadersArrayItem[i].cloudAppDelayStatistics[l];
-                            groupedSmeItem.cloudAppDelayStatistics[l].cloudApps.push.apply(groupedSmeItem.cloudAppDelayStatistics[l].cloudApps,cloudappItem.cloudApps);
-                        }
+                    for(var l=0; l< leadersArrayItem[i].cloudAppDelayStatistics.length; l++){
+                        var cloudappItem = leadersArrayItem[i].cloudAppDelayStatistics[l];
+                        groupedSmeItem.cloudAppDelayStatistics[l].cloudApps.push.apply(groupedSmeItem.cloudAppDelayStatistics[l].cloudApps,cloudappItem.cloudApps);
                     }
+                }
+
+                addRecordsWithUnspecifiedDate(groupedSmeItem,emptyLeaderVm);
                 smeAcceptanceData.push(groupedSmeItem);
             });
         }
@@ -139,6 +150,48 @@ function acceptanceStatisticsController($scope, $resource) {
         }
 
         return {};
+    }
+
+    var addRecordsWithUnspecifiedDate = function (groupItem, targetEmptyVm){
+        if (!targetEmptyVm.cloudAppDelayStatistics) return;
+
+        for (var j = 0; j < targetEmptyVm.cloudAppDelayStatistics.length; j++) {
+            var currentDelayStatistic = targetEmptyVm.cloudAppDelayStatistics[j];
+            var targetDelayRange = getDelayStatisticWithRange(groupItem, currentDelayStatistic.minRangeValue, currentDelayStatistic.maxRangeValue);
+            for (var k = 0; k < currentDelayStatistic.cloudApps.length; k++) {
+                if (groupItem.SME === currentDelayStatistic.cloudAppSmes[k]) {
+                    targetDelayRange.cloudApps.push(currentDelayStatistic.cloudApps[k]);
+                }
+            }
+        }
+    };
+
+    var addSmeFromEmptyVm = function (targetEmptyVm, allGroups) {
+        for (var j = 0; j < targetEmptyVm.cloudAppDelayStatistics.length; j++) {
+            var currentDelayStatistic = targetEmptyVm.cloudAppDelayStatistics[j];
+            for (var k = 0; k < currentDelayStatistic.cloudApps.length; k++) {
+                var record = _.find(allGroups, function (item) {
+                    return item[0] && item[0].SME == currentDelayStatistic.cloudAppSmes[k];
+                });
+
+                if (!record) {
+                    var newSmeName = currentDelayStatistic.cloudAppSmes[k];
+                    allGroups[newSmeName] = [getEmptyRecord("", newSmeName)];
+                }
+            }
+        }
+    }
+
+    var getEmptyRecord = function (leaderName, smeName) {
+        return { SME: smeName, leader : leaderName, cloudAppDelayStatistics : [
+            { minRangeValue: null, maxRangeValue: null, cloudApps: []},
+            {minRangeValue: -99999, maxRangeValue: 0, cloudApps: []},
+            {minRangeValue: 1, maxRangeValue: 15, cloudApps: []},
+            {minRangeValue: 16, maxRangeValue: 30, cloudApps: []},
+            {minRangeValue: 31, maxRangeValue: 45, cloudApps: []},
+            {minRangeValue: 46, maxRangeValue: 60, cloudApps: []},
+            {minRangeValue: 61, maxRangeValue: 10000, cloudApps: []}
+        ]};
     }
 
     var getCommonTotal = function () {

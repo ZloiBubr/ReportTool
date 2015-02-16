@@ -46,6 +46,7 @@ function getLeaderDelayStatisticVms(cloudApps) {
         }
 
         var leaderDelayStatisticVm = new LeaderDelayStatisticVm({ assignee: leaderName, delayStatistics: delayStatistics, SME: SME });
+
         if (checkLeaderDelayStatisticsOnZero(leaderDelayStatisticVm.cloudAppDelayStatistics)) {
             viewModels.push(leaderDelayStatisticVm);
         }
@@ -76,8 +77,8 @@ function getAllLeaders(cloudApps) {
 function getDelayDayRanges() {
     return [
         {
-            minRangeValue : null,//Current
-            maxRangeValue: null //Not assigned date
+            minRangeValue : null,//Not assigned date
+            maxRangeValue: null
         },
         {
             minRangeValue : -99999,//Current
@@ -113,24 +114,33 @@ function getStatisticByLeaderAndRange(leaderName, range, cloudApps){
         var delayInDay = getDayDiff(cloudApps[i].duedate);
 
         if (cloudApps[i].assignee === leaderName) {
+            if(leaderName && !_.isEmpty(cloudApps[i]._epic.assignee)){
+                SME = SME || cloudApps[i]._epic.assignee;
+            }
+
             if (delayInDay != null && range.minRangeValue != null && range.maxRangeValue != null) {
                 if (delayInDay >= range.minRangeValue && delayInDay <= range.maxRangeValue) {
                     delayStatistic.cloudApps.push(cloudApps[i].key);
-                    if(leaderName && !_.isEmpty(cloudApps[i]._epic.assignee)){
-                        SME = SME || cloudApps[i]._epic.assignee;
-                    }
-
+                    setSmeForCloudApp(cloudApps[i], leaderName, delayStatistic);
                     continue;
                 }
             }
 
             if (delayInDay == null && range.minRangeValue == null && range.maxRangeValue == null) {
                 delayStatistic.cloudApps.push(cloudApps[i].key);
+                setSmeForCloudApp(cloudApps[i], leaderName, delayStatistic);
             }
         }
     }
 
     return {delayStatistic: delayStatistic, SME: SME};
+}
+
+function setSmeForCloudApp(targetCloudApp, leaderName, targetDelayStatistic){
+    if (!leaderName && !_.isEmpty(targetCloudApp._epic.assignee)){
+        targetDelayStatistic.cloudAppSmes = targetDelayStatistic.cloudAppSmes || [];
+        targetDelayStatistic.cloudAppSmes.push(targetCloudApp._epic.assignee);
+    }
 }
 
 function IsLeaderInArray(arr, leaderName) {
