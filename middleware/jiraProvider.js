@@ -232,7 +232,16 @@ function Step1CollectModules(jira, callback) {
     },
     function(err) {
         if(err) {
-            LogProgress("Restarting Loop");
+            if(err === '401: Unauthorized Error'){
+                LogProgress(err);
+                throw new Error(err);
+            }
+            else if(err === '403: Forbidden'){
+                var message = "403: Forbidden, seems you was blocked by EPAM domain system or you need logout and login again in jira( https://jira.epam.com )";
+                LogProgress(message);
+                throw new Error(message);
+            }
+            LogProgress('Restarting Loop');
         }
         callback(err);
     });
