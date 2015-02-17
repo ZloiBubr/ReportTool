@@ -422,11 +422,13 @@ function ProcessPageFromJira(jira, issueKey, counter, callback) {
                     SavePage(jira, issue, function (error, dbPage) {
                         if (error) {
                             LogProgress("Restarting Loop for:"+issueKey, error);
+                            callback();
+                        }else {
+                            MapLinkedIssues(issue, dbPage);
+                            MapAcceptanceTasks(issue, dbPage);
+                            loopError = false;
+                            callback();
                         }
-                        MapLinkedIssues(issue, dbPage);
-                        MapAcceptanceTasks(issue, dbPage);
-                        loopError = false;
-                        callback();
                     });
                 }
                 else {
