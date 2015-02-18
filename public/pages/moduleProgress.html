@@ -109,6 +109,33 @@
                             <div class="total-size disp-block" style="color: darkred">{{version.total | number : 0}}</div>
                             <div class="total-left disp-block" style="font-style: italic">{{version.restSP | number : 0}}</div>
                             <br/>
+                            <div class="progress card-progress" title="Development progress">
+                                <div class="progress-bar progress-bar-success progress-bar-striped"
+                                     role="progressbar"
+                                     aria-valuenow="0"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100"
+                                     style="width: 0%" ng-style="{width: ((version.total - version.restSP) * 100 / version.total) + '%'}">
+                                </div>
+                            </div>
+                            <div class="progress card-progress" title="Checklists progress">
+                                <div class="progress-bar progress-bar-info progress-bar-striped"
+                                     role="progressbar"
+                                     aria-valuenow="0"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100"
+                                     style="width: 0%" ng-style="{width: version.checklistsProgress + '%'}">
+                                </div>
+                            </div>
+                            <div class="progress card-progress" title="QA progress">
+                                <div class="progress-bar progress-bar-warning progress-bar-striped"
+                                     role="progressbar"
+                                     aria-valuenow="0"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100"
+                                     style="width: 0%" ng-style="{width: version.QAProgress + '%'}">
+                                </div>
+                            </div>
                             <div class="total-comments disp-block">Cards:{{version.cards.length | number : 0}}</div>
                         </div>
                         <ul class="cards-column" ng-if="showCards">

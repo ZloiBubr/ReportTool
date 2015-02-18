@@ -280,6 +280,10 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
                 version.done += moduleProgressItem.reportedSP;
                 version.total += moduleProgressItem.summarySP;
                 version.restSP = version.total - version.done;
+                version.totalChecklistProgress += (moduleProgressItem.checklistsProgress * moduleProgressItem.summarySP);
+                version.checklistsProgress = version.totalChecklistProgress / version.total;
+                version.totalQAProgress += (moduleProgressItem.testingProgress * moduleProgressItem.summarySP);
+                version.QAProgress = version.totalQAProgress / version.total;
                 fillCards(teamObj, version, status, moduleProgressItem);
             }
         }
@@ -368,7 +372,15 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
                 if(version == "Undefined") {
                     version = "";
                 }
-                newTeam.versions.push( {name:version, done: 0, total: 0, cards: [], completed: false});
+                newTeam.versions.push( {
+                    name:version,
+                    done: 0,
+                    total: 0,
+                    cards: [],
+                    completed: false,
+                    totalChecklistProgress: 0,
+                    totalQAProgress: 0
+                });
             }
             $scope.teamLoadData.push(newTeam);
             teamObj = newTeam;
