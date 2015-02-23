@@ -1,0 +1,62 @@
+<div ng-repeat="module in cloudAddData.modules | filter:searchModule:strict">
+
+    <div ng-repeat="cloudApp in module.cloudApps | filter:onFilterCloudApps | filter:searchCloudApp:strict">
+        <div class="row">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th colspan="6">
+                            <span>{{module.moduleName}} / {{cloudApp.appName}}</span>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th style="width: 40%">Page</th>
+                        <th style="width: 10%">
+                            <span tooltip="Assignee">Assignee</span>
+                        </th>
+                        <th style="width: 3%">
+                            <span tooltip="Story Points">SP</span>
+                        </th>
+                        <th style="width: 3%">
+                            <span tooltip="Progress, %">%</span>
+                        </th>
+                        <th style="width: 4%">
+                            <span tooltip="Stream">Str</span>
+                        </th>
+                        <th style="width: 5%">Status</th>
+                        <th style="width: 3%">
+                            <span tooltip="Checklist Ready">CL</span>
+                        </th>
+                        <th style="width: 42%">Blockers</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="pageItem in cloudApp.pages" ng-init="status = statuses.getStatusByName(pageItem.taskStatus)">
+                        <td><span tooltip="{{pageItem.pageName}}">{{pageItem.pageName | limitTo:40}}</span></td>
+                        <td align="center" >{{pageItem.assignee}}</td>
+                        <td align="center" >{{pageItem.storyPoints}}</td>
+                        <td align="center" >{{pageItem.progress}}</td>
+                        <td align="center" >{{pageItem.stream}}</td>
+                        <td align="center" ><span tooltip="{{status.name}}"><span class="{{status.cssIcon}}"></span></span></td>
+                        <td align="center" >{{pageItem.checklistStatus ? '\u2713' : '\u2718'}}</td>
+                        <td >
+                            <span ng-repeat="blocker in pageItem.blockers">
+                                <a ng-if="blocker.status!='Closed'" class="btn btn-primary blocker_style"
+                                   ng-style={'background-color':stringToColorCode(blocker.key)}
+                                   href="{{blocker.uri}}" target="_blank">
+                                    {{blocker.key}} <span class="badge">{{blocker.pagesInvolved}}</span>
+                                </a>
+                                <a ng-if="blocker.status=='Closed' && isShowClosedBlockers"
+                                   class="btn btn-primary blocker_style blocker_status_{{blocker.status}}"
+                                   href="{{blocker.uri}}" target="_blank">
+                                    {{blocker.key}} <span class="badge">{{blocker.pagesInvolved}}</span>
+                                </a>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>

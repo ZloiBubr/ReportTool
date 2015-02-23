@@ -32,18 +32,18 @@
             <tbody>
             <tr ng-class="{'bg-warning': team.name == 'Total'}" ng-repeat="team in year.teams">
                 <td>{{team.name}}</td>
-                <td>{{team.months[0] | number:1}}</td>
-                <td>{{team.months[1] | number:1}}</td>
-                <td>{{team.months[2] | number:1}}</td>
-                <td>{{team.months[3] | number:1}}</td>
-                <td>{{team.months[4] | number:1}}</td>
-                <td>{{team.months[5] | number:1}}</td>
-                <td>{{team.months[6] | number:1}}</td>
-                <td>{{team.months[7] | number:1}}</td>
-                <td>{{team.months[8] | number:1}}</td>
-                <td>{{team.months[9] | number:1}}</td>
-                <td ng-class="{readyForAcceptance: team.months[10] > 440 && team.name != 'Total'}">{{team.months[10] | number:1}}</td>
-                <td ng-class="{readyForAcceptance: team.months[11] > 440 && team.name != 'Total'}">{{team.months[11] | number:1}}</td>
+                <td ng-repeat="monthItem in team.months" ng-class="{readyForAcceptance: isBonusReached(year.name, $index, monthItem.total_bonus_sp) && team.name != 'Total'}">
+                    {{monthItem.total_sp | number:1}}<br ng-if="team.name != 'Total'" />
+                    <span ng-if="team.name != 'Total'">{{monthItem.total_bonus_sp | number:1}}</span>
+                    <sub  ng-if="monthItem.dev_sp > 0">
+                        <span>=</span>
+                        <span title="Dev story points">{{monthItem.dev_sp || 0 | number:1}}</span>
+                        <span>+</span>
+                        <span class="yellow" title="QA story points">{{monthItem.qa_sp || 0 | number:1}}</span>
+                        <span>+</span>
+                        <span class="green" title="SME acceptance story points">{{monthItem.sme_sp || 0 | number:1}}</span>
+                    </sub>
+                </td>
             </tr>
             </tbody>
         </table>

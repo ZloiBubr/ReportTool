@@ -5,6 +5,12 @@ var log = require('../libs/log')(module);
 var helpers = require('../middleware/helpers');
 var cache = require('node_cache');
 
+var SP_TYPE = {
+    DEV : 1,
+    QA : 2,
+    SME : 3
+};
+
 exports.getData = function (req, res) {
 
     cache.getData("weeklyData",function(setterCallback){
@@ -22,6 +28,13 @@ function getNextSunday(d) {
     return new Date(d.setDate(diff));
 }
 
+function getDates (d){
+    var date = typeof d == 'string' ? new Date(d) : d;
+    //var date = new Date(Date.parse(d));
+    var norm_date = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+    return{ date: date, norm_date: getNextSunday(norm_date.getTime()).getTime() };
+}
+
 function parsePages(callback) {
     var velocity = { data: [], years: []};
     for (var k = 0; k < velocity.data.length; k++) {
@@ -36,18 +49,30 @@ function parsePages(callback) {
             var teamName = helpers.getTeamName(page.labels);
             for (var j = 0; j < page.progressHistory.length; j++) {
                 var history = page.progressHistory[j];
-                var date = new Date(Date.parse(history.dateChanged));
-                var norm_date = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
-                norm_date = getNextSunday(norm_date.getTime()).getTime();
+                var dates = getDates(history.dateChanged);
                 var from = parseInt(history.progressFrom);
                 var to = history.progressTo == null || history.progressTo == '' ? 0 : parseInt(history.progressTo);
                 var progress = to - from;
                 var calcStoryPoints = storyPoints * progress / 100;
-                putDataPoint(velocity, teamName, date, norm_date, calcStoryPoints);
+                var bonusCalcStoryPoints = (storyPoints * 0.7) * progress / 100;
+                putDataPoint(velocity, teamName, dates.norm_date, calcStoryPoints);
+                putTotalDataPoint(velocity, teamName, dates.norm_date, calcStoryPoints);
 
-                if (teamName != "Automation") {
-                    putDataPoint(velocity, "Total", date, norm_date, calcStoryPoints);
-                };
+                processMonthlyData(velocity, teamName, dates.date, bonusCalcStoryPoints, calcStoryPoints, SP_TYPE.DEV);
+                putTotalMonthlyPoint(velocity, teamName, dates.date, calcStoryPoints);
+
+            }
+            if(page.qaFinished){
+                var dates = getDates(page.qaFinished);
+                //var bonusCalcStoryPoints = storyPoints * 20 / 100;
+                processMonthlyData(velocity, teamName, dates.date, storyPoints * 20 / 100, 0, SP_TYPE.QA);
+                //putTotalMonthlyPoint(velocity, teamName, dates.date, bonusCalcStoryPoints);
+            }
+            if(page.smeFinished){
+                var dates = getDates(page.smeFinished);
+                //var bonusCalcStoryPoints = storyPoints * 10 / 100;
+                processMonthlyData(velocity, teamName, dates.date, storyPoints * 10 / 100, 0, SP_TYPE.SME);
+                //putTotalMonthlyPoint(velocity, teamName, dates.date, bonusCalcStoryPoints);
             }
         }
 
@@ -86,7 +111,13 @@ function parsePages(callback) {
     })
 }
 
-function putDataPoint(velocity, teamName, date, norm_date, calcStoryPoints) {
+function putTotalDataPoint(velocity, teamName, norm_date, calcStoryPoints) {
+    if (teamName != "Automation") {
+        putDataPoint(velocity, "Total", norm_date, calcStoryPoints);
+    }
+}
+
+function putDataPoint(velocity, teamName, norm_date, calcStoryPoints) {
     var teamObj = null;
     for (var k = 0; k < velocity.data.length; k++) {
         if (velocity.data[k].name == teamName) {
@@ -110,14 +141,18 @@ function putDataPoint(velocity, teamName, date, norm_date, calcStoryPoints) {
     if (!found) {
         teamObj.data.push({ x: norm_date, y: calcStoryPoints });
     }
-    processMonthlyData(velocity, teamName, date, calcStoryPoints);
 }
 
-function processMonthlyData(velocity, teamName, date, calcStoryPoints) {
+function putTotalMonthlyPoint(velocity, teamName, date, calcStoryPoints) {
+    if (teamName != "Automation") {
+        processMonthlyData(velocity, "Total", date, 0, calcStoryPoints);
+    }
+}
+
+function processMonthlyData(velocity, teamName, date, bonusCalcStoryPoints, calcStoryPoints, sp_type) {
     if(teamName == "--") {
         return;
     }
-
     var year = (new Date(date)).getUTCFullYear();
     var month = (new Date(date)).getUTCMonth();
 
@@ -148,9 +183,20 @@ function processMonthlyData(velocity, teamName, date, calcStoryPoints) {
     if (!teamObj) {
         teamObj = {
             name: teamName,
-            months: [0,0,0,0,0,0,0,0,0,0,0,0]
+            months: Array.apply(null, {length: 12}).map(function(){return {total_sp:0, total_bonus_sp:0, dev_sp:0, qa_sp:0, sme_sp:0}})
         };
         yearObj.teams.push(teamObj);
     }
-    teamObj.months[month] += calcStoryPoints;
+
+    teamObj.months[month].total_sp += calcStoryPoints;
+    teamObj.months[month].total_bonus_sp += bonusCalcStoryPoints;
+
+    if(sp_type == SP_TYPE.DEV){
+        teamObj.months[month].dev_sp += bonusCalcStoryPoints;
+    }
+    else if(sp_type == SP_TYPE.QA){
+        teamObj.months[month].qa_sp += bonusCalcStoryPoints;
+    }else if(sp_type == SP_TYPE.SME){
+        teamObj.months[month].sme_sp += bonusCalcStoryPoints;
+    }
 }

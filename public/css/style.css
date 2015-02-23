@@ -347,3 +347,34 @@ section.contentHideSidebar {
 table.center-align td {
     text-align: center;
 }
+
+
+.blocker_style {
+    padding: 3px 5px 3px 5px;
+    margin: 3px 0 3px 0;
+}
+
+.blocker_status_Closed
+{
+    color: black;
+    text-decoration: line-through;
+    background-color: #e4e4e4;
+}
+.blocker_status_Closed:hover
+{
+    text-decoration: line-through;
+    background-color: #cccccc;
+    color: black;
+}
+
+.blocker_status_table>thead>tr>td,
+.blocker_status_table>thead>tr>th,
+.blocker_status_table>tbody>tr>th,
+.blocker_status_table>tbody>tr>td
+{
+    padding: 0 !important;
+}
+
+.tooltip-inner {
+    max-width: 800px;
+}

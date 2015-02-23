@@ -1,0 +1,70 @@
+<div class="col-lg-6" ng-controller="cloudAppController">
+
+    <div class="panel panel-default">
+        <!-- Default panel contents -->
+        <div class="panel-heading">
+            <span class="glyphicon glyphicon-th-list"> </span> CloudApp Status
+            <a href="" ng-if="isEnabled" ng-click="onModalShow()"><span class="pull-right">
+                <span class="glyphicon glyphicon-cog"></span>Detailed</span></a>
+        </div>
+        <div class="panel-body" style="height: 500px; overflow: auto; padding: 0">
+            <ng-include ng-if="isEnabled"
+                        src="'pages/dashboard/widgets/CloudAppTeamAnalysis/CloudAppTeamAnalysis_GridControl_mini.html'"></ng-include>
+            <div ng-if="!isEnabled">
+                <h1>Please Select your Team</h1>
+            </div>
+        </div>
+    </div>
+
+    <div ng-if="isEnabled" class="modal fade" id="cloudAppModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="width: 100%">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span
+                            aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="myModalLabel">CloudApp Status and Blockers</h4>
+                </div>
+                <div class="modal-body container">
+
+                    <div class="col-md-2">
+                        <label for="teamSearch">Team:</label>
+                        <select id="teamSearch" class="form-control headerSelectWidth" ng-model="common.filteredTeam" ng-change="onTeamChange()"
+                                ng-options="team.id as team.name for team in allTeams"></select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="streamSearch">Stream:</label>
+                        <select id="streamSearch" class="form-control headerSelectWidth" ng-model="common.filteredStream"
+                                ng-options="stream.id as stream.name for stream in common.allStreams"></select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="moduleSearch">Module:</label>
+                        <input id="moduleSearch" class="form-control headerSelectWidth"  ng-model="searchModule.moduleName"/>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="cloudAppSearch">CloudApp:</label>
+                        <input id="cloudAppSearch" class="form-control headerSelectWidth"  ng-model="searchCloudApp.appName"/>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" ng-model="isShowClosedBlockers">Show closed blockers?
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-1">
+                        <div class="spinner" ng-show="isLoading"></div>
+                    </div>
+
+                    <ng-include src="'pages/dashboard/widgets/CloudAppTeamAnalysis/CloudAppTeamAnalysis_GridControl.html'"></ng-include>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
