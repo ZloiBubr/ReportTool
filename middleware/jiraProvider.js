@@ -38,8 +38,8 @@ var lastProgress = 0;
 
 exports.rememberResponse = function (req, res) {
     sessionsupport.setResponseObj('updateDb', req, res);
-    UpdateProgress(0, "JIRA");
-    UpdateProgress(0, "collections");
+    UpdateProgress(0, "page");
+    UpdateProgress(0, "issues");
 };
 
 var UpdateProgress = function (progress, type) {
@@ -63,6 +63,11 @@ var LogProgress = function (text, error) {
 };
 
 exports.updateJiraInfo = function (full, remove, jiraUser, jiraPassword, callback) {
+//***************************
+//true = exclude jira download
+    var debug = true;
+//***************************
+
     if (updateInProgress) {
         callback();
     }
@@ -73,15 +78,20 @@ exports.updateJiraInfo = function (full, remove, jiraUser, jiraPassword, callbac
         full = true;
     }
 
-    var jira = new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), jiraUser, jiraPassword, '2');
+    var jira = debug ? null : new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), jiraUser, jiraPassword, '2');
 
     async.series([
         function (callback) {
-            LogProgress("**** Step 1: collect issue keys from JIRA");
-            Step1CollectIssueKeys(jira, full, callback);
+            if(!debug) {
+                LogProgress("**** Step 1: collect issue keys from JIRA");
+                Step1CollectIssueKeys(jira, full, callback);
+            }
+            else {
+                callback();
+            }
         },
         function (callback) {
-            if(!remove) {
+            if(!remove && !debug) {
                 LogProgress("**** Step 2: collect issues from JIRA");
                 Step2CollectIssues(jira, callback);
             }
@@ -90,7 +100,7 @@ exports.updateJiraInfo = function (full, remove, jiraUser, jiraPassword, callbac
             }
         },
         function (callback) {
-            if(full) {
+            if(full && !debug) {
                 LogProgress("**** Step 3: remove deleted issues from database");
                 Step3DeleteIssues(callback);
             }
@@ -100,23 +110,26 @@ exports.updateJiraInfo = function (full, remove, jiraUser, jiraPassword, callbac
         },
         function (callback) {
             LogProgress("**** Step 4: drop collections from DB");
-            var db = mongoose.connection.db;
-            db.dropCollection('Modules', function (err) {
+            Module.collection.drop(function (err) {
                 if(err && err.errmsg != 'ns not found') {
                     callback(err);
                 }
-                db.dropCollection('Pages', function (err) {
+                LogProgress("1. Modules collection has been dropped");
+                Page.collection.drop(function (err) {
                     if(err && err.errmsg != 'ns not found') {
                         callback(err);
                     }
-                    db.dropCollection('Issues', function (err) {
+                    LogProgress("2. Pages collection has been dropped");
+                    Issue.collection.drop(function (err) {
                         if(err && err.errmsg != 'ns not found') {
                             callback(err);
                         }
-                        db.dropCollection('CloudApps', function (err) {
+                        LogProgress("3. Issues collection has been dropped");
+                        CloudApp.collection.drop(function (err) {
                             if(err && err.errmsg != 'ns not found') {
                                 callback(err);
                             }
+                            LogProgress("4. CloudApps collection has been dropped");
                             callback();
                         });
                     });
@@ -220,7 +233,7 @@ function Step1CollectIssueKeys(jira, full, callback) {
                         return loopCounter;
                     },
                     function (callback) {
-                        var queryString = full ? "project = PLEX-UXC" : "project = PLEX-UXC AND updated > -1d";
+                        var queryString = full ? "project = PLEX-UXC ORDER BY key ASC" : "project = PLEX-UXC AND updated > -1d ORDER BY key ASC";
 
                         LogProgress("**** collecting issue keys: from " + startKey + " to " + (startKey + 1000).toString());
 
@@ -275,28 +288,30 @@ function Step2CollectIssues(jira, callback) {
                         if (error) {
                             LogProgress("Restarting loop for key: "+issueObject.key, error);
                         }
-                        else if (issue != null) {
-                            OriginalJiraIssue.findOne({ key: issue.key }, function (err, dbissue) {
-                                if (err) {
-                                    callback(err);
-                                }
-
-                                if (!dbissue) {
-                                    dbissue = new OriginalJiraIssue();
-                                }
-                                dbissue.key = issue.key;
-                                dbissue.issuetype = issue.fields.issuetype.name;
-                                dbissue.object = issue;
-
-                                dbissue.save(function (err) {
-                                    loopError = false;
-                                    callback(err);
-                                });
-                            });
-                        }
                         else {
-                            loopError = false;
-                            callback();
+                            if (issue != null) {
+                                OriginalJiraIssue.findOne({ key: issue.key }, function (err, dbissue) {
+                                    if (err) {
+                                        callback(err);
+                                    }
+
+                                    if (!dbissue) {
+                                        dbissue = new OriginalJiraIssue();
+                                    }
+                                    dbissue.key = issue.key;
+                                    dbissue.issuetype = issue.fields.issuetype.name;
+                                    dbissue.object = issue;
+
+                                    dbissue.save(function (err) {
+                                        loopError = false;
+                                        callback(err);
+                                    });
+                                });
+                            }
+                            else {
+                                loopError = false;
+                                callback();
+                            }
                         }
                     });
                 },
@@ -347,7 +362,7 @@ function Step5CollectModules(callback) {
         var epic = doc.object;
         var module = epic.fields.summary.toLowerCase().indexOf('module') > -1;
         var automation = epic.fields.summary.toLowerCase().indexOf('automation') > -1;
-        var vpScreens = epic.fields.summary.toLowerCase().indexOf('screens') > -1;
+        var vpScreens = epic.fields.summary.toLowerCase().indexOf('vp screens') > -1;
         if(module && !automation && !vpScreens) {
             Module.findOne({ key: epic.key }, function (err, module) {
                 if (!module) {
@@ -369,7 +384,9 @@ function Step5CollectModules(callback) {
                 module.save(function (err) {
                     epicsList.push(epic.key);
                     LogProgress(epic.key + " : " + " Module Collected");
-                    callback(err);
+                    if(err) {
+                        callback(err);
+                    }
                 })
             });
 
@@ -416,8 +433,6 @@ function Step6CollectStories(callback) {
                 page.status = story.fields.status.name;
                 page.resolution = story.fields.resolution == null ? "" : story.fields.resolution.name;
                 page.reporter = story.fields.reporter.displayName;
-                page.originalEstimate = story.fields.timetracking.originalEstimate;
-                page.timeSpent = story.fields.timetracking.timeSpent;
                 page.labels = story.fields.labels;
                 if (story.fields.assignee != null)
                     page.assignee = story.fields.assignee.displayName;
@@ -440,26 +455,29 @@ function Step6CollectStories(callback) {
                             }
 
                             if (subtask) {
-                                if (subtask.fields.summary.indexOf('PLEX-Acceptance') > -1) {
-                                    page.devfinish = subtask.fields.customfield_24500 ? new Date(subtask.fields.customfield_24500) : null;
-                                    page.qafinish = subtask.fields.customfield_24501 ? new Date(subtask.fields.customfield_24501) : null;
-                                    page.accfinish = subtask.fields.customfield_24502 ? new Date(subtask.fields.customfield_24502) : null;
-                                    page.cusfinish = subtask.fields.customfield_24503 ? new Date(subtask.fields.customfield_24503) : null;
-                                    page.pmhfinish = subtask.fields.customfield_25900 ? new Date(subtask.fields.customfield_25900) : null;
-                                    page.lafinish = subtask.fields.customfield_25901 ? new Date(subtask.fields.customfield_25901) : null;
-                                    if (subtask.fields.status.name == STATUS.CLOSED.name) {
+                                var subtaskObj = subtask._doc.object;
+                                if (subtaskObj.fields.summary.toLowerCase().indexOf('PLEX-Acceptance') > -1) {
+                                    page.devfinish = subtaskObj.fields.customfield_24500 ? new Date(subtaskObj.fields.customfield_24500) : null;
+                                    page.qafinish = subtaskObj.fields.customfield_24501 ? new Date(subtaskObj.fields.customfield_24501) : null;
+                                    page.accfinish = subtaskObj.fields.customfield_24502 ? new Date(subtaskObj.fields.customfield_24502) : null;
+                                    page.cusfinish = subtaskObj.fields.customfield_24503 ? new Date(subtaskObj.fields.customfield_24503) : null;
+                                    page.pmhfinish = subtaskObj.fields.customfield_25900 ? new Date(subtaskObj.fields.customfield_25900) : null;
+                                    page.lafinish = subtaskObj.fields.customfield_25901 ? new Date(subtaskObj.fields.customfield_25901) : null;
+                                    if (subtaskObj.fields.status.name == STATUS.CLOSED.name) {
                                         page.status = STATUS.PRODUCTION.name;
                                     }
-                                    page.acceptanceStatus = subtask.fields.status.name;
-                                    page.acceptanceKey = subtask.key;
-                                    page.acceptanceAssignee = subtask.fields.assignee ? subtask.fields.assignee.name : "";
+                                    page.acceptanceStatus = subtaskObj.fields.status.name;
+                                    page.acceptanceKey = subtaskObj.key;
+                                    page.acceptanceAssignee = subtaskObj.fields.assignee ? subtaskObj.fields.assignee.name : "";
                                 }
-                                calcWorklogFromIssue(subtask, page);
+                                calcWorklogFromIssue(subtaskObj, page);
                             }
                             page.save(function (err) {
                                 pagesList.push(page.key);
                                 LogProgress(page.key + " : " + " Page Collected");
-                                callback(err);
+                                if(err) {
+                                    callback(err);
+                                }
                             })
                         });
                     }
