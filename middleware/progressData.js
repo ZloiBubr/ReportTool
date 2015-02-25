@@ -111,7 +111,7 @@ function putDataPoint(key, progress, teamName, date, calcStoryPoints, person, ur
                     if (pages) {
                         for (var l = 0; l < pages.length; l++) {
                             var page = pages[l];
-                            if (page.key == key) {
+                            if (page.key == key && page.person == person) {
                                 page.person = person;
                                 page.progress = page.progress + calcStoryPoints;
                                 page.devspent = devTimeSpent;

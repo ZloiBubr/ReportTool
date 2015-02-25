@@ -159,7 +159,7 @@ function WriteVersion(callback) {
 
 function Step1CollectModules(jira, callback) {
     var requestString = "project = PLEX-UXC AND issuetype = epic AND summary ~ Module AND NOT summary ~ automation AND NOT summary ~ screens ORDER BY key ASC";
-    //var requestString = "project = PLEX-UXC AND key = PLEXUXC-17040"; // for debug
+    //var requestString = "project = PLEX-UXC AND key = PLEXUXC-17043"; // for debug
     epicsList = [];
 
     UpdateProgress(0, "page");
@@ -769,6 +769,10 @@ function ParseFinishDates(item, page, created) {
         }
         if (from == STATUS.TESTINGINPROGRESS.name && to == STATUS.RESOLVED.name) {
             page.qaFinished = created;
+        }
+
+        if (from == STATUS.RESOLVED.name && to == STATUS.CLOSED.name) {
+            page.smeFinished = created;
         }
     }
 }

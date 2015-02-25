@@ -1,0 +1,50 @@
+<div ng-repeat="module in cloudAddData.modules">
+
+    <div ng-repeat="cloudApp in module.cloudApps | filter:onFilterCloudApps">
+            <table class="table blocker_status_table">
+                <thead>
+                    <tr>
+                        <th colspan="6">
+                            <span>{{module.moduleName}} / {{cloudApp.appName}}</span>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th style="width: 350px">Page</th>
+                        <th style="width: 160px">
+                            <span tooltip="Assignee">Assignee</span>
+                        </th>
+                        <th style="width: 40px">
+                            <span tooltip="Story Points">SP</span>
+                        </th>
+                        <th style="width: 40px">
+                            <span tooltip="Progress, %">%</span>
+                        </th>
+                        <th style="width: 40px">
+                            <span tooltip="Stream">Str</span>
+                        </th>
+                        <th style="width: 60px">Status</th>
+                        <th style="width: 35px">
+                            <span tooltip="Checklist Ready">CL</span>
+                        </th>
+                        <th style="">Block</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="pageItem in cloudApp.pages" ng-init="status = statuses.getStatusByName(pageItem.taskStatus)">
+                        <td><span tooltip="{{pageItem.pageName}}">{{pageItem.pageName | limitTo:40}}</span></td>
+                        <td  >{{pageItem.assignee}}</td>
+                        <td align="center" >{{pageItem.storyPoints}}</td>
+                        <td align="center" >{{pageItem.progress}}</td>
+                        <td align="center" >{{pageItem.stream}}</td>
+                        <td align="center" ><span tooltip="{{status.name}}"><span class="{{status.cssIcon}}"></span></span></td>
+                        <td align="center" >{{pageItem.checklistStatus ? '\u2713' : '\u2718'}}</td>
+                        <td align="center">
+                            <span>
+                                {{getBlockerCount(pageItem.blockers)}}
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+</div>
