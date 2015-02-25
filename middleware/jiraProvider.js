@@ -62,12 +62,7 @@ var LogProgress = function (text, error) {
     }
 };
 
-exports.updateJiraInfo = function (full, remove, jiraUser, jiraPassword, callback) {
-//***************************
-//true = exclude jira download
-    var debug = true;
-//***************************
-
+exports.updateJiraInfo = function (debug, full, remove, jiraUser, jiraPassword, callback) {
     if (updateInProgress) {
         callback();
     }
