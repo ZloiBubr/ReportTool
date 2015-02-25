@@ -38,8 +38,8 @@ var lastProgress = 0;
 
 exports.rememberResponse = function (req, res) {
     sessionsupport.setResponseObj('updateDb', req, res);
-    UpdateProgress(0, "page");
-    UpdateProgress(0, "issues");
+    UpdateProgress(0, "JIRA");
+    UpdateProgress(0, "collections");
 };
 
 var UpdateProgress = function (progress, type) {
@@ -102,19 +102,19 @@ exports.updateJiraInfo = function (full, remove, jiraUser, jiraPassword, callbac
             LogProgress("**** Step 4: drop collections from DB");
             var db = mongoose.connection.db;
             db.dropCollection('Modules', function (err) {
-                if(err) {
+                if(err && err.errmsg != 'ns not found') {
                     callback(err);
                 }
                 db.dropCollection('Pages', function (err) {
-                    if(err) {
+                    if(err && err.errmsg != 'ns not found') {
                         callback(err);
                     }
                     db.dropCollection('Issues', function (err) {
-                        if(err) {
+                        if(err && err.errmsg != 'ns not found') {
                             callback(err);
                         }
                         db.dropCollection('CloudApps', function (err) {
-                            if(err) {
+                            if(err && err.errmsg != 'ns not found') {
                                 callback(err);
                             }
                             callback();
@@ -129,7 +129,7 @@ exports.updateJiraInfo = function (full, remove, jiraUser, jiraPassword, callbac
         },
         function (callback) {
             LogProgress("**** Step 6: collect pages");
-            Step6CollectPages(callback);
+            Step6CollectStories(callback);
         },
             /*
         //step 2-2
@@ -345,9 +345,9 @@ function Step5CollectModules(callback) {
 
     stream.on('data', function (doc) {
         var epic = doc.object;
-        var module = epic.summary.indexOf('Module') > -1;
-        var automation = epic.summary.indexOf('Automation') > -1;
-        var vpScreens = epic.summary.indexOf('screens') > -1;
+        var module = epic.fields.summary.toLowerCase().indexOf('module') > -1;
+        var automation = epic.fields.summary.toLowerCase().indexOf('automation') > -1;
+        var vpScreens = epic.fields.summary.toLowerCase().indexOf('screens') > -1;
         if(module && !automation && !vpScreens) {
             Module.findOne({ key: epic.key }, function (err, module) {
                 if (!module) {
@@ -382,7 +382,7 @@ function Step5CollectModules(callback) {
     });
 }
 
-function Step6CollectPages(callback) {
+function Step6CollectStories(callback) {
     var stream = OriginalJiraIssue.find({issuetype: 'Story'}).stream();
 
     pagesList = [];
@@ -391,15 +391,17 @@ function Step6CollectPages(callback) {
         var story = doc.object;
         var epic = story.fields.customfield_14500; //Epic link
 
-        var willStore = false;
-        for(var i=0; i<epicsList.length; i++) {
-            if(epic == epicsList[i]) {
-                willStore = true;
-                break;
+        var storePage = false;
+        if(epic != undefined) {
+            for(var i=0; i<epicsList.length; i++) {
+                if(epic == epicsList[i]) {
+                    storePage = true;
+                    break;
+                }
             }
         }
 
-        if(willStore) {
+        if(storePage) {
             Page.findOne({ key: story.key }, function (err, page) {
                 if (err) {
                     callback(err);
