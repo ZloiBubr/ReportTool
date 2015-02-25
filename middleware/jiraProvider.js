@@ -389,7 +389,7 @@ function Step6CollectPages(callback) {
 
     stream.on('data', function (doc) {
         var story = doc.object;
-        var epic = story.fields.customfield_14500;
+        var epic = story.fields.customfield_14500; //Epic link
 
         var willStore = false;
         for(var i=0; i<epicsList.length; i++) {
@@ -561,58 +561,6 @@ function Step5ProcessBlockers(jira, callback) {
             ProcessBlockersFromJira(jira, linkedIssue, counter, callback);
         },
         function (err) {
-            callback();
-        }
-    );
-}
-
-function CollectPagesFromJira(jira, full, epicKey, callback) {
-    var queryString = full ?
-        util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s)", epicKey) :
-        util.format("project = PLEXUXC AND issuetype = Story AND 'Epic Link' in (%s) AND updated > -3d", epicKey);
-
-    var loopError = true;
-    async.whilst(function() {
-            return loopError;
-        },
-        function(callback) {
-            LogProgress("**** collect pages for module: " + epicKey);
-            jira.searchJira(queryString, { fields: ["summary","subtasks"] }, function (error, stories) {
-                if (error) {
-                    LogProgress("Collect pages error happened!", error);
-                    LogProgress("Restarting Loop for: "+epicKey, error);
-                    callback();
-                }
-                if (stories != null) {
-
-                    _.each(stories.issues, function (story){
-                        issuesList.push(story.key);
-                        pagesProgressCount++;
-                        epicIssueMap[story.key] = epicKey;
-
-                        if(story.fields && story.fields.subtasks && story.fields.subtasks.length > 0){
-                            for(var i=0;i<story.fields.subtasks.length;i++){
-                                if(story.fields.subtasks[i].fields && story.fields.subtasks[i].fields.summary.toLowerCase().indexOf("plex-acceptance") != -1){
-                                    acceptanceTasks[story.key] = {
-                                        id: story.fields.subtasks[i].id,
-                                        key: story.fields.subtasks[i].key
-                                    };
-                                    pagesProgressCount++;
-                                }
-                            }
-                        }
-                    });
-                    loopError = false;
-                    callback();
-                }
-                else{
-                    loopError = false;
-                    callback();
-                }
-            });
-        },
-        function(err) {
-            LogProgress(epicKey + " : " + " : Page Collected");
             callback();
         }
     );
