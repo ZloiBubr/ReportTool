@@ -352,7 +352,8 @@ function Step5CollectModules(callback) {
 
     epicsMap = {};
     var count = 0;
-    var count2 = 0
+    var count2 = 0;
+    var modulesCollection = [];
 
     stream.on('data', function (doc) {
         var epic = doc.object;
@@ -376,21 +377,29 @@ function Step5CollectModules(callback) {
             module.labels = epic.fields.labels;
             module.fixVersions = epic.fields.fixVersions && epic.fields.fixVersions.length > 0 ? epic.fields.fixVersions[0].name : "";
             module.priority = epic.fields.priority.name;
-            module.save(function (err) {
-                epicsMap[epic.key] = epic.key;
-                if(err) {
-                    callback(err);
-                }
-            })
+            modulesCollection.push(module);
         }
     }).on('error', function (err) {
         callback(err);
     }).on('close', function () {
         LogProgress(count + " Epics Total");
         LogProgress(count2 + " Modules Total");
-        LogProgress(Object.keys(epicsMap).length + " Modules Collected");
-        UpdateProgress(10, "issues");
-        callback();
+        async.eachSeries(modulesCollection, function(module, callback) {
+            module.save(function (err) {
+                epicsMap[module.key] = module.key;
+                if(err) {
+                    callback(err);
+                }
+                else {
+                    callback();
+                }
+            })
+        },
+        function(err) {
+            LogProgress(Object.keys(epicsMap).length + " Modules Collected");
+            UpdateProgress(10, "issues");
+            callback(err);
+        });
     });
 }
 
@@ -418,6 +427,8 @@ function Step6CollectStories(callback) {
 
     pagesMap = {};
     var count = 0;
+    var count2 = 0;
+    var pagesCollection = [];
 
     stream.on('data', function (doc) {
         var story = doc.object;
@@ -425,82 +436,76 @@ function Step6CollectStories(callback) {
         count++;
 
         if(epic != undefined && epicsMap[epic]) {
-            Page.findOne({ key: story.key }, function (err, page) {
-                if (err) {
-                    callback(err);
-                }
-
-                if (!page) {
-                    page = new Page();
-                }
-                page.key = story.key;
-                page.uri = "https://jira.epam.com/jira/browse/" + story.key;
-                page.summary = story.fields.summary;
-                page.status = story.fields.status.name;
-                page.resolution = story.fields.resolution == null ? "" : story.fields.resolution.name;
-                page.reporter = story.fields.reporter.displayName;
-                page.labels = story.fields.labels;
-                if (story.fields.assignee != null)
-                    page.assignee = story.fields.assignee.displayName;
-                page.storyPoints = story.fields.customfield_10004;
-                page.blockers = story.fields.customfield_20501;
-                page.progress = story.fields.customfield_20500;
-                page.epicKey = epic;
-                page.created = story.fields.created;
-                page.updated = story.fields.updated;
-                page.testingProgress = story.fields.customfield_24700;
-                page.checklistCreated = story.fields.customfield_24300 ? story.fields.customfield_24300[0].value == 'yes' : false;
-                parseHistory(story, page);
-                calcWorklogFromIssue(story, page);
-                if (story.fields.subtasks != null) {
-                    for (var i = 0; i < story.fields.subtasks.length; i++) {
-                        var subtaskKey = story.fields.subtasks[i].key;
-                        OriginalJiraIssue.findOne({key: subtaskKey}, function (err, subtask) {
-                            if (err) {
-                                callback(err);
-                            }
-
-                            if (subtask) {
-                                var subtaskObj = subtask._doc.object;
-                                if (subtaskObj.fields.summary.toLowerCase().indexOf('PLEX-Acceptance') > -1) {
-                                    page.devfinish = subtaskObj.fields.customfield_24500 ? new Date(subtaskObj.fields.customfield_24500) : null;
-                                    page.qafinish = subtaskObj.fields.customfield_24501 ? new Date(subtaskObj.fields.customfield_24501) : null;
-                                    page.accfinish = subtaskObj.fields.customfield_24502 ? new Date(subtaskObj.fields.customfield_24502) : null;
-                                    page.cusfinish = subtaskObj.fields.customfield_24503 ? new Date(subtaskObj.fields.customfield_24503) : null;
-                                    page.pmhfinish = subtaskObj.fields.customfield_25900 ? new Date(subtaskObj.fields.customfield_25900) : null;
-                                    page.lafinish = subtaskObj.fields.customfield_25901 ? new Date(subtaskObj.fields.customfield_25901) : null;
-                                    if (subtaskObj.fields.status.name == STATUS.CLOSED.name) {
-                                        page.status = STATUS.PRODUCTION.name;
-                                    }
-                                    page.acceptanceStatus = subtaskObj.fields.status.name;
-                                    page.acceptanceKey = subtaskObj.key;
-                                    page.acceptanceAssignee = subtaskObj.fields.assignee ? subtaskObj.fields.assignee.name : "";
-                                }
-                                calcWorklogFromIssue(subtaskObj, page);
-                            }
-                            page.save(function (err) {
-                                pagesMap[page.key] = page.key;
-                                if(err) {
-                                    callback(err);
-                                }
-                            })
-                        });
-                    }
-                }
-                else {
-                    page.save(function (err) {
-                        pagesMap[page.key] = page.key;
-                        if(err) {
+            count2++;
+            var page = new Page();
+            page.key = story.key;
+            page.uri = "https://jira.epam.com/jira/browse/" + story.key;
+            page.summary = story.fields.summary;
+            page.status = story.fields.status.name;
+            page.resolution = story.fields.resolution == null ? "" : story.fields.resolution.name;
+            page.reporter = story.fields.reporter.displayName;
+            page.labels = story.fields.labels;
+            if (story.fields.assignee != null)
+                page.assignee = story.fields.assignee.displayName;
+            page.storyPoints = story.fields.customfield_10004;
+            page.blockers = story.fields.customfield_20501;
+            page.progress = story.fields.customfield_20500;
+            page.epicKey = epic;
+            page.created = story.fields.created;
+            page.updated = story.fields.updated;
+            page.testingProgress = story.fields.customfield_24700;
+            page.checklistCreated = story.fields.customfield_24300 ? story.fields.customfield_24300[0].value == 'yes' : false;
+            parseHistory(story, page);
+            calcWorklogFromIssue(story, page);
+            if (story.fields.subtasks) {
+                for (var i = 0; i < story.fields.subtasks.length; i++) {
+                    var subtaskKey = story.fields.subtasks[i].key;
+                    OriginalJiraIssue.findOne({key: subtaskKey}).exec(function (err, subtask) {
+                        if (err) {
                             callback(err);
                         }
-                    })
+
+                        if (subtask) {
+                            var subtaskObj = subtask._doc.object;
+                            if (subtaskObj.fields.summary.toLowerCase().indexOf('PLEX-Acceptance') > -1) {
+                                page.devfinish = subtaskObj.fields.customfield_24500 ? new Date(subtaskObj.fields.customfield_24500) : null;
+                                page.qafinish = subtaskObj.fields.customfield_24501 ? new Date(subtaskObj.fields.customfield_24501) : null;
+                                page.accfinish = subtaskObj.fields.customfield_24502 ? new Date(subtaskObj.fields.customfield_24502) : null;
+                                page.cusfinish = subtaskObj.fields.customfield_24503 ? new Date(subtaskObj.fields.customfield_24503) : null;
+                                page.pmhfinish = subtaskObj.fields.customfield_25900 ? new Date(subtaskObj.fields.customfield_25900) : null;
+                                page.lafinish = subtaskObj.fields.customfield_25901 ? new Date(subtaskObj.fields.customfield_25901) : null;
+                                if (subtaskObj.fields.status.name == STATUS.CLOSED.name) {
+                                    page.status = STATUS.PRODUCTION.name;
+                                }
+                                page.acceptanceStatus = subtaskObj.fields.status.name;
+                                page.acceptanceKey = subtaskObj.key;
+                                page.acceptanceAssignee = subtaskObj.fields.assignee ? subtaskObj.fields.assignee.name : "";
+                            }
+                            calcWorklogFromIssue(subtaskObj, page);
+                        }
+                        page.save(function (err) {
+                            pagesMap[page.key] = page.key;
+                            if(err) {
+                                callback(err);
+                            }
+                        })
+                    });
                 }
-            });
+            }
+            else {
+                page.save(function (err) {
+                    pagesMap[page.key] = page.key;
+                    if(err) {
+                        callback(err);
+                    }
+                })
+            }
         }
     }).on('error', function (err) {
         callback(err);
     }).on('close', function () {
-        LogProgress(count + " Pages Total");
+        LogProgress(count + " Stories Total");
+        LogProgress(count2 + " Pages Total");
         LogProgress(Object.keys(pagesMap).length + " Pages Collected");
         UpdateProgress(50, "issues");
         callback();
