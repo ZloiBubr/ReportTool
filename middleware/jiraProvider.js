@@ -683,7 +683,7 @@ function MapLinkedIssues(issue, dbPage) {
 //                }
                 //else if(jiraLinkedIssue != null) {
                    // loopError = false;
-                    SaveLinkedIssue(jiraLinkedIssue, dbPage, linkType, callback);
+                    SaveLinkedIssue(jiraLinkedIssue, dbPage, linkedIssueItem.type.inward, callback);
 //                }
 //                else {
 //                    loopError = false;
@@ -802,7 +802,7 @@ function SaveAcceptanceTask(jiraAcceptanceTask, mapAcceptanceTask, callback) {
 }
 
 
-function SaveLinkedIssue(linkedIssue, dbPage, callback) {
+function SaveLinkedIssue(linkedIssue, dbPage, linkType, callback) {
     Issue.findOne({key: linkedIssue.key}, function (err, dbIssue) {
         if (err) {
             callback(err);
@@ -830,14 +830,16 @@ function SaveLinkedIssue(linkedIssue, dbPage, callback) {
             dbIssue.assignee = linkedIssue.fields.assignee.displayName;
 
 
-        dbIssue.pages = dbIssue.pages || [];
+        if(!_.isUndefined(dbIssue.pages)){
+            dbIssue.pages = [];
+        }
        // _.each(linkedIssueUniqList[linkedIssue.key].linkedPages, function (linkedPage) {
 
-        dbIssue.pages.push({linkType: linkedPage.linkType, page: linkedPage._id});
+        dbIssue.pages.push({linkType: linkType, page: dbPage._id});
        // });
 
         dbIssue.save(function (err) {
-            callback(err);
+            callback(err, dbIssue);
         });
     });
 }
