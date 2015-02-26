@@ -23,12 +23,11 @@ var STATUS = require('../public/jsc/models/statusList').STATUS;
 var JiraApi = require('jira').JiraApi;
 
 var issueObjects = [];
-var epicsList = [];
-var pagesList = [];
+var epicsMap = {};
+var pagesMap = {};
 
 var issuesList = [];
 var acceptanceTasks = {};
-var epicIssueMap = {};
 var linkedIssueUniqList = [];
 var pagesProgressCount = 0;
 var updateInProgress = false;
@@ -95,7 +94,7 @@ exports.updateJiraInfo = function (debug, full, remove, jiraUser, jiraPassword, 
             }
         },
         function (callback) {
-            if(full && !debug) {
+            if(remove && !debug) {
                 LogProgress("**** Step 3: remove deleted issues from database");
                 Step3DeleteIssues(callback);
             }
@@ -351,69 +350,81 @@ function Step3DeleteIssues(callback) {
 function Step5CollectModules(callback) {
     var stream = OriginalJiraIssue.find({issuetype: 'Epic'}).stream();
 
-    epicsList = [];
+    epicsMap = {};
+    var count = 0;
+    var count2 = 0
 
     stream.on('data', function (doc) {
         var epic = doc.object;
         var module = epic.fields.summary.toLowerCase().indexOf('module') > -1;
         var automation = epic.fields.summary.toLowerCase().indexOf('automation') > -1;
         var vpScreens = epic.fields.summary.toLowerCase().indexOf('vp screens') > -1;
+        count++;
         if(module && !automation && !vpScreens) {
-            Module.findOne({ key: epic.key }, function (err, module) {
-                if (!module) {
-                    module = new Module();
+            count2++;
+            var module = new Module();
+            module.key = epic.key;
+            module.summary = epic.fields.summary;
+            module.duedate = epic.fields.duedate == null ? null : new Date(epic.fields.duedate);
+            module.devfinish = epic.fields.customfield_24500 == null ? null : new Date(epic.fields.customfield_24500);
+            module.qafinish = epic.fields.customfield_24501 == null ? null : new Date(epic.fields.customfield_24501);
+            module.accfinish = epic.fields.customfield_24502 == null ? null : new Date(epic.fields.customfield_24502);
+            module.cusfinish = epic.fields.customfield_24503 == null ? null : new Date(epic.fields.customfield_24503);
+            module.assignee = epic.fields.assignee == null ? "Unassigned" : epic.fields.assignee.name;
+            module.status = epic.fields.status.name;
+            module.resolution = epic.fields.resolution == null ? "" : epic.fields.resolution.name;
+            module.labels = epic.fields.labels;
+            module.fixVersions = epic.fields.fixVersions && epic.fields.fixVersions.length > 0 ? epic.fields.fixVersions[0].name : "";
+            module.priority = epic.fields.priority.name;
+            module.save(function (err) {
+                epicsMap[epic.key] = epic.key;
+                if(err) {
+                    callback(err);
                 }
-                module.key = epic.key;
-                module.summary = epic.fields.summary;
-                module.duedate = epic.fields.duedate == null ? null : new Date(epic.fields.duedate);
-                module.devfinish = epic.fields.customfield_24500 == null ? null : new Date(epic.fields.customfield_24500);
-                module.qafinish = epic.fields.customfield_24501 == null ? null : new Date(epic.fields.customfield_24501);
-                module.accfinish = epic.fields.customfield_24502 == null ? null : new Date(epic.fields.customfield_24502);
-                module.cusfinish = epic.fields.customfield_24503 == null ? null : new Date(epic.fields.customfield_24503);
-                module.assignee = epic.fields.assignee == null ? "Unassigned" : epic.fields.assignee.name;
-                module.status = epic.fields.status.name;
-                module.resolution = epic.fields.resolution == null ? "" : epic.fields.resolution.name;
-                module.labels = epic.fields.labels;
-                module.fixVersions = epic.fields.fixVersions && epic.fields.fixVersions.length > 0 ? epic.fields.fixVersions[0].name : "";
-                module.priority = epic.fields.priority.name;
-                module.save(function (err) {
-                    epicsList.push(epic.key);
-                    LogProgress(epic.key + " : " + " Module Collected");
-                    if(err) {
-                        callback(err);
-                    }
-                })
-            });
-
+            })
         }
     }).on('error', function (err) {
         callback(err);
     }).on('close', function () {
+        LogProgress(count + " Epics Total");
+        LogProgress(count2 + " Modules Total");
+        LogProgress(Object.keys(epicsMap).length + " Modules Collected");
         UpdateProgress(10, "issues");
         callback();
+    });
+}
+
+function isAutomationStory(story) {
+    var labels = story.fields.labels;
+    for(var i=0; i<labels.length; i++) {
+        if(labels[i].toLowerCase().indexOf('automation') > -1) {
+            if(story.fields.status != STATUS.OPEN.name)
+                return true;
+        }
+    }
+    var epic = story.fields.customfield_14500;
+    OriginalJiraIssue.findOne({ key: epic }, function (err, epic) {
+        if(err) {
+            return false;
+        }
+        if(epic.summary.toLowerCase().indexOf('automation test data fixing') > -1) {
+            return true;
+        }
     });
 }
 
 function Step6CollectStories(callback) {
     var stream = OriginalJiraIssue.find({issuetype: 'Story'}).stream();
 
-    pagesList = [];
+    pagesMap = {};
+    var count = 0;
 
     stream.on('data', function (doc) {
         var story = doc.object;
         var epic = story.fields.customfield_14500; //Epic link
+        count++;
 
-        var storePage = false;
-        if(epic != undefined) {
-            for(var i=0; i<epicsList.length; i++) {
-                if(epic == epicsList[i]) {
-                    storePage = true;
-                    break;
-                }
-            }
-        }
-
-        if(storePage) {
+        if(epic != undefined && epicsMap[epic]) {
             Page.findOne({ key: story.key }, function (err, page) {
                 if (err) {
                     callback(err);
@@ -468,8 +479,7 @@ function Step6CollectStories(callback) {
                                 calcWorklogFromIssue(subtaskObj, page);
                             }
                             page.save(function (err) {
-                                pagesList.push(page.key);
-                                LogProgress(page.key + " : " + " Page Collected");
+                                pagesMap[page.key] = page.key;
                                 if(err) {
                                     callback(err);
                                 }
@@ -479,9 +489,10 @@ function Step6CollectStories(callback) {
                 }
                 else {
                     page.save(function (err) {
-                        pagesList.push(page.key);
-                        LogProgress(page.key + " : " + " Page Collected");
-                        callback(err);
+                        pagesMap[page.key] = page.key;
+                        if(err) {
+                            callback(err);
+                        }
                     })
                 }
             });
@@ -489,6 +500,8 @@ function Step6CollectStories(callback) {
     }).on('error', function (err) {
         callback(err);
     }).on('close', function () {
+        LogProgress(count + " Pages Total");
+        LogProgress(Object.keys(pagesMap).length + " Pages Collected");
         UpdateProgress(50, "issues");
         callback();
     });
@@ -682,7 +695,7 @@ function MapAcceptanceTasks(issue, dbPage) {
     if(acceptanceTask) {
         acceptanceTask.epicKey = dbPage.epicKey;
         acceptanceTask.parentPageId = dbPage._id;
-        acceptanceTask.epicId = epicsList[dbPage.epicKey].id;
+        acceptanceTask.epicId = epicsMap[dbPage.epicKey].id;
     }
 }
 
