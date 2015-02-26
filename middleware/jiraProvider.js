@@ -227,7 +227,8 @@ function Step1CollectIssueKeys(jira, full, callback) {
                         return loopCounter;
                     },
                     function (callback) {
-                        var queryString = full ? "project = PLEX-UXC ORDER BY key ASC" : "project = PLEX-UXC AND updated > -1d ORDER BY key ASC";
+                        //var queryString = full ? "project = PLEX-UXC ORDER BY key ASC" : "project = PLEX-UXC AND updated > -1d ORDER BY key ASC";
+                        var queryString = "project = PLEX-UXC and (key = 'PLEXUXC-17875' or key =  PLEXUXC-69956 or key = PLEXUXC-68142 or key = PLEXUXC-34882) ORDER BY key ASC";
 
                         LogProgress("**** collecting issue keys: from " + startKey + " to " + (startKey + 1000).toString());
 
@@ -457,6 +458,7 @@ function Step6CollectStories(callback) {
             page.checklistCreated = story.fields.customfield_24300 ? story.fields.customfield_24300[0].value == 'yes' : false;
             parseHistory(story, page);
             calcWorklogFromIssue(story, page);
+            MapLinkedIssues(story, page);
             if (story.fields.subtasks) {
                 for (var i = 0; i < story.fields.subtasks.length; i++) {
                     var subtaskKey = story.fields.subtasks[i].key;
@@ -669,8 +671,34 @@ function ProcessAcceptanceTasksFromJira(jira, acceptanceTasks, counter, callback
 
 
 function MapLinkedIssues(issue, dbPage) {
+
+    _.each(issue.fields.issuelinks, function (linkedIssueItem) {
+        var linkedIssue = linkedIssueItem.inwardIssue ? linkedIssueItem.inwardIssue : linkedIssueItem.outwardIssue;
+        if (linkedIssue.fields.issuetype.name != "Story") {
+            OriginalJiraIssue.find({key: linkedIssue.key},function (error, jiraLinkedIssue){
+//                if (error) {
+//                    LogProgress("Collect issues error happened!", error);
+//                    LogProgress("Restarting Loop for:"+linkedIssue.linkedIssueKey, error);
+//                    callback();
+//                }
+                //else if(jiraLinkedIssue != null) {
+                   // loopError = false;
+                    SaveLinkedIssue(jiraLinkedIssue, dbPage, linkType, callback);
+//                }
+//                else {
+//                    loopError = false;
+//                    callback();
+//                }
+            });
+        }
+
+
+    });
+
+
     if(dbPage != null) {
         _.each(issue.fields.issuelinks, function (linkedIssueItem) {
+
             var linkedIssue = linkedIssueItem.inwardIssue ? linkedIssueItem.inwardIssue : linkedIssueItem.outwardIssue;
             if (linkedIssue.fields.issuetype.name != "Story") {
                 if (_.isUndefined(linkedIssueUniqList[linkedIssue.key])) {
@@ -774,7 +802,7 @@ function SaveAcceptanceTask(jiraAcceptanceTask, mapAcceptanceTask, callback) {
 }
 
 
-function SaveLinkedIssue(linkedIssue, callback) {
+function SaveLinkedIssue(linkedIssue, dbPage, callback) {
     Issue.findOne({key: linkedIssue.key}, function (err, dbIssue) {
         if (err) {
             callback(err);
@@ -801,10 +829,12 @@ function SaveLinkedIssue(linkedIssue, callback) {
         if (linkedIssue.fields.assignee != null)
             dbIssue.assignee = linkedIssue.fields.assignee.displayName;
 
-        dbIssue.pages = [];
-        _.each(linkedIssueUniqList[linkedIssue.key].linkedPages, function (linkedPage) {
-            dbIssue.pages.push({linkType: linkedPage.linkType, page: linkedPage._id});
-        });
+
+        dbIssue.pages = dbIssue.pages || [];
+       // _.each(linkedIssueUniqList[linkedIssue.key].linkedPages, function (linkedPage) {
+
+        dbIssue.pages.push({linkType: linkedPage.linkType, page: linkedPage._id});
+       // });
 
         dbIssue.save(function (err) {
             callback(err);
