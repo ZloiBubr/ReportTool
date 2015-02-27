@@ -16,6 +16,7 @@ var cache = require('node_cache');
 var sessionsupport = require('../middleware/sessionsupport');
 var helpers = require('../middleware/helpers');
 var mongoose = require('./../libs/mongoose');
+var Q = require('q');
 
 var VERSION = require('../public/jsc/versions').VERSION;
 var STATUS = require('../public/jsc/models/statusList').STATUS;
@@ -435,83 +436,47 @@ function Step6CollectStories(callback) {
         var epic = story.fields.customfield_14500; //Epic link
         count++;
 
-        if(epic != undefined && epicsMap[epic]) {
+        if (epic != undefined && epicsMap[epic]) {
             count2++;
-            Page.findOne({ key: story.key }, function (err, page) {
-                if (err) {
-                    callback(err);
-                }
 
-                if (!page) {
-                    page = new Page();
-                }
-                page.key = story.key;
-                page.uri = "https://jira.epam.com/jira/browse/" + story.key;
-                page.summary = story.fields.summary;
-                page.status = story.fields.status.name;
-                page.resolution = story.fields.resolution == null ? "" : story.fields.resolution.name;
-                page.reporter = story.fields.reporter.displayName;
-                page.labels = story.fields.labels;
-                if (story.fields.assignee != null)
-                    page.assignee = story.fields.assignee.displayName;
-                page.storyPoints = story.fields.customfield_10004;
-                page.blockers = story.fields.customfield_20501;
-                page.progress = story.fields.customfield_20500;
-                page.epicKey = epic;
-                page.created = story.fields.created;
-                page.updated = story.fields.updated;
-                page.testingProgress = story.fields.customfield_24700;
-                page.checklistCreated = story.fields.customfield_24300 ? story.fields.customfield_24300[0].value == 'yes' : false;
-                parseHistory(story, page);
-                calcWorklogFromIssue(story, page);
-            MapLinkedIssues(story, page);
-                var index = -1;
-                async.whilst(function() {
-                    return story.fields.subtasks && story.fields.subtasks.length > 0 && ++index < story.fields.subtasks.length;
-                },
-                function(callback) {
-                    var subtaskKey = story.fields.subtasks[index].key;
-                    OriginalJiraIssue.findOne({key: subtaskKey}, function (err, subtask) {
-                        if (err) {
-                            callback(err);
-                            return;
-                        }
-
-                        if (subtask) {
-                            var subtaskObj = subtask._doc.object;
-                            if (subtaskObj.fields.summary.toLowerCase().indexOf('PLEX-Acceptance') > -1) {
-                                page.devfinish = subtaskObj.fields.customfield_24500 ? new Date(subtaskObj.fields.customfield_24500) : null;
-                                page.qafinish = subtaskObj.fields.customfield_24501 ? new Date(subtaskObj.fields.customfield_24501) : null;
-                                page.accfinish = subtaskObj.fields.customfield_24502 ? new Date(subtaskObj.fields.customfield_24502) : null;
-                                page.cusfinish = subtaskObj.fields.customfield_24503 ? new Date(subtaskObj.fields.customfield_24503) : null;
-                                page.pmhfinish = subtaskObj.fields.customfield_25900 ? new Date(subtaskObj.fields.customfield_25900) : null;
-                                page.lafinish = subtaskObj.fields.customfield_25901 ? new Date(subtaskObj.fields.customfield_25901) : null;
-                                if (subtaskObj.fields.status.name == STATUS.CLOSED.name) {
-                                    page.status = STATUS.PRODUCTION.name;
-                                }
-                                page.acceptanceStatus = subtaskObj.fields.status.name;
-                                page.acceptanceKey = subtaskObj.key;
-                                page.acceptanceAssignee = subtaskObj.fields.assignee ? subtaskObj.fields.assignee.name : "";
-                            }
-                            calcWorklogFromIssue(subtaskObj, page);
-                        }
-                        callback();
-                    });
-
-                },
-                function(err) {
-                    if(err) {
-                        callback(err);
+            Q().then(function(){
+                var deferred1 = Q.defer();
+                Page.findOne({ key: story.key }, function (err, page) {
+                    if (err) {
+                        deferred1.reject();
+                        return;
                     }
-                    page.save(function (err) {
-                        pagesMap[page.key] = page.key;
-                        if (err) {
-                            callback(err);
-                        }
-                        stream.resume();
-                    });
+
+                    if (!page) {
+                        page = new Page();
+                    }
+
+                    Q().then(function(){ mapPageProperties(story, page) })
+                       .then(function () { parseHistory(story, page);})
+                       .then(function () { calcWorklogFromIssue(story, page); })
+                       //.then(function() { mapLinkedIssues(story, page); })
+                       .all( mapSubtsks(story, page) )
+                       .then(function () {
+                            var deferred2 = Q.defer();
+                            page.save(function (err) {
+                                pagesMap[page.key] = page.key;
+                                if (err) {
+                                    deferred2.reject(err);
+                                } else {
+                                    deferred2.resolve();
+                                }
+                                stream.resume();
+                            });
+                            return deferred2.promise;
+                        })
+                       .fail(function (err) { deferred1.reject(err); })
+                       .done(function(){deferred1.resolve()});
                 });
-            });
+                return deferred1.promise;
+
+            })
+            .fail(function(err){ console.error(err); })
+            .fin(function(){ stream.resume(); });
         }
         else {
             stream.resume();
@@ -525,6 +490,74 @@ function Step6CollectStories(callback) {
         callback();
     });
 }
+
+// Step 6 methods
+
+function mapPageProperties(story, page){
+    page.key = story.key;
+    page.uri = "https://jira.epam.com/jira/browse/" + story.key;
+    page.summary = story.fields.summary;
+    page.status = story.fields.status.name;
+    page.resolution = story.fields.resolution == null ? "" : story.fields.resolution.name;
+    page.reporter = story.fields.reporter.displayName;
+    page.labels = story.fields.labels;
+    if (story.fields.assignee != null)
+        page.assignee = story.fields.assignee.displayName;
+    page.storyPoints = story.fields.customfield_10004;
+    page.blockers = story.fields.customfield_20501;
+    page.progress = story.fields.customfield_20500;
+    page.epicKey = epic;
+    page.created = story.fields.created;
+    page.updated = story.fields.updated;
+    page.testingProgress = story.fields.customfield_24700;
+    page.checklistCreated = story.fields.customfield_24300 ? story.fields.customfield_24300[0].value == 'yes' : false;
+}
+
+function mapSubtsks(){
+    if (_.isUndefined(story.fields.subtasks)) {
+        return;
+    }
+
+    var promises = [];
+
+    for (var index = -1; i < story.fields.subtasks.length; index++) {
+        var subtaskKey = story.fields.subtasks[index].key;
+        var deferred = Q.defer();
+
+        OriginalJiraIssue.findOne({key: subtaskKey}, function (err, subtask) {
+            if (err) {
+                deferred.reject(err);
+                return;
+            }
+
+            if (subtask) {
+                var subtaskObj = subtask._doc.object;
+                if (subtaskObj.fields.summary.toLowerCase().indexOf('PLEX-Acceptance') > -1) {
+                    page.devfinish = subtaskObj.fields.customfield_24500 ? new Date(subtaskObj.fields.customfield_24500) : null;
+                    page.qafinish = subtaskObj.fields.customfield_24501 ? new Date(subtaskObj.fields.customfield_24501) : null;
+                    page.accfinish = subtaskObj.fields.customfield_24502 ? new Date(subtaskObj.fields.customfield_24502) : null;
+                    page.cusfinish = subtaskObj.fields.customfield_24503 ? new Date(subtaskObj.fields.customfield_24503) : null;
+                    page.pmhfinish = subtaskObj.fields.customfield_25900 ? new Date(subtaskObj.fields.customfield_25900) : null;
+                    page.lafinish = subtaskObj.fields.customfield_25901 ? new Date(subtaskObj.fields.customfield_25901) : null;
+                    if (subtaskObj.fields.status.name == STATUS.CLOSED.name) {
+                        page.status = STATUS.PRODUCTION.name;
+                    }
+                    page.acceptanceStatus = subtaskObj.fields.status.name;
+                    page.acceptanceKey = subtaskObj.key;
+                    page.acceptanceAssignee = subtaskObj.fields.assignee ? subtaskObj.fields.assignee.name : "";
+                }
+                calcWorklogFromIssue(subtaskObj, page);
+            }
+
+            deferred.resolve();
+        });
+
+        promises.push(deferred.promise);
+    }
+    return promises;
+}
+
+// End Step 6 Methods
 
 function Step2CollectAutomationStories(jira, full, callback) {
     var queryString = "project = PLEXUXC AND issuetype = Story AND ((labels in (Automation) AND status not in (Open)) OR ('Epic Link' = 'Automation test data fixing'))";
