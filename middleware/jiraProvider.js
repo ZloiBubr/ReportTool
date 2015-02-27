@@ -354,9 +354,9 @@ function Step5CollectModules(callback) {
     epicsMap = {};
     var count = 0;
     var count2 = 0;
-    var modulesCollection = [];
 
     stream.on('data', function (doc) {
+        stream.pause();
         var epic = doc.object;
         var module = epic.fields.summary.toLowerCase().indexOf('module') > -1;
         var automation = epic.fields.summary.toLowerCase().indexOf('automation') > -1;
@@ -386,28 +386,20 @@ function Step5CollectModules(callback) {
                     if (err) {
                         callback(err);
                     }
+                    stream.resume();
                 });
             });
+        }
+        else {
+            stream.resume();
         }
     }).on('error', function (err) {
         callback(err);
     }).on('close', function () {
         LogProgress(count + " Epics Total");
         LogProgress(count2 + " Modules Total");
-        async.whilst(
-            function() {
-                Module.count({}, function( err, collectionCount){
-                    return collectionCount != count2;
-                });
-            },
-            function(callback) {
-                callback();
-            },
-            function(err) {
-                LogProgress(count2 + " Modules Collected");
-                UpdateProgress(10, "issues");
-                callback(err);
-        });
+        UpdateProgress(10, "issues");
+        callback();
     });
 }
 
@@ -438,6 +430,7 @@ function Step6CollectStories(callback) {
     var count2 = 0;
 
     stream.on('data', function (doc) {
+        stream.pause();
         var story = doc.object;
         var epic = story.fields.customfield_14500; //Epic link
         count++;
@@ -481,6 +474,7 @@ function Step6CollectStories(callback) {
                     OriginalJiraIssue.findOne({key: subtaskKey}, function (err, subtask) {
                         if (err) {
                             callback(err);
+                            return;
                         }
 
                         if (subtask) {
@@ -501,6 +495,7 @@ function Step6CollectStories(callback) {
                             }
                             calcWorklogFromIssue(subtaskObj, page);
                         }
+                        callback();
                     });
 
                 },
@@ -513,29 +508,21 @@ function Step6CollectStories(callback) {
                         if (err) {
                             callback(err);
                         }
+                        stream.resume();
                     });
                 });
             });
+        }
+        else {
+            stream.resume();
         }
     }).on('error', function (err) {
         callback(err);
     }).on('close', function () {
         LogProgress(count + " Stories Total");
         LogProgress(count2 + " Pages Total");
-        async.whilst(
-            function() {
-                Page.count({}, function( err, collectionCount){
-                    return collectionCount != count2;
-                });
-            },
-            function(callback) {
-                callback();
-            },
-            function(err) {
-                LogProgress(count2 + " Pages Collected");
-                UpdateProgress(50, "issues");
-                callback(err);
-        });
+        UpdateProgress(50, "issues");
+        callback();
     });
 }
 
