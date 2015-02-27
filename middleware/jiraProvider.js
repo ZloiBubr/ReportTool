@@ -402,25 +402,6 @@ function Step5CollectModules(callback) {
     });
 }
 
-function isAutomationStory(story) {
-    var labels = story.fields.labels;
-    for(var i=0; i<labels.length; i++) {
-        if(labels[i].toLowerCase().indexOf('automation') > -1) {
-            if(story.fields.status != STATUS.OPEN.name)
-                return true;
-        }
-    }
-    var epic = story.fields.customfield_14500;
-    OriginalJiraIssue.findOne({ key: epic }, function (err, epic) {
-        if(err) {
-            return false;
-        }
-        if(epic.summary.toLowerCase().indexOf('automation test data fixing') > -1) {
-            return true;
-        }
-    });
-}
-
 function Step6CollectStories(callback) {
     var stream = OriginalJiraIssue.find({issuetype: 'Story'}).stream();
 
@@ -477,7 +458,7 @@ function Step6CollectStories(callback) {
 
                         if (subtask) {
                             var subtaskObj = subtask._doc.object;
-                            if (subtaskObj.fields.summary.toLowerCase().indexOf('PLEX-Acceptance') > -1) {
+                            if (subtaskObj.fields.summary.toLowerCase().indexOf('plex-acceptance') > -1) {
                                 page.devfinish = subtaskObj.fields.customfield_24500 ? new Date(subtaskObj.fields.customfield_24500) : null;
                                 page.qafinish = subtaskObj.fields.customfield_24501 ? new Date(subtaskObj.fields.customfield_24501) : null;
                                 page.accfinish = subtaskObj.fields.customfield_24502 ? new Date(subtaskObj.fields.customfield_24502) : null;
@@ -521,6 +502,25 @@ function Step6CollectStories(callback) {
         LogProgress(count2 + " Pages Total");
         UpdateProgress(50, "issues");
         callback();
+    });
+}
+
+function isAutomationStory(story) {
+    var labels = story.fields.labels;
+    for(var i=0; i<labels.length; i++) {
+        if(labels[i].toLowerCase().indexOf('automation') > -1) {
+            if(story.fields.status != STATUS.OPEN.name)
+                return true;
+        }
+    }
+    var epic = story.fields.customfield_14500;
+    OriginalJiraIssue.findOne({ key: epic }, function (err, epic) {
+        if(err) {
+            return false;
+        }
+        if(epic.summary.toLowerCase().indexOf('automation test data fixing') > -1) {
+            return true;
+        }
     });
 }
 
