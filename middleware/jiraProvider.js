@@ -363,42 +363,49 @@ function Step5CollectModules(callback) {
         count++;
         if(module && !automation && !vpScreens) {
             count2++;
-            var module = new Module();
-            module.key = epic.key;
-            module.summary = epic.fields.summary;
-            module.duedate = epic.fields.duedate == null ? null : new Date(epic.fields.duedate);
-            module.devfinish = epic.fields.customfield_24500 == null ? null : new Date(epic.fields.customfield_24500);
-            module.qafinish = epic.fields.customfield_24501 == null ? null : new Date(epic.fields.customfield_24501);
-            module.accfinish = epic.fields.customfield_24502 == null ? null : new Date(epic.fields.customfield_24502);
-            module.cusfinish = epic.fields.customfield_24503 == null ? null : new Date(epic.fields.customfield_24503);
-            module.assignee = epic.fields.assignee == null ? "Unassigned" : epic.fields.assignee.name;
-            module.status = epic.fields.status.name;
-            module.resolution = epic.fields.resolution == null ? "" : epic.fields.resolution.name;
-            module.labels = epic.fields.labels;
-            module.fixVersions = epic.fields.fixVersions && epic.fields.fixVersions.length > 0 ? epic.fields.fixVersions[0].name : "";
-            module.priority = epic.fields.priority.name;
-            modulesCollection.push(module);
+            Module.findOne({ key: epic.key }, function (err, module) {
+                if (!module) {
+                    module = new Module();
+                }
+                module.key = epic.key;
+                module.summary = epic.fields.summary;
+                module.duedate = epic.fields.duedate == null ? null : new Date(epic.fields.duedate);
+                module.devfinish = epic.fields.customfield_24500 == null ? null : new Date(epic.fields.customfield_24500);
+                module.qafinish = epic.fields.customfield_24501 == null ? null : new Date(epic.fields.customfield_24501);
+                module.accfinish = epic.fields.customfield_24502 == null ? null : new Date(epic.fields.customfield_24502);
+                module.cusfinish = epic.fields.customfield_24503 == null ? null : new Date(epic.fields.customfield_24503);
+                module.assignee = epic.fields.assignee == null ? "Unassigned" : epic.fields.assignee.name;
+                module.status = epic.fields.status.name;
+                module.resolution = epic.fields.resolution == null ? "" : epic.fields.resolution.name;
+                module.labels = epic.fields.labels;
+                module.fixVersions = epic.fields.fixVersions && epic.fields.fixVersions.length > 0 ? epic.fields.fixVersions[0].name : "";
+                module.priority = epic.fields.priority.name;
+                module.save(function (err) {
+                    epicsMap[module.key] = module.key;
+                    if (err) {
+                        callback(err);
+                    }
+                });
+            });
         }
     }).on('error', function (err) {
         callback(err);
     }).on('close', function () {
         LogProgress(count + " Epics Total");
         LogProgress(count2 + " Modules Total");
-        async.eachSeries(modulesCollection, function(module, callback) {
-            module.save(function (err) {
-                epicsMap[module.key] = module.key;
-                if(err) {
-                    callback(err);
-                }
-                else {
-                    callback();
-                }
-            })
-        },
-        function(err) {
-            LogProgress(Object.keys(epicsMap).length + " Modules Collected");
-            UpdateProgress(10, "issues");
-            callback(err);
+        async.whilst(
+            function() {
+                Module.count({}, function( err, collectionCount){
+                    return collectionCount != count2;
+                });
+            },
+            function(callback) {
+                callback();
+            },
+            function(err) {
+                LogProgress(count2 + " Modules Collected");
+                UpdateProgress(10, "issues");
+                callback(err);
         });
     });
 }
@@ -428,7 +435,6 @@ function Step6CollectStories(callback) {
     pagesMap = {};
     var count = 0;
     var count2 = 0;
-    var pagesCollection = [];
 
     stream.on('data', function (doc) {
         var story = doc.object;
@@ -437,30 +443,40 @@ function Step6CollectStories(callback) {
 
         if(epic != undefined && epicsMap[epic]) {
             count2++;
-            var page = new Page();
-            page.key = story.key;
-            page.uri = "https://jira.epam.com/jira/browse/" + story.key;
-            page.summary = story.fields.summary;
-            page.status = story.fields.status.name;
-            page.resolution = story.fields.resolution == null ? "" : story.fields.resolution.name;
-            page.reporter = story.fields.reporter.displayName;
-            page.labels = story.fields.labels;
-            if (story.fields.assignee != null)
-                page.assignee = story.fields.assignee.displayName;
-            page.storyPoints = story.fields.customfield_10004;
-            page.blockers = story.fields.customfield_20501;
-            page.progress = story.fields.customfield_20500;
-            page.epicKey = epic;
-            page.created = story.fields.created;
-            page.updated = story.fields.updated;
-            page.testingProgress = story.fields.customfield_24700;
-            page.checklistCreated = story.fields.customfield_24300 ? story.fields.customfield_24300[0].value == 'yes' : false;
-            parseHistory(story, page);
-            calcWorklogFromIssue(story, page);
-            if (story.fields.subtasks) {
-                for (var i = 0; i < story.fields.subtasks.length; i++) {
-                    var subtaskKey = story.fields.subtasks[i].key;
-                    OriginalJiraIssue.findOne({key: subtaskKey}).exec(function (err, subtask) {
+            Page.findOne({ key: story.key }, function (err, page) {
+                if (err) {
+                    callback(err);
+                }
+
+                if (!page) {
+                    page = new Page();
+                }
+                page.key = story.key;
+                page.uri = "https://jira.epam.com/jira/browse/" + story.key;
+                page.summary = story.fields.summary;
+                page.status = story.fields.status.name;
+                page.resolution = story.fields.resolution == null ? "" : story.fields.resolution.name;
+                page.reporter = story.fields.reporter.displayName;
+                page.labels = story.fields.labels;
+                if (story.fields.assignee != null)
+                    page.assignee = story.fields.assignee.displayName;
+                page.storyPoints = story.fields.customfield_10004;
+                page.blockers = story.fields.customfield_20501;
+                page.progress = story.fields.customfield_20500;
+                page.epicKey = epic;
+                page.created = story.fields.created;
+                page.updated = story.fields.updated;
+                page.testingProgress = story.fields.customfield_24700;
+                page.checklistCreated = story.fields.customfield_24300 ? story.fields.customfield_24300[0].value == 'yes' : false;
+                parseHistory(story, page);
+                calcWorklogFromIssue(story, page);
+                var index = -1;
+                async.whilst(function() {
+                    return story.fields.subtasks && story.fields.subtasks.length > 0 && ++index < story.fields.subtasks.length;
+                },
+                function(callback) {
+                    var subtaskKey = story.fields.subtasks[index].key;
+                    OriginalJiraIssue.findOne({key: subtaskKey}, function (err, subtask) {
                         if (err) {
                             callback(err);
                         }
@@ -483,32 +499,41 @@ function Step6CollectStories(callback) {
                             }
                             calcWorklogFromIssue(subtaskObj, page);
                         }
-                        page.save(function (err) {
-                            pagesMap[page.key] = page.key;
-                            if(err) {
-                                callback(err);
-                            }
-                        })
                     });
-                }
-            }
-            else {
-                page.save(function (err) {
-                    pagesMap[page.key] = page.key;
+
+                },
+                function(err) {
                     if(err) {
                         callback(err);
                     }
-                })
-            }
+                    page.save(function (err) {
+                        pagesMap[page.key] = page.key;
+                        if (err) {
+                            callback(err);
+                        }
+                    });
+                });
+            });
         }
     }).on('error', function (err) {
         callback(err);
     }).on('close', function () {
         LogProgress(count + " Stories Total");
         LogProgress(count2 + " Pages Total");
-        LogProgress(Object.keys(pagesMap).length + " Pages Collected");
-        UpdateProgress(50, "issues");
-        callback();
+        async.whilst(
+            function() {
+                Page.count({}, function( err, collectionCount){
+                    return collectionCount != count2;
+                });
+            },
+            function(callback) {
+                callback();
+            },
+            function(err) {
+                LogProgress(count2 + " Pages Collected");
+                UpdateProgress(50, "issues");
+                callback(err);
+        });
     });
 }
 
