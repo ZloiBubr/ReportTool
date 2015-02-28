@@ -228,8 +228,8 @@ function Step1CollectIssueKeys(jira, full, callback) {
                         return loopCounter;
                     },
                     function (callback) {
-                        //var queryString = full ? "project = PLEX-UXC ORDER BY key ASC" : "project = PLEX-UXC AND updated > -1d ORDER BY key ASC";
-                        var queryString = "project = PLEX-UXC and (key = 'PLEXUXC-17875' or key =  PLEXUXC-69956 or key = PLEXUXC-68142 or key = PLEXUXC-34882) ORDER BY key ASC";
+                        var queryString = full ? "project = PLEX-UXC ORDER BY key ASC" : "project = PLEX-UXC AND updated > -1d ORDER BY key ASC";
+                        //var queryString = "project = PLEX-UXC and (key = 'PLEXUXC-17875' or key =  PLEXUXC-69956 or key = PLEXUXC-68142 or key = PLEXUXC-34882 or key = PLEXUXC-17876 or key = PLEXUXC-74084 or key = PLEXUXC-17879) ORDER BY key ASC";
 
                         LogProgress("**** collecting issue keys: from " + startKey + " to " + (startKey + 1000).toString());
 
@@ -451,11 +451,12 @@ function Step6CollectStories(callback) {
                         page = new Page();
                     }
 
-                    Q().then(function(){ mapPageProperties(story, page) })
-                       .then(function () { parseHistory(story, page);})
-                       .then(function () { calcWorklogFromIssue(story, page); })
+                    mapPageProperties(story, page);
+                    parseHistory(story, page);
+                    calcWorklogFromIssue(story, page);
+
+                    Q.all( mapSubtsks(story, page, epic) )
                        //.then(function() { mapLinkedIssues(story, page); })
-                       .all( mapSubtsks(story, page) )
                        .then(function () {
                             var deferred2 = Q.defer();
                             page.save(function (err) {
@@ -465,18 +466,27 @@ function Step6CollectStories(callback) {
                                 } else {
                                     deferred2.resolve();
                                 }
-                                stream.resume();
+                                //stream.resume();
                             });
                             return deferred2.promise;
                         })
-                       .fail(function (err) { deferred1.reject(err); })
-                       .done(function(){deferred1.resolve()});
+                       .done(
+                        function (err) { // success
+                            deferred1.resolve();
+                        },
+                        function(err){ // error
+                            deferred1.reject(err);
+                        });
                 });
                 return deferred1.promise;
 
             })
-            .fail(function(err){ console.error(err); })
-            .fin(function(){ stream.resume(); });
+            .fail(function(err){
+                    console.error(err);
+                })
+            .fin(function(){ //finally run in any case
+                    stream.resume();
+                });
         }
         else {
             stream.resume();
@@ -493,7 +503,7 @@ function Step6CollectStories(callback) {
 
 // Step 6 methods
 
-function mapPageProperties(story, page){
+function mapPageProperties(story, page, epic){
     page.key = story.key;
     page.uri = "https://jira.epam.com/jira/browse/" + story.key;
     page.summary = story.fields.summary;
@@ -513,17 +523,17 @@ function mapPageProperties(story, page){
     page.checklistCreated = story.fields.customfield_24300 ? story.fields.customfield_24300[0].value == 'yes' : false;
 }
 
-function mapSubtsks(){
+function  mapSubtsks(story, page){
     if (_.isUndefined(story.fields.subtasks)) {
-        return;
+        return [];
     }
 
     var promises = [];
 
-    for (var index = -1; i < story.fields.subtasks.length; index++) {
-        var subtaskKey = story.fields.subtasks[index].key;
-        var deferred = Q.defer();
+    _.each(story.fields.subtasks, function(subtaskItem){
+        var subtaskKey = subtaskItem.key;
 
+        var deferred = Q.defer();
         OriginalJiraIssue.findOne({key: subtaskKey}, function (err, subtask) {
             if (err) {
                 deferred.reject(err);
@@ -553,7 +563,8 @@ function mapSubtsks(){
         });
 
         promises.push(deferred.promise);
-    }
+    });
+
     return promises;
 }
 
