@@ -16,6 +16,7 @@ var cache = require('node_cache');
 var sessionsupport = require('../middleware/sessionsupport');
 var helpers = require('../middleware/helpers');
 var mongoose = require('./../libs/mongoose');
+var Q = require('q');
 
 var VERSION = require('../public/jsc/versions').VERSION;
 var STATUS = require('../public/jsc/models/statusList').STATUS;
@@ -228,6 +229,7 @@ function Step1CollectIssueKeys(jira, full, callback) {
                     },
                     function (callback) {
                         var queryString = full ? "project = PLEX-UXC ORDER BY key ASC" : "project = PLEX-UXC AND updated > -1d ORDER BY key ASC";
+                        //var queryString = "project = PLEX-UXC and (key = 'PLEXUXC-17875' or key =  PLEXUXC-69956 or key = PLEXUXC-68142 or key = PLEXUXC-34882 or key = PLEXUXC-17876 or key = PLEXUXC-74084 or key = PLEXUXC-17879) ORDER BY key ASC";
 
                         LogProgress("**** collecting issue keys: from " + startKey + " to " + (startKey + 1000).toString());
 
@@ -415,82 +417,57 @@ function Step6CollectStories(callback) {
         var epic = story.fields.customfield_14500; //Epic link
         count++;
 
-        if(epic != undefined && epicsMap[epic]) {
+        if (epic != undefined && epicsMap[epic]) {
             count2++;
-            Page.findOne({ key: story.key }, function (err, page) {
-                if (err) {
-                    callback(err);
-                }
 
-                if (!page) {
-                    page = new Page();
-                }
-                page.key = story.key;
-                page.uri = "https://jira.epam.com/jira/browse/" + story.key;
-                page.summary = story.fields.summary;
-                page.status = story.fields.status.name;
-                page.resolution = story.fields.resolution == null ? "" : story.fields.resolution.name;
-                page.reporter = story.fields.reporter.displayName;
-                page.labels = story.fields.labels;
-                if (story.fields.assignee != null)
-                    page.assignee = story.fields.assignee.displayName;
-                page.storyPoints = story.fields.customfield_10004;
-                page.blockers = story.fields.customfield_20501;
-                page.progress = story.fields.customfield_20500;
-                page.epicKey = epic;
-                page.created = story.fields.created;
-                page.updated = story.fields.updated;
-                page.testingProgress = story.fields.customfield_24700;
-                page.checklistCreated = story.fields.customfield_24300 ? story.fields.customfield_24300[0].value == 'yes' : false;
-                parseHistory(story, page);
-                calcWorklogFromIssue(story, page);
-                var index = -1;
-                async.whilst(function() {
-                    return story.fields.subtasks && story.fields.subtasks.length > 0 && ++index < story.fields.subtasks.length;
-                },
-                function(callback) {
-                    var subtaskKey = story.fields.subtasks[index].key;
-                    OriginalJiraIssue.findOne({key: subtaskKey}, function (err, subtask) {
-                        if (err) {
-                            callback(err);
-                            return;
-                        }
-
-                        if (subtask) {
-                            var subtaskObj = subtask._doc.object;
-                            if (subtaskObj.fields.summary.toLowerCase().indexOf('plex-acceptance') > -1) {
-                                page.devfinish = subtaskObj.fields.customfield_24500 ? new Date(subtaskObj.fields.customfield_24500) : null;
-                                page.qafinish = subtaskObj.fields.customfield_24501 ? new Date(subtaskObj.fields.customfield_24501) : null;
-                                page.accfinish = subtaskObj.fields.customfield_24502 ? new Date(subtaskObj.fields.customfield_24502) : null;
-                                page.cusfinish = subtaskObj.fields.customfield_24503 ? new Date(subtaskObj.fields.customfield_24503) : null;
-                                page.pmhfinish = subtaskObj.fields.customfield_25900 ? new Date(subtaskObj.fields.customfield_25900) : null;
-                                page.lafinish = subtaskObj.fields.customfield_25901 ? new Date(subtaskObj.fields.customfield_25901) : null;
-                                if (subtaskObj.fields.status.name == STATUS.CLOSED.name) {
-                                    page.status = STATUS.PRODUCTION.name;
-                                }
-                                page.acceptanceStatus = subtaskObj.fields.status.name;
-                                page.acceptanceKey = subtaskObj.key;
-                                page.acceptanceAssignee = subtaskObj.fields.assignee ? subtaskObj.fields.assignee.name : "";
-                            }
-                            calcWorklogFromIssue(subtaskObj, page);
-                        }
-                        callback();
-                    });
-
-                },
-                function(err) {
-                    if(err) {
-                        callback(err);
+            Q().then(function(){
+                var deferred1 = Q.defer();
+                Page.findOne({ key: story.key }, function (err, page) {
+                    if (err) {
+                        deferred1.reject();
+                        return;
                     }
-                    page.save(function (err) {
-                        pagesMap[page.key] = page.key;
-                        if (err) {
-                            callback(err);
-                        }
-                        stream.resume();
-                    });
+
+                    if (!page) {
+                        page = new Page();
+                    }
+
+                    mapPageProperties(story, page);
+                    parseHistory(story, page);
+                    calcWorklogFromIssue(story, page);
+
+                    Q.all( mapSubtsks(story, page, epic) )
+                       //.then(function() { mapLinkedIssues(story, page); })
+                       .then(function () {
+                            var deferred2 = Q.defer();
+                            page.save(function (err) {
+                                pagesMap[page.key] = page.key;
+                                if (err) {
+                                    deferred2.reject(err);
+                                } else {
+                                    deferred2.resolve();
+                                }
+                                //stream.resume();
+                            });
+                            return deferred2.promise;
+                        })
+                       .done(
+                        function (err) { // success
+                            deferred1.resolve();
+                        },
+                        function(err){ // error
+                            deferred1.reject(err);
+                        });
                 });
-            });
+                return deferred1.promise;
+
+            })
+            .fail(function(err){
+                    console.error(err);
+                })
+            .fin(function(){ //finally run in any case
+                    stream.resume();
+                });
         }
         else {
             stream.resume();
@@ -504,6 +481,131 @@ function Step6CollectStories(callback) {
         callback();
     });
 }
+
+// Step 6 methods
+
+function mapPageProperties(story, page, epic){
+    page.key = story.key;
+    page.uri = "https://jira.epam.com/jira/browse/" + story.key;
+    page.summary = story.fields.summary;
+    page.status = story.fields.status.name;
+    page.resolution = story.fields.resolution == null ? "" : story.fields.resolution.name;
+    page.reporter = story.fields.reporter.displayName;
+    page.labels = story.fields.labels;
+    if (story.fields.assignee != null)
+        page.assignee = story.fields.assignee.displayName;
+    page.storyPoints = story.fields.customfield_10004;
+    page.blockers = story.fields.customfield_20501;
+    page.progress = story.fields.customfield_20500;
+    page.epicKey = epic;
+    page.created = story.fields.created;
+    page.updated = story.fields.updated;
+    page.testingProgress = story.fields.customfield_24700;
+    page.checklistCreated = story.fields.customfield_24300 ? story.fields.customfield_24300[0].value == 'yes' : false;
+}
+
+function parseHistory(issue, page) {
+    for (var i = 0; i < issue.changelog.total; i++) {
+        var history = issue.changelog.histories[i];
+        var author = history.author.displayName;
+        for (var y = 0; y < history.items.length; y++) {
+            var item = history.items[y];
+            ParseProgress(item, page, author, history.created);
+            ParseFinishDates(item, page, history.created);
+        }
+    }
+}
+
+function calcWorklogFromIssue(issue, page) {
+    if (issue.fields.worklog) {
+        for (var i = 0; i < issue.fields.worklog.worklogs.length; i++) {
+            var worklog = issue.fields.worklog.worklogs[i];
+            var author = worklog.author.displayName;
+            var timeSpent = worklog.timeSpentSeconds / 3600;
+
+            if (page.worklogHistory == null) {
+                page.worklogHistory = [
+                    {
+                        person: author,
+                        timeSpent: timeSpent,
+                        dateChanged: new Date(worklog.created),
+                        dateStarted: new Date(worklog.started)
+                    }
+                ];
+            }
+            else {
+                //look if already exists
+                var recordFound = false;
+                for (var o = 0; o < page.worklogHistory.length; o++) {
+                    var record = page.worklogHistory[o];
+                    if (record.person == author &&
+                        record.timeSpent == timeSpent &&
+                        record.dateChanged.getTime() == new Date(worklog.created).getTime() &&
+                        record.dateStarted.getTime() == new Date(worklog.started).getTime()) {
+                        recordFound = true;
+                        break;
+                    }
+                }
+                if (!recordFound) {
+                    page.worklogHistory.push({
+                        person: author,
+                        timeSpent: timeSpent,
+                        dateChanged: new Date(worklog.created),
+                        dateStarted: new Date(worklog.started)
+                    });
+                }
+            }
+        }
+    }
+}
+
+function mapSubtsks(story, page){
+    if (_.isUndefined(story.fields.subtasks)) {
+        return [];
+    }
+
+    var promises = [];
+
+    _.each(story.fields.subtasks, function(subtaskItem){
+        var subtaskKey = subtaskItem.key;
+
+        var deferred = Q.defer();
+        OriginalJiraIssue.findOne({key: subtaskKey}, function (err, subtask) {
+            if (err) {
+                deferred.reject(err);
+                return;
+            }
+
+            if (subtask) {
+                var subtaskObj = subtask._doc.object;
+                    if (subtaskObj.fields.summary.toLowerCase().indexOf('plex-acceptance') > -1) {
+                    page.devfinish = subtaskObj.fields.customfield_24500 ? new Date(subtaskObj.fields.customfield_24500) : null;
+                    page.qafinish = subtaskObj.fields.customfield_24501 ? new Date(subtaskObj.fields.customfield_24501) : null;
+                    page.accfinish = subtaskObj.fields.customfield_24502 ? new Date(subtaskObj.fields.customfield_24502) : null;
+                    page.cusfinish = subtaskObj.fields.customfield_24503 ? new Date(subtaskObj.fields.customfield_24503) : null;
+                    page.pmhfinish = subtaskObj.fields.customfield_25900 ? new Date(subtaskObj.fields.customfield_25900) : null;
+                    page.lafinish = subtaskObj.fields.customfield_25901 ? new Date(subtaskObj.fields.customfield_25901) : null;
+                    if (subtaskObj.fields.status.name == STATUS.CLOSED.name) {
+                        page.status = STATUS.PRODUCTION.name;
+                    }
+                    page.acceptanceStatus = subtaskObj.fields.status.name;
+                    page.acceptanceKey = subtaskObj.key;
+                    page.acceptanceAssignee = subtaskObj.fields.assignee ? subtaskObj.fields.assignee.name : "";
+                }
+                calcWorklogFromIssue(subtaskObj, page);
+            }
+
+            deferred.resolve();
+        });
+
+        promises.push(deferred.promise);
+    });
+
+    return promises;
+}
+
+// End Step 6 Methods
+
 
 function isAutomationStory(story) {
     var labels = story.fields.labels;
@@ -522,6 +624,8 @@ function isAutomationStory(story) {
             return true;
         }
     });
+
+    return promises;
 }
 
 function Step2CollectAutomationStories(jira, full, callback) {
@@ -681,8 +785,34 @@ function ProcessAcceptanceTasksFromJira(jira, acceptanceTasks, counter, callback
 
 
 function MapLinkedIssues(issue, dbPage) {
+
+    _.each(issue.fields.issuelinks, function (linkedIssueItem) {
+        var linkedIssue = linkedIssueItem.inwardIssue ? linkedIssueItem.inwardIssue : linkedIssueItem.outwardIssue;
+        if (linkedIssue.fields.issuetype.name != "Story") {
+            OriginalJiraIssue.find({key: linkedIssue.key},function (error, jiraLinkedIssue){
+//                if (error) {
+//                    LogProgress("Collect issues error happened!", error);
+//                    LogProgress("Restarting Loop for:"+linkedIssue.linkedIssueKey, error);
+//                    callback();
+//                }
+                //else if(jiraLinkedIssue != null) {
+                   // loopError = false;
+                    SaveLinkedIssue(jiraLinkedIssue, dbPage, linkedIssueItem.type.inward, callback);
+//                }
+//                else {
+//                    loopError = false;
+//                    callback();
+//                }
+            });
+        }
+
+
+    });
+
+
     if(dbPage != null) {
         _.each(issue.fields.issuelinks, function (linkedIssueItem) {
+
             var linkedIssue = linkedIssueItem.inwardIssue ? linkedIssueItem.inwardIssue : linkedIssueItem.outwardIssue;
             if (linkedIssue.fields.issuetype.name != "Story") {
                 if (_.isUndefined(linkedIssueUniqList[linkedIssue.key])) {
@@ -786,7 +916,7 @@ function SaveAcceptanceTask(jiraAcceptanceTask, mapAcceptanceTask, callback) {
 }
 
 
-function SaveLinkedIssue(linkedIssue, callback) {
+function SaveLinkedIssue(linkedIssue, dbPage, linkType, callback) {
     Issue.findOne({key: linkedIssue.key}, function (err, dbIssue) {
         if (err) {
             callback(err);
@@ -813,13 +943,17 @@ function SaveLinkedIssue(linkedIssue, callback) {
         if (linkedIssue.fields.assignee != null)
             dbIssue.assignee = linkedIssue.fields.assignee.displayName;
 
-        dbIssue.pages = [];
-        _.each(linkedIssueUniqList[linkedIssue.key].linkedPages, function (linkedPage) {
-            dbIssue.pages.push({linkType: linkedPage.linkType, page: linkedPage._id});
-        });
+
+        if(!_.isUndefined(dbIssue.pages)){
+            dbIssue.pages = [];
+        }
+       // _.each(linkedIssueUniqList[linkedIssue.key].linkedPages, function (linkedPage) {
+
+        dbIssue.pages.push({linkType: linkType, page: dbPage._id});
+       // });
 
         dbIssue.save(function (err) {
-            callback(err);
+            callback(err, dbIssue);
         });
     });
 }
@@ -880,61 +1014,6 @@ function ParseFinishDates(item, page, created) {
         }
         if (from == STATUS.TESTINGINPROGRESS.name && to == STATUS.RESOLVED.name) {
             page.qaFinished = created;
-        }
-    }
-}
-
-function parseHistory(issue, page) {
-    for (var i = 0; i < issue.changelog.total; i++) {
-        var history = issue.changelog.histories[i];
-        var author = history.author.displayName;
-        for (var y = 0; y < history.items.length; y++) {
-            var item = history.items[y];
-            ParseProgress(item, page, author, history.created);
-            ParseFinishDates(item, page, history.created);
-        }
-    }
-}
-
-function calcWorklogFromIssue(issue, page) {
-    if (issue.fields.worklog) {
-        for (var i = 0; i < issue.fields.worklog.worklogs.length; i++) {
-            var worklog = issue.fields.worklog.worklogs[i];
-            var author = worklog.author.displayName;
-            var timeSpent = worklog.timeSpentSeconds / 3600;
-
-            if (page.worklogHistory == null) {
-                page.worklogHistory = [
-                    {
-                        person: author,
-                        timeSpent: timeSpent,
-                        dateChanged: new Date(worklog.created),
-                        dateStarted: new Date(worklog.started)
-                    }
-                ];
-            }
-            else {
-                //look if already exists
-                var recordFound = false;
-                for (var o = 0; o < page.worklogHistory.length; o++) {
-                    var record = page.worklogHistory[o];
-                    if (record.person == author &&
-                        record.timeSpent == timeSpent &&
-                        record.dateChanged.getTime() == new Date(worklog.created).getTime() &&
-                        record.dateStarted.getTime() == new Date(worklog.started).getTime()) {
-                        recordFound = true;
-                        break;
-                    }
-                }
-                if (!recordFound) {
-                    page.worklogHistory.push({
-                        person: author,
-                        timeSpent: timeSpent,
-                        dateChanged: new Date(worklog.created),
-                        dateStarted: new Date(worklog.started)
-                    });
-                }
-            }
         }
     }
 }
