@@ -35,11 +35,23 @@ var Q = require('q');
 
 
             var qqqq = Q();
-            Q.all(fn1())
+            Q().all(fn1())
+                //.then(function(){
+                //return Q.all(fn1())})
+                .then(function(){
+                    var d1 = Q.defer();
+                    console.log("some func1");
+                    d1.resolve();
+                    return d1.promise;
+                })
+                //.then(function(){
+                //    return Q.all(fn1())
+                //})
+             .all(fn1())
             .then(function(){
                 var d1 = Q.defer();
-                console.log("some func1");
-                d1.reject();
+                console.log("some func2");
+                d1.resolve();
                 return d1.promise;
             })
 //            .fail(function(err){

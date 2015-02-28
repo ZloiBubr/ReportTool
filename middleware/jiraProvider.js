@@ -436,8 +436,8 @@ function Step6CollectStories(callback) {
                     parseHistory(story, page);
                     calcWorklogFromIssue(story, page);
 
-                    Q.all( mapSubtsks(story, page, epic) )
-                       //.then(function() { mapLinkedIssues(story, page); })
+                    Q().then(function(){return Q.all( mapSubtsks(story, page, epic)) })
+                       .then(function() {return Q.all(mapLinkedIssues(story, page)) })
                        .then(function () {
                             var deferred2 = Q.defer();
                             page.save(function (err) {
@@ -600,6 +600,99 @@ function mapSubtsks(story, page){
 
         promises.push(deferred.promise);
     });
+
+    return promises;
+}
+
+function mapLinkedIssues(jiraPage, dbPage) {
+
+    var promises = [];
+    _.each(jiraPage.fields.issuelinks, function (linkedIssueItem) {
+        var linkedIssue = linkedIssueItem.inwardIssue ? linkedIssueItem.inwardIssue : linkedIssueItem.outwardIssue;
+        if (linkedIssue.fields.issuetype.name != "Story") {
+            OriginalJiraIssue.findOne({key: linkedIssue.key},function (error, jiraLinkedIssue){
+                var jiraIssueItem = jiraLinkedIssue.object;
+                var deffered = Q.defer();
+                Issue.findOne({key: linkedIssue.key}, function (err, dbIssue) {
+                    if (err) {
+                        deffered.reject(err);
+                    }
+
+                    if (!dbIssue) {
+                        dbIssue = new Issue();
+                    }
+
+                    dbIssue.key = jiraIssueItem.key;
+                    dbIssue.uri = "https://jira.epam.com/jira/browse/" + jiraIssueItem.key;
+                    dbIssue.type = jiraIssueItem.fields.issuetype.name;
+                    dbIssue.summary = jiraIssueItem.fields.summary;
+                    dbIssue.status = jiraIssueItem.fields.status.name;
+                    dbIssue.resolution = jiraIssueItem.fields.resolution == null ? "" : jiraIssueItem.fields.resolution.name;
+                    dbIssue.reporter = jiraIssueItem.fields.reporter.displayName;
+                    //dbIssue.originalEstimate = jiraIssueItem.fields.timetracking.originalEstimate;
+                    //dbIssue.timeSpent = jiraIssueItem.fields.timetracking.timeSpent;
+
+                    dbIssue.created = jiraIssueItem.fields.created;
+                    dbIssue.updated = jiraIssueItem.fields.updated;
+
+                    dbIssue.labels = jiraIssueItem.fields.labels;
+                    if (jiraIssueItem.fields.assignee != null)
+                        dbIssue.assignee = jiraIssueItem.fields.assignee.displayName;
+
+                    if(_.isUndefined(dbIssue.pages)){
+                        dbIssue.pages = [];
+                    }
+                    dbIssue.pages.push({linkType: linkedIssueItem.type.inward, page: dbPage._id});
+
+
+                    dbIssue.save(function (err) {
+                        if(err){
+                            deffered.reject(err);
+                        }
+                        else{
+
+                            if(_.isUndefined(dbPage.issues)){
+                                dbPage.issues = [];
+                            }
+                            dbPage.issues.push({inward: linkedIssueItem.type.outward, issue: dbIssue._id});
+
+                            deffered.resolve(dbIssue);
+                        }
+                    });
+                });
+
+                promises.push(deffered.promise);
+            });
+        }
+    });
+
+
+//    if(dbPage != null) {
+//        _.each(issue.fields.issuelinks, function (linkedIssueItem) {
+//
+//            var linkedIssue = linkedIssueItem.inwardIssue ? linkedIssueItem.inwardIssue : linkedIssueItem.outwardIssue;
+//            if (linkedIssue.fields.issuetype.name != "Story") {
+//                if (_.isUndefined(linkedIssueUniqList[linkedIssue.key])) {
+//                    linkedIssueUniqList[linkedIssue.key] = {
+//                        linkedIssueKey: linkedIssue.key,
+//                        linkedPages: [
+//                            {
+//                                key: issue.key,
+//                                _id: dbPage._id,
+//                                linkType: linkedIssueItem.type.inward
+//                            }
+//                        ]
+//                    };
+//                } else {
+//                    linkedIssueUniqList[linkedIssue.key].linkedPages.push({
+//                        key: issue.key,
+//                        _id: dbPage._id,
+//                        linkType: linkedIssueItem.type.inward});
+//                }
+//            }
+//        });
+//    }
+
 
     return promises;
 }
@@ -784,58 +877,7 @@ function ProcessAcceptanceTasksFromJira(jira, acceptanceTasks, counter, callback
 
 
 
-function MapLinkedIssues(issue, dbPage) {
 
-    _.each(issue.fields.issuelinks, function (linkedIssueItem) {
-        var linkedIssue = linkedIssueItem.inwardIssue ? linkedIssueItem.inwardIssue : linkedIssueItem.outwardIssue;
-        if (linkedIssue.fields.issuetype.name != "Story") {
-            OriginalJiraIssue.find({key: linkedIssue.key},function (error, jiraLinkedIssue){
-//                if (error) {
-//                    LogProgress("Collect issues error happened!", error);
-//                    LogProgress("Restarting Loop for:"+linkedIssue.linkedIssueKey, error);
-//                    callback();
-//                }
-                //else if(jiraLinkedIssue != null) {
-                   // loopError = false;
-                    SaveLinkedIssue(jiraLinkedIssue, dbPage, linkedIssueItem.type.inward, callback);
-//                }
-//                else {
-//                    loopError = false;
-//                    callback();
-//                }
-            });
-        }
-
-
-    });
-
-
-    if(dbPage != null) {
-        _.each(issue.fields.issuelinks, function (linkedIssueItem) {
-
-            var linkedIssue = linkedIssueItem.inwardIssue ? linkedIssueItem.inwardIssue : linkedIssueItem.outwardIssue;
-            if (linkedIssue.fields.issuetype.name != "Story") {
-                if (_.isUndefined(linkedIssueUniqList[linkedIssue.key])) {
-                    linkedIssueUniqList[linkedIssue.key] = {
-                        linkedIssueKey: linkedIssue.key,
-                        linkedPages: [
-                            {
-                                key: issue.key,
-                                _id: dbPage._id,
-                                linkType: linkedIssueItem.type.inward
-                            }
-                        ]
-                    };
-                } else {
-                    linkedIssueUniqList[linkedIssue.key].linkedPages.push({
-                        key: issue.key,
-                        _id: dbPage._id,
-                        linkType: linkedIssueItem.type.inward});
-                }
-            }
-        });
-    }
-}
 
 function MapAcceptanceTasks(issue, dbPage) {
     var acceptanceTask = acceptanceTasks[issue.key];
@@ -911,49 +953,6 @@ function SaveAcceptanceTask(jiraAcceptanceTask, mapAcceptanceTask, callback) {
 
             dbIssue.save(function (err) {
             callback(err);
-        });
-    });
-}
-
-
-function SaveLinkedIssue(linkedIssue, dbPage, linkType, callback) {
-    Issue.findOne({key: linkedIssue.key}, function (err, dbIssue) {
-        if (err) {
-            callback(err);
-        }
-
-        if (!dbIssue) {
-            dbIssue = new Issue();
-        }
-
-        dbIssue.key = linkedIssue.key;
-        dbIssue.uri = "https://jira.epam.com/jira/browse/" + linkedIssue.key;
-        dbIssue.type = linkedIssue.fields.issuetype.name;
-        dbIssue.summary = linkedIssue.fields.summary;
-        dbIssue.status = linkedIssue.fields.status.name;
-        dbIssue.resolution = linkedIssue.fields.resolution == null ? "" : linkedIssue.fields.resolution.name;
-        dbIssue.reporter = linkedIssue.fields.reporter.displayName;
-        dbIssue.originalEstimate = linkedIssue.fields.timetracking.originalEstimate;
-        dbIssue.timeSpent = linkedIssue.fields.timetracking.timeSpent;
-
-        dbIssue.created = linkedIssue.fields.created;
-        dbIssue.updated = linkedIssue.fields.updated;
-
-        dbIssue.labels = linkedIssue.fields.labels;
-        if (linkedIssue.fields.assignee != null)
-            dbIssue.assignee = linkedIssue.fields.assignee.displayName;
-
-
-        if(!_.isUndefined(dbIssue.pages)){
-            dbIssue.pages = [];
-        }
-       // _.each(linkedIssueUniqList[linkedIssue.key].linkedPages, function (linkedPage) {
-
-        dbIssue.pages.push({linkType: linkType, page: dbPage._id});
-       // });
-
-        dbIssue.save(function (err) {
-            callback(err, dbIssue);
         });
     });
 }
