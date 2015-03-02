@@ -228,7 +228,7 @@ function Step1CollectIssueKeys(jira, full, callback) {
                         return loopCounter;
                     },
                     function (callback) {
-                        var queryString = full ? "project = PLEX-UXC ORDER BY key ASC" : "project = PLEX-UXC AND updated > -1d ORDER BY key ASC";
+                        var queryString = full ? "project = PLEX-UXC ORDER BY key ASC" : "project = PLEX-UXC AND updated > -3d ORDER BY key ASC";
                         //var queryString = "project = PLEX-UXC and (key = 'PLEXUXC-17875' or key =  PLEXUXC-69956 or key = PLEXUXC-68142 or key = PLEXUXC-34882 or key = PLEXUXC-17876 or key = PLEXUXC-74084 or key = PLEXUXC-17879) ORDER BY key ASC";
 
                         LogProgress("**** collecting issue keys: from " + startKey + " to " + (startKey + 1000).toString());
@@ -436,7 +436,7 @@ function Step6CollectStories(callback) {
                     parseHistory(story, page);
                     calcWorklogFromIssue(story, page);
 
-                    Q().then(function(){return Q.all( mapSubtsks(story, page, epic)) })
+                    Q().then(function(){return Q.all( mapSubtsks(story, page)) })
                        .then(function() {return Q.all(mapLinkedIssues(story, page)) })
                        .then(function () {
                             var deferred2 = Q.defer();
@@ -484,7 +484,7 @@ function Step6CollectStories(callback) {
 
 // Step 6 methods
 
-function mapPageProperties(story, page, epic){
+function mapPageProperties(story, page){
     page.key = story.key;
     page.uri = "https://jira.epam.com/jira/browse/" + story.key;
     page.summary = story.fields.summary;
@@ -497,7 +497,7 @@ function mapPageProperties(story, page, epic){
     page.storyPoints = story.fields.customfield_10004;
     page.blockers = story.fields.customfield_20501;
     page.progress = story.fields.customfield_20500;
-    page.epicKey = epic;
+    page.epicKey = story.fields.customfield_14500;
     page.created = story.fields.created;
     page.updated = story.fields.updated;
     page.testingProgress = story.fields.customfield_24700;
