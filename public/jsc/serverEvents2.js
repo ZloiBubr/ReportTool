@@ -2,7 +2,9 @@ if (!!window.EventSource) {
     var source = new EventSource('/update_labels');
     source.addEventListener('logmessage', function(e) {
         var text = e.data;
-        if(text == "**** Update Finished ****") {
+        if(text == "---- Update Finished ----" ||
+            text == "**** Update Failed ****" ||
+            text == "**** Update Succeed ****") {
             $("#updatebtn").button("reset");
         }
         else {

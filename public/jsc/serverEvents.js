@@ -12,7 +12,9 @@ if (!!window.EventSource) {
     }, false);
     source.addEventListener('logmessage', function(e) {
         var text = e.data;
-        if(text == "**** Update Finished ****") {
+        if(text == "---- Update Finished ----" ||
+           text == "**** Update Failed ****" ||
+           text == "**** Update Succeed ****") {
             $("#updatebtn").button("reset");
             $("#cleanbtn").button("reset");
         }

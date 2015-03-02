@@ -78,6 +78,14 @@ exports.updateJiraInfo = function (debug, full, remove, jiraUser, jiraPassword, 
     async.series([
         function (callback) {
             if(!debug) {
+                WriteVersion(true, callback);
+            }
+            else {
+                callback();
+            }
+        },
+        function (callback) {
+            if(!debug) {
                 LogProgress("**** Step 1: collect issue keys from JIRA");
                 Step1CollectIssueKeys(jira, full, callback);
             }
@@ -174,10 +182,15 @@ exports.updateJiraInfo = function (debug, full, remove, jiraUser, jiraPassword, 
         },
              */
         function (callback) {
-            WriteVersion(callback);
+            if(!debug) {
+                WriteVersion(false, callback);
+            }
+            else {
+                callback();
+            }
         },
         function (callback) {
-            LogProgress("**** Update Finished ****");
+            LogProgress("---- Update Finished ----");
             cache.clearAllData();
             callback();
         }
@@ -195,7 +208,7 @@ exports.updateJiraInfo = function (debug, full, remove, jiraUser, jiraPassword, 
     callback();
 };
 
-function WriteVersion(callback) {
+function WriteVersion(started, callback) {
     Version.findOne({ numerical: VERSION.NUMBER }, function (err, version) {
         if (err) {
             callback(err);
@@ -206,7 +219,12 @@ function WriteVersion(callback) {
             version.numerical = VERSION.NUMBER;
             version.name = VERSION.NAME;
         }
-        version.updated = new Date(Date.now());
+        if(started) {
+            version.started = new Date(Date.now());
+        }
+        else {
+            version.updated = new Date(Date.now());
+        }
         version.save(function (err, page) {
             callback(err, page);
         });
@@ -442,6 +460,7 @@ function Step6CollectStories(callback) {
                             var deferred2 = Q.defer();
                             page.save(function (err) {
                                 pagesMap[page.key] = page.key;
+                                LogProgress(page.key + " stored to database");
                                 if (err) {
                                     deferred2.reject(err);
                                 } else {
@@ -477,7 +496,7 @@ function Step6CollectStories(callback) {
     }).on('close', function () {
         LogProgress(count + " Stories Total");
         LogProgress(count2 + " Pages Total");
-        UpdateProgress(50, "issues");
+        UpdateProgress(80, "issues");
         callback();
     });
 }
@@ -610,56 +629,61 @@ function mapLinkedIssues(jiraPage, dbPage) {
     _.each(jiraPage.fields.issuelinks, function (linkedIssueItem) {
         var linkedIssue = linkedIssueItem.inwardIssue ? linkedIssueItem.inwardIssue : linkedIssueItem.outwardIssue;
         if (linkedIssue.fields.issuetype.name != "Story") {
-            OriginalJiraIssue.findOne({key: linkedIssue.key},function (error, jiraLinkedIssue){
-                var jiraIssueItem = jiraLinkedIssue.object;
-                var deffered = Q.defer();
-                Issue.findOne({key: linkedIssue.key}, function (err, dbIssue) {
-                    if (err) {
-                        deffered.reject(err);
-                    }
-
-                    if (!dbIssue) {
-                        dbIssue = new Issue();
-                    }
-
-                    dbIssue.key = jiraIssueItem.key;
-                    dbIssue.uri = "https://jira.epam.com/jira/browse/" + jiraIssueItem.key;
-                    dbIssue.type = jiraIssueItem.fields.issuetype.name;
-                    dbIssue.summary = jiraIssueItem.fields.summary;
-                    dbIssue.status = jiraIssueItem.fields.status.name;
-                    dbIssue.resolution = jiraIssueItem.fields.resolution == null ? "" : jiraIssueItem.fields.resolution.name;
-                    dbIssue.reporter = jiraIssueItem.fields.reporter.displayName;
-                    //dbIssue.originalEstimate = jiraIssueItem.fields.timetracking.originalEstimate;
-                    //dbIssue.timeSpent = jiraIssueItem.fields.timetracking.timeSpent;
-
-                    dbIssue.created = jiraIssueItem.fields.created;
-                    dbIssue.updated = jiraIssueItem.fields.updated;
-
-                    dbIssue.labels = jiraIssueItem.fields.labels;
-                    if (jiraIssueItem.fields.assignee != null)
-                        dbIssue.assignee = jiraIssueItem.fields.assignee.displayName;
-
-                    if(_.isUndefined(dbIssue.pages)){
-                        dbIssue.pages = [];
-                    }
-                    dbIssue.pages.push({linkType: linkedIssueItem.type.inward, page: dbPage._id});
-
-
-                    dbIssue.save(function (err) {
-                        if(err){
+            var deffered = Q.defer();
+            OriginalJiraIssue.findOne({key: linkedIssue.key},function (err, jiraLinkedIssue){
+                if(err || !jiraLinkedIssue) {
+                    deffered.reject(err);
+                }
+                if(jiraLinkedIssue) {
+                    var jiraIssueItem = jiraLinkedIssue.object;
+                    Issue.findOne({key: linkedIssue.key}, function (err, dbIssue) {
+                        if (err) {
                             deffered.reject(err);
                         }
-                        else{
 
-                            if(_.isUndefined(dbPage.issues)){
-                                dbPage.issues = [];
-                            }
-                            dbPage.issues.push({inward: linkedIssueItem.type.outward, issue: dbIssue._id});
-
-                            deffered.resolve(dbIssue);
+                        if (!dbIssue) {
+                            dbIssue = new Issue();
                         }
+
+                        dbIssue.key = jiraIssueItem.key;
+                        dbIssue.uri = "https://jira.epam.com/jira/browse/" + jiraIssueItem.key;
+                        dbIssue.type = jiraIssueItem.fields.issuetype.name;
+                        dbIssue.summary = jiraIssueItem.fields.summary;
+                        dbIssue.status = jiraIssueItem.fields.status.name;
+                        dbIssue.resolution = jiraIssueItem.fields.resolution == null ? "" : jiraIssueItem.fields.resolution.name;
+                        dbIssue.reporter = jiraIssueItem.fields.reporter.displayName;
+                        //dbIssue.originalEstimate = jiraIssueItem.fields.timetracking.originalEstimate;
+                        //dbIssue.timeSpent = jiraIssueItem.fields.timetracking.timeSpent;
+
+                        dbIssue.created = jiraIssueItem.fields.created;
+                        dbIssue.updated = jiraIssueItem.fields.updated;
+
+                        dbIssue.labels = jiraIssueItem.fields.labels;
+                        if (jiraIssueItem.fields.assignee != null)
+                            dbIssue.assignee = jiraIssueItem.fields.assignee.displayName;
+
+                        if (_.isUndefined(dbIssue.pages)) {
+                            dbIssue.pages = [];
+                        }
+                        dbIssue.pages.push({linkType: linkedIssueItem.type.inward, page: dbPage._id});
+
+
+                        dbIssue.save(function (err) {
+                            if (err) {
+                                deffered.reject(err);
+                            }
+                            else {
+
+                                if (_.isUndefined(dbPage.issues)) {
+                                    dbPage.issues = [];
+                                }
+                                dbPage.issues.push({inward: linkedIssueItem.type.outward, issue: dbIssue._id});
+
+                                deffered.resolve(dbIssue);
+                            }
+                        });
                     });
-                });
+                }
 
                 promises.push(deffered.promise);
             });
