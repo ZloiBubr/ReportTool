@@ -11,7 +11,7 @@ function velocityChartController($scope, $resource, $modal, $timeout, $window) {
     /* ------------------------------------------------------ Init/Reinit -------------------------------*/
     $scope.init = function () {
         $scope.common = {};
-        $scope.isExtendView = false;
+        $scope.isExtendView = true;
         $scope.extendModel = { data:[] };
         $scope.currentDate = new Date();
 
@@ -209,8 +209,11 @@ function velocityChartController($scope, $resource, $modal, $timeout, $window) {
 
         for(var i=0; i<$scope.distributionoData.data.length; i++)
         {
-            if($scope.distributionoData.data[i].name == $scope.STATUS.CLOSED.name ||
-                $scope.distributionoData.data[i].name == $scope.STATUS.PRODUCTION.name){
+            if($scope.distributionoData.data[i].name == $scope.STATUS.ACCEPTED.name ||
+                $scope.distributionoData.data[i].name == $scope.STATUS.PRODUCTION.name ||
+                $scope.distributionoData.data[i].name == $scope.STATUS.PMREVIEW.name ||
+                $scope.distributionoData.data[i].name == $scope.STATUS.LAREADY.name
+            ){
                 result.pages.closed += $scope.distributionoData.data[i].data[0];
                 result.sp.closed += $scope.distributionoData.data[i].data[1];
             }
