@@ -36,6 +36,8 @@ var updateInProgress = false;
 var progressCounter = 0;
 var lastProgress = 0;
 
+var updateSpan = 0;
+
 exports.rememberResponse = function (req, res) {
     sessionsupport.setResponseObj('updateDb', req, res);
     UpdateProgress(0, "page");
@@ -76,6 +78,14 @@ exports.updateJiraInfo = function (debug, full, remove, jiraUser, jiraPassword, 
     var jira = debug ? null : new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), jiraUser, jiraPassword, '2');
 
     async.series([
+            function (callback) {
+                if(!debug) {
+                    calcUpdateInterval(callback);
+                }
+                else {
+                    callback();
+                }
+            },
         function (callback) {
             if(!debug) {
                 WriteVersion(true, callback);
@@ -231,9 +241,31 @@ function WriteVersion(started, callback) {
     });
 }
 
+function calcUpdateInterval(callback) {
+    Version.findOne({ numerical: VERSION.NUMBER }, function (err, version) {
+        if (err) {
+            callback(err);
+        }
+
+        if (!version) {
+            updateSpan = 0;
+        }
+        else {
+            updateSpan = new Date(Date.now()) - version.started;
+        }
+        callback();
+    });
+}
+
 function Step1CollectIssueKeys(jira, full, callback) {
     var startKey = 0;
     var loopCounter = true;
+
+    var span = updateSpan > 0 ? parseInt(updateSpan / 1000 / 3600) : 24 * 3; // 3 days by default
+    span = span > 0 ? span+1 : 2;
+    var queryString = full ? "project = PLEX-UXC ORDER BY key ASC" : util.format("project = PLEX-UXC AND updated > -%sh ORDER BY key ASC", span);
+    //var queryString = "project = PLEX-UXC and (key = 'PLEXUXC-17875' or key =  PLEXUXC-69956 or key = PLEXUXC-68142 or key = PLEXUXC-34882 or key = PLEXUXC-17876 or key = PLEXUXC-74084 or key = PLEXUXC-17879) ORDER BY key ASC";
+
 
     UpdateProgress(0, "page");
     UpdateProgress(0, "issues");
@@ -246,8 +278,6 @@ function Step1CollectIssueKeys(jira, full, callback) {
                         return loopCounter;
                     },
                     function (callback) {
-                        var queryString = full ? "project = PLEX-UXC ORDER BY key ASC" : "project = PLEX-UXC AND updated > -3d ORDER BY key ASC";
-                        //var queryString = "project = PLEX-UXC and (key = 'PLEXUXC-17875' or key =  PLEXUXC-69956 or key = PLEXUXC-68142 or key = PLEXUXC-34882 or key = PLEXUXC-17876 or key = PLEXUXC-74084 or key = PLEXUXC-17879) ORDER BY key ASC";
 
                         LogProgress("**** collecting issue keys: from " + startKey + " to " + (startKey + 1000).toString());
 
