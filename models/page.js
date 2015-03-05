@@ -3,7 +3,6 @@ var Schema = mongoose.Schema;
 
 var schema = new Schema({
     key:                    { type: String, unique: true, index: true },
-    epicKey:                { type: String, index: true },
     uri:                    { type: String },
     summary:                { type: String },
     status:                 { type: String },
@@ -25,6 +24,7 @@ var schema = new Schema({
             progressTo:     { type: String },
             dateChanged:    { type: Date }
         }],
+    epicKey:                { type: String },
     worklogHistory: [{
             person:         { type: String },
             timeSpent:      { type: String },
