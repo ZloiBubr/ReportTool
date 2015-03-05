@@ -24,13 +24,10 @@ var STATUS = require('../public/jsc/models/statusList').STATUS;
 var JiraApi = require('jira').JiraApi;
 
 var issueObjects = [];
+var acceptanceObjectsMap = {};
 var epicsMap = {};
 var pagesMap = {};
 
-var issuesList = [];
-var acceptanceTasks = {};
-var linkedIssueUniqList = [];
-var pagesProgressCount = 0;
 var updateInProgress = false;
 
 var progressCounter = 0;
@@ -41,7 +38,6 @@ var updateSpan = 0;
 exports.rememberResponse = function (req, res) {
     sessionsupport.setResponseObj('updateDb', req, res);
     UpdateProgress(0, "page");
-    UpdateProgress(0, "issues");
 };
 
 var UpdateProgress = function (progress, type) {
@@ -78,14 +74,14 @@ exports.updateJiraInfo = function (debug, full, remove, jiraUser, jiraPassword, 
     var jira = debug ? null : new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), jiraUser, jiraPassword, '2');
 
     async.series([
-            function (callback) {
-                if(!debug) {
-                    calcUpdateInterval(callback);
-                }
-                else {
-                    callback();
-                }
-            },
+        function (callback) {
+            if(!debug) {
+                calcUpdateInterval(callback);
+            }
+            else {
+                callback();
+            }
+        },
         function (callback) {
             if(!debug) {
                 WriteVersion(true, callback);
@@ -157,40 +153,10 @@ exports.updateJiraInfo = function (debug, full, remove, jiraUser, jiraPassword, 
             LogProgress("**** Step 6: collect pages");
             Step6CollectStories(callback);
         },
-            /*
-        //step 2-2
         function (callback) {
-            LogProgress("**** Step 2-2: collect automation stories");
-            //grab automation pages list
-            Step2CollectAutomationStories(jira, full, callback);
+            LogProgress("**** Step 7: collect acceptance tasks");
+            Step7CollectAcceptanceTasks(callback);
         },
-        //step 3
-        function (callback) {
-            //process pages
-            LogProgress("**** Step 3: process " + issuesList.length + " pages");
-            Step3ProcessPages(jira, callback);
-        },
-        //step 5
-        function (callback) {
-            // process linked issues pages
-            LogProgress("**** Step 4: process acceptance tasks");
-            Step4ProcessCloudApps(jira, callback);
-        },
-        //step 5
-        function (callback) {
-            // process linked issues pages
-            LogProgress("**** Step 5: process blockers");
-            Step5ProcessBlockers(jira, callback);
-        },
-
-        //step 6
-        function (callback) {
-//            LogProgress("**** Step 5: Update End");
-//            response.end();
-            updateInProgress = false;
-            callback();
-        },
-             */
         function (callback) {
             if(!debug) {
                 WriteVersion(false, callback);
@@ -205,7 +171,6 @@ exports.updateJiraInfo = function (debug, full, remove, jiraUser, jiraPassword, 
             callback();
         }
     ],
-    //optional callback
     function(err) {
         if(err) {
             LogProgress("**** Update Failed ****", err);
@@ -264,11 +229,9 @@ function Step1CollectIssueKeys(jira, full, callback) {
     var span = updateSpan > 0 ? parseInt(updateSpan / 1000 / 3600) : 24 * 3; // 3 days by default
     span = span > 0 ? span+1 : 2;
     var queryString = full ? "project = PLEX-UXC ORDER BY key ASC" : util.format("project = PLEX-UXC AND updated > -%sh ORDER BY key ASC", span);
-    //var queryString = "project = PLEX-UXC and (key = 'PLEXUXC-17875' or key =  PLEXUXC-69956 or key = PLEXUXC-68142 or key = PLEXUXC-34882 or key = PLEXUXC-17876 or key = PLEXUXC-74084 or key = PLEXUXC-17879) ORDER BY key ASC";
 
 
     UpdateProgress(0, "page");
-    UpdateProgress(0, "issues");
 
     issueObjects = [];
 
@@ -296,7 +259,7 @@ function Step1CollectIssueKeys(jira, full, callback) {
                                 _.each(stories.issues, function (story) {
                                     issueObjects.push({key: story.key, issuetype: story.fields.issuetype.name});
                                 });
-                                if(stories.issues.length == 0) {
+                                if(stories.issues.length == 0 || stories.issues.length < 1000) {
                                     loopCounter = false;
                                 }
                                 callback();
@@ -430,8 +393,8 @@ function Step5CollectModules(callback) {
                 module.labels = epic.fields.labels;
                 module.fixVersions = epic.fields.fixVersions && epic.fields.fixVersions.length > 0 ? epic.fields.fixVersions[0].name : "";
                 module.priority = epic.fields.priority.name;
-                module.save(function (err) {
-                    epicsMap[module.key] = module.key;
+                module.save(function (err, dbModule) {
+                    epicsMap[module.key] = {key: module.key, dbid: dbModule._id};
                     if (err) {
                         callback(err);
                     }
@@ -447,7 +410,6 @@ function Step5CollectModules(callback) {
     }).on('close', function () {
         LogProgress(count + " Epics Total");
         LogProgress(count2 + " Modules Total");
-        UpdateProgress(10, "issues");
         callback();
     });
 }
@@ -458,6 +420,7 @@ function Step6CollectStories(callback) {
     pagesMap = {};
     var count = 0;
     var count2 = 0;
+    acceptanceObjectsMap = {};
 
     stream.on('data', function (doc) {
         stream.pause();
@@ -488,9 +451,9 @@ function Step6CollectStories(callback) {
                        .then(function() {return Q.all(mapLinkedIssues(story, page)) })
                        .then(function () {
                             var deferred2 = Q.defer();
-                            page.save(function (err) {
-                                pagesMap[page.key] = page.key;
-                                LogProgress(page.key + " stored to database");
+                            page.save(function (err, dbPage) {
+                                pagesMap[page.key] = {key: page.key, dbid: dbPage._id};
+                                LogProgress(page.key + " Page stored to database");
                                 if (err) {
                                     deferred2.reject(err);
                                 } else {
@@ -526,7 +489,6 @@ function Step6CollectStories(callback) {
     }).on('close', function () {
         LogProgress(count + " Stories Total");
         LogProgress(count2 + " Pages Total");
-        UpdateProgress(80, "issues");
         callback();
     });
 }
@@ -608,6 +570,21 @@ function calcWorklogFromIssue(issue, page) {
     }
 }
 
+function mapDates(page, subtaskObj) {
+    page.devfinish = subtaskObj.fields.customfield_24500 ? new Date(subtaskObj.fields.customfield_24500) : null;
+    page.qafinish = subtaskObj.fields.customfield_24501 ? new Date(subtaskObj.fields.customfield_24501) : null;
+    page.accfinish = subtaskObj.fields.customfield_24502 ? new Date(subtaskObj.fields.customfield_24502) : null;
+    page.cusfinish = subtaskObj.fields.customfield_24503 ? new Date(subtaskObj.fields.customfield_24503) : null;
+    page.pmhfinish = subtaskObj.fields.customfield_25900 ? new Date(subtaskObj.fields.customfield_25900) : null;
+    page.lafinish = subtaskObj.fields.customfield_25901 ? new Date(subtaskObj.fields.customfield_25901) : null;
+    if (subtaskObj.fields.status.name == STATUS.CLOSED.name) {
+        page.status = STATUS.PRODUCTION.name;
+    }
+    page.acceptanceStatus = subtaskObj.fields.status.name;
+    page.acceptanceKey = subtaskObj.key;
+    page.acceptanceAssignee = subtaskObj.fields.assignee ? subtaskObj.fields.assignee.name : "";
+}
+
 function mapSubtsks(story, page){
     if (_.isUndefined(story.fields.subtasks)) {
         return [];
@@ -627,19 +604,9 @@ function mapSubtsks(story, page){
 
             if (subtask) {
                 var subtaskObj = subtask._doc.object;
-                    if (subtaskObj.fields.summary.toLowerCase().indexOf('plex-acceptance') > -1) {
-                    page.devfinish = subtaskObj.fields.customfield_24500 ? new Date(subtaskObj.fields.customfield_24500) : null;
-                    page.qafinish = subtaskObj.fields.customfield_24501 ? new Date(subtaskObj.fields.customfield_24501) : null;
-                    page.accfinish = subtaskObj.fields.customfield_24502 ? new Date(subtaskObj.fields.customfield_24502) : null;
-                    page.cusfinish = subtaskObj.fields.customfield_24503 ? new Date(subtaskObj.fields.customfield_24503) : null;
-                    page.pmhfinish = subtaskObj.fields.customfield_25900 ? new Date(subtaskObj.fields.customfield_25900) : null;
-                    page.lafinish = subtaskObj.fields.customfield_25901 ? new Date(subtaskObj.fields.customfield_25901) : null;
-                    if (subtaskObj.fields.status.name == STATUS.CLOSED.name) {
-                        page.status = STATUS.PRODUCTION.name;
-                    }
-                    page.acceptanceStatus = subtaskObj.fields.status.name;
-                    page.acceptanceKey = subtaskObj.key;
-                    page.acceptanceAssignee = subtaskObj.fields.assignee ? subtaskObj.fields.assignee.name : "";
+                if (subtaskObj.fields.summary.toLowerCase().indexOf('plex-acceptance') > -1) {
+                    mapDates(page, subtaskObj);
+                    acceptanceObjectsMap[subtaskObj.key] = {key: subtaskObj.key, parentPage: page.key, epicKey: page.epicKey};
                 }
                 calcWorklogFromIssue(subtaskObj, page);
             }
@@ -765,244 +732,124 @@ function isAutomationStory(story) {
 }
 
 // End Step 6 Methods
+function Step7CollectAcceptanceTasks(callback) {
+    var stream = OriginalJiraIssue.find({issuetype: 'Sub-task'}).stream();
 
+    var count = 0;
+    var count2 = 0;
 
-function Step2CollectAutomationStories(jira, full, callback) {
-    var queryString = "project = PLEXUXC AND issuetype = Story AND ((labels in (Automation) AND status not in (Open)) OR ('Epic Link' = 'Automation test data fixing'))";
+    stream.on('data', function (doc) {
+        stream.pause();
+        var subTask = doc.object;
+        count++;
 
-    if(!full) {
-        queryString += " AND updated > -3d";
-    }
+        if (acceptanceObjectsMap[subTask.key]) {
+            count2++;
 
-    var loopError = true;
-    async.whilst(function() {
-            return loopError;
-        },
-        function(callback) {
-            LogProgress("**** collect automation stories");
-            jira.searchJira(queryString, { fields: ["summary"] }, function (error, stories) {
-                if (error) {
-                    LogProgress("Collect automation stories error happened!", error);
-                    LogProgress("Restarting Loop", error);
-                    callback();
-                }
-                if (stories != null) {
-                    async.eachSeries(stories.issues, function (story, callback) {
-                            pagesProgressCount++;
-                            issuesList.push(story.key);
-                            //epicIssueMap[story.key] = moduleKey;
-                            callback();
-                        },
-                        function (err) {
+            Q().then(function(){
+                var deferred1 = Q.defer();
+                CloudApp.findOne({ key: subTask.key }, function (err, cloudApp) {
+                    if (err) {
+                        deferred1.reject();
+                        return;
+                    }
+
+                    if (!cloudApp) {
+                        cloudApp = new CloudApp();
+                    }
+
+                    mapAcceptanceTask(cloudApp, subTask);
+                    cloudApp.epicKey = acceptanceObjectsMap[subTask.key].epicKey;
+
+                    Q().then(function(){
+                        var deferred3 = Q.defer();
+                        Page.findOne({key: acceptanceObjectsMap[subTask.key].parentPage}, function (err, page) {
                             if (err) {
-                                LogProgress("Restarting Loop for: "+story.key, err);
+                                deferred3.reject(err);
+                            } else {
+                                cloudApp._parentPage = page._id;
+                                deferred3.resolve();
+                            }
+                        });
+                        return deferred3.promise;
+                    }).then(function() {
+                        var deferred4 = Q.defer();
+                        Module.findOne({key: acceptanceObjectsMap[subTask.key].epicKey}, function (err, epic) {
+                            if (err) {
+                                deferred4.reject(err);
+                            } else if(epic) {
+                                cloudApp._epic = epic._id;
+                                deferred4.resolve();
                             }
                             else {
-                                loopError = false;
+                                deferred4.resolve();
                             }
-                            callback();
-                        }
-                    );
-                }
-                else {
-                    loopError = false;
-                    callback();
-                }
-            });
-        },
-        function(err) {
-            LogProgress("Automation Stories Collected");
-            callback();
+                        });
+                        return deferred4.promise;
+                    }).then(function () {
+                            var deferred2 = Q.defer();
+                            cloudApp.save(function (err, dbPage) {
+                                LogProgress(cloudApp.key + " Acceptance Task stored to database");
+                                if (err) {
+                                    deferred2.reject(err);
+                                } else {
+                                    deferred2.resolve();
+                                }
+                            });
+                            return deferred2.promise;
+                        })
+                        .done(
+                        function () { // success
+                            deferred1.resolve();
+                        },
+                        function(err){ // error
+                            deferred1.reject(err);
+                        });
+                });
+                return deferred1.promise;
+
+            })
+                .fail(function(err){
+                    console.error(err);
+                })
+                .fin(function(){ //finally run in any case
+                    stream.resume();
+                });
         }
-    );
-}
-
-
-function Step4ProcessCloudApps(jira, callback) {
-    async.eachLimit(Object.keys(acceptanceTasks), 10, function (acceptanceTaskKey, callback) {
-            var currentProgress = Math.floor((++progressCounter * 100) / pagesProgressCount);
-            var acceptanceTask = acceptanceTasks[acceptanceTaskKey];
-            if (lastProgress != currentProgress) {
-                lastProgress = currentProgress;
-                UpdateProgress(currentProgress, "page");
-            }
-
-            ProcessAcceptanceTasksFromJira(jira, acceptanceTask, progressCounter, callback)
-        },
-        function (err) {
-            callback();
+        else {
+            stream.resume();
         }
-    );
-}
-
-function Step5ProcessBlockers(jira, callback) {
-    var counter = 0;
-    var lastProgress = 0;
-    var keys = Object.keys(linkedIssueUniqList);
-    async.eachLimit(keys, 10, function (linkedIssueKey, callback) {
-            var currentProgress = Math.floor((++counter * 100) / keys.length);
-            if (lastProgress != currentProgress) {
-                lastProgress = currentProgress;
-                UpdateProgress(currentProgress, "issues");
-            }
-            var linkedIssue = linkedIssueUniqList[linkedIssueKey];
-            ProcessBlockersFromJira(jira, linkedIssue, counter, callback);
-        },
-        function (err) {
-            callback();
-        }
-    );
-}
-
-function ProcessPageFromJira(jira, issueKey, counter, callback) {
-    var loopError = true;
-    async.whilst(function() {
-            return loopError;
-        },
-        function(callback) {
-            jira.findIssue(issueKey + "?expand=changelog", function (error, issue) {
-                if (error) {
-                    LogProgress("Collect pages error happened!", error);
-                    LogProgress("Restarting Loop for: "+issueKey, error);
-                    callback();
-                }
-                else if (issue != null) {
-                    SavePage(jira, issue, function (error, dbPage) {
-                        if (error) {
-                            LogProgress("Restarting Loop for:"+issueKey, error);
-                            callback();
-                        }else {
-                            MapLinkedIssues(issue, dbPage);
-                            MapAcceptanceTasks(issue, dbPage);
-                            loopError = false;
-                            callback();
-                        }
-                    });
-                }
-                else {
-                    loopError = false;
-                    callback();
-                }
-            });
-        },
-        function(err) {
-            LogProgress(counter + ":" + issueKey + " : Page Collected");
-            callback();
-        }
-    );
-}
-
-function ProcessAcceptanceTasksFromJira(jira, acceptanceTasks, counter, callback) {
-    var loopError = true;
-    async.whilst(function() {
-            return loopError;
-        },
-        function(callback) {
-            jira.findIssue(acceptanceTasks.id, function (error, jiraAcceptanceTask) {
-                if (error) {
-                    LogProgress("Collect acceptance tasks error happened!", error);
-                    LogProgress("Restarting Loop for:"+jiraAcceptanceTask.key, error);
-                    callback();
-                }
-                else if(jiraAcceptanceTask != null) {
-                    loopError = false;
-                    SaveAcceptanceTask(jiraAcceptanceTask, acceptanceTasks, callback);
-                }
-                else {
-                    loopError = false;
-                    callback();
-                }
-            });
-        },
-        function(err) {
-            LogProgress(counter + ":" + acceptanceTasks.key + " : Acceptance Task Collected");
-            callback();
-        }
-    );
-}
-
-
-
-
-
-function MapAcceptanceTasks(issue, dbPage) {
-    var acceptanceTask = acceptanceTasks[issue.key];
-    if(acceptanceTask) {
-        acceptanceTask.epicKey = dbPage.epicKey;
-        acceptanceTask.parentPageId = dbPage._id;
-        acceptanceTask.epicId = epicsMap[dbPage.epicKey].id;
-    }
-}
-
-function ProcessBlockersFromJira(jira, linkedIssue, counter, callback) {
-    var loopError = true;
-    async.whilst(function() {
-            return loopError;
-        },
-        function(callback) {
-            jira.findIssue(linkedIssue.linkedIssueKey, function (error, jiraLinkedIssue) {
-                if (error) {
-                    LogProgress("Collect issues error happened!", error);
-                    LogProgress("Restarting Loop for:"+linkedIssue.linkedIssueKey, error);
-                    callback();
-                }
-                else if(jiraLinkedIssue != null) {
-                    loopError = false;
-                    SaveLinkedIssue(jiraLinkedIssue, callback);
-                }
-                else {
-                    loopError = false;
-                    callback();
-                }
-            });
-        },
-        function(err) {
-            LogProgress(counter + ":" + linkedIssue.linkedIssueKey + " : Issue Collected");
-            callback(err);
-        }
-    );
-}
-function SaveAcceptanceTask(jiraAcceptanceTask, mapAcceptanceTask, callback) {
-        CloudApp.findOne({key: mapAcceptanceTask.key}, function (err, dbIssue) {
-        if (err) {
-            callback(err);
-        }
-
-        if (!dbIssue) {
-            dbIssue = new CloudApp();
-        }
-
-        dbIssue.key = jiraAcceptanceTask.key;
-        dbIssue.uri = "https://jira.epam.com/jira/browse/" + jiraAcceptanceTask.key;
-        dbIssue.type = jiraAcceptanceTask.fields.issuetype.name;
-        dbIssue.summary = jiraAcceptanceTask.fields.summary;
-        dbIssue.status = jiraAcceptanceTask.fields.status.name;
-        dbIssue.resolution = jiraAcceptanceTask.fields.resolution == null ? "" : jiraAcceptanceTask.fields.resolution.name;
-        dbIssue.reporter = jiraAcceptanceTask.fields.reporter.displayName;
-
-        dbIssue.created = jiraAcceptanceTask.fields.created;
-        dbIssue.updated = jiraAcceptanceTask.fields.updated;
-
-        dbIssue.dev_complete = jiraAcceptanceTask.fields.customfield_24500;
-        dbIssue.qa_complete= jiraAcceptanceTask.fields.customfield_24501;
-        dbIssue.sme_complete = jiraAcceptanceTask.fields.customfield_24502;
-        dbIssue.plex_complete = jiraAcceptanceTask.fields.customfield_24503;
-        dbIssue.duedate = jiraAcceptanceTask.fields.duedate;
-
-        dbIssue.labels = jiraAcceptanceTask.fields.labels;
-        if (jiraAcceptanceTask.fields.assignee != null)
-            dbIssue.assignee = jiraAcceptanceTask.fields.assignee.displayName;
-
-        dbIssue.epicKey = mapAcceptanceTask.epicKey;
-        dbIssue._parentPage = mapAcceptanceTask.parentPageId;
-        dbIssue._epic = mapAcceptanceTask.epicId;
-
-            dbIssue.save(function (err) {
-            callback(err);
-        });
+    }).on('error', function (err) {
+        callback(err);
+    }).on('close', function () {
+        LogProgress(count + " SubTasks Total");
+        LogProgress(count2 + " CloudApps Total");
+        callback();
     });
 }
 
+function mapAcceptanceTask(dbIssue, originalIssue) {
+    dbIssue.key = originalIssue.key;
+    dbIssue.uri = "https://jira.epam.com/jira/browse/" + originalIssue.key;
+    dbIssue.type = originalIssue.fields.issuetype.name;
+    dbIssue.summary = originalIssue.fields.summary;
+    dbIssue.status = originalIssue.fields.status.name;
+    dbIssue.resolution = originalIssue.fields.resolution == null ? "" : originalIssue.fields.resolution.name;
+    dbIssue.reporter = originalIssue.fields.reporter.displayName;
+
+    dbIssue.created = originalIssue.fields.created;
+    dbIssue.updated = originalIssue.fields.updated;
+
+    dbIssue.dev_complete = originalIssue.fields.customfield_24500;
+    dbIssue.qa_complete = originalIssue.fields.customfield_24501;
+    dbIssue.sme_complete = originalIssue.fields.customfield_24502;
+    dbIssue.plex_complete = originalIssue.fields.customfield_24503;
+    dbIssue.duedate = originalIssue.fields.duedate;
+
+    dbIssue.labels = originalIssue.fields.labels;
+    if (originalIssue.fields.assignee != null)
+        dbIssue.assignee = originalIssue.fields.assignee.displayName;
+}
 
 function ParseProgress(item, page, author, created) {
     if (item.fieldtype == 'custom' && (item.field == 'Progress' || item.field == "Progress, %")) {

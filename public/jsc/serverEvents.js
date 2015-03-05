@@ -6,9 +6,6 @@ if (!!window.EventSource) {
         {
             $("#page_progress_bar").css({ width: data.page + '%' });
         }
-        else{
-            $("#issue_progress_bar").css({ width: data.issues + '%' });
-        }
     }, false);
     source.addEventListener('logmessage', function(e) {
         var text = e.data;
