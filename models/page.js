@@ -20,6 +20,7 @@ var schema = new Schema({
     storyPoints:            { type: String },
     devFinished:            { type: String },
     qaFinished:             { type: String },
+    smeFinished:            { type: String },
     progressHistory: [{
             person:         { type: String },
             progressFrom:   { type: String },

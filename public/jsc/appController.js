@@ -34,7 +34,20 @@ function appController($scope, $resource, $window) {
         return allTeamsArray;
     }();
 
-    $scope.allStreams = [{id: "All", name: "All"}];
+    $scope.allStreams = function () {
+        var result = [{"id": "All", "name": "All"}];
+
+        for (var i = 1; i < $scope.allTeams.length; i++) {
+            if($scope.allTeams[i].streams) {
+                $scope.allTeams[i].streams.forEach(function (item) {
+                    result.push({"id": item.replace("Stream", ""), "name": item, "dependencyTeamId":$scope.allTeams[i].id})
+                });
+            }
+        }
+
+        return result;
+    }();
+
     $scope.allSMEs = [{id: "All", name: "All"}];
     $scope.allModuleGroups = [{id: "All", name: "All"}];
     $scope.allModules = [{id: "All", name: "All"}];

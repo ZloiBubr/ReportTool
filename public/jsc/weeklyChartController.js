@@ -98,6 +98,21 @@ function weeklyChartController($scope, $resource, $window) {
     };
 
     /* ----------------------------------------- Helpers/Angular Filters and etc-----------------------------------*/
+    var bonusMapping = {
+        2014:{
+            10: 440,
+            11: 440
+        },
+        2015:{
+
+        }
+    };
+
+    $scope.isBonusReached = function(year, monthIndex, sp){
+        return sp >= bonusMapping[year][monthIndex];
+    };
+
+
     $scope.init();
 }
 

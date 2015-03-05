@@ -2,11 +2,15 @@
     <!-- Default panel contents -->
     <div class="panel-heading container-fluid">
         <div class="row">
-            <div class="col-lg-2">
+            <div class="col-md-2">
                 <label for="teamFilterControl">Team:</label>
-                <select id="teamFilterControl" class="form-control headerSelectWidth" ng-model="common.filteredTeam" class="headerSelectWidth" ng-options="team.id as team.name for team in allTeams"></select>
+                <select id="teamFilterControl" ng-change="saveStorageToLocalDb(); onFilterChange();" class="form-control headerSelectWidth" ng-model="common.filteredTeam" ng-options="team.id as team.name for team in allTeams"></select>
             </div>
-            <div class="col-lg-1">
+            <div class="col-md-2">
+                <label for="streamFilterControl">Stream:</label>
+                <select id="streamFilterControl" ng-change="saveStorageToLocalDb()" class="form-control headerSelectWidth" ng-model="common.filteredStream" ng-options="stream.id as stream.name for stream in common.allStreams"></select>
+            </div>
+            <div class="col-md-2">
                 <div class="spinner" ng-show="isLoading"></div>
             </div>
         </div>
