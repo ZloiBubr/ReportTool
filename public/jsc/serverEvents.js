@@ -6,14 +6,12 @@ if (!!window.EventSource) {
         {
             $("#page_progress_bar").css({ width: data.page + '%' });
         }
-        else{
-            $("#issue_progress_bar").css({ width: data.issues + '%' });
-        }
     }, false);
     source.addEventListener('logmessage', function(e) {
         var text = e.data;
-        if(text == "**** Update Succeed ****" ||
-            text == "**** Update Failed ****") {
+        if(text == "---- Update Finished ----" ||
+           text == "**** Update Failed ****" ||
+           text == "**** Update Succeed ****") {
             $("#updatebtn").button("reset");
             $("#cleanbtn").button("reset");
         }

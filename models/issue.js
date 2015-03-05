@@ -20,8 +20,6 @@ var schema = new Schema({
 
     resolution:             { type: String },
     reporter:               { type: String },
-    originalEstimate:       { type: String },
-    timeSpent:              { type: String },
     labels:                 { type: String },
     assignee:               { type: String },
 

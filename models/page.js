@@ -9,8 +9,6 @@ var schema = new Schema({
     status:                 { type: String },
     resolution:             { type: String },
     reporter:               { type: String },
-    originalEstimate:       { type: String },
-    timeSpent:              { type: String },
     labels:                 { type: String },
     assignee:               { type: String },
     blockers:               { type: String },

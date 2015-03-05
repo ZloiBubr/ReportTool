@@ -26,6 +26,7 @@ exports.processItems = function (params, callback) {
             //step 2
             function (callback) {
                 updateInProgress = false;
+                writeToClient("---- Update Finished ----", err);
                 callback();
             }
         ],

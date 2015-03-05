@@ -21,11 +21,11 @@ exports.getData = function (req, res) {
 function distribution (){
     this.data =  [
                 {
-                    name: STATUS.PMREVIEW.name,
+                    name: STATUS.LAREADY.name,
                     data: [0,0]
                 },
                 {
-                    name: STATUS.LAREADY.name,
+                    name: STATUS.PMREVIEW.name,
                     data: [0,0]
                 },
                 {
@@ -33,7 +33,7 @@ function distribution (){
                     data: [0,0]
                 },
                 {
-                    name: STATUS.CLOSED.name,
+                    name: STATUS.ACCEPTED.name,
                     data: [0,0]
                 },
                 {
@@ -127,9 +127,9 @@ function parsePages(callback) {
                                     if(pages != null && pages.length > 0) {
                                         async.eachSeries(pages, function(page, callback) {
                                                 var storyPoints = page.storyPoints == null ? 0 : parseFloat(page.storyPoints);
-                                                var status = page.status;
+                                                var status = helpers.updateStatus(page);
                                                 var resolution = page.resolution;
-                                                var ignore = !helpers.isActive(status, resolution);
+                                                var ignore = !helpers.isActive(page.status, resolution);
 
                                                 for (var j = 0; j < page.progressHistory.length; j++) {
                                                     var history = page.progressHistory[j];
@@ -341,10 +341,6 @@ function addStackedData(velocity, status, storyPoints, teamName) {
             added = true;
             break;
         }
-    }
-
-    if(!added) {
-        log.info(status + ':' + storyPoints);
     }
 }
 
