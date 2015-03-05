@@ -435,7 +435,7 @@ function Step6CollectStories(callback) {
         var epic = story.fields.customfield_14500; //Epic link
         count++;
 
-        if (epic != undefined && epicsMap[epic]) {
+        if ((epic != undefined && epicsMap[epic]) || isAutomationStory(story)) {
             count2++;
 
             Q().then(function(){
@@ -721,9 +721,6 @@ function mapLinkedIssues(jiraPage, dbPage) {
     return promises;
 }
 
-// End Step 6 Methods
-
-
 function isAutomationStory(story) {
     var labels = story.fields.labels;
     for(var i=0; i<labels.length; i++) {
@@ -732,18 +729,13 @@ function isAutomationStory(story) {
                 return true;
         }
     }
-    var epic = story.fields.customfield_14500;
-    OriginalJiraIssue.findOne({ key: epic }, function (err, epic) {
-        if(err) {
-            return false;
-        }
-        if(epic.summary.toLowerCase().indexOf('automation test data fixing') > -1) {
-            return true;
-        }
-    });
 
-    return promises;
+    var epic = story.fields.customfield_14500;
+    return (epic == "PLEXUXC-37455");
 }
+
+// End Step 6 Methods
+
 
 function Step2CollectAutomationStories(jira, full, callback) {
     var queryString = "project = PLEXUXC AND issuetype = Story AND ((labels in (Automation) AND status not in (Open)) OR ('Epic Link' = 'Automation test data fixing'))";
