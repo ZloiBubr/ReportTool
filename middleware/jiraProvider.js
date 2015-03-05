@@ -782,6 +782,7 @@ function Step7CollectAcceptanceTasks(callback) {
                                 deferred4.resolve();
                             }
                             else {
+                                LogProgress("******************* Possible wrong epic name " + acceptanceObjectsMap[subTask.key].epicKey);
                                 deferred4.resolve();
                             }
                         });
