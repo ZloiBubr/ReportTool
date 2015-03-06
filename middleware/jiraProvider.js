@@ -291,9 +291,10 @@ function Step2CollectIssues(jira, callback) {
                     return loopError;
                 },
                 function(callback) {
-                    jira.findIssue(issueObject.key + "?expand=changelog,subtasks", function (error, issue) {
-                        if (error) {
-                            LogProgress("Restarting loop for key: "+issueObject.key, error);
+                    jira.findIssue(issueObject.key + "?expand=changelog,subtasks", function (err, issue) {
+                        if (err) {
+                            LogProgress("Restarting loop for key: "+issueObject.key, err);
+                            callback(err);
                         }
                         else {
                             if (issue != null) {
@@ -323,13 +324,18 @@ function Step2CollectIssues(jira, callback) {
                     });
                 },
                 function(err) {
-                    LogProgress(++progressCounter + ":" + issueObject.key + " : Issue Collected");
-                    var progress = Math.floor(progressCounter*100/issueObjects.length);
-                    if(progress != lastProgress) {
-                        lastProgress = progress;
-                        UpdateProgress(progress, "page");
+                    if(err) {
+                        callback(err);
                     }
-                    callback(err);
+                    else {
+                        LogProgress(++progressCounter + ":" + issueObject.key + " : Issue Collected");
+                        var progress = Math.floor(progressCounter*100/issueObjects.length);
+                        if(progress != lastProgress) {
+                            lastProgress = progress;
+                            UpdateProgress(progress, "page");
+                        }
+                        callback();
+                    }
                 }
             );
         },
