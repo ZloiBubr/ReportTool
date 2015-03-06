@@ -130,9 +130,6 @@ function putDataPoint(cloudAppData, module, page) {
     }
     var calcStoryPoints = storyPoints * progress / 100.;
 
-    if(page.status == "Production") {
-        page.status = STATUS.PRODUCTION.name;
-    }
     var status = helpers.updateStatus(page);
     var fullUri = initUri + "CloudApp_" + cloudAppName + "') AND 'Epic Link' = " + module.key;
     var cloudApp;

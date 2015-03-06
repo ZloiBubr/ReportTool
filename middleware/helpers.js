@@ -122,11 +122,13 @@ exports.updateStatus = function(page) {
     if(page.status == STATUS.CLOSED.name && (
         page.resolution == RESOLUTION.DONE.name ||
         page.resolution == RESOLUTION.FIXED.name ||
-        page.resolution == RESOLUTION.IMPLEMENTED.name
+        page.resolution == RESOLUTION.IMPLEMENTED.name ||
+        page.resolution == RESOLUTION.RESOLVED.name
         )) {
         newStatus = STATUS.ACCEPTED.name;
     }
-    if(page.status == STATUS.CLOSED.name && (
+    if((page.status == STATUS.CLOSED.name ||
+        page.status == STATUS.RESOLVED.name) && (
         page.resolution == RESOLUTION.CANCELED.name ||
         page.resolution == RESOLUTION.REJECTED.name ||
         page.resolution == RESOLUTION.OUTOFSCOPE.name ||

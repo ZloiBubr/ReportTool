@@ -23,6 +23,7 @@ exports.RESOLUTION = {
     FIXED : { name: "Fixed" },
     IMPLEMENTED : { name: "Implemented" },
     OUTOFSCOPE: { name: "Out of Scope" },
+    RESOLVED: { name: "Resolved" },
     REJECTED: { name: "Rejected" },
     CANCELED: { name: "Canceled" },
     ACCEPTED: { name: "Accepted" },
