@@ -78,6 +78,8 @@
                 <li class="cancelled list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.cancelled.isChecked" ng-change="processWithRowSpans(true)">Out Of Scope</label><span class="badge pull-right">{{total.cancelled.count}}</span></div></li>
                 <li class="cancelled list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.notApplicable.isChecked" ng-change="processWithRowSpans(true)">Not Applicable</label><span class="badge pull-right">{{total.notApplicable.count}}</span></div></li>
                 <li class="production list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.production.isChecked" ng-change="processWithRowSpans(true)">Dev Complete</label><span class="badge pull-right">{{total.production.count}}</span></div></li>
+                <li class="production list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.pmReview.isChecked" ng-change="processWithRowSpans(true)"> PM Review</label></span><span class="badge pull-right">{{total.pmReview.count}}</span></div></li>
+                <li class="production list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.laReady.isChecked" ng-change="processWithRowSpans(true)"> LA Ready</label></span><span class="badge pull-right">{{total.laReady.count}}</span></div></li>
                 <li class="list-group-item"></li>
                 <li class="list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.all.isChecked" ng-change="onSelectDeselectAll()">Total</label><span class="badge pull-right">{{total.total}}</span></div></li>
                 <li class="list-group-item"></li>
@@ -146,7 +148,7 @@
                                     readyForAcceptance: card.status == 'Resolved',
                                     readyForQA: card.status == 'Ready for QA' || card.status == 'Testing in Progress',
                                     cancelled: card.status == 'Canceled',
-                                    production: card.status == 'Ready for PM Handoff',
+                                    production: card.status == 'Ready for PM Handoff' || card.status == 'PM Review' || card.status == 'LA Ready',
                                     'bg-info': true}"> </div>
                                 <div class="card-content card-module">
                                     <div class="progress card-progress" title="Development progress">

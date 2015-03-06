@@ -379,6 +379,8 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
         $scope.total.deferred.isChecked = $scope.total.all.isChecked;
         $scope.total.cancelled.isChecked = $scope.total.all.isChecked;
         $scope.total.production.isChecked = $scope.total.all.isChecked;
+        $scope.total.pmReview.isChecked = $scope.total.all.isChecked;
+        $scope.total.laReady.isChecked = $scope.total.all.isChecked;
 
         $scope.processWithRowSpans(true);
     };
@@ -427,6 +429,8 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
             total_resolved_isChecked: $scope.total.resolved.isChecked,
             total_accepted_isChecked: $scope.total.accepted.isChecked,
             total_production_isChecked: $scope.total.production.isChecked,
+            total_pmReview_isChecked: $scope.total.pmReview.isChecked,
+            total_laReady_isChecked: $scope.total.laReady.isChecked,
             total_all_isChecked: $scope.total.all.isChecked
         };
         localStorageService.set('waveProgressController', storage);
@@ -457,6 +461,8 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
                 $scope.total.resolved.isChecked = storage.total_resolved_isChecked;
                 $scope.total.accepted.isChecked = storage.total_accepted_isChecked;
                 $scope.total.production.isChecked = storage.total_production_isChecked;
+                $scope.total.pmReview.isChecked = storage.total_pmReview_isChecked;
+                $scope.total.laReady.isChecked = storage.total_laReady_isChecked;
                 $scope.total.all.isChecked = storage.total_all_isChecked;
             }
             catch (ex) {

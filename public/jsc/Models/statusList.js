@@ -68,6 +68,8 @@ exports.statuses = function() {
     this.closed = new exports.statusEntity(exports.STATUS.CLOSED);
     this.cancelled = new exports.statusEntity(exports.STATUS.CANCELED);
     this.notApplicable = new exports.statusEntity(exports.STATUS.NOTAPPLICABLE);
+    this.pmReview = new exports.statusEntity(exports.STATUS.PMREVIEW);
+    this.laReady = new exports.statusEntity(exports.STATUS.LAREADY);
 
     this.getStatusByName = function(statusName){
         switch(statusName)
@@ -102,6 +104,10 @@ exports.statuses = function() {
                 return this.closed;
             case exports.STATUS.NOTAPPLICABLE.name:
                 return this.notApplicable;
+            case exports.STATUS.PMREVIEW.name:
+                return this.pmReview;
+            case exports.STATUS.LAREADY.name:
+                return this.laReady;
             default :
                 return this.blocked;
         }
@@ -122,6 +128,8 @@ exports.statuses = function() {
         this.closed.count = 0;
         this.cancelled.count = 0;
         this.notApplicable.count = 0;
+        this.pmReview.count = 0;
+        this.laReady.count = 0;
     }
 };
 
