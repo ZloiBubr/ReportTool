@@ -1,6 +1,6 @@
 function acceptanceStatisticsController($scope, $resource) {
     var resource = $resource('/acceptanceStatistics');
-    var baseUrl = "https://jira.epam.com/jira/issues/?filter=-4&jql=";
+    var baseUrl = "https://jira.epam.com/jira/issues/?jql=";
 
     $scope.init = function () {
         $scope.isOnlySmeMode = true;

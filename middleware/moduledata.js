@@ -88,7 +88,13 @@ function updateChecklistsProgress(moduledata) {
             }
             total++;
         }
-        moduledata.module[i].checklistsProgress = total > 0 ? created*100 / total : 0;
+        item.checklistsProgress = total > 0 ? created*100 / total : 0;
+
+        var progress = 0.;
+        for(var k=0; k<item.testingProgress.length; k++) {
+            progress += item.testingProgress[k];
+        }
+        item.testingProgress = item.testingProgress.length > 0 ? progress / item.testingProgress.length : 0.;
     }
 }
 
@@ -144,7 +150,7 @@ function putDataPoint(moduledata, module, page, count) {
             xxl: false,
             teamName: teamName,
             streamName: streamName,
-            testingProgress: isParentPage && page.testingProgress ? parseFloat(page.testingProgress) : 0.,
+            testingProgress: [],
             checklistsProgress: [],
             cloudApps: [],
             devFinishDate: module.devfinish,
@@ -175,7 +181,7 @@ function putDataPoint(moduledata, module, page, count) {
             moduled.status = newStatus.name;
         }
         if(isParentPage) {
-            moduled.testingProgress = page.testingProgress ? parseFloat(page.testingProgress) : 0.;
+            moduled.testingProgress.push(page.testingProgress ? parseFloat(page.testingProgress) : 0.);
             moduled.acceptanceStatus.push(page.acceptanceStatus);
         }
         moduled.checklistsProgress.push(page.checklistCreated);
