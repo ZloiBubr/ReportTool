@@ -64,6 +64,9 @@ function getAllLeaders(cloudApps) {
 
     for (var i = 0; i < cloudApps.length; i++){
         var leaderName = cloudApps[i].assignee;
+
+        if (!leaderName) continue;
+
         if (!IsLeaderInArray(leaders, leaderName)){
             leaders.push(leaderName);
         }else{

@@ -34,7 +34,7 @@ function acceptanceStatisticsController($scope, $resource) {
                 return item.SME;
             });
 
-            addSmeFromEmptyVm(emptyLeaderVm, groupedbySme);
+            //addSmeFromEmptyVm(emptyLeaderVm, groupedbySme);
 
             _.each(groupedbySme, function(leadersArrayItem){
                 var groupedSmeItem = jQuery.extend(true, {}, leadersArrayItem[0]);
@@ -166,6 +166,7 @@ function acceptanceStatisticsController($scope, $resource) {
         }
     };
 
+
     var addSmeFromEmptyVm = function (targetEmptyVm, allGroups) {
         for (var j = 0; j < targetEmptyVm.cloudAppDelayStatistics.length; j++) {
             var currentDelayStatistic = targetEmptyVm.cloudAppDelayStatistics[j];
@@ -181,6 +182,7 @@ function acceptanceStatisticsController($scope, $resource) {
             }
         }
     }
+
 
     var getEmptyRecord = function (leaderName, smeName) {
         return { SME: smeName, leader : leaderName, cloudAppDelayStatistics : [
