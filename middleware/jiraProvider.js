@@ -4,12 +4,15 @@
 var util = require('util');
 var config = require('../config');
 var log = require('../libs/log')(module);
+
 var Module = require('../models/module').Module;
 var Page = require('../models/page').Page;
 var OriginalJiraIssue = require('../models/originalJiraIssue').Issue;
 var Version = require('../models/Version').Version;
 var Issue = require('../models/issue').Issue;
 var CloudApp = require('../models/cloudApp').CloudApp;
+var SizeChange = require('../models/sizeChange').SizeChange;
+
 var _ = require('underscore');
 var async = require('async');
 var cache = require('node_cache');
@@ -27,6 +30,7 @@ var issueObjects = [];
 var acceptanceObjectsMap = {};
 var epicsMap = {};
 var pagesMap = {};
+var sizeChanges = [];
 
 var updateInProgress = false;
 
@@ -139,7 +143,13 @@ exports.updateJiraInfo = function (debug, full, remove, jiraUser, jiraPassword, 
                                 callback(err);
                             }
                             LogProgress("4. CloudApps collection has been dropped");
-                            callback();
+                            SizeChange.collection.drop(function (err) {
+                                if(err && err.errmsg != 'ns not found') {
+                                    callback(err);
+                                }
+                                LogProgress("5. SizeChange collection has been dropped");
+                                callback();
+                            });
                         });
                     });
                 });
@@ -156,6 +166,10 @@ exports.updateJiraInfo = function (debug, full, remove, jiraUser, jiraPassword, 
         function (callback) {
             LogProgress("**** Step 7: collect acceptance tasks");
             Step7CollectAcceptanceTasks(callback);
+        },
+        function (callback) {
+            LogProgress("**** Step 8: save story point changes");
+            Step8CollectStoryPointsChanges(callback);
         },
         function (callback) {
             if(!debug) {
@@ -427,6 +441,7 @@ function Step6CollectStories(callback) {
     var count = 0;
     var count2 = 0;
     acceptanceObjectsMap = {};
+    sizeChanges = [];
 
     stream.on('data', function (doc) {
         stream.pause();
@@ -529,6 +544,7 @@ function parseHistory(issue, page) {
             var item = history.items[y];
             ParseProgress(item, page, author, history.created);
             ParseFinishDates(item, page, history.created);
+            ParseSizeChanges(item, history, page);
         }
     }
 }
@@ -858,6 +874,26 @@ function mapAcceptanceTask(dbIssue, originalIssue) {
         dbIssue.assignee = originalIssue.fields.assignee.displayName;
 }
 
+function ParseSizeChanges(item, history, page) {
+    var dateCreated = new Date(history.created);
+    var dateMonthAgo = new Date(Date.now());
+    dateMonthAgo.setMonth(dateMonthAgo.getMonth()-1);
+
+    if(dateCreated < dateMonthAgo) {
+        return;
+    }
+    if (item.fieldtype == 'custom' && (item.field == 'Story Points')) {
+        var from = item.fromString == null ||
+        item.fromString == undefined ||
+        item.fromString == ''
+            ?
+            '0' : item.fromString;
+        var to = item.toString;
+
+        sizeChanges.push({date: dateCreated, key: page.key, summary: page.summary, person: history.author.displayName, from: from, to: to});
+    }
+}
+
 function ParseProgress(item, page, author, created) {
     if (item.fieldtype == 'custom' && (item.field == 'Progress' || item.field == "Progress, %")) {
         var from = item.fromString == null ||
@@ -915,6 +951,26 @@ function ParseFinishDates(item, page, created) {
             page.qaFinished = created;
         }
     }
+}
+
+function Step8CollectStoryPointsChanges(callback) {
+    _.each(sizeChanges, function(sizeChange) {
+        var sizeChangeDb = new SizeChange();
+        sizeChangeDb.date = sizeChange.date;
+        sizeChangeDb.key = sizeChange.key;
+        sizeChangeDb.summary = sizeChange.summary;
+        sizeChangeDb.from = sizeChange.from;
+        sizeChangeDb.to = sizeChange.to;
+        sizeChangeDb.person = sizeChange.person;
+        sizeChangeDb.save(function (err) {
+           if(err) {
+               callback(err);
+           }
+           else {
+               callback();
+           }
+        });
+    });
 }
 
 
