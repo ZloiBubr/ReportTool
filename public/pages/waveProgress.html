@@ -76,7 +76,9 @@
                 <li class="blocked list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.blocked.isChecked" ng-change="processWithRowSpans(true)"> Blocked</label><span class="badge pull-right">{{total.blocked.count}}</span></div></li>
                 <li class="readyForAcceptance list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.resolved.isChecked" ng-change="processWithRowSpans(true)"> Resolved</label><span class="badge pull-right">{{total.resolved.count}}</span></div></li>
                 <li class="accepted list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.accepted.isChecked" ng-change="processWithRowSpans(true)"> Accepted</label><span class="badge pull-right">{{total.accepted.count}}</span></div></li>
-                <li class="production list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.production.isChecked" ng-change="processWithRowSpans(true)"> Dev Complete</label></span><span class="badge pull-right">{{total.production.count}}</span></div></li>
+                <li class="production list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.production.isChecked" ng-change="processWithRowSpans(true)"> PM Handoff</label></span><span class="badge pull-right">{{total.production.count}}</span></div></li>
+                <li class="production list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.pmReview.isChecked" ng-change="processWithRowSpans(true)"> PM Review</label></span><span class="badge pull-right">{{total.pmReview.count}}</span></div></li>
+                <li class="production list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.laReady.isChecked" ng-change="processWithRowSpans(true)"> LA Ready</label></span><span class="badge pull-right">{{total.laReady.count}}</span></div></li>
                 <li class="list-group-item"></li>
                 <li class="list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.all.isChecked" ng-change="onSelectDeselectAll()"> Total</label><span class="badge pull-right">{{total.total}}</span></div></li>
                 <li class="list-group-item"></li>
@@ -113,7 +115,7 @@
                                     readyForAcceptance: card.status == 'Resolved',
                                     readyForQA: card.status == 'Ready for QA' || card.status == 'Testing in Progress',
                                     cancelled: card.status == 'Canceled',
-                                    production: card.status == 'Ready for PM Handoff',
+                                    production: card.status == 'Ready for PM Handoff' || card.status == 'PM Review' || card.status == 'LA Ready',
                                     'bg-info': true,
                                     'card-high': detailedView}"> </div>
                                 <div class="card-content">

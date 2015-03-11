@@ -54,7 +54,7 @@ function parsePages(callback) {
                 var to = history.progressTo == null || history.progressTo == '' ? 0 : parseInt(history.progressTo);
                 var progress = to - from;
                 var calcStoryPoints = storyPoints * progress / 100;
-                var bonusCalcStoryPoints = (storyPoints * 0.7) * progress / 100;
+                var bonusCalcStoryPoints = (storyPoints * 0.5) * progress / 100;
                 putDataPoint(velocity, teamName, dates.norm_date, calcStoryPoints);
                 putTotalDataPoint(velocity, teamName, dates.norm_date, calcStoryPoints);
 
@@ -65,13 +65,7 @@ function parsePages(callback) {
             if(page.qaFinished){
                 var dates = getDates(page.qaFinished);
                 //var bonusCalcStoryPoints = storyPoints * 20 / 100;
-                processMonthlyData(velocity, teamName, dates.date, storyPoints * 20 / 100, 0, SP_TYPE.QA);
-                //putTotalMonthlyPoint(velocity, teamName, dates.date, bonusCalcStoryPoints);
-            }
-            if(page.smeFinished){
-                var dates = getDates(page.smeFinished);
-                //var bonusCalcStoryPoints = storyPoints * 10 / 100;
-                processMonthlyData(velocity, teamName, dates.date, storyPoints * 10 / 100, 0, SP_TYPE.SME);
+                processMonthlyData(velocity, teamName, dates.date, storyPoints * 50 / 100, 0, SP_TYPE.QA);
                 //putTotalMonthlyPoint(velocity, teamName, dates.date, bonusCalcStoryPoints);
             }
         }

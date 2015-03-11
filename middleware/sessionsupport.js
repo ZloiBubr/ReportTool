@@ -19,7 +19,7 @@ exports.setResponseObj = function(type, req, res) {
 
 exports.notifySubscribers = function(type, event, data) {
     for(var i=0; i<responses.length; i++) {
-        if(Date.now() - responses[i].session > 60*60*1000) { //session TTL 60 min
+        if(Date.now() - responses[i].session > 6*60*60*1000) { //session TTL 6*60 min
             responses.splice(i, 1);
             continue;
         }

@@ -244,6 +244,22 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
                     ProcessCards(moduleProgressItem, $scope.STATUS.PRODUCTION.name);
                 }
             }
+            else if(moduleProgressItem.status == $scope.STATUS.PMREVIEW.name &&
+                moduleProgressItem.moduleStatus == $scope.STATUS.CLOSED.name) {
+                var pmReviewEntity = $scope.total.getStatusByName($scope.STATUS.PMREVIEW.name);
+                processEntity(pmReviewEntity, moduleProgressItem);
+                if(addCards && pmReviewEntity.isChecked) {
+                    ProcessCards(moduleProgressItem, $scope.STATUS.PMREVIEW.name);
+                }
+            }
+            else if(moduleProgressItem.status == $scope.STATUS.LAREADY.name &&
+                moduleProgressItem.moduleStatus == $scope.STATUS.CLOSED.name) {
+                var laReadyEntity = $scope.total.getStatusByName($scope.STATUS.LAREADY.name);
+                processEntity(laReadyEntity, moduleProgressItem);
+                if(addCards && laReadyEntity.isChecked) {
+                    ProcessCards(moduleProgressItem, $scope.STATUS.LAREADY.name);
+                }
+            }
             else if(moduleProgressItem.status == $scope.STATUS.RESOLVED.name) {
                 var resolvedEntity = $scope.total.getStatusByName($scope.STATUS.RESOLVED.name);
                 processEntity(resolvedEntity, moduleProgressItem);
@@ -438,6 +454,8 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
         $scope.total.cancelled.isChecked = $scope.total.all.isChecked;
         $scope.total.notApplicable.isChecked = $scope.total.all.isChecked;
         $scope.total.production.isChecked = $scope.total.all.isChecked;
+        $scope.total.pmReview.isChecked = $scope.total.all.isChecked;
+        $scope.total.laReady.isChecked = $scope.total.all.isChecked;
 
         $scope.processWithRowSpans(true);
     };
@@ -479,6 +497,9 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
             total_accepted_isChecked: $scope.total.accepted.isChecked,
             total_cancelled_isChecked: $scope.total.cancelled.isChecked,
             total_notApplicable_isChecked: $scope.total.notApplicable.isChecked,
+            total_production_isChecked: $scope.total.production.isChecked,
+            total_pmReview_isChecked: $scope.total.pmReview.isChecked,
+            total_laReady_isChecked: $scope.total.laReady.isChecked,
             total_all_isChecked: $scope.total.all.isChecked
         };
         localStorageService.set('moduleProgressController', storage);
@@ -503,6 +524,9 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
                     $scope.total.accepted.isChecked = storage.total_accepted_isChecked;
                     $scope.total.cancelled.isChecked = storage.total_cancelled_isChecked;
                     $scope.total.notApplicable.isChecked = storage.total_notApplicable_isChecked;
+                    $scope.total.production.isChecked = storage.total_production_isChecked;
+                    $scope.total.pmReview.isChecked = storage.total_pmReview_isChecked;
+                    $scope.total.laReady.isChecked = storage.total_laReady_isChecked;
                     $scope.total.all.isChecked = storage.total_all_isChecked;
             }
             catch (ex) {
