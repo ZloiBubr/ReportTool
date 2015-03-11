@@ -1,6 +1,9 @@
 var mongoose = require('../libs/mongoose');
+
 var Module = require('../models/module').Module;
 var Page = require('../models/page').Page;
+var SizeChange = require('../models/sizeChange').SizeChange;
+
 var log = require('../libs/log')(module);
 var async = require('async');
 var _ = require('underscore');
@@ -119,6 +122,18 @@ function parsePages(callback) {
     var maximumBurnCore = 0.0;
     async.series([
         function (callback) {
+            SizeChange.find({}).exec(function(err, sizeChanges) {
+                velocity.sizeChanges = sizeChanges;
+                velocity.sizeChanges.sort(function (a, b) {
+                    a = new Date(a.date);
+                    b = new Date(b.date);
+                    return a < b ? 1 : a > b ? -1 : 0;
+                });
+
+                callback();
+            });
+        },
+        function (callback) {
             Module.find({}).exec(function(err, modules) {
                 var modulesAdded = [];
                 async.series([
@@ -126,6 +141,10 @@ function parsePages(callback) {
                                 Page.find({epicKey: module.key}).exec(function (err, pages) {
                                     if(pages != null && pages.length > 0) {
                                         async.eachSeries(pages, function(page, callback) {
+                                                if(page.automationType) {
+                                                    callback();
+                                                    return;
+                                                }
                                                 var storyPoints = page.storyPoints == null ? 0 : parseFloat(page.storyPoints);
                                                 var status = helpers.updateStatus(page);
                                                 var resolution = page.resolution;

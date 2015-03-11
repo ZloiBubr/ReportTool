@@ -56,10 +56,10 @@ function parsePages(callback) {
                 var calcStoryPoints = storyPoints * progress / 100;
                 var bonusCalcStoryPoints = (storyPoints * 0.5) * progress / 100;
                 putDataPoint(velocity, teamName, dates.norm_date, calcStoryPoints);
-                putTotalDataPoint(velocity, teamName, dates.norm_date, calcStoryPoints);
+                putTotalDataPoint(velocity, page, teamName, dates.norm_date, calcStoryPoints);
 
                 processMonthlyData(velocity, teamName, dates.date, bonusCalcStoryPoints, calcStoryPoints, SP_TYPE.DEV);
-                putTotalMonthlyPoint(velocity, teamName, dates.date, calcStoryPoints);
+                putTotalMonthlyPoint(velocity, page, teamName, dates.date, calcStoryPoints);
 
             }
             if(page.qaFinished){
@@ -105,8 +105,8 @@ function parsePages(callback) {
     })
 }
 
-function putTotalDataPoint(velocity, teamName, norm_date, calcStoryPoints) {
-    if (teamName != "Automation") {
+function putTotalDataPoint(velocity, page, teamName, norm_date, calcStoryPoints) {
+    if (!page.automationType) {
         putDataPoint(velocity, "Total", norm_date, calcStoryPoints);
     }
 }
@@ -137,8 +137,8 @@ function putDataPoint(velocity, teamName, norm_date, calcStoryPoints) {
     }
 }
 
-function putTotalMonthlyPoint(velocity, teamName, date, calcStoryPoints) {
-    if (teamName != "Automation") {
+function putTotalMonthlyPoint(velocity, page, teamName, date, calcStoryPoints) {
+    if (!page.automationType) {
         processMonthlyData(velocity, "Total", date, 0, calcStoryPoints);
     }
 }

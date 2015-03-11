@@ -3,6 +3,7 @@ var Schema = mongoose.Schema;
 
 var schema = new Schema({
     key:                    { type: String, unique: true, index: true },
+    automationType:         { type: Boolean, default: false },
     epicKey:                { type: String, index: true },
     uri:                    { type: String },
     summary:                { type: String },

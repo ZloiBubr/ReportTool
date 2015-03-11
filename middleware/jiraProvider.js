@@ -168,7 +168,7 @@ exports.updateJiraInfo = function (debug, full, remove, jiraUser, jiraPassword, 
             Step7CollectAcceptanceTasks(callback);
         },
         function (callback) {
-            LogProgress("**** Step 8: save story point changes");
+            LogProgress("**** Step 8: save story points changes");
             Step8CollectStoryPointsChanges(callback);
         },
         function (callback) {
@@ -464,6 +464,9 @@ function Step6CollectStories(callback) {
                         page = new Page();
                     }
 
+                    if(isAutomationStory(story)) {
+                        page.automationType = true;
+                    }
                     mapPageProperties(story, page);
                     parseHistory(story, page);
                     calcWorklogFromIssue(story, page);
@@ -743,9 +746,13 @@ function mapLinkedIssues(jiraPage, dbPage) {
 function isAutomationStory(story) {
     var labels = story.fields.labels;
     for(var i=0; i<labels.length; i++) {
-        if(labels[i].toLowerCase().indexOf('automation') > -1) {
-            if(story.fields.status != STATUS.OPEN.name)
+        if(labels[i].toLowerCase().indexOf('automation') > -1 &&
+            labels[i].toLowerCase().indexOf('automation_no') < 0 &&
+            labels[i].toLowerCase().indexOf('automation_yes') < 0
+        ) {
+            if(story.fields.status != STATUS.OPEN.name) {
                 return true;
+            }
         }
     }
 
@@ -875,6 +882,9 @@ function mapAcceptanceTask(dbIssue, originalIssue) {
 }
 
 function ParseSizeChanges(item, history, page) {
+    if(page.automationType) {
+        return;
+    }
     var dateCreated = new Date(history.created);
     var dateMonthAgo = new Date(Date.now());
     dateMonthAgo.setMonth(dateMonthAgo.getMonth()-1);
@@ -954,7 +964,7 @@ function ParseFinishDates(item, page, created) {
 }
 
 function Step8CollectStoryPointsChanges(callback) {
-    _.each(sizeChanges, function(sizeChange) {
+    async.each(sizeChanges, function(sizeChange, callback) {
         var sizeChangeDb = new SizeChange();
         sizeChangeDb.date = sizeChange.date;
         sizeChangeDb.key = sizeChange.key;
@@ -963,13 +973,12 @@ function Step8CollectStoryPointsChanges(callback) {
         sizeChangeDb.to = sizeChange.to;
         sizeChangeDb.person = sizeChange.person;
         sizeChangeDb.save(function (err) {
-           if(err) {
-               callback(err);
-           }
-           else {
-               callback();
-           }
+            LogProgress(sizeChangeDb.key + " Change stored to database");
+            callback(err);
         });
+    },
+    function(err) {
+        callback(err);
     });
 }
 
