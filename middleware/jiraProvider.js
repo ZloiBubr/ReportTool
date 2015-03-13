@@ -308,32 +308,25 @@ function Step2CollectIssues(jira, callback) {
                     jira.findIssue(issueObject.key + "?expand=changelog,subtasks", function (err, issue) {
                         if (err) {
                             LogProgress("Restarting loop for key: "+issueObject.key, err);
-                            callback(err);
+                        }
+                        if (issue != null) {
+                            OriginalJiraIssue.findOne({ key: issue.key }, function (err, dbissue) {
+                                if (!dbissue) {
+                                    dbissue = new OriginalJiraIssue();
+                                }
+                                dbissue.key = issue.key;
+                                dbissue.issuetype = issue.fields.issuetype.name;
+                                dbissue.object = issue;
+
+                                dbissue.save(function (err) {
+                                    loopError = false;
+                                    callback();
+                                });
+                            });
                         }
                         else {
-                            if (issue != null) {
-                                OriginalJiraIssue.findOne({ key: issue.key }, function (err, dbissue) {
-                                    if (err) {
-                                        callback(err);
-                                    }
-
-                                    if (!dbissue) {
-                                        dbissue = new OriginalJiraIssue();
-                                    }
-                                    dbissue.key = issue.key;
-                                    dbissue.issuetype = issue.fields.issuetype.name;
-                                    dbissue.object = issue;
-
-                                    dbissue.save(function (err) {
-                                        loopError = false;
-                                        callback(err);
-                                    });
-                                });
-                            }
-                            else {
-                                loopError = false;
-                                callback();
-                            }
+                            loopError = false;
+                            callback();
                         }
                     });
                 },
@@ -953,11 +946,10 @@ function ParseFinishDates(item, page, created) {
         var from = item.fromString;
         var to = item.toString;
 
-        if (from == STATUS.INPROGRESS.name && to == STATUS.READYFORQA.name && page.devFinished == null ||
-            from == STATUS.CODEREVIEW.name && to == STATUS.READYFORQA.name && page.devFinished == null) {
+        if (to == STATUS.READYFORQA.name) {
             page.devFinished = created;
         }
-        if (from == STATUS.TESTINGINPROGRESS.name && to == STATUS.RESOLVED.name) {
+        if (to == STATUS.RESOLVED.name) {
             page.qaFinished = created;
         }
     }
