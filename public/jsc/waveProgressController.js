@@ -40,7 +40,7 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
         $scope.allSMEs = [{id: "All", name: "All"}];
         $scope.allModuleGroups = [{id: "All", name: "All"}];
         $scope.allModules = [{id: "All", name: "All"}];
-        $scope.allVersions = [{id: "All", name: "All"}, {id: "Q1", name: "Q1"}, {id: "Q2", name: "Q2"}];
+        $scope.allVersions = [{id: "All", name: "All"}, {id: "Q1", name: "Q1"}, {id: "Q2", name: "Q2"}, {id: "Q3", name: "Q3"}, {id: "Q12", name: "Q12"}];
         $scope.allStatuses = [
             {name: $scope.STATUS.DEFERRED.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
             {name: $scope.STATUS.OPEN.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
@@ -61,7 +61,7 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
     };
 
     function FillVersionsCombo() {
-        $scope.allVersions = [{id: "All", name: "All"}, {id: "Q1", name: "Q1"}, {id: "Q2", name: "Q2"}];
+        $scope.allVersions = [{id: "All", name: "All"}, {id: "Q1", name: "Q1"}, {id: "Q2", name: "Q2"}, {id: "Q3", name: "Q3"}, {id: "Q12", name: "Q12"}];
         _.each($scope.cloudAppData.cloudApp, function(cloudAppItem){
             var found = false;
             var versionProcessed = cloudAppItem.fixVersions == "" ? "Undefined" : cloudAppItem.fixVersions;
@@ -234,17 +234,39 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
             }
             if(addCards && $scope.filteredVersion != $scope.allVersions[0].id) {
                 if($scope.filteredVersion == "Q1") {
-                    if(!(cloudAppItem.fixVersions == "2.0 January 2015" ||
-                        cloudAppItem.fixVersions == "3.0 February 2015" ||
-                        cloudAppItem.fixVersions == "4.0 March 2015"
+                    if(!(
+                        cloudAppItem.fixVersions.indexOf("2.0") > -1 ||
+                        cloudAppItem.fixVersions.indexOf("3.0") > -1 ||
+                        cloudAppItem.fixVersions.indexOf("4.0") > -1
                         )) {
                         return;
                     }
                 }
                 else if($scope.filteredVersion == "Q2") {
-                    if(!(cloudAppItem.fixVersions == "5.0 April 2015" ||
-                        cloudAppItem.fixVersions == "6.0 May 2015" ||
-                        cloudAppItem.fixVersions == "7.0 June 2015"
+                    if(!(
+                        cloudAppItem.fixVersions.indexOf("5.0") > -1 ||
+                        cloudAppItem.fixVersions.indexOf("6.0") > -1 ||
+                        cloudAppItem.fixVersions.indexOf("7.0") > -1
+                        )) {
+                        return;
+                    }
+                }
+                else if($scope.filteredVersion == "Q12") {
+                    if(!(
+                        cloudAppItem.fixVersions.indexOf("2.0") > -1 ||
+                        cloudAppItem.fixVersions.indexOf("3.0") > -1 ||
+                        cloudAppItem.fixVersions.indexOf("4.0") > -1 ||
+                        cloudAppItem.fixVersions.indexOf("5.0") > -1 ||
+                        cloudAppItem.fixVersions.indexOf("6.0") > -1 ||
+                        cloudAppItem.fixVersions.indexOf("7.0") > -1
+                        )) {
+                        return;
+                    }
+                }
+                else if($scope.filteredVersion == "Q3") {
+                    if(!(cloudAppItem.fixVersions.indexOf("8.0") > -1 ||
+                        cloudAppItem.fixVersions.indexOf("9.0") > -1 ||
+                        cloudAppItem.fixVersions.indexOf("10.0") > -1
                         )) {
                         return;
                     }

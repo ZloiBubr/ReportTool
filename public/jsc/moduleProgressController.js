@@ -34,7 +34,7 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
         $scope.total.total = 0;
         $scope.allSMEs = [{id: "All", name: "All"}];
         $scope.allModuleGroups = [{id: "All", name: "All"}];
-        $scope.allVersions = [{id: "All", name: "All"}, {id: "Q1", name: "Q1"}, {id: "Q2", name: "Q2"}];
+        $scope.allVersions = [{id: "All", name: "All"}, {id: "Q1", name: "Q1"}, {id: "Q2", name: "Q2"}, {id: "Q3", name: "Q3"}, {id: "Q12", name: "Q12"}];
         $scope.showVersions = [];
         $scope.teamLoadData = [];
     };
@@ -173,17 +173,39 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
             }
             if(addCards && $scope.filteredVersion != $scope.allVersions[0].id) {
                 if($scope.filteredVersion == "Q1") {
-                    if(!(moduleProgressItem.fixVersions == "2.0 January 2015" ||
-                        moduleProgressItem.fixVersions == "3.0 February 2015" ||
-                        moduleProgressItem.fixVersions == "4.0 March 2015"
+                    if(!(
+                        moduleProgressItem.fixVersions.indexOf("2.0") > -1 ||
+                        moduleProgressItem.fixVersions.indexOf("3.0") > -1 ||
+                        moduleProgressItem.fixVersions.indexOf("4.0") > -1
                     )) {
                         return;
                     }
                 }
                 else if($scope.filteredVersion == "Q2") {
-                    if(!(moduleProgressItem.fixVersions == "5.0 April 2015" ||
-                        moduleProgressItem.fixVersions == "6.0 May 2015" ||
-                        moduleProgressItem.fixVersions == "7.0 June 2015"
+                    if(!(
+                        moduleProgressItem.fixVersions.indexOf("5.0") > -1 ||
+                        moduleProgressItem.fixVersions.indexOf("6.0") > -1 ||
+                        moduleProgressItem.fixVersions.indexOf("7.0") > -1
+                        )) {
+                        return;
+                    }
+                }
+                else if($scope.filteredVersion == "Q12") {
+                    if(!(
+                        moduleProgressItem.fixVersions.indexOf("2.0") > -1 ||
+                        moduleProgressItem.fixVersions.indexOf("3.0") > -1 ||
+                        moduleProgressItem.fixVersions.indexOf("4.0") > -1 ||
+                        moduleProgressItem.fixVersions.indexOf("5.0") > -1 ||
+                        moduleProgressItem.fixVersions.indexOf("6.0") > -1 ||
+                        moduleProgressItem.fixVersions.indexOf("7.0") > -1
+                        )) {
+                        return;
+                    }
+                }
+                else if($scope.filteredVersion == "Q3") {
+                    if(!(moduleProgressItem.fixVersions.indexOf("8.0") > -1 ||
+                        moduleProgressItem.fixVersions.indexOf("9.0") > -1 ||
+                        moduleProgressItem.fixVersions.indexOf("10.0") > -1
                         )) {
                         return;
                     }
