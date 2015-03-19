@@ -187,9 +187,6 @@ function putDataPoint(moduledata, module, page, count) {
         moduled.checklistsProgress.push(page.checklistCreated);
         addCloudApp(moduled, page);
     }
-    if(moduled.status == "Production") {
-        moduled.status = STATUS.PRODUCTION.name;
-    }
 }
 
 function addCloudApp(module, page) {

@@ -4,12 +4,15 @@
 var util = require('util');
 var config = require('../config');
 var log = require('../libs/log')(module);
+
 var Module = require('../models/module').Module;
 var Page = require('../models/page').Page;
 var OriginalJiraIssue = require('../models/originalJiraIssue').Issue;
 var Version = require('../models/Version').Version;
 var Issue = require('../models/issue').Issue;
 var CloudApp = require('../models/cloudApp').CloudApp;
+var SizeChange = require('../models/sizeChange').SizeChange;
+
 var _ = require('underscore');
 var async = require('async');
 var cache = require('node_cache');
@@ -27,6 +30,7 @@ var issueObjects = [];
 var acceptanceObjectsMap = {};
 var epicsMap = {};
 var pagesMap = {};
+var sizeChanges = [];
 
 var updateInProgress = false;
 
@@ -139,7 +143,13 @@ exports.updateJiraInfo = function (debug, full, remove, jiraUser, jiraPassword, 
                                 callback(err);
                             }
                             LogProgress("4. CloudApps collection has been dropped");
-                            callback();
+                            SizeChange.collection.drop(function (err) {
+                                if(err && err.errmsg != 'ns not found') {
+                                    callback(err);
+                                }
+                                LogProgress("5. SizeChange collection has been dropped");
+                                callback();
+                            });
                         });
                     });
                 });
@@ -156,6 +166,10 @@ exports.updateJiraInfo = function (debug, full, remove, jiraUser, jiraPassword, 
         function (callback) {
             LogProgress("**** Step 7: collect acceptance tasks");
             Step7CollectAcceptanceTasks(callback);
+        },
+        function (callback) {
+            LogProgress("**** Step 8: save story points changes");
+            Step8CollectStoryPointsChanges(callback);
         },
         function (callback) {
             if(!debug) {
@@ -294,32 +308,25 @@ function Step2CollectIssues(jira, callback) {
                     jira.findIssue(issueObject.key + "?expand=changelog,subtasks", function (err, issue) {
                         if (err) {
                             LogProgress("Restarting loop for key: "+issueObject.key, err);
-                            callback(err);
+                        }
+                        if (issue != null) {
+                            OriginalJiraIssue.findOne({ key: issue.key }, function (err, dbissue) {
+                                if (!dbissue) {
+                                    dbissue = new OriginalJiraIssue();
+                                }
+                                dbissue.key = issue.key;
+                                dbissue.issuetype = issue.fields.issuetype.name;
+                                dbissue.object = issue;
+
+                                dbissue.save(function (err) {
+                                    loopError = false;
+                                    callback();
+                                });
+                            });
                         }
                         else {
-                            if (issue != null) {
-                                OriginalJiraIssue.findOne({ key: issue.key }, function (err, dbissue) {
-                                    if (err) {
-                                        callback(err);
-                                    }
-
-                                    if (!dbissue) {
-                                        dbissue = new OriginalJiraIssue();
-                                    }
-                                    dbissue.key = issue.key;
-                                    dbissue.issuetype = issue.fields.issuetype.name;
-                                    dbissue.object = issue;
-
-                                    dbissue.save(function (err) {
-                                        loopError = false;
-                                        callback(err);
-                                    });
-                                });
-                            }
-                            else {
-                                loopError = false;
-                                callback();
-                            }
+                            loopError = false;
+                            callback();
                         }
                     });
                 },
@@ -427,6 +434,7 @@ function Step6CollectStories(callback) {
     var count = 0;
     var count2 = 0;
     acceptanceObjectsMap = {};
+    sizeChanges = [];
 
     stream.on('data', function (doc) {
         stream.pause();
@@ -449,6 +457,9 @@ function Step6CollectStories(callback) {
                         page = new Page();
                     }
 
+                    if(isAutomationStory(story)) {
+                        page.automationType = true;
+                    }
                     mapPageProperties(story, page);
                     parseHistory(story, page);
                     calcWorklogFromIssue(story, page);
@@ -529,6 +540,7 @@ function parseHistory(issue, page) {
             var item = history.items[y];
             ParseProgress(item, page, author, history.created);
             ParseFinishDates(item, page, history.created);
+            ParseSizeChanges(item, history, page);
         }
     }
 }
@@ -727,9 +739,13 @@ function mapLinkedIssues(jiraPage, dbPage) {
 function isAutomationStory(story) {
     var labels = story.fields.labels;
     for(var i=0; i<labels.length; i++) {
-        if(labels[i].toLowerCase().indexOf('automation') > -1) {
-            if(story.fields.status != STATUS.OPEN.name)
+        if(labels[i].toLowerCase().indexOf('automation') > -1 &&
+            labels[i].toLowerCase().indexOf('automation_no') < 0 &&
+            labels[i].toLowerCase().indexOf('automation_yes') < 0
+        ) {
+            if(story.fields.status != STATUS.OPEN.name) {
                 return true;
+            }
         }
     }
 
@@ -858,6 +874,29 @@ function mapAcceptanceTask(dbIssue, originalIssue) {
         dbIssue.assignee = originalIssue.fields.assignee.displayName;
 }
 
+function ParseSizeChanges(item, history, page) {
+    if(page.automationType) {
+        return;
+    }
+    var dateCreated = new Date(history.created);
+    var dateMonthAgo = new Date(Date.now());
+    dateMonthAgo.setMonth(dateMonthAgo.getMonth()-1);
+
+    if(dateCreated < dateMonthAgo) {
+        return;
+    }
+    if (item.fieldtype == 'custom' && (item.field == 'Story Points')) {
+        var from = item.fromString == null ||
+        item.fromString == undefined ||
+        item.fromString == ''
+            ?
+            '0' : item.fromString;
+        var to = item.toString;
+
+        sizeChanges.push({date: dateCreated, key: page.key, summary: page.summary, person: history.author.displayName, from: from, to: to});
+    }
+}
+
 function ParseProgress(item, page, author, created) {
     if (item.fieldtype == 'custom' && (item.field == 'Progress' || item.field == "Progress, %")) {
         var from = item.fromString == null ||
@@ -907,14 +946,32 @@ function ParseFinishDates(item, page, created) {
         var from = item.fromString;
         var to = item.toString;
 
-        if (from == STATUS.INPROGRESS.name && to == STATUS.READYFORQA.name && page.devFinished == null ||
-            from == STATUS.CODEREVIEW.name && to == STATUS.READYFORQA.name && page.devFinished == null) {
+        if (to == STATUS.READYFORQA.name) {
             page.devFinished = created;
         }
-        if (from == STATUS.TESTINGINPROGRESS.name && to == STATUS.RESOLVED.name) {
+        if (to == STATUS.RESOLVED.name) {
             page.qaFinished = created;
         }
     }
+}
+
+function Step8CollectStoryPointsChanges(callback) {
+    async.each(sizeChanges, function(sizeChange, callback) {
+        var sizeChangeDb = new SizeChange();
+        sizeChangeDb.date = sizeChange.date;
+        sizeChangeDb.key = sizeChange.key;
+        sizeChangeDb.summary = sizeChange.summary;
+        sizeChangeDb.from = sizeChange.from;
+        sizeChangeDb.to = sizeChange.to;
+        sizeChangeDb.person = sizeChange.person;
+        sizeChangeDb.save(function (err) {
+            LogProgress(sizeChangeDb.key + " Change stored to database");
+            callback(err);
+        });
+    },
+    function(err) {
+        callback(err);
+    });
 }
 
 

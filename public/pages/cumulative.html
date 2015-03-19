@@ -15,6 +15,40 @@
     </div>
 
     <div>
+        <table id="sizeChangesTable" class="table table-striped table-bordered">
+            <thead class="progressTableMainHeader">
+            <tr style="background-color: #99bafa">
+                <th>Date</th>
+                <th>Key</th>
+                <th>Summary</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Person</th>
+            </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat = "sizeChange in sizeChanges" >
+                    <td style="width: 10%">{{sizeChange.date | date:'yyyy-MM-dd'}}</td>
+                    <td style="width: 15%"><a href="{{sizeChange.uri}}">{{sizeChange.key}}</a></td>
+                    <td>{{sizeChange.summary}}</td>
+                    <td style="width: 10%">{{sizeChange.from}}</td>
+                    <td style="width: 10%">{{sizeChange.to}}</td>
+                    <td style="width: 15%">{{sizeChange.person}}</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr style="background-color: #99bafa">
+                    <td>Total</td>
+                    <td>Total</td>
+                    <td>Total</td>
+                    <td>{{sizeChanges.fromTotal}}</td>
+                    <td>{{sizeChanges.toTotal}}</td>
+                    <td>Delta: {{sizeChanges.toTotal - sizeChanges.fromTotal | number : 1 }} SP</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <div>
         <table id="copyStackedTable" style="display: none">
             <tr ng-repeat = "(key,val) in distributionByTeam" >
                 <td style="border: solid gray thin">{{currentDate | date:'yyyy-MM-dd'}}</td>

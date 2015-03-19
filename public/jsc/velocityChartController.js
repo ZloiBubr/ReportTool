@@ -157,6 +157,18 @@ function velocityChartController($scope, $resource, $modal, $timeout, $window) {
 
             $scope.distributionoData = data.distribution;
             $scope.distributionByTeam = data.distributionByTeam;
+            $scope.sizeChanges = data.sizeChanges;
+
+            var fromTotal = 0.;
+            var toTotal = 0.;
+            _.forEach($scope.sizeChanges, function(item) {
+               item.uri = "https://jira.epam.com/jira/browse/" + item.key;
+                fromTotal += parseFloat(item.from);
+                toTotal += item.to ? parseFloat(item.to) : 0;
+            });
+            $scope.sizeChanges.fromTotal = fromTotal;
+            $scope.sizeChanges.toTotal = toTotal;
+
 
             $scope.pagesModel = {data:[]};
             $scope.spModel = {data:[]};
