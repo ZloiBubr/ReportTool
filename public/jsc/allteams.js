@@ -24,7 +24,8 @@ function Teams() {
                 "Pavel Kastsiuk",
                 "Juliana Stolnik",
 		        "Volha Viktarava",
-                "Artsiom Kazlou"
+                "Artsiom Kazlou",
+                "Aliaksandr Lukyanchyk"
             ],
             testers: [
                 "Pavel Vysotsky",

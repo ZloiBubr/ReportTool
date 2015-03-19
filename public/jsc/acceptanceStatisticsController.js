@@ -1,40 +1,53 @@
-function acceptanceStatisticsController($scope, $resource) {
-    var resource = $resource('/acceptanceStatistics');
+function acceptanceStatisticsController($scope, $resource, $stateParams, $state) {
+    var routes = { checklistRoute : '/checklistDueDateStatistic', acceptanceRoute : '/acceptanceStatistics', bugRoute : '/bugDueDateStatistic' };
     var baseUrl = "https://jira.epam.com/jira/issues/?jql=";
 
     $scope.init = function () {
+        var currentEntity = $stateParams.displayedEntity || "Acceptance Task";
+        $scope.currentEntity = currentEntity;
         $scope.isOnlySmeMode = true;
-        $scope.loadData().done($scope.prepareData);
+        $scope.chooseEntity();
     };
-
 
     $scope.reinit = function(){
         $scope.prepareData()
+    };
+    
+    $scope.changeState = function () {
+        $state.go('acceptanceStatistics', { displayedEntity : $scope.currentEntity });
+    }
+
+    $scope.chooseEntity = function (){
+        if ($scope.currentEntity == "Acceptance Task") {
+            resource = $resource(routes.acceptanceRoute);
+            $state.go('acceptanceStatistics', { displayedEntity : $scope.currentEntity });
+        }
+
+        if ($scope.currentEntity == "Checklist"){
+            resource = $resource(routes.checklistRoute);
+        }
+
+        if ($scope.currentEntity == "Bug"){
+            resource = $resource(routes.bugRoute);
+        }
+
+        $scope.loadData().done($scope.prepareData);
     };
 
     $scope.prepareData  = function (){
         var statistics = [];
         var smeAcceptanceData = [];
-        $scope.total = {
-            totalUnspecifiedDate: 0,
-            totalCurrent: 0,
-            totalWithFirstRange : 0,
-            totalWithSecondRange : 0,
-            totalWithThirdRange : 0,
-            totalWithFourthRange : 0,
-            totalWithFifthRange : 0,
-            commonTotal : getCommonTotal
-        };
-        if($scope.isOnlySmeMode) {
-            var emptyLeaderVm = jQuery.extend(true, {},_.find($scope.smeAcceptanceData, function (item) {
-                if (item.leader === "") return item;
-            }));
 
+        var totals = [];
+        for (var i = 0; i < $scope.ranges.length; i++){
+            totals.push(0);
+        }
+        $scope.totals = totals;
+
+        if($scope.isOnlySmeMode) {
             var groupedbySme = _.groupBy($scope.smeAcceptanceData, function (item) {
                 return item.SME;
             });
-
-            //addSmeFromEmptyVm(emptyLeaderVm, groupedbySme);
 
             _.each(groupedbySme, function(leadersArrayItem){
                 var groupedSmeItem = jQuery.extend(true, {}, leadersArrayItem[0]);
@@ -42,13 +55,12 @@ function acceptanceStatisticsController($scope, $resource) {
                 if (groupedSmeItem.SME === "") return false;
 
                 for(var i=1; i<leadersArrayItem.length;i++){
-                    for(var l=0; l< leadersArrayItem[i].cloudAppDelayStatistics.length; l++){
-                        var cloudappItem = leadersArrayItem[i].cloudAppDelayStatistics[l];
-                        groupedSmeItem.cloudAppDelayStatistics[l].cloudApps.push.apply(groupedSmeItem.cloudAppDelayStatistics[l].cloudApps,cloudappItem.cloudApps);
+                    for(var l=0; l< leadersArrayItem[i].entityDelayStatistics.length; l++){
+                        var cloudAppItem = leadersArrayItem[i].entityDelayStatistics[l];
+                        groupedSmeItem.entityDelayStatistics[l].entities.push.apply(groupedSmeItem.entityDelayStatistics[l].entities, cloudAppItem.entities);
                     }
                 }
 
-                addRecordsWithUnspecifiedDate(groupedSmeItem,emptyLeaderVm);
                 smeAcceptanceData.push(groupedSmeItem);
             });
         }
@@ -59,13 +71,9 @@ function acceptanceStatisticsController($scope, $resource) {
         for (var i = 0; i <  smeAcceptanceData.length; i++){
             var statistic = getLeaderStatistic( smeAcceptanceData[i]);
 
-            $scope.total.totalUnspecifiedDate += statistic.notAssignedDueAppCount;
-            $scope.total.totalCurrent += statistic.currentRangeAppCount;
-            $scope.total.totalWithFirstRange += statistic.firstRangeAppCount;
-            $scope.total.totalWithSecondRange += statistic.secondRangeAppCount;
-            $scope.total.totalWithThirdRange += statistic.thirdRangeAppCount;
-            $scope.total.totalWithFourthRange += statistic.fourthRangeAppCount;
-            $scope.total.totalWithFifthRange += statistic.fifthRangeAppCount;
+            for (var j = 0; j < statistic.delayStatistics.length; j++){
+                $scope.totals[j] += statistic.delayStatistics[j].count;
+            }
 
             statistics.push(statistic);
         }
@@ -78,6 +86,7 @@ function acceptanceStatisticsController($scope, $resource) {
 
         var successCallback = function (data) {
             $scope.smeAcceptanceData = data.result;
+            $scope.ranges = data.ranges;
             deferred.resolve();
         };
 
@@ -91,40 +100,23 @@ function acceptanceStatisticsController($scope, $resource) {
     }
 
     var getLeaderStatistic  = function (leaderStatistic) {
-        var statisticWithNotAssignedDue = getDelayStatisticWithRange(leaderStatistic, null, null);
-        var delayStatisticWithCurrent = getDelayStatisticWithRange(leaderStatistic, -99999, 0);
-        var delayStatisticWithFirstRange = getDelayStatisticWithRange(leaderStatistic, 1, 15);
-        var delayStatisticWithSecondRange = getDelayStatisticWithRange(leaderStatistic, 16, 30);
-        var delayStatisticWithThirdRange = getDelayStatisticWithRange(leaderStatistic, 31, 45);
-        var delayStatisticWithFourthRange = getDelayStatisticWithRange(leaderStatistic, 46, 60);
-        var delayStatisticWithFifthRange = getDelayStatisticWithRange(leaderStatistic, 61, 10000);
+        var leaderDelayStatistics = [];
+        for (var i = 0; i < $scope.ranges.length; i++){
+            var delayStatistic = getDelayStatisticWithRange(leaderStatistic, $scope.ranges[i].minRangeValue, $scope.ranges[i].maxRangeValue);
+            delayStatistic.jiraLink = getJiraLink(delayStatistic.entities);
+            delayStatistic.count = delayStatistic.entities ? delayStatistic.entities.length : 0;
+            leaderDelayStatistics.push(delayStatistic);
+        }
 
         var statistic = {};
         statistic.leader = $scope.isOnlySmeMode ? leaderStatistic.SME :leaderStatistic.leader;
-        statistic.notAssignedDueAppCount = statisticWithNotAssignedDue.cloudApps.length;
-        statistic.currentRangeAppCount = delayStatisticWithCurrent.cloudApps.length;
-        statistic.firstRangeAppCount = delayStatisticWithFirstRange.cloudApps.length;
-        statistic.secondRangeAppCount = delayStatisticWithSecondRange.cloudApps.length;
-        statistic.thirdRangeAppCount = delayStatisticWithThirdRange.cloudApps.length;
-        statistic.fourthRangeAppCount = delayStatisticWithFourthRange.cloudApps.length;
-        statistic.fifthRangeAppCount = delayStatisticWithFifthRange.cloudApps.length;
-
-        statistic.notAssignedDueJiraLink = getJiraLink(statisticWithNotAssignedDue.cloudApps);
-        statistic.currentRangeJiraLink = getJiraLink(delayStatisticWithCurrent.cloudApps);
-        statistic.firstRangeJiraLink = getJiraLink(delayStatisticWithFirstRange.cloudApps);
-        statistic.secondRangeJiraLink = getJiraLink(delayStatisticWithSecondRange.cloudApps);
-        statistic.thirdRangeJiraLink = getJiraLink(delayStatisticWithThirdRange.cloudApps);
-        statistic.fourthRangeJiraLink = getJiraLink(delayStatisticWithFourthRange.cloudApps);
-        statistic.fifthRangeJiraLink = getJiraLink(delayStatisticWithFifthRange.cloudApps);
+        statistic.delayStatistics = leaderDelayStatistics;
 
         statistic.total = function (){
-            var total = statistic.currentRangeAppCount;
-            total += statistic.notAssignedDueAppCount;
-            total += statistic.firstRangeAppCount;
-            total += statistic.secondRangeAppCount;
-            total += statistic.thirdRangeAppCount;
-            total += statistic.fourthRangeAppCount;
-            total += statistic.fifthRangeAppCount;
+            var total = 0;
+            for (var index = 0; index < statistic.delayStatistics.length; index++){
+                total += statistic.delayStatistics[index].count;
+            }
 
             return total;
         }
@@ -133,7 +125,7 @@ function acceptanceStatisticsController($scope, $resource) {
     }
 
     var getDelayStatisticWithRange = function (leaderStatistic, min, max) {
-        var delayStatistics = leaderStatistic.cloudAppDelayStatistics;
+        var delayStatistics = leaderStatistic.entityDelayStatistics;
 
         for (var i = 0; i < delayStatistics.length; i++){
             if ((min === null || max === null) && (delayStatistics[i].minRangeValue === null || delayStatistics[i].maxRangeValue === null)) {
@@ -152,58 +144,11 @@ function acceptanceStatisticsController($scope, $resource) {
         return {};
     }
 
-    var addRecordsWithUnspecifiedDate = function (groupItem, targetEmptyVm){
-        if (!targetEmptyVm.cloudAppDelayStatistics) return;
-
-        for (var j = 0; j < targetEmptyVm.cloudAppDelayStatistics.length; j++) {
-            var currentDelayStatistic = targetEmptyVm.cloudAppDelayStatistics[j];
-            var targetDelayRange = getDelayStatisticWithRange(groupItem, currentDelayStatistic.minRangeValue, currentDelayStatistic.maxRangeValue);
-            for (var k = 0; k < currentDelayStatistic.cloudApps.length; k++) {
-                if (groupItem.SME === currentDelayStatistic.cloudAppSmes[k]) {
-                    targetDelayRange.cloudApps.push(currentDelayStatistic.cloudApps[k]);
-                }
-            }
+    $scope.getCommonTotal = function () {
+        var total = 0;
+        for (var i = 0; i < $scope.statistics.length; i++){
+            total += $scope.statistics[i].total();
         }
-    };
-
-
-    var addSmeFromEmptyVm = function (targetEmptyVm, allGroups) {
-        for (var j = 0; j < targetEmptyVm.cloudAppDelayStatistics.length; j++) {
-            var currentDelayStatistic = targetEmptyVm.cloudAppDelayStatistics[j];
-            for (var k = 0; k < currentDelayStatistic.cloudApps.length; k++) {
-                var record = _.find(allGroups, function (item) {
-                    return item[0] && item[0].SME == currentDelayStatistic.cloudAppSmes[k];
-                });
-
-                if (!record) {
-                    var newSmeName = currentDelayStatistic.cloudAppSmes[k];
-                    allGroups[newSmeName] = [getEmptyRecord("", newSmeName)];
-                }
-            }
-        }
-    }
-
-
-    var getEmptyRecord = function (leaderName, smeName) {
-        return { SME: smeName, leader : leaderName, cloudAppDelayStatistics : [
-            { minRangeValue: null, maxRangeValue: null, cloudApps: []},
-            {minRangeValue: -99999, maxRangeValue: 0, cloudApps: []},
-            {minRangeValue: 1, maxRangeValue: 15, cloudApps: []},
-            {minRangeValue: 16, maxRangeValue: 30, cloudApps: []},
-            {minRangeValue: 31, maxRangeValue: 45, cloudApps: []},
-            {minRangeValue: 46, maxRangeValue: 60, cloudApps: []},
-            {minRangeValue: 61, maxRangeValue: 10000, cloudApps: []}
-        ]};
-    }
-
-    var getCommonTotal = function () {
-        var total = $scope.total.totalCurrent;
-        total += $scope.total.totalUnspecifiedDate;
-        total += $scope.total.totalWithFirstRange;
-        total += $scope.total.totalWithSecondRange;
-        total += $scope.total.totalWithThirdRange;
-        total += $scope.total.totalWithFourthRange;
-        total += $scope.total.totalWithFifthRange;
 
         return total;
     };

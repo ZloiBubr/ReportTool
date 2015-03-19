@@ -1,0 +1,57 @@
+<div ng-controller="acceptanceStatisticsController" class="container">
+    <div class="row">
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" ng-model="isOnlySmeMode" ng-change="reinit()"> Group by SME
+            </label>
+        </div>
+        <div>
+            <label>
+                <select ng-model="currentEntity" ng-change="changeState()">
+                    <option value="Acceptance Task">Acceptance Tasks</option>
+                    <option value="Checklist">Checklists</option>
+                    <option value="Bug">Bugs</option>
+                </select>
+            </label>
+        </div>
+        <table class="table table-striped table-timesheet-hover no-padding col-lg-12 table-bordered center-align">
+            <thead class="progressTableMainHeader">
+            <tr>
+                <th>
+                    Leader
+                </th>
+                <th ng-repeat="range in ranges">
+                    {{range.title}}
+                </th>
+                <th>
+                    Total
+                </th>
+            </tr>
+            </thead>
+
+            <tbody style="height: 100px;">
+            <tr ng-repeat="statistic in statistics | orderBy : 'leader' ">
+                <td>{{statistic.leader}}</td>
+                <td ng-repeat="delayStatistic in statistic.delayStatistics">
+                    <a href="{{delayStatistic.jiraLink}}" ng-if="delayStatistic.count != 0">
+                        {{delayStatistic.count}}
+                    </a>
+                </td>
+                <td>{{statistic.total()}}</td>
+            </tr>
+            </tbody>
+
+            <tfoot>
+            <tr>
+                <td>Totals:</td>
+                <td ng-repeat="total in totals track by $index">
+                    {{totals[$index]}}
+                </td>
+                <td>
+                    {{getCommonTotal()}}
+                </td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
