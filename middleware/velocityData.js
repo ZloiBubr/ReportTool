@@ -168,7 +168,7 @@ function parsePages(callback) {
                                                     var calcStoryPoints = storyPoints * progress / 100;
 
                                                     putDataPoint(velocity, "Actual burn", date, calcStoryPoints, "");
-                                                    if(module.fixVersions != "8.0 Final") {
+                                                    if(module.fixVersions.toLowerCase().indexOf("final") < 0) {
                                                         putDataPoint(velocity, "Actual burn core", date, calcStoryPoints, "");
                                                     }
                                                 }
@@ -184,7 +184,7 @@ function parsePages(callback) {
                                                             modulesAdded.push(module.summary);
                                                         }
                                                         putDataPoint(velocity, "Planned burn", date, storyPoints, tooltip);
-                                                        if(module.fixVersions != "8.0 Final") {
+                                                        if(module.fixVersions.toLowerCase().indexOf("final") < 0) {
                                                             maximumBurnCore += storyPoints;
                                                             putDataPoint(velocity, "Planned burn core", date, storyPoints, tooltip);
                                                         }

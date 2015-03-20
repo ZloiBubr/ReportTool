@@ -120,7 +120,9 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
             return a > b ? 1 : a < b ? -1 : 0;
         });
         $scope.showVersions.sort(function (a, b) {
-            return a > b ? 1 : a < b ? -1 : 0;
+            var num1 = parseFloat(a.substring(0,4));
+            var num2 = parseFloat(b.substring(0,4));
+            return num1 > num2 ? 1 : num1 < num2 ? -1 : 0;
         });
     }
 
