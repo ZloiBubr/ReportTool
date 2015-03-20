@@ -20,12 +20,18 @@ exports.getChecklists = function (req, res) {
 };
 
 function parsePages(callback) {
-    Issues.find({ issuetype: "Sub-task", "object.fields.summary": /.*\[PLEX.*/})
+    var request = {
+        issuetype:"Sub-task",
+        "object.fields.status.name" : {$nin:[STATUS.CLOSED.name, STATUS.RESOLVED.name, STATUS.BLOCKED.name]},
+        "object.fields.summary": /.*\[PLEX\-Check.*/i
+    };
+
+    Issues.find(request)
         .exec(function (err, checklists) {
             if (err) throw err;
 
             var propertyGetter = {
-                getDue : function (entity) { return entity.object.fields.duedate; },
+                getDue : function (entity) { return entity.object.fields.created; },
                 getAssignee : function (entity) { return entity.object.fields.assignee ? entity.object.fields.assignee.displayName : ""; },
                 getKey : function (entity) { return entity.key; }
             };

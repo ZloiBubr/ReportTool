@@ -24,7 +24,7 @@ function parsePages(callback) {
 
     var request = {
         issuetype:"Bug",
-        "object.fields.status.name" : {$nin:[STATUS.CLOSED.name, STATUS.RESOLVED.name, "Closed", "Resolved"]}
+        "object.fields.status.name" : {$nin:[STATUS.CLOSED.name, STATUS.RESOLVED.name, STATUS.DEFERRED.name, STATUS.DECLINED.name, STATUS.BLOCKED.name]}
     };
 
     Issues.find(request)

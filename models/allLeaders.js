@@ -5,80 +5,133 @@
 var leaderDictionary = {
 
     // SME Glen Tillman
-    "Glen_Tillman" : { SME: "Glen_Tillman" },
+    "Glen Tillman" : { SME: "Glen Tillman" },
     // Glen Tillman guys
-    "Ross Henri" : { SME: "Glen_Tillman" },
-    "Jeff Priskorn" : { SME: "Glen_Tillman" },
+    "Ross Henri" : { SME: "Glen Tillman" },
+    "Andy Hall" : { SME: "Glen Tillman" },
+    "Jon Stroven" : { SME: "Glen Tillman" },
+    "Patrick Stockton" : { SME: "Glen Tillman" },
+    "Igor Gedeon" : { SME: "Glen Tillman" },
+    "Jason Middleton" : { SME: "Glen Tillman" },
 
     // SME Jon Demski
-    "Jon_Demski" : { SME: "Jon_Demski" },
+    "Jon Demski" : { SME: "Jon Demski" },
     // Jon Demski guys
-    "Meredith Schmidt" : { SME: "Jon_Demski" },
-    "Sudhakar Rameswaran" : { SME: "Jon_Demski" },
-    "Danny Johnston" : { SME: "Jon_Demski" },
-    "Bindu Alookaren" : { SME: "Jon_Demski" },
-    "Matt Smyczynski" : { SME: "Jon_Demski" },
+    "Meredith Schmidt" : { SME: "Jon Demski" },
+    "Sudhakar Rameswaran" : { SME: "Jon Demski" },
+    "Danny Johnston" : { SME: "Jon Demski" },
+    "Bindu Alookaren" : { SME: "Jon Demski" },
+    "Chris Herberg" : { SME: "Jon Demski" },
+    "Matt Smyczynski" : { SME: "Jon Demski" },
+    "Chris Dwyer" : { SME: "Jon Demski" },
+    "Stephen Filus" : { SME: "Jon Demski" },
+    "Evan Mcdaniel" : { SME: "Jon Demski" },
 
     // SME Mark Meier
-    "Mark_Meier" : { SME: "Mark_Meier" },
+    "Mark Meier" : { SME: "Mark Meier" },
     // Mark Meier guys
-    "Lisa Gies" : { SME: "Mark_Meier" },
-    "Ian Taylor" : { SME: "Mark_Meier" },
-    "Sean Sherman" : { SME: "Mark_Meier" },
-    "Henry Chen" : { SME : "Mark_Meier" },
+    "Lisa Gies" : { SME: "Mark Meier" },
+    "Ian Taylor" : { SME: "Mark Meier" },
+    "Sean Sherman" : { SME: "Mark Meier" },
+    "Henry Chen" : { SME : "Mark Meier" },
+    "George Matus" : { SME : "Mark Meier" },
+    "Andrew Freckelton" : { SME : "Mark Meier" },
 
     // SME Karen Dalrymple
-    "Karen_Dalrymple" : { SME: "Karen_Dalrymple" },
+    "Karen Dalrymple" : { SME: "Karen Dalrymple" },
     // Karen Dalrymple guys
-    "David Golus" : { SME: "Karen_Dalrymple" },
-    "Harry Murphy" : { SME: "Karen_Dalrymple" },
-    "Aaron Bard" : { SME: "Karen_Dalrymple" },
-    "Andrew Graham" : { SME: "Karen_Dalrymple" },
-    "Joe Korolewicz" : { SME: "Karen_Dalrymple" },
-    "Robin Griffin" : { SME: "Karen_Dalrymple" },
-    "Don Ebben" : { SME: "Karen_Dalrymple" },
-    "Matthew McCloskey" : { SME: "Karen_Dalrymple" },
+    "David Golus" : { SME: "Karen Dalrymple" },
+    "Harry Murphy" : { SME: "Karen Dalrymple" },
+    "Aaron Bard" : { SME: "Karen Dalrymple" },
+    "Andrew Graham" : { SME: "Karen Dalrymple" },
+    "Joe Korolewicz" : { SME: "Karen Dalrymple" },
+    "Robin Griffin" : { SME: "Karen Dalrymple" },
+    "Don Ebben" : { SME: "Karen Dalrymple" },
+    "Matthew McCloskey" : { SME: "Karen Dalrymple" },
+    "Christian Schwartz" : { SME: "Karen Dalrymple" },
 
     // SME Phil Lintern
-    "Phil_Lintern" : { SME: "Phil_Lintern" },
+    "Phil Lintern" : { SME: "Phil Lintern" },
     // Phil Lintern guys
-    "Jeff Junttonen" : { SME: "Phil_Lintern" },
-    "Chris Shell" : { SME: "Phil_Lintern" },
-    "Todd Jonckheere" : { SME: "Phil_Lintern" },
+    "Jeff Junttonen" : { SME: "Phil Lintern" },
+    "Chris Shell" : { SME: "Phil Lintern" },
+    "Todd Jonckheere" : { SME: "Phil Lintern" },
+    "Xava Yang" : { SME: "Phil Lintern" },
+
 
     // SME Mike Medwith
-    "Mike_Medwith" : { SME: "Mike_Medwith" },
+    "Mike Medwith" : { SME: "Mike Medwith" },
     // Mike Medwith guys
-    "Nilesh Humbad" : { SME: "Mike_Medwith" },
-    "Jeffrey Ring" : { SME: "Mike_Medwith" },
+    "Nilesh Humbad" : { SME: "Mike Medwith" },
+    "Jeffrey Ring" : { SME: "Mike Medwith" },
+    "Lance Menard" : { SME: "Mike Medwith" },
+    "Eric Stevens" : { SME: "Mike Medwith" },
+    "Stephen Filus" : { SME: "Mike Medwith" },
+    "Matthew Frederick" : { SME: "Mike Medwith" },
+    "Matthew Orlando" : { SME: "Mike Medwith" },
+
 
     // SME Toulor Xiong
-    "Toulor_Xiong" : { SME: "Toulor_Xiong" },
+    "Toulor Xiong" : { SME: "Toulor Xiong" },
     // Toulor Xiong guys
-    "Rey Moyet" : { SME: "Toulor_Xiong" },
-    "Toulor Xiong" : { SME: "Toulor_Xiong" },
-    "Zachary Higgins" : { SME: "Toulor_Xiong" },
-    "Ryan Smith" : { SME: "Toulor_Xiong" },
+    "Rey Moyet" : { SME: "Toulor Xiong" },
+    "Zachary Higgins" : { SME: "Toulor Xiong" },
+    "Ryan Smith" : { SME: "Toulor Xiong" },
+    "Cherie Glenn" : { SME: "Toulor Xiong" },
+    "Jacqueline Arrowood" : { SME: "Toulor Xiong" },
+
 
     // SME Mike Breckle
-    "Richard Pokrefky" : { SME: "Mike_Breckle" },
+    "Mike Breckle" : { SME: "Mike Breckle" },
     // Mike Breckle guys
-    "Constantine de Castro" : { SME: "Mike_Breckle" },
-    "Sushma Krishnaswamy" : { SME: "Mike_Breckle" },
-    "Mike Zdanio" : { SME: "Mike_Breckle" },
-    "Eric Benchich" : { SME: "Mike_Breckle" },
+    "Constantine de Castro" : { SME: "Mike Breckle" },
+    "Sushma Krishnaswamy" : { SME: "Mike Breckle" },
+    "Mike Zdanio" : { SME: "Mike Breckle" },
+    "Eric Benchich" : { SME: "Mike Breckle" },
+    "Richard Pokrefky" : { SME: "Mike Breckle" },
+    "Yubo Dong" : { SME: "Mike Breckle" },
+    "Tom Nowak" : { SME: "Mike Breckle" },
+    "Stephanie Owens" : { SME: "Mike Breckle" },
+    "Devin Holland" : { SME: "Mike Breckle" },
+    "Robert Bedard" : { SME: "Mike Breckle" },
+    "David Sabourin" : { SME: "Mike Breckle" },
 
     // SME Mike Reinelt
-    "Mike_Reinelt" : { SME: "Mike_Reinelt" },
+    "Mike Reinelt" : { SME: "Mike Reinelt" },
     // Mike Reinelt guys
-    "Michael Hay" : { SME: "Mike_Reinelt" },
-    "Scott Bishop" : { SME: "Mike_Reinelt" },
+    "Michael Hay" : { SME: "Mike Reinelt" },
+    "Scott Bishop" : { SME: "Mike Reinelt" },
+    "Jeff Priskorn" : { SME: "Mike Reinelt" },
+    "Chong Lee" : { SME: "Mike Reinelt" },
+    "Jesse Monarch" : { SME: "Mike Reinelt" },
+    "Robert Sessions" : { SME: "Mike Reinelt" },
+    "Brian Muraco" : { SME: "Mike Reinelt" },
+
 
     // SME Jim Bielecki
-    "Jim_Bielecki" : { SME: "Jim_Bielecki" },
+    "Jim Bielecki" : { SME: "Jim Bielecki" },
     // Jim Bielecki guys
-    "Brett Goulder" : { SME: "Jim_Bielecki" },
-    "Jim Bielecki" : { SME: "Jim_Bielecki" }
+    "Brett Goulder" : { SME: "Jim Bielecki" },
+    "Lane Johnston" : { SME: "Jim Bielecki" },
+    "James Zawacki" : { SME: "Jim Bielecki" },
+    "Graham MacMaster" : { SME: "Jim Bielecki" },
+
+    // SME David Caruso
+    "David Caruso" : { SME: "David Caruso" },
+    // David Caruso guys
+    "George Jeler" : { SME: "David Caruso" },
+    "Patrick Parkhill" : { SME: "David Caruso" },
+    "Charlie Prater" : { SME: "David Caruso" },
+    "Eric Austin" : { SME: "David Caruso" },
+    "Jeff Jovick" : { SME: "David Caruso" },
+
+    // SME Robert Wright
+    "Robert Wright" : { SME: "Robert Wright" },
+    // Robert Wright guys
+    "Don Ebben" : { SME: "Robert Wright" },
+    "Rosemary Dutka" : { SME: "Robert Wright" },
+    "John Reese" : { SME: "Robert Wright" },
+    "Matt White" : { SME: "Robert Wright" }
 
 };
 

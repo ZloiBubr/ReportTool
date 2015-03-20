@@ -38,7 +38,7 @@ function DateRangeProcessDataService() {
 
     /***********Private Members***********/
 
-    var getStatisticByLeaderAndRange = function (leaderName, range, entities, getObj){
+    var getStatisticByLeaderAndRange = function (leaderName, range, entities){
         var delayStatistic = new DelayStatistic({minRangeValue: range.minRangeValue, maxRangeValue: range.maxRangeValue});
         for (var i = 0; i < entities.length; i++){
             var currentDue = self.propertyGetter.getDue(entities[i]);

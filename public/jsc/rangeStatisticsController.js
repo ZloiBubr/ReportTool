@@ -1,4 +1,4 @@
-function acceptanceStatisticsController($scope, $resource, $stateParams, $state) {
+function rangeStatisticsController($scope, $resource, $stateParams, $state) {
     var routes = { checklistRoute : '/checklistDueDateStatistic', acceptanceRoute : '/acceptanceStatistics', bugRoute : '/bugDueDateStatistic' };
     var baseUrl = "https://jira.epam.com/jira/issues/?jql=";
 
@@ -14,13 +14,12 @@ function acceptanceStatisticsController($scope, $resource, $stateParams, $state)
     };
     
     $scope.changeState = function () {
-        $state.go('acceptanceStatistics', { displayedEntity : $scope.currentEntity });
+        $state.go('rangeStatistics', { displayedEntity : $scope.currentEntity });
     }
 
     $scope.chooseEntity = function (){
         if ($scope.currentEntity == "Acceptance Task") {
             resource = $resource(routes.acceptanceRoute);
-            $state.go('acceptanceStatistics', { displayedEntity : $scope.currentEntity });
         }
 
         if ($scope.currentEntity == "Checklist"){

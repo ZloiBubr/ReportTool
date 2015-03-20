@@ -15,7 +15,8 @@ exports.STATUS = {
     LAREADY: { value: 13, name: "LA Ready", icon: "glyphicon glyphicon-star"},
     ACCEPTED: { value: 14, name: "Accepted", icon: "glyphicon glyphicon-star"},
     CANCELED: { value: 15, name: "Canceled", icon: "glyphicon glyphicon-ban-circle"},
-    NOTAPPLICABLE: { value: 16, name: "Not Applicable", icon: "glyphicon glyphicon-ban-circle"}
+    NOTAPPLICABLE: { value: 16, name: "Not Applicable", icon: "glyphicon glyphicon-ban-circle"},
+    DECLINED: { value: 17, name: "Declined", icon: "glyphicon glyphicon-ban-circle"},
 };
 
 exports.RESOLUTION = {
