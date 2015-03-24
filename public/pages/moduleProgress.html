@@ -141,7 +141,6 @@
                             <div class="total-comments disp-block">Cards:{{version.cards.length | number : 0}}</div>
                             <img class="card-icon" title="Blocked" ng-show="version.hasblockers" width="20" height="20" alt="Conf" src="img/ban.png"/>
                             <img class="card-icon" title="Deferred" ng-show="version.hasdeferred" width="20" height="20" alt="Conf" src="img/deffered.png"/>
-                            <img class="card-icon" title="Has XXL or XXXL pages" ng-show="version.hasxxl" width="20" height="20" alt="Conf" src="img/xxl.png"/>
                         </div>
                         <ul class="cards-column" ng-if="showCards">
                             <li ng-repeat = "card in version.cards" class="card-full card-module">
