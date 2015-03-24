@@ -320,6 +320,8 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
                 version.done += moduleProgressItem.reportedSP;
                 version.total += moduleProgressItem.summarySP;
                 version.restSP = version.total - version.done;
+                version.hasblockers |= moduleProgressItem.hasblockers | false;
+                version.hasdeferred |= moduleProgressItem.hasdeferred | false;
                 version.totalChecklistProgress += (moduleProgressItem.checklistsProgress * moduleProgressItem.summarySP);
                 version.checklistsProgress = version.totalChecklistProgress / version.total;
                 version.totalQAProgress += (moduleProgressItem.testingProgress * moduleProgressItem.summarySP);

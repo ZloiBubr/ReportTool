@@ -139,6 +139,8 @@
                                 </div>
                             </div>
                             <div class="total-comments disp-block">Cards:{{version.cards.length | number : 0}}</div>
+                            <img class="card-icon" title="Blocked" ng-show="version.hasblockers" width="20" height="20" alt="Conf" src="img/ban.png"/>
+                            <img class="card-icon" title="Deferred" ng-show="version.hasdeferred" width="20" height="20" alt="Conf" src="img/deffered.png"/>
                         </div>
                         <ul class="cards-column" ng-if="showCards">
                             <li ng-repeat = "card in version.cards" class="card-full card-module">
@@ -188,8 +190,8 @@
                                     <img class="card-icon" title="Priority Minor" ng-show="card.priority == 4" width="20" height="20" alt="Conf" src="img/4.png"/>
                                     <img class="card-icon" title="Priority Trivial" ng-show="card.priority == 5" width="20" height="20" alt="Conf" src="img/5.png"/>
                                     <img class="card-icon" title="Due Date confirmed" ng-show="card.dueDateConfirmed" width="20" height="20" alt="Conf" src="img/duedate2.png"/>
-                                    <img class="card-icon" title="Blocked" ng-show="card.status == exports.STATUS.BLOCKED.name" width="20" height="20" alt="Conf" src="img/ban.png"/>
-                                    <img class="card-icon" title="Deferred" ng-show="card.status == exports.STATUS.DEFERRED.name" width="20" height="20" alt="Conf" src="img/deffered.png"/>
+                                    <img class="card-icon" title="Blocked" ng-show="card.hasblockers" width="20" height="20" alt="Conf" src="img/ban.png"/>
+                                    <img class="card-icon" title="Deferred" ng-show="card.hasdeferred" width="20" height="20" alt="Conf" src="img/deffered.png"/>
                                     <img class="card-icon" title="Has XXL or XXXL pages" ng-show="card.xxl" width="20" height="20" alt="Conf" src="img/xxl.png"/>
                                     <div class="card-size" title="Story Points">{{card.summarySP | number : 0}}</div>
                                     <div class="card-pages" title="Cloud Apps">{{card.cloudAppsCount | number : 0}}</div>

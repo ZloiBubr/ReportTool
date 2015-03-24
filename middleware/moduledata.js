@@ -171,8 +171,8 @@ function putDataPoint(moduledata, module, page, count) {
     moduled.pagescount = count;
 
     if(page) {
-        moduled.hasblockers = page.status == STATUS.BLOCKED.name;
-        moduled.hasdeferred = page.status == STATUS.DEFERRED.name;
+        moduled.hasblockers |= page.status == STATUS.BLOCKED.name | false;
+        moduled.hasdeferred |= page.status == STATUS.DEFERRED.name | false;
 
         var moduleStatus = statusList.getStatusByName(moduled.status);
         var newStatus = statusList.getStatusByName(helpers.updateStatus(page));
