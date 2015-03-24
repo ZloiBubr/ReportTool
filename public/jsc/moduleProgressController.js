@@ -322,6 +322,7 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
                 version.restSP = version.total - version.done;
                 version.hasblockers |= moduleProgressItem.hasblockers | false;
                 version.hasdeferred |= moduleProgressItem.hasdeferred | false;
+                version.hasxxl |= moduleProgressItem.xxl | false;
                 version.totalChecklistProgress += (moduleProgressItem.checklistsProgress * moduleProgressItem.summarySP);
                 version.checklistsProgress = version.totalChecklistProgress / version.total;
                 version.totalQAProgress += (moduleProgressItem.testingProgress * moduleProgressItem.summarySP);
@@ -359,9 +360,7 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
                 card.testingProgress = card.summaryTestingProgress / card.modulesCount;
                 card.summaryChecklistsProgress += item.checklistsProgress ? item.checklistsProgress : 0;
                 card.checklistsProgress = card.summaryChecklistsProgress / card.modulesCount;
-                if(item.xxl) {
-                    card.xxl = true;
-                }
+                card.xxl |= item.xxl | false;
                 var oldStatus = $scope.total.getStatusByName(card.status);
                 var newStatus = $scope.total.getStatusByName(status);
                 if(newStatus.weight < oldStatus.weight){
