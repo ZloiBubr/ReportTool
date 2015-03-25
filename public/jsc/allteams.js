@@ -9,33 +9,29 @@ function Teams() {
             developers: [
                 "Andrei Osipau2",
                 "Dzianis Arlouski",
-                "Siarhei Tkachenka",
                 "Iryna Kucharenka1",
-                "Ivan Izmer",
                 "Mark Varabyou",
+                "Pavel Kastsiuk",
                 "Raman But-Husaim",
                 "Siarhei Abrazhevich",
+                "Siarhei Tkachenka",
+                "Aliaksandr Koush",
                 "Artsiom Rusak",
                 "Raman Ivanou",
-                "Aliaksandr Koush",
+                "Aliaksandr Lukyanchyk",
                 "Nicolay Kostroma",
                 "Valentina Napolnova",
                 "Aliaksey Rahatka",
-                "Pavel Kastsiuk",
-                "Juliana Stolnik",
-		        "Volha Viktarava",
-                "Artsiom Kazlou",
-                "Aliaksandr Lukyanchyk"
+                "Volha Viktarava",
+                "Artsiom Kazlou"
             ],
             testers: [
+                "Artsiom Yesis",
+                "Maksim Khurkunou",
                 "Pavel Vysotsky",
                 "Viktoriya Harbatsenkava",
                 "Hanna Prykhodzka",
-                "Kseniya Kavalchuk",
                 "Yuliya Tukaila",
-		        "Aliaksei Huliayeu",
-		        "Artsiom Yesis",
-		        "Siarhei Shyshparonak",
                 "Aliaksandra Kutynka"
             ]
         },
@@ -54,22 +50,21 @@ function Teams() {
                 "Yevhenii Havryliuk",
                 "Yuriy Shestyora",
                 "Ihor Bershov",
-                "Vladyslav Pilhui",
                 "Oleksandr Zhyltsov",
                 "Oleksii Suriadnyi",
                 "Serhiy Haponenko",
+                "Volodymyr Osmak",
                 "Yevhenii Lomov",
                 "Ihor Rudchenko",
-		        "Volodymyr Osmak",
-                "Allaberdi Hojayev"
+                "Vladyslav Pilhui"
             ],
             testers: [
+                "Oleksii Milman",
+                "Aliaksei Huliayeu",
                 "Mila Botnar",
                 "Yuri Timchenko",
                 "Anastasia Kotenyova",
                 "Pavlo Golovashchenko",
-                "Oleksii Milman",
-		        "Svitlana Andrieieva",
                 "Denys Pugachov"
             ]
         },
@@ -83,29 +78,28 @@ function Teams() {
                 "Andrei Kandybovich",
                 "Dzmitry Siamchonak",
                 "Mikita Stalpinski",
+                "Siarhei Maksimau1",
                 "Uladzimir Harabtsou",
                 "Aliaksandr Nikulin",
                 "Ilya Kazlou1",
                 "Katsiaryna Kaliukhovich",
                 "Vadzim Vysotski",
+                "Anton Kratenok",
                 "Edhar Liashok",
                 "Raman Prakofyeu",
                 "Ruslan Khilmanovich",
-                "Anton Kratenok",
-                "Siarhei Maksimau1",
                 "Dzmitry Chapurok",
-		        "Pavel Davidouski",
-                "Evgeny Sinitsyn"                
+                "Pavel Davidouski",
+                "Evgeny Sinitsyn"
             ],
             testers: [
-                "Aliaksei Burnosenka",
+                "Mikhail Naskalau",
                 "Viktar Mikalayenka",
                 "Eugeny Okulik",
                 "Yuliya Kalasouskaya",
                 "Hanna Maskalenka",
-		        "Kiryl Kozubouski",
-		        "Mikhail Naskalau",
-		        "Nataliya Shmakava",
+                "Kiryl Kozubouski",
+                "Nataliya Shmakava",
                 "Valiantsina Krautsevich"
             ]
         },
@@ -116,39 +110,44 @@ function Teams() {
             teamLead: "Dzmitry Tabolich",
             qaTeamLead: "Iryna Kutsko",
             developers: [
+
+
+                "Andrii Prykhodko",
                 "Pavel Naumenka",
                 "Sergei Kulick",
-                "Ilya Huchok",
                 "Aliaksandr Rusak",
                 "Andrei Kasak",
                 "Andrei Krasnou",
                 "Pavel Krakasevich",
                 "Stepan Zelenin",
+                "Uladzimir Vysotski",
+                "Andrei Salanovich",
                 "Dzmitry Isachenka",
-                "Eugen Surovets",
                 "Katsiaryna Tsalabanava",
-                "Andrii Prykhodko",
-                "Hleb Krotsik",
-                "Uladzimir Vysotski"
+                "Ilya Huchok",
+                "Hleb Krotsik"
             ],
             testers: [
                 "Anna Novikova",
                 "Anton Rapinchuk",
                 "Igor Andros",
                 "Maria Sobal",
-                "Yuliya Karnatsevich",
                 "Nastassia Dziadkova",
-                "Iryna Kutsko",
-                "Natalya Krestelyova"
+                "Yuliya Karnatsevich",
+                "Natalya Krestelyova",
+                "Siarhei Shyshparonak",
+                "Iryna Kutsko"
             ]
         },
         {
             id: "Viva",
             name: "Viva",
             streams: ["StreamV1", "StreamV2", "StreamV3"],
-            teamLead: "Valentine Zhuck",
+            teamLead: "Andrei Kharcheuka",
             qaTeamLead: "Katsiaryna Kuchko",
             developers: [
+                "Aleh Dukel",
+                "Kanstantsin Ldou",
                 "Viachaslau Anufryiuk",
                 "Yury Yamoryk",
                 "Aliaksandr Kladau",
@@ -157,22 +156,21 @@ function Teams() {
                 "Maksim Tsikhan",
                 "Petr Falitarchyk",
                 "Yuri Chupyrkin",
+
                 "Aliaksandr Rykau",
                 "Ivan Dziameshka",
                 "Siarhei Bahdanovich",
-                "Andrei Lysenka",
-                "Aleh Dukel",
                 "Ivan Yanchuk",
-                "Kanstantsin Ldou",
-		        "Mikhail Kelbas"
+                "Mikhail Kelbas"
             ],
             testers: [
+                "Dzmitry Palkhouski",
                 "Iryna Malets",
                 "Maryia Kireyeva",
+                "Uladzislau Sushkevich",
                 "Iryna Shuliak",
-                "Liudmila Barshcheuskaya",
                 "Iryna Razorionova",
-		        "Volha Shymanovich",
+                "Volha Shymanovich",
                 "Katsiaryna Kuchko"
             ]
         },
@@ -184,14 +182,16 @@ function Teams() {
             developers: [
                 "Roman Golovchenko",
                 "Bohdan Sorokin",
-		        "Ivan Manzhos",
-		        "Oleh Vinnikov",
+                "Ivan Manzhos",
+                "Oleh Vinnikov",
                 "Andrii Savinov",
                 "Olena Ostroverkhova"
             ],
             testers: [
                 "Ivan Nalyvaiko",
                 "Oleksii Shchelkunov",
+                "Maryna Shelaputina",
+                "Dmytro Hrynko",
                 "Valeriia Karabut"
             ]
         },
@@ -203,7 +203,7 @@ function Teams() {
                 "Viachaslau Naimovich",
                 "Vitali Sonchyk",
                 "Katsiaryna Kulbitskaya",
-                "Maryia Kashtanava"               
+                "Maryia Kashtanava"
             ]
         }
     ]
@@ -212,37 +212,41 @@ function Teams() {
 exports.AllTeams = new Teams();
 
 exports.OldDevelopers = function oldDevelopers(name) {
-    if(name == 'Valentine Zhuck' ||
-        name == 'Dzmitry Tabolich' ||
-        name == 'Heorhi Vilkitski' ||
-        name == "Hanna Kastsian" ||
-        name == "Alena Charnova" ||
-        name == "Aliaksei Astashkin" ||
-        name == "yauheni_lohinau" ||
-        name == "Dmytro Komar" ||
-        name == "Aliaksei Labachou" ||
-        name == "Mariya Babich" ||
-		name == "mariya_babich mariya_babich" ||
-        name == "Katsiaryna Sasina" ||
-        name == "aliaksei_labachou aliaksei_labachou" ||
-        name == "Maryna Furman" ||
- 	    name == "Dzmitry Salodki" ||
-	    name == "Volha Shandrokha" ||
- 	    name == "Kate Tsalabanava" ||
- 	    name == "Vitali Podobed" ||
- 	    name == "Siarhei Zhalezka" ||
- 	    name == "Maryna Furman" ||
- 	    name == "Aliaksandr Basau" ||
- 	    name == "Katsiaryna Firsava" ||
- 	    name == "Rustam Allanazarau" ||
- 	    name == "Nadzeya Mishurava" ||
-        name == "Yevhenii Koliesnik" ||
-        name == "Dmytro Petlia" ||
-        name == "Siarhei Nikitsin" ||
-        name == "Valentine Zhuck" ||
-        name == "Katsiaryna Zeliankova" ||
-        name == undefined) {
-        return true;
-    }
-    return false;
+    return !!(name == 'Valentine Zhuck' ||
+    name == 'Dzmitry Tabolich' ||
+    name == 'Heorhi Vilkitski' ||
+    name == "Hanna Kastsian" ||
+    name == "Alena Charnova" ||
+    name == "Aliaksei Astashkin" ||
+    name == "yauheni_lohinau" ||
+    name == "Dmytro Komar" ||
+    name == "Aliaksei Labachou" ||
+    name == "Mariya Babich" ||
+    name == "mariya_babich mariya_babich" ||
+    name == "Katsiaryna Sasina" ||
+    name == "aliaksei_labachou aliaksei_labachou" ||
+    name == "Maryna Furman" ||
+    name == "Dzmitry Salodki" ||
+    name == "Volha Shandrokha" ||
+    name == "Kate Tsalabanava" ||
+    name == "Vitali Podobed" ||
+    name == "Siarhei Zhalezka" ||
+    name == "Maryna Furman" ||
+    name == "Aliaksandr Basau" ||
+    name == "Katsiaryna Firsava" ||
+    name == "Rustam Allanazarau" ||
+    name == "Nadzeya Mishurava" ||
+    name == "Yevhenii Koliesnik" ||
+    name == "Dmytro Petlia" ||
+    name == "Siarhei Nikitsin" ||
+    name == "Valentine Zhuck" ||
+    name == "Katsiaryna Zeliankova" ||
+    name == "Ivan Izmer" ||
+    name == "Juliana Stolnik" ||
+    name == "Allaberdi Hojayev" ||
+    name == "Eugen Surovets" ||
+    name == "Andrei Lysenka" ||
+
+    name == undefined);
+
 };
