@@ -3,7 +3,7 @@
  */
 var Page = require("../models/page").Page;
 var Issue = require('../models/issue').Issue;
-var jiraTextUtility = require("./Utility/JiraTextUtility");
+var helpers = require("./helpers");
 var STATUS = require('../public/jsc/models/statusList').STATUS;
 var _ = require('underscore');
 var async = require('async');
@@ -75,7 +75,7 @@ function parsePages(teamToSearch, cloudAppToSearch, callback) {
 
             async.eachLimit(pages, 10, function (page, callback) {
                     (function (page) {
-                        if (cloudAppToSearch && jiraTextUtility.getCloudAppName(page.labels) != cloudAppToSearch) {
+                        if (cloudAppToSearch && helpers.getCloudAppName(page.labels) != cloudAppToSearch) {
                             callback();
                             return;
                         }
@@ -85,15 +85,15 @@ function parsePages(teamToSearch, cloudAppToSearch, callback) {
                                 callback(err);
                             }
 
-                            var moduleName = jiraTextUtility.getModuleName(page.labels);
-                            var cloudAppName = jiraTextUtility.getCloudAppName(page.labels);
+                            var moduleName = helpers.getModuleName(page.labels);
+                            var cloudAppName = helpers.getCloudAppName(page.labels);
                             var assignee = getShortName(page.assignee);
                             var pageKey = page.key;
                             var progress = page.progress;
                             var shortPageName = page.summary.split("\\").pop();
                             var storyPoints = page.storyPoints;
-                            var team = jiraTextUtility.getTeamName(page.labels);
-                            var streamName = jiraTextUtility.getStreamName(page.labels);
+                            var team = helpers.getTeamName(page.labels);
+                            var streamName = helpers.getStreamName(page.labels);
                             var pageStatus = page.status;
                             var checklistStatus = page.checklistCreated;
 
