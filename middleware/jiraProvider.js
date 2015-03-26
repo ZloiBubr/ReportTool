@@ -491,10 +491,10 @@ function Step6CollectStories(callback) {
                 return deferred1.promise;
 
             })
-            .fail(function(err){
+            .catch(function(err){
                     console.error(err);
                 })
-            .fin(function(){ //finally run in any case
+            .finally(function(){ //finally run in any case
                     stream.resume();
                 });
         }
@@ -832,10 +832,10 @@ function Step7CollectAcceptanceTasks(callback) {
                 return deferred1.promise;
 
             })
-                .fail(function(err){
+                .catch(function(err){
                     console.error(err);
                 })
-                .fin(function(){ //finally run in any case
+                .finally(function(){ //finally run in any case
                     stream.resume();
                 });
         }
