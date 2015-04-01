@@ -16,17 +16,16 @@ var SizeChange = require('../models/sizeChange').SizeChange;
 var _ = require('underscore');
 var async = require('async');
 var cache = require('node_cache');
-var sessionsupport = require('../middleware/sessionsupport');
-var helpers = require('../middleware/helpers');
+var sessionSupport = require('./sessionsupport');
+var helpers = require('./helpers');
+var jiraHelpers = require('./jiraHelpers');
 var mongoose = require('./../libs/mongoose');
 var Q = require('q');
 
-var VERSION = require('../public/jsc/versions').VERSION;
 var STATUS = require('../public/jsc/models/statusList').STATUS;
 
 var JiraApi = require('jira').JiraApi;
 
-var issueObjects = [];
 var acceptanceObjectsMap = {};
 var epicsMap = {};
 var pagesMap = {};
@@ -34,18 +33,15 @@ var sizeChanges = [];
 
 var updateInProgress = false;
 
-var progressCounter = 0;
-var lastProgress = 0;
 
-var updateSpan = 0;
 
 exports.rememberResponse = function (req, res) {
-    sessionsupport.setResponseObj('updateDb', req, res);
+    sessionSupport.setResponseObj('updateDb', req, res);
     UpdateProgress(0, "page");
 };
 
 var UpdateProgress = function (progress, type) {
-    sessionsupport.notifySubscribers('updateDb', "progress", '{"' + type + '":' + progress.toString() + "}");
+    sessionSupport.notifySubscribers('updateDb', "progress", '{"' + type + '":' + progress.toString() + "}");
     if (progress > 0) {
         LogProgress("**********" + type + " Progress " + progress.toString() + "% **********");
     }
@@ -54,105 +50,73 @@ var UpdateProgress = function (progress, type) {
 var LogProgress = function (text, error) {
     if (error) {
         var errorText = error == null ? "not evaluated" : error.message == null ? error : error.message;
-        sessionsupport.notifySubscribers('updateDb', "errmessage", text + ", reason - " + errorText);
+        sessionSupport.notifySubscribers('updateDb', "errmessage", text + ", reason - " + errorText);
         log.error(text);
         log.error(error);
     }
     else {
-        sessionsupport.notifySubscribers('updateDb', "logmessage", text);
+        sessionSupport.notifySubscribers('updateDb', "logmessage", text);
         log.info(text);
     }
 };
 
-exports.updateJiraInfo = function (debug, full, remove, jiraUser, jiraPassword, callback) {
+exports.updateJiraInfo = function (debugMode, fullUpdate, removeMode, jiraUser, jiraPassword, callback) {
     if (updateInProgress) {
         callback();
     }
 
     updateInProgress = true;
-    progressCounter = 0;
-    if(remove) {
-        full = true;
+
+    var progressCounter = 0;
+    var updateSpan = 0;
+
+    if(removeMode) {
+        fullUpdate = true;
     }
 
-    var jira = debug ? null : new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), jiraUser, jiraPassword, '2');
+    var jira = debugMode ? null : new JiraApi(config.get("jiraAPIProtocol"), config.get("jiraUrl"), config.get("jiraPort"), jiraUser, jiraPassword, '2');
+    var issues = [];
+    var issuesMap = {};
 
     async.series([
         function (callback) {
-            if(!debug) {
-                calcUpdateInterval(callback);
-            }
-            else {
-                callback();
-            }
+            jiraHelpers.calcUpdateInterval(debugMode, function(span, err) {
+                if(err) {
+                    callback(err);
+                }
+                else {
+                    updateSpan = span;
+                    callback();
+                }
+            });
         },
         function (callback) {
-            if(!debug) {
-                WriteVersion(true, callback);
-            }
-            else {
-                callback();
-            }
+            jiraHelpers.WriteVersion(true, debugMode, callback);
         },
         function (callback) {
-            if(!debug) {
-                LogProgress("**** Step 1: collect issue keys from JIRA");
-                Step1CollectIssueKeys(jira, full, callback);
-            }
-            else {
-                callback();
-            }
+            LogProgress("**** Step 1: collect issue keys from JIRA");
+            Step1CollectIssueKeys(debugMode, fullUpdate, updateSpan, jira, issues, issuesMap, callback);
         },
         function (callback) {
-            if(!remove && !debug) {
-                LogProgress("**** Step 2: collect issues from JIRA");
-                Step2CollectIssues(jira, callback);
-            }
-            else {
-                callback();
-            }
+            LogProgress("**** Step 2: collect issues from JIRA");
+            Step2CollectIssues(removeMode, debugMode, progressCounter, jira, issues, callback);
         },
         function (callback) {
-            if(remove && !debug) {
-                LogProgress("**** Step 3: remove deleted issues from database");
-                Step3DeleteIssues(callback);
-            }
-            else {
-                callback();
-            }
+            LogProgress("**** Step 3: remove deleted issues from database");
+            Step3DeleteIssues(removeMode, debugMode, issuesMap, callback);
         },
         function (callback) {
             LogProgress("**** Step 4: drop collections from DB");
-            Module.collection.drop(function (err) {
-                if(err && err.errmsg != 'ns not found') {
-                    callback(err);
-                }
-                LogProgress("1. Modules collection has been dropped");
-                Page.collection.drop(function (err) {
-                    if(err && err.errmsg != 'ns not found') {
-                        callback(err);
-                    }
-                    LogProgress("2. Pages collection has been dropped");
-                    Issue.collection.drop(function (err) {
-                        if(err && err.errmsg != 'ns not found') {
-                            callback(err);
-                        }
-                        LogProgress("3. Issues collection has been dropped");
-                        CloudApp.collection.drop(function (err) {
-                            if(err && err.errmsg != 'ns not found') {
-                                callback(err);
-                            }
-                            LogProgress("4. CloudApps collection has been dropped");
-                            SizeChange.collection.drop(function (err) {
-                                if(err && err.errmsg != 'ns not found') {
-                                    callback(err);
-                                }
-                                LogProgress("5. SizeChange collection has been dropped");
-                                callback();
-                            });
-                        });
-                    });
-                });
+
+            async.series([
+                function(callback) { return jiraHelpers.collectionDrop(Module, LogProgress, callback) },
+                function(callback) { return jiraHelpers.collectionDrop(Page, LogProgress, callback) },
+                function(callback) { return jiraHelpers.collectionDrop(Issue, LogProgress, callback) },
+                function(callback) { return jiraHelpers.collectionDrop(CloudApp, LogProgress, callback) },
+                function(callback) { return jiraHelpers.collectionDrop(SizeChange, LogProgress, callback) }
+            ],
+            function(err) {
+                callback(err);
             });
         },
         function (callback) {
@@ -172,12 +136,7 @@ exports.updateJiraInfo = function (debug, full, remove, jiraUser, jiraPassword, 
             Step8CollectStoryPointsChanges(callback);
         },
         function (callback) {
-            if(!debug) {
-                WriteVersion(false, callback);
-            }
-            else {
-                callback();
-            }
+            jiraHelpers.WriteVersion(false, debugMode, callback);
         },
         function (callback) {
             LogProgress("---- Update Finished ----");
@@ -197,154 +156,56 @@ exports.updateJiraInfo = function (debug, full, remove, jiraUser, jiraPassword, 
     callback();
 };
 
-function WriteVersion(started, callback) {
-    Version.findOne({ numerical: VERSION.NUMBER }, function (err, version) {
-        if (err) {
-            callback(err);
-        }
-
-        if (!version) {
-            version = new Version();
-            version.numerical = VERSION.NUMBER;
-            version.name = VERSION.NAME;
-        }
-        if(started) {
-            version.started = new Date(Date.now());
-        }
-        else {
-            version.updated = new Date(Date.now());
-        }
-        version.save(function (err, page) {
-            callback(err, page);
-        });
-    });
-}
-
-function calcUpdateInterval(callback) {
-    Version.findOne({ numerical: VERSION.NUMBER }, function (err, version) {
-        if (err) {
-            callback(err);
-        }
-
-        if (!version) {
-            updateSpan = 0;
-        }
-        else {
-            updateSpan = new Date(Date.now()) - version.started;
-        }
+function Step1CollectIssueKeys(debugMode, fullUpdate, updateSpan, jira, issues, issuesMap, callback) {
+    //do not call jira update for debug
+    if(debugMode) {
         callback();
-    });
-}
+        return;
+    }
 
-function Step1CollectIssueKeys(jira, full, callback) {
     var startKey = 0;
-    var loopCounter = true;
+    var loopFlag = true;
 
-    var span = updateSpan > 0 ? parseInt(updateSpan / 1000 / 3600) : 24 * 3; // 3 days by default
+    var span = updateSpan > 0 ? parseInt(updateSpan / 1000 / 3600) : 72;
     span = span > 0 ? span+1 : 2;
-    var queryString = full ? "project = PLEX-UXC ORDER BY key ASC" : util.format("project = PLEX-UXC AND updated > -%sh ORDER BY key ASC", span);
+    var queryString = fullUpdate ? "project = PLEX-UXC ORDER BY key ASC" : util.format("project = PLEX-UXC AND updated > -%sh ORDER BY key ASC", span);
 
 
     UpdateProgress(0, "page");
 
-    issueObjects = [];
+    async.whilst(function () {
+            return loopFlag;
+        },
+        function (callback) {
 
-    async.series([
-            function(callback) {
-                async.whilst(function () {
-                        return loopCounter;
-                    },
-                    function (callback) {
+            LogProgress("**** collecting issue keys: from " + startKey + " to " + (startKey + 1000).toString());
 
-                        LogProgress("**** collecting issue keys: from " + startKey + " to " + (startKey + 1000).toString());
+            var optional = {};
+            optional.maxResults = 1000;
+            optional.startAt = startKey;
+            optional.fields = ["issuetype"];
+            startKey += 1000;
 
-                        var optional = {};
-                        optional.maxResults = 1000;
-                        optional.startAt = startKey;
-                        optional.fields = ["issuetype"];
-                        startKey += 1000;
-
-                        jira.searchJira(queryString, optional, function (error, stories) {
-                            if (error) {
-                                LogProgress("Collect issues error happened!", error);
-                                callback(error);
-                            }
-                            if (stories != null) {
-                                _.each(stories.issues, function (story) {
-                                    issueObjects.push({key: story.key, issuetype: story.fields.issuetype.name});
-                                });
-                                if(stories.issues.length == 0 || stories.issues.length < 1000) {
-                                    loopCounter = false;
-                                }
-                                callback();
-                            }
-                            else {
-                                loopCounter = false;
-                                callback();
-                            }
-                        });
-                    },
-                    function (err) {
-                        callback(err);
-                    }
-                );
-            }
-        ],
-        function(err) {
-            callback(err);
-        }
-    );
-}
-
-function Step2CollectIssues(jira, callback) {
-    LogProgress("**** Collecting " + issueObjects.length + " issues");
-    lastProgress = 0;
-    async.eachLimit(issueObjects, 50, function (issueObject, callback) {
-            var loopError = true;
-            async.whilst(function() {
-                    return loopError;
-                },
-                function(callback) {
-                    jira.findIssue(issueObject.key + "?expand=changelog,subtasks", function (err, issue) {
-                        if (err) {
-                            LogProgress("Restarting loop for key: "+issueObject.key, err);
-                        }
-                        if (issue != null) {
-                            OriginalJiraIssue.findOne({ key: issue.key }, function (err, dbissue) {
-                                if (!dbissue) {
-                                    dbissue = new OriginalJiraIssue();
-                                }
-                                dbissue.key = issue.key;
-                                dbissue.issuetype = issue.fields.issuetype.name;
-                                dbissue.object = issue;
-
-                                dbissue.save(function (err) {
-                                    loopError = false;
-                                    callback();
-                                });
-                            });
-                        }
-                        else {
-                            loopError = false;
-                            callback();
-                        }
-                    });
-                },
-                function(err) {
-                    if(err) {
-                        callback(err);
-                    }
-                    else {
-                        LogProgress(++progressCounter + ":" + issueObject.key + " : Issue Collected");
-                        var progress = Math.floor(progressCounter*100/issueObjects.length);
-                        if(progress != lastProgress) {
-                            lastProgress = progress;
-                            UpdateProgress(progress, "page");
-                        }
-                        callback();
-                    }
+            jira.searchJira(queryString, optional, function (error, jiraIssues) {
+                if (error) {
+                    LogProgress("Collect issues error happened!", error);
+                    callback(error);
                 }
-            );
+                if (jiraIssues != null) {
+                    _.each(jiraIssues.issues, function (issue) {
+                        issues.push(issue.key);
+                        issuesMap[issue.key] = issue.key;
+                    });
+                    if(jiraIssues.issues.length == 0 || jiraIssues.issues.length < 1000) {
+                        loopFlag = false;
+                    }
+                    callback();
+                }
+                else {
+                    loopFlag = false;
+                    callback();
+                }
+            });
         },
         function (err) {
             callback(err);
@@ -352,18 +213,47 @@ function Step2CollectIssues(jira, callback) {
     );
 }
 
-function Step3DeleteIssues(callback) {
+function Step2CollectIssues(deleteMode, debugMode, progressCounter, jira, issues, callback) {
+    //do not call jira update for debug or delete
+    if(deleteMode || debugMode) {
+        callback();
+        return;
+    }
+    LogProgress("**** Collecting " + issues.length + " issues");
+    var lastProgress = 0;
+    async.eachLimit(issues, 50, function (issueKey, callback) {
+        var jiraIssue = {};
+        jiraIssue.issue = {};
+        async.series([
+                function (callback) { return jiraHelpers.getFullJiraIssue(jira, issueKey, jiraIssue, LogProgress, callback) },
+                function (callback) { return jiraHelpers.updateWorklogForJiraIssue(jira, jiraIssue, LogProgress, callback) },
+                function (callback) { return jiraHelpers.saveJiraIssueToDB(jiraIssue, callback) }
+            ],
+            function (err) {
+                LogProgress(++progressCounter + ":" + issueKey + " : Issue Collected");
+                var progress = Math.floor(progressCounter * 100 / issues.length);
+                if (progress != lastProgress) {
+                    lastProgress = progress;
+                    UpdateProgress(progress, "page");
+                }
+                callback();
+            });
+    },
+    function(err) {
+        callback(err);
+    });
+}
+
+function Step3DeleteIssues(removeMode, debugMode, issuesMap, callback) {
+    if(!removeMode || debugMode) {
+        callback();
+        return;
+    }
+
     var stream = OriginalJiraIssue.find().stream();
 
     stream.on('data', function (doc) {
-        var found = false;
-        for(var i=0; i < issueObjects.length; i++) {
-            if(issueObjects[i].key == doc.key) {
-                found = true;
-                break;
-            }
-        }
-        if(!found) {
+        if(issuesMap[doc.key] == undefined) {
             doc.remove();
         }
     }).on('error', function (err) {
