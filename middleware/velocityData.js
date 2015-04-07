@@ -11,6 +11,9 @@ var cache = require('node_cache');
 var helpers = require('../middleware/helpers');
 var STATUS = require('../public/jsc/models/statusList').STATUS;
 
+var statusExport = require('../public/jsc/Models/statusList');
+var versionHelper  = new statusExport.versionHelper();
+
 exports.getData = function (req, res) {
 
     cache.getData("velocityData",function(setterCallback){
@@ -168,7 +171,7 @@ function parsePages(callback) {
                                                     var calcStoryPoints = storyPoints * progress / 100;
 
                                                     putDataPoint(velocity, "Actual burn", date, calcStoryPoints, "");
-                                                    if(module.fixVersions.toLowerCase().indexOf("final") < 0) {
+                                                    if(versionHelper.isCoreVersion(module.fixVersions)) {
                                                         putDataPoint(velocity, "Actual burn core", date, calcStoryPoints, "");
                                                     }
                                                 }
@@ -184,7 +187,7 @@ function parsePages(callback) {
                                                             modulesAdded.push(module.summary);
                                                         }
                                                         putDataPoint(velocity, "Planned burn", date, storyPoints, tooltip);
-                                                        if(module.fixVersions.toLowerCase().indexOf("final") < 0) {
+                                                        if(versionHelper.isCoreVersion(module.fixVersions)) {
                                                             maximumBurnCore += storyPoints;
                                                             putDataPoint(velocity, "Planned burn core", date, storyPoints, tooltip);
                                                         }

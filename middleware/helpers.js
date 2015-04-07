@@ -168,7 +168,3 @@ exports.isBlocked = function(status) {
 exports.isDeferred = function(status) {
     return status == STATUS.DEFERRED.name;
 };
-
-
-
-

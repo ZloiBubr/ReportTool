@@ -212,18 +212,12 @@ function moduleTargetsController($scope, $resource, $window, $filter, localStora
             }
             if(addCards && $scope.filteredVersion != $scope.allVersions[0].id) {
                 if($scope.filteredVersion == "Q1") {
-                    if(!(moduleProgressItem.fixVersions == "2.0 January 2015" ||
-                        moduleProgressItem.fixVersions == "3.0 February 2015" ||
-                        moduleProgressItem.fixVersions == "4.0 March 2015"
-                        )) {
+                    if(!$scope.versionHelper.isQ1Version(moduleProgressItem.fixVersions)) {
                         return;
                     }
                 }
                 else if($scope.filteredVersion == "Q2") {
-                    if(!(moduleProgressItem.fixVersions == "5.0 April 2015" ||
-                        moduleProgressItem.fixVersions == "6.0 May 2015" ||
-                        moduleProgressItem.fixVersions == "7.0 June 2015"
-                        )) {
+                    if(!$scope.versionHelper.isQ2Version(moduleProgressItem.fixVersions)) {
                         return;
                     }
                 }

@@ -234,40 +234,23 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
             }
             if(addCards && $scope.filteredVersion != $scope.allVersions[0].id) {
                 if($scope.filteredVersion == "Q1") {
-                    if(!(
-                        cloudAppItem.fixVersions.indexOf("2.0") > -1 ||
-                        cloudAppItem.fixVersions.indexOf("3.0") > -1 ||
-                        cloudAppItem.fixVersions.indexOf("4.0") > -1
-                        )) {
+                    if(!$scope.versionHelper.isQ1Version(cloudAppItem.fixVersions)) {
                         return;
                     }
                 }
                 else if($scope.filteredVersion == "Q2") {
-                    if(!(
-                        cloudAppItem.fixVersions.indexOf("5.0") > -1 ||
-                        cloudAppItem.fixVersions.indexOf("6.0") > -1 ||
-                        cloudAppItem.fixVersions.indexOf("7.0") > -1
-                        )) {
+                    if(!$scope.versionHelper.isQ2Version(cloudAppItem.fixVersions)) {
                         return;
                     }
                 }
                 else if($scope.filteredVersion == "Q12") {
-                    if(!(
-                        cloudAppItem.fixVersions.indexOf("2.0") > -1 ||
-                        cloudAppItem.fixVersions.indexOf("3.0") > -1 ||
-                        cloudAppItem.fixVersions.indexOf("4.0") > -1 ||
-                        cloudAppItem.fixVersions.indexOf("5.0") > -1 ||
-                        cloudAppItem.fixVersions.indexOf("6.0") > -1 ||
-                        cloudAppItem.fixVersions.indexOf("7.0") > -1
-                        )) {
+                    if(!$scope.versionHelper.isQ1Version(cloudAppItem.fixVersions) &&
+                    !$scope.versionHelper.isQ2Version(cloudAppItem.fixVersions)) {
                         return;
                     }
                 }
                 else if($scope.filteredVersion == "Q3") {
-                    if(!(cloudAppItem.fixVersions.indexOf("8.0") > -1 ||
-                        cloudAppItem.fixVersions.indexOf("9.0") > -1 ||
-                        cloudAppItem.fixVersions.indexOf("10.0") > -1
-                        )) {
+                    if(!$scope.versionHelper.isQ3Version(cloudAppItem.fixVersions)) {
                         return;
                     }
                 }
