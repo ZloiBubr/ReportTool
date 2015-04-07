@@ -161,6 +161,7 @@ function putDataPoint(cloudAppData, module, page) {
                 cloudApp.lafinish = page.lafinish;
                 cloudApp.acceptanceUri = acceptanceUri;
                 cloudApp.acceptanceAssignee = page.acceptanceAssignee;
+                cloudApp.status = status;
             }
 
             var found = false;
