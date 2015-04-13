@@ -28,11 +28,14 @@ exports.getData = function (req, res) {
 
 function parsePages(teamName, month, callback) {
     var request = {
-        issuetype:"Epic",
-        "object.fields.labels" : {$in:[teamName]}
+        issuetype: "Epic",
+        "object.fields.labels" : {"$in":[teamName]},
+        "object.fields.status.name" : {"$ne": "Closed"}
     };
 
-    var result = {};
+    var result = {
+        modules: []
+    };
 
     Issues.find(request)
         .exec(function (err, epics) {
@@ -43,9 +46,15 @@ function parsePages(teamName, month, callback) {
                 _.each(epics, function(epic){
 
                     var date = new Date(epic.object.fields.duedate);
-                    if(date.getMonth() == month){
-                        result[epic.key.replace("-","")] = {};
-                        promises.push(fillStories(result[epic.key.replace("-","")], epic.key, epic.object.fields.summary));
+                    if(date.getMonth()+1 == month){
+                        var module ={
+                            moduleKey : epic.key,
+                            moduleName : epic.object.fields.summary,
+                            stories: []
+                        };
+
+                        result.modules.push(module);
+                        promises.push(fillStories(module.stories, epic.key, epic.object.fields.summary));
                     }
 
                 });
@@ -59,9 +68,8 @@ function parsePages(teamName, month, callback) {
         });
 };
 
-function fillStories (epicObject, epickey, epicsummary){
+function fillStories (storiesArray, epickey, epicsummary){
     var deffered = Q.defer();
-    epicObject.stories = {};
 
     var request = {
         issuetype: "Story",
@@ -85,11 +93,8 @@ function fillStories (epicObject, epickey, epicsummary){
         storyItem.epicKey = epickey;
         storyItem.epicSummary = epicsummary;
 
-        epicObject.stories[storyItem.key]  = storyItem;
-        //epicObject.stories.push(storyItem);
+        storiesArray.push(storyItem);
     });
-
-
             deffered.resolve();
 
         });
