@@ -135,6 +135,36 @@ exports.statuses = function() {
     }
 };
 
+exports.versionHelper = function() {
+    this.isCoreVersion = function(versionName) {
+        return versionName.toLowerCase().indexOf('1.0') > -1 ||
+            versionName.toLowerCase().indexOf('2.0') > -1 ||
+            versionName.toLowerCase().indexOf('3.0') > -1 ||
+            versionName.toLowerCase().indexOf('4.0') > -1 ||
+            versionName.toLowerCase().indexOf('5.0') > -1 ||
+            versionName.toLowerCase().indexOf('6.0') > -1 ||
+            versionName.toLowerCase().indexOf('7.0') > -1;
+    };
+
+    this.isQ1Version = function(versionName) {
+        return versionName.toLowerCase().indexOf('2.0') > -1 ||
+            versionName.toLowerCase().indexOf('3.0') > -1 ||
+            versionName.toLowerCase().indexOf('4.0') > -1;
+    };
+
+    this.isQ2Version = function(versionName) {
+        return versionName.toLowerCase().indexOf('5.0') > -1 ||
+            versionName.toLowerCase().indexOf('6.0') > -1 ||
+            versionName.toLowerCase().indexOf('7.0') > -1;
+    };
+
+    this.isQ3Version = function(versionName) {
+        return versionName.toLowerCase().indexOf('8.0') > -1 ||
+            versionName.toLowerCase().indexOf('9.0') > -1 ||
+            versionName.toLowerCase().indexOf('10.0') > -1;
+    };
+};
+
 
 
 

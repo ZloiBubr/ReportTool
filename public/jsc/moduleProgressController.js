@@ -175,40 +175,23 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
             }
             if(addCards && $scope.filteredVersion != $scope.allVersions[0].id) {
                 if($scope.filteredVersion == "Q1") {
-                    if(!(
-                        moduleProgressItem.fixVersions.indexOf("2.0") > -1 ||
-                        moduleProgressItem.fixVersions.indexOf("3.0") > -1 ||
-                        moduleProgressItem.fixVersions.indexOf("4.0") > -1
-                    )) {
+                    if(!$scope.versionHelper.isQ1Version(moduleProgressItem.fixVersions)) {
                         return;
                     }
                 }
                 else if($scope.filteredVersion == "Q2") {
-                    if(!(
-                        moduleProgressItem.fixVersions.indexOf("5.0") > -1 ||
-                        moduleProgressItem.fixVersions.indexOf("6.0") > -1 ||
-                        moduleProgressItem.fixVersions.indexOf("7.0") > -1
-                        )) {
+                    if(!$scope.versionHelper.isQ2Version(moduleProgressItem.fixVersions)) {
                         return;
                     }
                 }
                 else if($scope.filteredVersion == "Q12") {
-                    if(!(
-                        moduleProgressItem.fixVersions.indexOf("2.0") > -1 ||
-                        moduleProgressItem.fixVersions.indexOf("3.0") > -1 ||
-                        moduleProgressItem.fixVersions.indexOf("4.0") > -1 ||
-                        moduleProgressItem.fixVersions.indexOf("5.0") > -1 ||
-                        moduleProgressItem.fixVersions.indexOf("6.0") > -1 ||
-                        moduleProgressItem.fixVersions.indexOf("7.0") > -1
-                        )) {
+                    if(!$scope.versionHelper.isQ1Version(moduleProgressItem.fixVersions) &&
+                    !$scope.versionHelper.isQ2Version(moduleProgressItem.fixVersions)) {
                         return;
                     }
                 }
                 else if($scope.filteredVersion == "Q3") {
-                    if(!(moduleProgressItem.fixVersions.indexOf("8.0") > -1 ||
-                        moduleProgressItem.fixVersions.indexOf("9.0") > -1 ||
-                        moduleProgressItem.fixVersions.indexOf("10.0") > -1
-                        )) {
+                    if(!$scope.versionHelper.isQ3Version(moduleProgressItem.fixVersions)) {
                         return;
                     }
                 }
