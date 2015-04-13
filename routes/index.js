@@ -18,6 +18,7 @@ var cloudappsdata = require('../routes/getcloudappsdata');
 var issuesDataRouter = require('../routes/issuesDataRouter');
 var checkListRouter = require('../routes/getCheckList');
 var bugListRouter = require('../routes/getBugs');
+var exportStories = require('../routes/exportStories');
 var ClearDB = require('../middleware/createDb').Clear;
 
 /* GET home page. */
@@ -43,6 +44,7 @@ router.get('/acceptanceStatistics', acceptanceStatistics.get);
 router.get('/cloudappsdata', cloudappsdata.get);
 router.get('/checklistDueDateStatistic', checkListRouter.get);
 router.get('/bugDueDateStatistic', bugListRouter.get);
+router.get('/exportStories', exportStories.get);
 
 router.get('/update_progress', function (req, res) {
     req.socket.setTimeout(1000 * 60 * 10);

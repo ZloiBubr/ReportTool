@@ -11,10 +11,14 @@ exports.getData = function (req, res) {
     var fromDate = req.params.fromDate ? new Date(req.params.fromDate) : undefined;
     var toDate = req.params.toDate ? new Date(req.params.toDate) : undefined;
 
-    parsePages(fromDate, toDate, function (err, personaldata) {
-        if (err) throw err;
-        res.json(personaldata);
-    });
+    if(_.isUndefined(fromDate) || _.isUndefined(toDate) || fromDate.getFullYear() <= 1970 || toDate.getFullYear() <= 1970){
+        res.end();
+    }else {
+        parsePages(fromDate, toDate, function (err, personaldata) {
+            if (err) throw err;
+            res.json(personaldata);
+        });
+    }
 };
 
 function fillPersonalData(teamPersonalProgress) {
