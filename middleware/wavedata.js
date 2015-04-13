@@ -211,6 +211,18 @@ function putDataPoint(cloudAppData, module, page) {
             acceptanceUri: acceptanceUri,
             acceptanceAssignee: page.acceptanceAssignee
     };
+        if(isParentPage) {
+            cloudApp.testingProgress = page.testingProgress;
+            cloudApp.devfinish = page.devfinish;
+            cloudApp.qafinish = page.qafinish;
+            cloudApp.accfinish = page.accfinish;
+            cloudApp.cusfinish = page.cusfinish;
+            cloudApp.pmhfinish = page.pmhfinish;
+            cloudApp.lafinish = page.lafinish;
+            cloudApp.acceptanceUri = acceptanceUri;
+            cloudApp.acceptanceAssignee = page.acceptanceAssignee;
+            cloudApp.status = status;
+        }
         cloudAppData.cloudApp.push(cloudApp);
     }
 }
