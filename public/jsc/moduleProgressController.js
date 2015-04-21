@@ -34,7 +34,14 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
         $scope.total.total = 0;
         $scope.allSMEs = [{id: "All", name: "All"}];
         $scope.allModuleGroups = [{id: "All", name: "All"}];
-        $scope.allVersions = [{id: "All", name: "All"}, {id: "Q1", name: "Q1"}, {id: "Q2", name: "Q2"}, {id: "Q3", name: "Q3"}, {id: "Q12", name: "Q12"}];
+        $scope.allVersions = [
+            {id: "All", name: "All"},
+            {id: "Q1", name: "Q1"},
+            {id: "Q2", name: "Q2"},
+            {id: "Q3", name: "Q3"},
+            {id: "Q12", name: "Q12"},
+            {id: "CORE", name: "CORE"}
+        ];
         $scope.showVersions = [];
         $scope.teamLoadData = [];
     };
@@ -192,6 +199,11 @@ function moduleProgressController($scope, $resource, $window, $filter, localStor
                 }
                 else if($scope.filteredVersion == "Q3") {
                     if(!$scope.versionHelper.isQ3Version(moduleProgressItem.fixVersions)) {
+                        return;
+                    }
+                }
+                else if($scope.filteredVersion == "CORE") {
+                    if(!$scope.versionHelper.isCoreVersion(moduleProgressItem.fixVersions)) {
                         return;
                     }
                 }

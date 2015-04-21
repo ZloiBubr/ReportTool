@@ -123,7 +123,8 @@ exports.updateStatus = function(page) {
         page.resolution == RESOLUTION.DONE.name ||
         page.resolution == RESOLUTION.FIXED.name ||
         page.resolution == RESOLUTION.IMPLEMENTED.name ||
-        page.resolution == RESOLUTION.RESOLVED.name
+        page.resolution == RESOLUTION.RESOLVED.name ||
+        page.resolution == RESOLUTION.APPROVED.name
         )) {
         newStatus = STATUS.ACCEPTED.name;
     }

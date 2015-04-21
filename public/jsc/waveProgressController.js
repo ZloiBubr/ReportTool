@@ -40,7 +40,14 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
         $scope.allSMEs = [{id: "All", name: "All"}];
         $scope.allModuleGroups = [{id: "All", name: "All"}];
         $scope.allModules = [{id: "All", name: "All"}];
-        $scope.allVersions = [{id: "All", name: "All"}, {id: "Q1", name: "Q1"}, {id: "Q2", name: "Q2"}, {id: "Q3", name: "Q3"}, {id: "Q12", name: "Q12"}];
+        $scope.allVersions = [
+            {id: "All", name: "All"},
+            {id: "Q1", name: "Q1"},
+            {id: "Q2", name: "Q2"},
+            {id: "Q3", name: "Q3"},
+            {id: "Q12", name: "Q12"},
+            {id: "CORE", name: "CORE"}
+        ];
         $scope.allStatuses = [
             {name: $scope.STATUS.DEFERRED.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
             {name: $scope.STATUS.OPEN.name, cards: [], totalReported: 0, totalRequired: 0, totalLeft: 0 },
@@ -61,7 +68,6 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
     };
 
     function FillVersionsCombo() {
-        $scope.allVersions = [{id: "All", name: "All"}, {id: "Q1", name: "Q1"}, {id: "Q2", name: "Q2"}, {id: "Q3", name: "Q3"}, {id: "Q12", name: "Q12"}];
         _.each($scope.cloudAppData.cloudApp, function(cloudAppItem){
             var found = false;
             var versionProcessed = cloudAppItem.fixVersions == "" ? "Undefined" : cloudAppItem.fixVersions;
@@ -77,7 +83,6 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
     }
 
     function FillGroupsCombo() {
-        $scope.allModuleGroups = [{id: "All", name: "All"}];
         _.each($scope.cloudAppData.cloudApp, function(cloudAppItem){
             var found = false;
             _.each($scope.allModuleGroups, function (it_group) {
@@ -103,7 +108,6 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
     }
 
     function FillModulesCombo() {
-        $scope.allModules = [{id: "All", name: "All"}];
         _.each($scope.cloudAppData.cloudApp, function(cloudAppItem){
             if($scope.filteredMG != $scope.allModuleGroups[0].id && cloudAppItem.moduleGroupName != $scope.filteredMG){
                 return;
@@ -132,7 +136,6 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
     }
 
     function FillSmeCombo() {
-        $scope.allSMEs = [{id: "All", name: "All"}];
         _.each($scope.cloudAppData.cloudApp, function(cloudAppItem){
             var found = false;
             _.each($scope.allSMEs, function (sme) {
@@ -158,7 +161,6 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
     }
 
     function FillStreamsCombo() {
-        $scope.allStreams = [{id: "All", name: "All"}];
         _.each($scope.cloudAppData.cloudApp, function(cloudAppItem){
             if($scope.filteredTeam != $scope.allTeams[0].id && cloudAppItem.teamName != $scope.filteredTeam){
                 return;
@@ -251,6 +253,11 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
                 }
                 else if($scope.filteredVersion == "Q3") {
                     if(!$scope.versionHelper.isQ3Version(cloudAppItem.fixVersions)) {
+                        return;
+                    }
+                }
+                else if($scope.filteredVersion == "CORE") {
+                    if(!$scope.versionHelper.isCoreVersion(cloudAppItem.fixVersions)) {
                         return;
                     }
                 }

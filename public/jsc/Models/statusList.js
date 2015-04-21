@@ -29,7 +29,8 @@ exports.RESOLUTION = {
     CANCELED: { name: "Canceled" },
     ACCEPTED: { name: "Accepted" },
     DUPLICATE: { name: "Duplicate" },
-    OBSOLETE: { name: "Obsolete" }
+    OBSOLETE: { name: "Obsolete" },
+    APPROVED: { name: "Approved" }
 };
 
 exports.isAccepted = function(status) {
