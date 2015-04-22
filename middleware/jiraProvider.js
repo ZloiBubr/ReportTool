@@ -485,7 +485,8 @@ function mapDates(page, subtaskObj) {
     page.cusfinish = subtaskObj.fields.customfield_24503 ? new Date(subtaskObj.fields.customfield_24503) : null;
     page.pmhfinish = subtaskObj.fields.customfield_25900 ? new Date(subtaskObj.fields.customfield_25900) : null;
     page.lafinish = subtaskObj.fields.customfield_25901 ? new Date(subtaskObj.fields.customfield_25901) : null;
-    if (subtaskObj.fields.status.name == STATUS.CLOSED.name) {
+    var status = helpers.updateStatus(page);
+    if (subtaskObj.fields.status.name == STATUS.CLOSED.name && status != STATUS.CANCELED.name) {
         page.status = STATUS.PRODUCTION.name;
     }
     page.acceptanceStatus = subtaskObj.fields.status.name;
