@@ -86,39 +86,23 @@ function distribution (){
 }
 
 function parsePages(callback) {
+    var cloudAppsMap = {};
 
     var velocity = {
         data: [
         {
             data: [],
-            name: "Planned burn"
+            name: "Planned burn core"        },
+        {
+            data: [],
+            name: "Actual burn core"
         },
         {
             data: [],
-            name: "Actual burn"
-        },
-        {
-            data: [],
-            name: "Projected burn"
-        },
-        {
-            data: [],
-            name: "Planned burn core",
-            visible: false
-        },
-        {
-            data: [],
-            name: "Actual burn core",
-            visible: false
-        },
-        {
-            data: [],
-            name: "Projected burn core",
-            visible: false
+            name: "Projected burn core"
         }],
         
-        distribution: new distribution(),
-        distributionByTeam: {}
+        distribution: new distribution()
     };
 
     var maximumBurn = 0.0;
@@ -170,7 +154,6 @@ function parsePages(callback) {
                                                     var progress = to - from;
                                                     var calcStoryPoints = storyPoints * progress / 100;
 
-                                                    putDataPoint(velocity, "Actual burn", date, calcStoryPoints, "");
                                                     if(versionHelper.isCoreVersion(module.fixVersions)) {
                                                         putDataPoint(velocity, "Actual burn core", date, calcStoryPoints, "");
                                                     }
@@ -186,15 +169,14 @@ function parsePages(callback) {
                                                             tooltip = module.summary;
                                                             modulesAdded.push(module.summary);
                                                         }
-                                                        putDataPoint(velocity, "Planned burn", date, storyPoints, tooltip);
                                                         if(versionHelper.isCoreVersion(module.fixVersions)) {
                                                             maximumBurnCore += storyPoints;
                                                             putDataPoint(velocity, "Planned burn core", date, storyPoints, tooltip);
                                                         }
                                                     }
                                                 }
-                                                if(!ignore) {
-                                                    addStackedData(velocity, status, storyPoints, helpers.getTeamName(page.labels));
+                                                if(!ignore && versionHelper.isCoreVersion(module.fixVersions)) {
+                                                    addStackedData(cloudAppsMap, page, status, storyPoints);
                                                 }
                                                 callback();
                                             },
@@ -220,24 +202,21 @@ function parsePages(callback) {
         function () {
             var date = new Date("January 1, 2014 00:00:00");
             date = date.getTime();
-            putDataPoint(velocity, "Planned burn", date, 0.0);
             putDataPoint(velocity, "Planned burn core", date, 0.0);
             SortData(velocity);
-            AddProjection(true, maximumBurn, velocity);
-            AddProjection(false, maximumBurnCore, velocity);
-            SumData(true, maximumBurn, velocity);
-            SumData(false, maximumBurnCore, velocity);
-            AdjustProjection(true, velocity);
-            AdjustProjection(false, velocity);
+            AddProjection(maximumBurnCore, velocity);
+            SumData(maximumBurnCore, velocity);
+            AdjustProjection(velocity);
+            AddPageStatuses(cloudAppsMap, velocity);
             callback(velocity);
         }
     ]);
 }
 
-function AdjustProjection(isCore, velocity) {
+function AdjustProjection(velocity) {
     var lastValue = 0.0;
-    var actualName = isCore ? "Actual burn" : "Actual burn core";
-    var projectedName = isCore ? "Projected burn" : "Projected burn core";
+    var actualName = "Actual burn core";
+    var projectedName = "Projected burn core";
 
     for (var k = 0; k < velocity.data.length; k++) {
         var burn = velocity.data[k];
@@ -278,9 +257,9 @@ function AdjustProjection(isCore, velocity) {
     }
 }
 
-function AddProjection(isCore, maximumBurn, velocity) {
-    var actualName = isCore ? "Actual burn" : "Actual burn core";
-    var projectedName = isCore ? "Projected burn" : "Projected burn core";
+function AddProjection(maximumBurn, velocity) {
+    var actualName = "Actual burn core";
+    var projectedName = "Projected burn core";
     var monthAgo = new Date(Date.now());
     monthAgo.setMonth(monthAgo.getMonth()-3);
     var monthAgoMsc = monthAgo.getTime();
@@ -313,8 +292,8 @@ function AddProjection(isCore, maximumBurn, velocity) {
     }
 }
 
-function SumData(isCore, maximumBurn, velocity) {
-    var burnsList = isCore ? ["Planned burn", "Actual burn"] : ["Planned burn core", "Actual burn core"];
+function SumData(maximumBurn, velocity) {
+    var burnsList = ["Planned burn core", "Actual burn core"];
     for (var k = 0; k < velocity.data.length; k++) {
         var burn = velocity.data[k];
         if(burn.name != burnsList[0] && burn.name != burnsList[1]) {
@@ -347,22 +326,32 @@ function SortData(velocity) {
     }
 }
 
-function addStackedData(velocity, status, storyPoints, teamName) {
-    var added = false;
-
-    var team = velocity.distributionByTeam[teamName == "--"? "NoTeam" : teamName] = velocity.distributionByTeam[teamName == "--"? "NoTeam" : teamName] || {distribution: new distribution()};
-
-    for(var i=0; i<velocity.distribution.data.length; i++) {
-        if (velocity.distribution.data[i].name == status) {
-            velocity.distribution.data[i].data[0]++;
-            velocity.distribution.data[i].data[1] += storyPoints || 0;
-
-            team.distribution.data[i].data[0]++;
-            team.distribution.data[i].data[1] += storyPoints || 0;
-
-            added = true;
-            break;
+function AddPageStatuses(cloudAppsMap, velocity) {
+    _.each(Object.keys(cloudAppsMap), function (key) {
+        var cloudAppItem = cloudAppsMap[key];
+        for (var i = 0; i < velocity.distribution.data.length; i++) {
+            if (velocity.distribution.data[i].name == cloudAppItem.status) {
+                velocity.distribution.data[i].data[0] += cloudAppItem.pages.length;
+                velocity.distribution.data[i].data[1] += cloudAppItem.storyPoints || 0;
+                break;
+            }
         }
+    });
+}
+
+function addStackedData(cloudAppsMap, page, status, storyPoints) {
+    var cloudAppName = helpers.getCloudAppName(page.labels);
+    var cloudAppItem = cloudAppsMap[cloudAppName];
+    if(!cloudAppItem) {
+        cloudAppsMap[cloudAppName] = { pages: [], status: status, storyPoints: 0};
+        cloudAppItem = cloudAppsMap[cloudAppName];
+    }
+
+    cloudAppItem.pages.push(page.key);
+    cloudAppItem.storyPoints += storyPoints || 0;
+
+    if(helpers.isParentPage(page.labels)) {
+        cloudAppItem.status = status;
     }
 }
 
@@ -376,7 +365,7 @@ function putDataPoint(velocity, burnName, date, calcStoryPoints, tooltip) {
                 if ((burnData.x - date) == 0) {
                     found = true;
                     burnData.y += calcStoryPoints;
-                    if(burn.name == "Planned burn" || burn.name == "Planned burn core") {
+                    if(burn.name == "Planned burn core") {
                         burnData.tooltip += tooltip == "" ? "" : "," + tooltip;
                     }
                     return;
