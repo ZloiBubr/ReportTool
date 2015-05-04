@@ -92,7 +92,7 @@ exports.calcUpdateInterval = function(debug, callback) {
                 callback(0);
             }
             else {
-                callback(new Date(Date.now()) - version.updated);
+                callback((new Date(Date.now())).getTime() - version.updated.getTime());
             }
         });
     }

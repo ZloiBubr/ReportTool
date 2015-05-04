@@ -109,11 +109,11 @@ exports.updateJiraInfo = function (debugMode, fullUpdate, removeMode, jiraUser, 
             LogProgress("**** Step 4: drop collections from DB");
 
             async.series([
-                function(callback) { return jiraHelpers.collectionDrop(Module, LogProgress, callback) },
-                function(callback) { return jiraHelpers.collectionDrop(Page, LogProgress, callback) },
-                function(callback) { return jiraHelpers.collectionDrop(Issue, LogProgress, callback) },
-                function(callback) { return jiraHelpers.collectionDrop(CloudApp, LogProgress, callback) },
-                function(callback) { return jiraHelpers.collectionDrop(SizeChange, LogProgress, callback) }
+                function(callback) { return jiraHelpers.collectionDrop(Module, LogProgress, callback); },
+                function(callback) { return jiraHelpers.collectionDrop(Page, LogProgress, callback); },
+                function(callback) { return jiraHelpers.collectionDrop(Issue, LogProgress, callback); },
+                function(callback) { return jiraHelpers.collectionDrop(CloudApp, LogProgress, callback); },
+                function(callback) { return jiraHelpers.collectionDrop(SizeChange, LogProgress, callback); }
             ],
             function(err) {
                 callback(err);
@@ -166,7 +166,7 @@ function Step1CollectIssueKeys(debugMode, fullUpdate, updateSpan, jira, issues, 
     var startKey = 0;
     var loopFlag = true;
 
-    var span = updateSpan > 0 ? parseInt(updateSpan / 1000 / 3600) : 72;
+    var span = updateSpan > 0 ? updateSpan / 1000 / 3600 : 72;
     span = span > 0 ? span+1 : 2;
     var queryString = fullUpdate ? "project = PLEX-UXC ORDER BY key ASC" : util.format("project = PLEX-UXC AND updated > -%sh ORDER BY key ASC", span);
 
@@ -225,9 +225,9 @@ function Step2CollectIssues(deleteMode, debugMode, progressCounter, jira, issues
         var jiraIssue = {};
         jiraIssue.issue = {};
         async.series([
-                function (callback) { return jiraHelpers.getFullJiraIssue(jira, issueKey, jiraIssue, LogProgress, callback) },
-                function (callback) { return jiraHelpers.updateWorklogForJiraIssue(jira, jiraIssue, LogProgress, callback) },
-                function (callback) { return jiraHelpers.saveJiraIssueToDB(jiraIssue, callback) }
+                function (callback) { return jiraHelpers.getFullJiraIssue(jira, issueKey, jiraIssue, LogProgress, callback); },
+                function (callback) { return jiraHelpers.updateWorklogForJiraIssue(jira, jiraIssue, LogProgress, callback); },
+                function (callback) { return jiraHelpers.saveJiraIssueToDB(jiraIssue, callback); }
             ],
             function (err) {
                 LogProgress(++progressCounter + ":" + issueKey + " : Issue Collected");
@@ -354,8 +354,8 @@ function Step6CollectStories(callback) {
                     parseHistory(story, page);
                     calcWorklogFromIssue(story, page);
 
-                    Q().then(function(){return Q.all( mapSubtsks(story, page)) })
-                       .then(function() {return Q.all(mapLinkedIssues(story, page)) })
+                    Q().then(function(){return Q.all( mapSubtsks(story, page)); })
+                       .then(function() {return Q.all(mapLinkedIssues(story, page)); })
                        .then(function () {
                             var deferred2 = Q.defer();
                             page.save(function (err, dbPage) {
@@ -834,7 +834,6 @@ function ParseProgress(item, page, author, created) {
 
 function ParseFinishDates(item, page, created) {
     if (item.fieldtype == 'jira' && item.field == 'status') {
-        var from = item.fromString;
         var to = item.toString;
 
         if (to == STATUS.READYFORQA.name) {
