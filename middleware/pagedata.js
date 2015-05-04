@@ -2,6 +2,7 @@ var mongoose = require('../libs/mongoose');
 var Module = require('../models/module').Module;
 var Page = require('../models/page').Page;
 var log = require('../libs/log')(module);
+var _ = require('underscore');
 
 exports.getData = function (req, res) {
     var id = req.params.id;
@@ -11,12 +12,12 @@ exports.getData = function (req, res) {
     });
 };
 
-function personWorklog(person, spent) {
+function PersonWorklog(person, spent) {
     this.person = person;
     this.spent = spent;
 }
 
-function progressData() {
+function ProgressData() {
     this.series = [
         {
             data: [[
@@ -29,15 +30,14 @@ function progressData() {
 }
 
 function PutSeriesPoint(pData, pName, dateC, progress) {
-    var found = false;
-    for (var i = 0; i < pData.series.length; i++) {
-        if (pData.series[i].name == pName) {
-            found = true;
-            pData.series[i].data.push([dateC, progress]);
-            break;
+    var seriesData = null;
+    _.each(pData.series, function(series) {
+        if (series.name == pName) {
+            seriesData = series;
+            series.data.push([dateC, progress]);
         }
-    }
-    if (!found) {
+    });
+    if(!seriesData) {
         pData.series.push({name: pName, data: [
             [dateC, progress]
         ]});
@@ -60,10 +60,11 @@ function getPage(id, callback) {
                 page[0]._doc.devFinished = (new Date(Date.parse(page[0]._doc.qaFinished))).toDateString();
             }
 
-            var pData = new progressData();
+            var pData = new ProgressData();
             pData.series = [];
-            for (var j = 0; j < page[0]._doc.progressHistory.length; j++) {
-                var history = page[0]._doc.progressHistory[j];
+            var progressHistory = page[0]._doc.progressHistory;
+            for (var j = 0; j < progressHistory.length; j++) {
+                var history = progressHistory[j];
                 var person = history.person;
 
                 var progress = parseInt(history.progressTo);
@@ -74,22 +75,22 @@ function getPage(id, callback) {
             }
 
             //sort history by dates
-            var historyData = page[0]._doc.worklogHistory;
-            historyData.sort(function (a, b) {
+            var worklogHistory = page[0]._doc.worklogHistory;
+            worklogHistory.sort(function (a, b) {
                 a = new Date(Date.parse(a._doc.dateStarted));
                 b = new Date(Date.parse(b._doc.dateStarted));
                 return a > b ? 1 : a < b ? -1 : 0;
             });
 
             var persons = [];
-            for (var j = 0; j < historyData.length; j++) {
-                var worklog = historyData[j];
+            for (var j = 0; j < worklogHistory.length; j++) {
+                var worklog = worklogHistory[j];
                 var found = false;
-                var person = worklog.person;
+                var person2 = worklog.person;
                 var spent = parseFloat(worklog.timeSpent);
-                var progress = spent;
+                var progress2 = spent;
                 for(var i=0; i<persons.length; i++) {
-                    if(persons[i].person == person) {
+                    if(persons[i].person == person2) {
                         found = true;
                         persons[i].spent += spent;
                         progress = persons[i].spent;
@@ -97,19 +98,19 @@ function getPage(id, callback) {
                     }
                 }
                 if(!found) {
-                    var personW = new personWorklog(person, spent);
+                    var personW = new PersonWorklog(person, spent);
                     persons.push(personW);
                 }
 
-                var dateC = Date.parse(worklog.dateStarted);
-                var pName = person + " hours";
+                var dateC2 = Date.parse(worklog.dateStarted);
+                var pName2 = person + " hours";
 
-                PutSeriesPoint(pData, pName, dateC, progress);
+                PutSeriesPoint(pData, pName2, dateC2, progress2);
             }
             page[0]._doc.worklogPersons = persons;
             page[0]._doc.pData = pData;
 
             callback(err, page[0]);
-        })
-    })
+        });
+    });
 }

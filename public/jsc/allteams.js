@@ -208,7 +208,7 @@ function Teams() {
                 "Maryia Kashtanava"
             ]
         }
-    ]
+    ];
 }
 
 exports.AllTeams = new Teams();

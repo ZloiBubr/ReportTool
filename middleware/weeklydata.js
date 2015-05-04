@@ -4,6 +4,7 @@ var Page = require('../models/page').Page;
 var log = require('../libs/log')(module);
 var helpers = require('../middleware/helpers');
 var cache = require('node_cache');
+var _ = require('underscore');
 
 var SP_TYPE = {
     DEV : 1,
@@ -63,16 +64,15 @@ function parsePages(callback) {
 
             }
             if(page.qaFinished){
-                var dates = getDates(page.qaFinished);
+                var dates2 = getDates(page.qaFinished);
                 //var bonusCalcStoryPoints = storyPoints * 20 / 100;
-                processMonthlyData(velocity, teamName, dates.date, storyPoints * 50 / 100, 0, SP_TYPE.QA);
+                processMonthlyData(velocity, teamName, dates2.date, storyPoints * 50 / 100, 0, SP_TYPE.QA);
                 //putTotalMonthlyPoint(velocity, teamName, dates.date, bonusCalcStoryPoints);
             }
         }
 
         //2. sort
-        for (var k = 0; k < velocity.data.length; k++) {
-            var team = velocity.data[k];
+        _.each(velocity.data, function(team) {
             team.data.sort(function (a, b) {
                 var aa = new Date(a.x);
                 var bb = new Date(b.x);
@@ -81,14 +81,13 @@ function parsePages(callback) {
             for (var l = 0; l < team.data.length; l++) {
                 team.data[l].y = Math.round(team.data[l].y*10)/10;
             }
-        }
+        });
         velocity.years.sort(function(a,b) {
             var aa = a.name;
             var bb = b.name;
             return aa > bb ? 1 : aa < bb ? -1 : 0;
         });
-        for (var k = 0; k < velocity.years.length; k++) {
-            var year = velocity.years[k];
+        _.each(velocity.years, function(year) {
             year.teams.sort(function (a, b) {
                 var aa = a.name;
                 var bb = b.name;
@@ -100,9 +99,9 @@ function parsePages(callback) {
                 }
                 return aa > bb ? 1 : aa < bb ? -1 : 0;
             });
-        }
+        });
         callback(err, velocity);
-    })
+    });
 }
 
 function putTotalDataPoint(velocity, page, teamName, norm_date, calcStoryPoints) {
@@ -177,7 +176,7 @@ function processMonthlyData(velocity, teamName, date, bonusCalcStoryPoints, calc
     if (!teamObj) {
         teamObj = {
             name: teamName,
-            months: Array.apply(null, {length: 12}).map(function(){return {total_sp:0, total_bonus_sp:0, dev_sp:0, qa_sp:0, sme_sp:0}})
+            months: Array.apply(null, {length: 12}).map(function(){return {total_sp:0, total_bonus_sp:0, dev_sp:0, qa_sp:0, sme_sp:0};})
         };
         yearObj.teams.push(teamObj);
     }

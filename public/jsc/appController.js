@@ -53,11 +53,11 @@ function appController($scope, $resource, $window) {
     $scope.allModules = [{id: "All", name: "All"}];
     $scope.allVersions = [{id: "All", name: "All"}];
 
-    $scope.statuses = $window.exports.statuses;
+    $scope.statuses = $window.exports.Statuses;
     $scope.STATUS = $window.exports.STATUS;
     $scope.RESOLUTION = $window.exports.RESOLUTION;
     $scope.VERSION = $window.exports.VERSION;
-    $scope.versionHelper  = new $window.exports.versionHelper();
+    $scope.versionHelper  = new $window.exports.VersionHelper();
 
 
     $scope.getPriorityNumber = $window.exports.getPriorityNumber;

@@ -1,5 +1,5 @@
 var mongoose = require('../libs/mongoose');
-var progressModel = require('../models/progress').progress;
+var ProgressModel = require('../models/progress').Progress;
 var Module = require('../models/module').Module;
 var Page = require('../models/page').Page;
 var log = require('../libs/log')(module);
@@ -31,7 +31,7 @@ function getPrevMonday(d) {
 }
 
 function parsePages(callback) {
-    var progress = new progressModel();
+    var progress = new ProgressModel();
     //1. grab all pages
     Page.find({}, function (err, pages) {
         progress.dates = [];
@@ -93,7 +93,7 @@ function parsePages(callback) {
         sortData(progress);
 
         callback(err, progress);
-    })
+    });
 }
 
 function putDataPoint(key, progress, teamName, date, calcStoryPoints, person, uri, devTimeSpent, qaTimeSpent, storyPoints, pageProgress, estimated, blockersnum) {

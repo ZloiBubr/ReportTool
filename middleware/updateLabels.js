@@ -61,8 +61,6 @@ var writeToClient = function (text, error) {
 };
 
 function Step1CollectIssues(jira, params, callback) {
-    issuesList = [];
-
     var loopError = 3;
     async.whilst(function() {
             return loopError-- > 0;
@@ -141,14 +139,14 @@ function ProcessPageFromJira(jira, params, issue, callback) {
                 }
             }
             if(addEpics) {
-                var exists = false;
+                var exists2 = false;
                 for(var j=0; j < issueUpdate.fields.customfield_10002.length; j++) {
                     if(params.epicsToAdd == issueUpdate.fields.customfield_10002[j]) {
-                        exists = true;
+                        exists2 = true;
                         break;
                     }
                 }
-                if(!exists) {
+                if(!exists2) {
                     issueUpdate.fields.customfield_10002.push(params.epicsToAdd);
                 }
             }

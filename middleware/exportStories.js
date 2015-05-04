@@ -63,7 +63,7 @@ function parsePages(teamName, month, callback) {
 
             }()).done(function(){
                 callback(err,result);
-            })
+            });
 
         });
 };

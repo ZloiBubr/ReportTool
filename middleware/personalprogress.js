@@ -1,7 +1,7 @@
 var mongoose = require('../libs/mongoose');
 var Module = require('../models/module').Module;
 var Page = require('../models/page').Page;
-var teamsModels = require('../models/teamPersonalProgress');
+var TeamModels = require('../models/teamPersonalProgress');
 var log = require('../libs/log')(module);
 var AllTeams = require('../public/jsc/allteams').AllTeams;
 var async = require('async');
@@ -23,16 +23,16 @@ exports.getData = function (req, res) {
 
 function fillPersonalData(teamPersonalProgress) {
     _.each(AllTeams.teams, function (team) {
-        var pteam = new teamsModels.Team(team.name);
+        var pteam = new TeamModels.Team(team.name);
         teamPersonalProgress.teams.push(pteam);
         _.each(team.developers, function (developerName) {
-            pteam.developers.push(new teamsModels.Developer(developerName));
-        })
-    })
+            pteam.developers.push(new TeamModels.Developer(developerName));
+        });
+    });
 }
 
 function parsePages(fromDate, toDate, callback) {
-    var teamsModel = new teamsModels.TeamPersonalProgress();
+    var teamsModel = new TeamModels.TeamPersonalProgress();
     fillPersonalData(teamsModel);
 
 
@@ -60,17 +60,17 @@ function parsePages(fromDate, toDate, callback) {
                     Page.find({worklogHistory: {$elemMatch: {person: developer.name, dateStarted: {$gte: teamsModel.startDate, $lte: teamsModel.endDate}}}},
                         function (err, workLogPages) {
 
-                            var workLogPages = _.uniq(_.union(ProgressPages,workLogPages),false,function(item){return item.key});
+                            var workLogPages = _.uniq(_.union(ProgressPages,workLogPages),false,function(item){return item.key;});
 
                             var effectiveDays = 0;
                             for (var d = new Date(teamsModel.startDate.getTime()); d <= teamsModel.endDate; d.setDate(d.getDate() + 1)) {
                                 var progressDetail = _.find(developer.progressDetails, function (progressDetailedItem) {
-                                    return progressDetailedItem.date.getTime() == d.getTime()
+                                    return progressDetailedItem.date.getTime() == d.getTime();
                                 });
 
                                 if (_.isUndefined(progressDetail)) {
-                                    progressDetail = new teamsModels.ProgressDetail(new Date(d));
-                                    developer.progressDetails.push(progressDetail)
+                                    progressDetail = new TeamModels.ProgressDetail(d);
+                                    developer.progressDetails.push(progressDetail);
                                 }
 
                                 _.each(workLogPages, function (pageItem) {
@@ -108,16 +108,16 @@ function parsePages(fromDate, toDate, callback) {
                             }
 
                             developerCallback();
-                        })
+                        });
 
                 });
 
         }, function (err) {
             teamCallback(err);
-        })
+        });
     }, function (err) {
         callback(err, teamsModel);
-    })
+    });
 }
 
 function parseWorklogHistory (day, developer, progressDetail, pageItem)
@@ -126,10 +126,10 @@ function parseWorklogHistory (day, developer, progressDetail, pageItem)
         if (worklogItem.person == developer.name && datesCompareHelper(worklogItem.dateStarted, day)) {
 
             var page = _.find(progressDetail.pages, function (tpageItem) {
-                return tpageItem.pageId == pageItem.key
+                return tpageItem.pageId == pageItem.key;
             });
             if (_.isUndefined(page)) {
-                page = new teamsModels.Page(pageItem.key);
+                page = new TeamModels.Page(pageItem.key);
                 progressDetail.pages.push(page);
             }
 
@@ -146,11 +146,11 @@ function parseProgressHistory (day, developer, progressDetail, pageItem) {
         if (progresHistoryItem.person == developer.name && datesCompareHelper(progresHistoryItem.dateChanged, day)) {
 
             var page = _.find(progressDetail.pages, function (tpageItem) {
-                return tpageItem.pageId == pageItem.key
+                return tpageItem.pageId == pageItem.key;
             });
 
             if (_.isUndefined(page)) {
-                page = new teamsModels.Page(pageItem.key);
+                page = new TeamModels.Page(pageItem.key);
                 progressDetail.pages.push(page);
             }
 

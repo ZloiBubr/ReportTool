@@ -10,7 +10,7 @@ var async = require('async');
 var cache = require('node_cache');
 var _ = require('underscore');
 var statusExport = require('../public/jsc/models/statusList');
-var statusList = new statusExport.statuses();
+var statusList = new statusExport.Statuses();
 
 exports.getData = function (req, res) {
     cache.getData("moduleData",function(setterCallback){
@@ -20,7 +20,7 @@ exports.getData = function (req, res) {
     }, function(value){res.json(value);});
 };
 
-function moduleData() {
+function ModuleData() {
     this.module = [];
 }
 
@@ -33,7 +33,7 @@ function SortData(moduledata) {
 }
 
 function parsePages(callback) {
-    var moduledata = new moduleData();
+    var moduledata = new ModuleData();
     moduledata.module = [];
 
     async.series([
@@ -58,7 +58,7 @@ function parsePages(callback) {
                                 putDataPoint(moduledata, module, null, count);
                                 callback();
                             }
-                        })
+                        });
                     },
                     function(err) {
                         callback();
@@ -190,28 +190,27 @@ function putDataPoint(moduledata, module, page, count) {
 }
 
 function addCloudApp(module, page) {
-    var found = false;
     var status = page.status;
     if(status == "Production") {
         status = STATUS.PRODUCTION.name;
     }
 
+    var cloudApp = null;
     var cloudAppName = helpers.getCloudAppName(page.labels);
     for(var i=0; i<module.cloudApps.length; i++) {
         if(module.cloudApps[i].name == cloudAppName) {
-            found = true;
+            cloudApp = module.cloudApps[i].name;
             break;
         }
     }
-    if(!found) {
-        var cloudApp = {
+    if(!cloudApp) {
+        cloudApp = {
             name: cloudAppName,
             cloudAppStatus: status
         };
         module.cloudApps.push(cloudApp);
     }
     if(helpers.isParentPage(page.labels)) {
-        var cloudApp = module.cloudApps[module.cloudApps.length-1];
         cloudApp.devFinishDate = page.devfinish;
         cloudApp.qaFinishDate = page.qafinish;
         cloudApp.acceptanceFinishDate = page.accfinish;

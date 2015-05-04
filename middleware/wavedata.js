@@ -8,7 +8,7 @@ var async = require('async');
 var _ = require('underscore');
 var cache = require('node_cache');
 var statusExport = require('../public/jsc/Models/statusList');
-var statusList = new statusExport.statuses();
+var statusList = new statusExport.Statuses();
 var STATUS = require('../public/jsc/models/statusList').STATUS;
 
 exports.getData = function (req, res) {
@@ -20,12 +20,12 @@ exports.getData = function (req, res) {
     }, function(value){res.json(value);});
 };
 
-function cloudAppData() {
+function CloudAppData() {
     this.cloudApp = [];
 }
 
 function parsePages(callback) {
-    var cloudappdata = new cloudAppData();
+    var cloudappdata = new CloudAppData();
     cloudappdata.cloudApp = [];
 
     async.series([
@@ -48,7 +48,7 @@ function parsePages(callback) {
                                     else {
                                         callback();
                                     }
-                                })
+                                });
                             },
                             function() {
                                 callback();

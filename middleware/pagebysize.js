@@ -4,6 +4,7 @@ var Page = require('../models/page').Page;
 var log = require('../libs/log')(module);
 var persons = require('./persons');
 var cache = require('node_cache');
+var _ = require('underscore');
 
 exports.getData = function (req, res) {
 
@@ -22,7 +23,7 @@ function isDeveloper(name) {
     return false;
 }
 
-function pagebysizeModel() {
+function PageBySizeModel() {
     this.data = [
         {
             data: [],
@@ -62,7 +63,7 @@ function pagebysizeModel() {
 }
 
 function parsePages(callback) {
-    var model = new pagebysizeModel();
+    var model = new PageBySizeModel();
     for (var k = 0; k < model.data.length; k++) {
         var team = model.data[k];
         team.data = [];
@@ -80,7 +81,6 @@ function parsePages(callback) {
                 continue;
             }
             var dateDevFinished = new Date(Date.parse(page.devFinished)).getTime();
-            var dateQAFinished = new Date(Date.parse(page.qaFinished)).getTime();
             var pageSize = getPageSize(page.labels);
             var timeDevSpent = 0.;
             var timeQASpent = 0.;
@@ -104,16 +104,15 @@ function parsePages(callback) {
         }
 
         //2. sort
-        for (var k = 0; k < model.data.length; k++) {
-            var team = model.data[k];
+        _.each(model.data, function (team){
             team.data.sort(function (a, b) {
                 var aa = new Date(a.x);
                 var bb = new Date(b.x);
                 return aa > bb ? 1 : aa < bb ? -1 : 0;
             });
-        }
+        });
         callback(err, model);
-    })
+    });
 }
 
 function getTeamName(labels) {

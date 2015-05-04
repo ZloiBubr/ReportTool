@@ -1,4 +1,4 @@
-exports.progress = function () {
+exports.Progress = function () {
     this.dates = [
         {
             date: Date.now(),

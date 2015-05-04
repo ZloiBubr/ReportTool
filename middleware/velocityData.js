@@ -12,7 +12,7 @@ var helpers = require('../middleware/helpers');
 var STATUS = require('../public/jsc/models/statusList').STATUS;
 
 var statusExport = require('../public/jsc/Models/statusList');
-var versionHelper  = new statusExport.versionHelper();
+var versionHelper  = new statusExport.VersionHelper();
 
 exports.getData = function (req, res) {
 
@@ -24,7 +24,7 @@ exports.getData = function (req, res) {
 };
 
 
-function distribution (){
+function Distribution (){
     this.data =  [
                 {
                     name: STATUS.LAREADY.name,
@@ -102,7 +102,7 @@ function parsePages(callback) {
             name: "Projected burn core"
         }],
         
-        distribution: new distribution()
+        distribution: new Distribution()
     };
 
     var maximumBurn = 0.0;
@@ -141,7 +141,7 @@ function parsePages(callback) {
                                                     var history = page.progressHistory[j];
                                                     var date = new Date(Date.parse(history.dateChanged));
                                                     date.setHours(12, 0, 0, 0);
-                                                    date = date.getTime();
+                                                    var time = date.getTime();
                                                     var from = parseInt(history.progressFrom);
                                                     if(from > 1) {
                                                         if(history.progressTo == '0' ||
@@ -155,15 +155,15 @@ function parsePages(callback) {
                                                     var calcStoryPoints = storyPoints * progress / 100;
 
                                                     if(versionHelper.isCoreVersion(module.fixVersions)) {
-                                                        putDataPoint(velocity, "Actual burn core", date, calcStoryPoints, "");
+                                                        putDataPoint(velocity, "Actual burn core", time, calcStoryPoints, "");
                                                     }
                                                 }
                                                 if(module.duedate != null) {
                                                     if(!ignore) {
                                                         maximumBurn += storyPoints;
-                                                        var date = new Date(Date.parse(module.duedate));
-                                                        date.setHours(12, 0, 0, 0);
-                                                        date = date.getTime();
+                                                        var date2 = new Date(Date.parse(module.duedate));
+                                                        date2.setHours(12, 0, 0, 0);
+                                                        var time2 = date2.getTime();
                                                         var tooltip = "";
                                                         if(modulesAdded.indexOf(module.summary) < 0) {
                                                             tooltip = module.summary;
@@ -171,7 +171,7 @@ function parsePages(callback) {
                                                         }
                                                         if(versionHelper.isCoreVersion(module.fixVersions)) {
                                                             maximumBurnCore += storyPoints;
-                                                            putDataPoint(velocity, "Planned burn core", date, storyPoints, tooltip);
+                                                            putDataPoint(velocity, "Planned burn core", time2, storyPoints, tooltip);
                                                         }
                                                     }
                                                 }
@@ -188,7 +188,7 @@ function parsePages(callback) {
                                     else {
                                         callback();
                                     }
-                                })
+                                });
                             },
                             function(err) {
                                 callback();
@@ -201,8 +201,8 @@ function parsePages(callback) {
         },
         function () {
             var date = new Date("January 1, 2014 00:00:00");
-            date = date.getTime();
-            putDataPoint(velocity, "Planned burn core", date, 0.0);
+            var time = date.getTime();
+            putDataPoint(velocity, "Planned burn core", time, 0.0);
             SortData(velocity);
             AddProjection(maximumBurnCore, velocity);
             SumData(maximumBurnCore, velocity);

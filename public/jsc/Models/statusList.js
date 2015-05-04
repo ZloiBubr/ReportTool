@@ -37,7 +37,7 @@ exports.isAccepted = function(status) {
    return status == exports.STATUS.ACCEPTED.name || status == exports.STATUS.PRODUCTION.name;
 };
 
-exports.statusEntity = function(status)
+exports.StatusEntity = function(status)
 {
     this.name = status.name || "";
     this.isChecked = true;
@@ -55,24 +55,24 @@ exports.getPriorityNumber = function(priorityText) {
 };
 
 
-exports.statuses = function() {
-    this.blocked = new exports.statusEntity(exports.STATUS.BLOCKED);
-    this.open = new exports.statusEntity(exports.STATUS.OPEN);
-    this.reopened = new exports.statusEntity(exports.STATUS.REOPENED);
-    this.deferred = new exports.statusEntity(exports.STATUS.DEFERRED);
-    this.assigned = new exports.statusEntity(exports.STATUS.ASSIGNED);
-    this.inProgress = new exports.statusEntity(exports.STATUS.INPROGRESS);
-    this.codeReview = new exports.statusEntity(exports.STATUS.CODEREVIEW);
-    this.readyForQA = new exports.statusEntity(exports.STATUS.READYFORQA);
-    this.testingInProgress = new exports.statusEntity(exports.STATUS.TESTINGINPROGRESS);
-    this.resolved = new exports.statusEntity(exports.STATUS.RESOLVED);
-    this.accepted = new exports.statusEntity(exports.STATUS.ACCEPTED);
-    this.production = new exports.statusEntity(exports.STATUS.PRODUCTION);
-    this.closed = new exports.statusEntity(exports.STATUS.CLOSED);
-    this.cancelled = new exports.statusEntity(exports.STATUS.CANCELED);
-    this.notApplicable = new exports.statusEntity(exports.STATUS.NOTAPPLICABLE);
-    this.pmReview = new exports.statusEntity(exports.STATUS.PMREVIEW);
-    this.laReady = new exports.statusEntity(exports.STATUS.LAREADY);
+exports.Statuses = function() {
+    this.blocked = new exports.StatusEntity(exports.STATUS.BLOCKED);
+    this.open = new exports.StatusEntity(exports.STATUS.OPEN);
+    this.reopened = new exports.StatusEntity(exports.STATUS.REOPENED);
+    this.deferred = new exports.StatusEntity(exports.STATUS.DEFERRED);
+    this.assigned = new exports.StatusEntity(exports.STATUS.ASSIGNED);
+    this.inProgress = new exports.StatusEntity(exports.STATUS.INPROGRESS);
+    this.codeReview = new exports.StatusEntity(exports.STATUS.CODEREVIEW);
+    this.readyForQA = new exports.StatusEntity(exports.STATUS.READYFORQA);
+    this.testingInProgress = new exports.StatusEntity(exports.STATUS.TESTINGINPROGRESS);
+    this.resolved = new exports.StatusEntity(exports.STATUS.RESOLVED);
+    this.accepted = new exports.StatusEntity(exports.STATUS.ACCEPTED);
+    this.production = new exports.StatusEntity(exports.STATUS.PRODUCTION);
+    this.closed = new exports.StatusEntity(exports.STATUS.CLOSED);
+    this.cancelled = new exports.StatusEntity(exports.STATUS.CANCELED);
+    this.notApplicable = new exports.StatusEntity(exports.STATUS.NOTAPPLICABLE);
+    this.pmReview = new exports.StatusEntity(exports.STATUS.PMREVIEW);
+    this.laReady = new exports.StatusEntity(exports.STATUS.LAREADY);
 
     this.getStatusByName = function(statusName){
         switch(statusName)
@@ -114,7 +114,7 @@ exports.statuses = function() {
             default :
                 return this.blocked;
         }
-    }
+    };
     this.resetCounters = function(){
         this.blocked.count = 0;
         this.open.count = 0;
@@ -133,10 +133,10 @@ exports.statuses = function() {
         this.notApplicable.count = 0;
         this.pmReview.count = 0;
         this.laReady.count = 0;
-    }
+    };
 };
 
-exports.versionHelper = function() {
+exports.VersionHelper = function() {
     this.isCoreVersion = function(versionName) {
         return versionName.toLowerCase().indexOf('1.0') > -1 ||
             versionName.toLowerCase().indexOf('2.0') > -1 ||

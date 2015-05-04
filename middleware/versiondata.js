@@ -14,12 +14,12 @@ exports.getData = function (req, res) {
     });
 };
 
-function versionData() {
+function VersionData() {
     this.version = {};
 }
 
 function parsePages(callback) {
-    var versiondata = new versionData();
+    var versiondata = new VersionData();
     versiondata.version = {};
 
     Version.find({numerical: VERSION.NUMBER}).exec(function(err, versions) {

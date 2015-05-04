@@ -4,7 +4,7 @@ var Page = require('../models/page').Page;
 var log = require('../libs/log')(module);
 var helpers = require('../middleware/helpers');
 var statusExport = require('../public/jsc/Models/statusList');
-var statusList = new statusExport.statuses();
+var statusList = new statusExport.Statuses();
 var async = require('async');
 var _ = require('underscore');
 var cache = require('node_cache');
@@ -19,17 +19,17 @@ exports.getData = function (req, res) {
 
 };
 
-function cloudAppData() {
+function CloudAppData() {
     this.cloudApp = [];
 }
 
-function chartData() {
+function ChartData() {
     this.data = [];
 }
 
 function parsePages(callback) {
-    var cloudappdata = new cloudAppData();
-    var chartdata = new chartData();
+    var cloudappdata = new CloudAppData();
+    var chartdata = new ChartData();
 
     async.series([
         function (callback) {
@@ -49,7 +49,7 @@ function parsePages(callback) {
                                     else {
                                         callback();
                                     }
-                                })
+                                });
                             },
                             function() {
                                 callback();
@@ -69,14 +69,13 @@ function parsePages(callback) {
 }
 
 function sortChartData(chartdata) {
-    for (var k = 0; k < chartdata.data.length; k++) {
-        var dataLine = chartdata.data[k];
+    _.each(chartdata.data, function(dataLine) {
         dataLine.data.sort(function (a, b) {
             var aa = new Date(a.x);
             var bb = new Date(b.x);
             return aa > bb ? 1 : aa < bb ? -1 : 0;
         });
-    }
+    });
 }
 
 function copyCloudAppData(chartdata, cloudappdata) {

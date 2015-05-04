@@ -12,7 +12,7 @@ var helpers = require('../middleware/helpers');
 var _ = require('underscore');
 var cache = require('node_cache');
 var statusExport = require('../public/jsc/Models/statusList');
-var statusList = new statusExport.statuses();
+var statusList = new statusExport.Statuses();
 
 
 
@@ -26,14 +26,12 @@ exports.getData = function (req, res) {
 };
 
 function parsePages(callback) {
-    var moduleHash = [];
-
     Module.find({}).exec(function(err, modules){
         var modulesHash = getRemapedModuleCollection(modules);
         Issue.find({})
             .populate('pages.page')
             .exec(function (err, issues) {
-                var issueList = new issuesViewModel.issues();
+                var issueList = new issuesViewModel.Issues();
 
                 if (err) {
                     callback(err);
@@ -61,14 +59,14 @@ function parsePages(callback) {
                             dbPage.dueDate = module.duedate;
                         }
                         else{
-                            console.error("issuesDataProvider.js page without module was found")
+                            console.error("issuesDataProvider.js page without module was found");
                         }
 
-                        var linkedPage = new issuesViewModel.linkedPage(dbPage.key, dbPage.reporter, dbPage.timeSpent, dbPage.labels, dbPage.assignee, helpers.getTeamName(dbPage.labels), dbPage.dueDate || "");
-                        linkedPages.push(new issuesViewModel.link(dbPageItem.linkType, linkedPage));
+                        var linkedPage = new issuesViewModel.LinkedPage(dbPage.key, dbPage.reporter, dbPage.timeSpent, dbPage.labels, dbPage.assignee, helpers.getTeamName(dbPage.labels), dbPage.dueDate || "");
+                        linkedPages.push(new issuesViewModel.Link(dbPageItem.linkType, linkedPage));
                     });
 
-                    var issue = new issuesViewModel.issue(
+                    var issue = new issuesViewModel.Issue(
                         dbIssue.key,
                         dbIssue.type,
                         dbIssue.status,
@@ -80,7 +78,7 @@ function parsePages(callback) {
                         linkedPages
                     );
 
-                    issueList.issues.push(issue)
+                    issueList.issues.push(issue);
                 });
 
                 callback(err, issueList.issues);
@@ -93,7 +91,7 @@ function getRemapedModuleCollection(modules){
     var result = [];
     _.each(modules, function(module){
         result[module.key] = module;
-    })
+    });
     return result;
 }
 

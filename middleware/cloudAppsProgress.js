@@ -21,9 +21,9 @@ exports.getData = function (req, res) {
             setterCallback(data);
         });
     }, function(value){res.json(value);});
-}
+};
 
-function cloudAppData() {
+function CloudAppData() {
     this.modules = [
         {
             moduleName: "",
@@ -55,11 +55,11 @@ function cloudAppData() {
                 }
             ]
         }
-    ]
+    ];
 }
 
 function parsePages(teamToSearch, cloudAppToSearch, callback) {
-    var cloudAppsData = new cloudAppData();
+    var cloudAppsData = new CloudAppData();
     cloudAppsData.modules = [];
 
     var query = {};
@@ -107,14 +107,14 @@ function parsePages(teamToSearch, cloudAppToSearch, callback) {
                                     pagesInvolved: pageIssue.pages.length,
                                     type: pageIssue.type,
                                     isF5Issue: pageIssue.labels.indexOf("F5") > -1
-                                })
+                                });
                             }
 
                             putDataPoint(cloudAppsData, moduleName, cloudAppName, pageKey, assignee, progress, shortPageName, storyPoints, team, streamName, pageStatus, checklistStatus, blockers);
 
                             callback();
-                        })
-                    }(page))
+                        });
+                    }(page));
 
                 },
                 function (err) {
@@ -141,9 +141,9 @@ function parsePages(teamToSearch, cloudAppToSearch, callback) {
                                     module = {moduleName: moduleItem.moduleName, cloudApps: []};
                                     filteredResult.modules.push(module);
                                 }
-                                module.cloudApps.push(cloudItem)
+                                module.cloudApps.push(cloudItem);
                             }
-                        })
+                        });
                     });
 
                     var diff = process.hrtime(time);
