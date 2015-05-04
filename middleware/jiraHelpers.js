@@ -92,7 +92,9 @@ exports.calcUpdateInterval = function(debug, callback) {
                 callback(0);
             }
             else {
-                callback((new Date(Date.now())).getTime() - version.updated.getTime());
+                var span = ((new Date(Date.now())).getTime() - version.updated.getTime()) / 1000 / 3600;
+                span = Math.floor(span);
+                callback(span);
             }
         });
     }
