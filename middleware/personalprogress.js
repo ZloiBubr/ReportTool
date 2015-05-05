@@ -69,7 +69,7 @@ function parsePages(fromDate, toDate, callback) {
                                 });
 
                                 if (_.isUndefined(progressDetail)) {
-                                    progressDetail = new TeamModels.ProgressDetail(d);
+                                    progressDetail = new TeamModels.ProgressDetail(new Date(d));
                                     developer.progressDetails.push(progressDetail);
                                 }
 

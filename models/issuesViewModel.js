@@ -1,7 +1,7 @@
 /**
  * Created by Heorhi_Vilkitski on 8/5/2014.
  */
-exports.issues = function () {
+exports.Issues = function () {
     this.issues = [
         {
 
@@ -9,7 +9,7 @@ exports.issues = function () {
         }];
 };
 
-exports.issue = function(key, type, status, reporter, timeSpent, lables, assignee, updated, linkedPages){
+exports.Issue = function(key, type, status, reporter, timeSpent, lables, assignee, updated, linkedPages){
     this.key = key || "";
     this.type = type || "";
     this.status = status || "";
@@ -21,12 +21,12 @@ exports.issue = function(key, type, status, reporter, timeSpent, lables, assigne
     this.linkedPages = linkedPages || [];
 };
 
-exports.link = function(linkType, page){
+exports.Link = function(linkType, page){
     this.linkType = linkType || "";
-    this.page = page || new exports.linkedPage();
+    this.page = page || new exports.LinkedPage();
 };
 
-exports.linkedPage = function(key, reporter, timeSpent, labels, assignee, team, dueDate){
+exports.LinkedPage = function(key, reporter, timeSpent, labels, assignee, team, dueDate){
     this.key = key || "";
     this.reporter = reporter || "";
     this.timeSpent = timeSpent || "";

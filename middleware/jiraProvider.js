@@ -166,7 +166,7 @@ function Step1CollectIssueKeys(debugMode, fullUpdate, updateSpan, jira, issues, 
     var startKey = 0;
     var loopFlag = true;
 
-    var span = updateSpan | 72;
+    var span = updateSpan < 1 ? 72 : updateSpan;
     span = span > 0 ? span+1 : 2;
     var queryString = fullUpdate ? "project = PLEX-UXC ORDER BY key ASC" : util.format("project = PLEX-UXC AND updated > -%sh ORDER BY key ASC", span);
 
