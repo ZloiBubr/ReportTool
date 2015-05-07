@@ -56,37 +56,37 @@ function velocityChartController($scope, $resource, $modal, $timeout, $window) {
                     stacking: 'normal'
                 }
             },
+            turboThreshold: 0,
             series: $scope.pagesModel.data
         });
 
-         if($scope.isExtendView){
-            $('#stacked_container_sp').highcharts({
-                chart: {
-                    type: 'bar'
-                },
+        $('#stacked_container_sp').highcharts({
+            chart: {
+                type: 'bar'
+            },
+            title: {
+                text: 'Distribution by SP status, closed ' + totalClosedResult.sp.closed + ' from ' + totalClosedResult.sp.total + ' or ' + totalClosedResult.sp.closedPercents + '%'
+            },
+            xAxis: {
+                categories: ['SP']
+            },
+            yAxis: {
+                min: 0,
                 title: {
-                    text: 'Distribution by SP status, closed ' + totalClosedResult.sp.closed + ' from ' + totalClosedResult.sp.total + ' or ' + totalClosedResult.sp.closedPercents + '%'
-                },
-                xAxis: {
-                    categories: ['SP']
-                },
-                yAxis: {
-                    min: 0,
-                    title: {
-                        text: 'Total SP distribution'
-                    }
-                },
-                legend: {
-                    reversed: true
-                },
-                plotOptions: {
-                    series: {
-                        stacking: 'normal'
-                    }
-                },
-                series: $scope.spModel.data
-            });
-        }
+                    text: 'Total SP distribution'
+                }
+            },
+            legend: {
+                reversed: true
+            },
+            plotOptions: {
+                series: {
+                    stacking: 'normal'
+                }
+            },
+            turboThreshold: 0,
+            series: $scope.spModel.data
+        });
 
         $('#container').highcharts({
             chart: {
@@ -124,7 +124,7 @@ function velocityChartController($scope, $resource, $modal, $timeout, $window) {
             },
             tooltip: {
                 formatter: function () {
-                    if(this.point.tooltip == "") {
+                    if(this.point.tooltip == null) {
                         return (new Date(this.x)).toDateString() + ":" + this.y;
                     }
                     var modules = this.point.tooltip ? this.point.tooltip.split(",") : [];
@@ -141,6 +141,7 @@ function velocityChartController($scope, $resource, $modal, $timeout, $window) {
                 verticalAlign: 'bottom',
                 borderWidth: 0
             },
+            turboThreshold: 0,
             series: $scope.chartsData.data
         });
 

@@ -65,6 +65,7 @@ function pagebysizeChartController($scope, $resource, $window) {
                 verticalAlign: 'center',
                 borderWidth: 0
             },
+            turboThreshold: 0,
             series: $scope.chartsData.data
         });
     };

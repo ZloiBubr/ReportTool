@@ -105,7 +105,6 @@ function parsePages(callback) {
         distribution: new Distribution()
     };
 
-    var maximumBurn = 0.0;
     var maximumBurnCore = 0.0;
     async.series([
         function (callback) {
@@ -125,59 +124,46 @@ function parsePages(callback) {
                 var modulesAdded = [];
                 async.series([
                         async.eachSeries(modules, function(module, callback) {
+                                if(!versionHelper.isCoreVersion(module.fixVersions)) {
+                                    callback();
+                                    return;
+                                }
                                 Page.find({epicKey: module.key}).exec(function (err, pages) {
                                     if(pages != null && pages.length > 0) {
                                         async.eachSeries(pages, function(page, callback) {
-                                                if(page.automationType) {
+                                                if(page.automationType || !helpers.isActive(page.status, page.resolution)) {
                                                     callback();
                                                     return;
                                                 }
-                                                var storyPoints = page.storyPoints == null ? 0 : parseFloat(page.storyPoints);
-                                                var status = helpers.updateStatus(page);
-                                                var resolution = page.resolution;
-                                                var ignore = !helpers.isActive(page.status, resolution);
+                                                var storyPoints = page.storyPoints != null ? parseFloat(page.storyPoints) : 0.;
+                                                var progress = page.progress != null ? parseFloat(page.progress) : 0.;
+                                                var calcStoryPoints = storyPoints * progress / 100;
+                                                maximumBurnCore += storyPoints;
 
+                                                var status = helpers.updateStatus(page);
+
+                                                var lastTime = (new Date(2014,1,1)).getTime();
                                                 for (var j = 0; j < page.progressHistory.length; j++) {
-                                                    var history = page.progressHistory[j];
-                                                    var date = new Date(Date.parse(history.dateChanged));
+                                                    var date = new Date(Date.parse(page.progressHistory[j].dateChanged))
                                                     date.setHours(12, 0, 0, 0);
                                                     var time = date.getTime();
-                                                    var from = parseInt(history.progressFrom);
-                                                    if(from > 1) {
-                                                        if(history.progressTo == '0' ||
-                                                            history.progressTo == '1' ||
-                                                            history.progressTo == '' ||
-                                                            history.progressTo == null)
-                                                            continue;
-                                                    }
-                                                    var to = history.progressTo == null || history.progressTo == '' ? 0 : parseInt(history.progressTo);
-                                                    var progress = to - from;
-                                                    var calcStoryPoints = storyPoints * progress / 100;
-
-                                                    if(versionHelper.isCoreVersion(module.fixVersions)) {
-                                                        putDataPoint(velocity, "Actual burn core", time, calcStoryPoints, "");
+                                                    if(lastTime < time) {
+                                                        lastTime = time;
                                                     }
                                                 }
+                                                putDataPoint(velocity, "Actual burn core", lastTime, calcStoryPoints, "");
                                                 if(module.duedate != null) {
-                                                    if(!ignore) {
-                                                        maximumBurn += storyPoints;
-                                                        var date2 = new Date(Date.parse(module.duedate));
-                                                        date2.setHours(12, 0, 0, 0);
-                                                        var time2 = date2.getTime();
-                                                        var tooltip = "";
-                                                        if(modulesAdded.indexOf(module.summary) < 0) {
-                                                            tooltip = module.summary;
-                                                            modulesAdded.push(module.summary);
-                                                        }
-                                                        if(versionHelper.isCoreVersion(module.fixVersions)) {
-                                                            maximumBurnCore += storyPoints;
-                                                            putDataPoint(velocity, "Planned burn core", time2, storyPoints, tooltip);
-                                                        }
+                                                    var dueDate = new Date(Date.parse(module.duedate));
+                                                    dueDate.setHours(12, 0, 0, 0);
+                                                    var dueTime = dueDate.getTime();
+                                                    var tooltip = "";
+                                                    if(modulesAdded.indexOf(module.summary) < 0) {
+                                                        tooltip = module.summary;
+                                                        modulesAdded.push(module.summary);
                                                     }
+                                                    putDataPoint(velocity, "Planned burn core", dueTime, storyPoints, tooltip);
                                                 }
-                                                if(!ignore && versionHelper.isCoreVersion(module.fixVersions)) {
-                                                    addStackedData(cloudAppsMap, page, status, storyPoints);
-                                                }
+                                                addStackedData(cloudAppsMap, page, status, storyPoints);
                                                 callback();
                                             },
                                             function(err) {
@@ -286,7 +272,7 @@ function AddProjection(maximumBurn, velocity) {
     projectedBurn.dashStyle = "ShortDash";
     while(pointDate < projectEnd) {
         var pointDateMsc = pointDate.getTime();
-        projectedBurn.data.push({x:pointDateMsc, y:pointValue, tooltip: ""});
+        projectedBurn.data.push({x:pointDateMsc, y:pointValue});
         pointValue -= sum/3.;
         pointDate.setMonth(pointDate.getMonth()+1);
     }
@@ -332,7 +318,7 @@ function AddPageStatuses(cloudAppsMap, velocity) {
         for (var i = 0; i < velocity.distribution.data.length; i++) {
             if (velocity.distribution.data[i].name == cloudAppItem.status) {
                 velocity.distribution.data[i].data[0] += cloudAppItem.pages.length;
-                velocity.distribution.data[i].data[1] += cloudAppItem.storyPoints || 0;
+                velocity.distribution.data[i].data[1] += cloudAppItem.storyPoints;
                 break;
             }
         }
@@ -341,14 +327,15 @@ function AddPageStatuses(cloudAppsMap, velocity) {
 
 function addStackedData(cloudAppsMap, page, status, storyPoints) {
     var cloudAppName = helpers.getCloudAppName(page.labels);
-    var cloudAppItem = cloudAppsMap[cloudAppName];
+    var moduleKey = page.epicKey;
+    var cloudAppItem = cloudAppsMap[cloudAppName+moduleKey];
     if(!cloudAppItem) {
-        cloudAppsMap[cloudAppName] = { pages: [], status: status, storyPoints: 0};
-        cloudAppItem = cloudAppsMap[cloudAppName];
+        cloudAppItem = { pages: [], status: status, storyPoints: 0};
+        cloudAppsMap[cloudAppName+moduleKey] = cloudAppItem;
     }
 
     cloudAppItem.pages.push(page.key);
-    cloudAppItem.storyPoints += storyPoints || 0;
+    cloudAppItem.storyPoints += storyPoints;
 
     if(helpers.isParentPage(page.labels)) {
         cloudAppItem.status = status;
@@ -356,6 +343,7 @@ function addStackedData(cloudAppsMap, page, status, storyPoints) {
 }
 
 function putDataPoint(velocity, burnName, date, calcStoryPoints, tooltip) {
+    var plannedName = "Planned burn core";
     for (var k = 0; k < velocity.data.length; k++) {
         var burn = velocity.data[k];
         if (burn.name == burnName) {
@@ -365,14 +353,15 @@ function putDataPoint(velocity, burnName, date, calcStoryPoints, tooltip) {
                 if ((burnData.x - date) == 0) {
                     found = true;
                     burnData.y += calcStoryPoints;
-                    if(burn.name == "Planned burn core") {
+                    if(burn.name == plannedName) {
                         burnData.tooltip += tooltip == "" ? "" : "," + tooltip;
                     }
                     return;
                 }
             }
             if (!found) {
-                burn.data.push({x: date, y: calcStoryPoints, tooltip: tooltip});
+                var newPoint = burn.name == plannedName ? {x: date, y: calcStoryPoints, tooltip: tooltip} : {x: date, y: calcStoryPoints};
+                burn.data.push(newPoint);
                 return;
             }
         }

@@ -5,7 +5,6 @@ var Page = require('../models/page').Page;
 var OriginalJiraIssue = require('../models/originalJiraIssue').Issue;
 var Version = require('../models/Version').Version;
 var Issue = require('../models/issue').Issue;
-var CloudApp = require('../models/cloudApp').CloudApp;
 var SizeChange = require('../models/sizeChange').SizeChange;
 
 var VERSION = require('../public/jsc/versions').VERSION;

@@ -13,11 +13,11 @@ var statusExport = require('../public/jsc/models/statusList');
 var statusList = new statusExport.Statuses();
 
 exports.getData = function (req, res) {
-    cache.getData("moduleData",function(setterCallback){
+    cache.getData("moduleData", function (setterCallback) {
         parsePages(function (data) {
             setterCallback(data);
         });
-    }, function(value){res.json(value);});
+    }, function (value) { res.json(value); });
 };
 
 function ModuleData() {
@@ -38,21 +38,21 @@ function parsePages(callback) {
 
     async.series([
         function (callback) {
-            Module.find({}).exec(function(err, modules) {
+            Module.find({}).exec(function (err, modules) {
                 async.series([
-                    async.eachSeries(modules, function(module, callback) {
-                            var count = 0;
-                            Page.find({epicKey: module.key}).exec(function (err, pages) {
-                            if(pages != null && pages.length > 0) {
-                                async.eachSeries(pages, function(page, callback) {
-                                        if(helpers.isActive(page.status, page.resolution)) {
-                                            putDataPoint(moduledata, module, page, ++count);
-                                        }
-                                        callback();
-                                },
-                                function(err) {
+                    async.eachSeries(modules, function (module, callback) {
+                        var count = 0;
+                        Page.find({ epicKey: module.key }).exec(function (err, pages) {
+                            if (pages != null && pages.length > 0) {
+                                async.eachSeries(pages, function (page, callback) {
+                                    if (helpers.isActive(page.status, page.resolution)) {
+                                        putDataPoint(moduledata, module, page, ++count);
+                                    }
                                     callback();
-                                });
+                                },
+                                    function (err) {
+                                        callback();
+                                    });
                             }
                             else {
                                 putDataPoint(moduledata, module, null, count);
@@ -60,13 +60,13 @@ function parsePages(callback) {
                             }
                         });
                     },
-                    function(err) {
-                        callback();
-                    })
+                        function (err) {
+                            callback();
+                        })
                 ],
-                function(err) {
-                    callback();
-                });
+                    function (err) {
+                        callback();
+                    });
             });
         },
         function () {
@@ -78,20 +78,20 @@ function parsePages(callback) {
 }
 
 function updateChecklistsProgress(moduledata) {
-    for(var i=0; i<moduledata.module.length; i++) {
+    for (var i = 0; i < moduledata.module.length; i++) {
         var created = 0;
         var total = 0;
         var item = moduledata.module[i];
-        for(var j=0; j<item.checklistsProgress.length; j++) {
-            if(item.checklistsProgress[j] == true) {
+        for (var j = 0; j < item.checklistsProgress.length; j++) {
+            if (item.checklistsProgress[j] == true) {
                 created++;
             }
             total++;
         }
-        item.checklistsProgress = total > 0 ? created*100 / total : 0;
+        item.checklistsProgress = total > 0 ? created * 100 / total : 0;
 
         var progress = 0.;
-        for(var k=0; k<item.testingProgress.length; k++) {
+        for (var k = 0; k < item.testingProgress.length; k++) {
             progress += item.testingProgress[k];
         }
         item.testingProgress = item.testingProgress.length > 0 ? progress / item.testingProgress.length : 0.;
@@ -104,13 +104,13 @@ function putDataPoint(moduledata, module, page, count) {
     var streamName = helpers.getStreamName(labels);
     var storyPoints, moduleGroup, progress, calcStoryPoints;
     var isParentPage = page ? helpers.isParentPage(page.labels) : false;
-    if(page) {
+    if (page) {
         storyPoints = page.storyPoints == null ? 0. : parseFloat(page.storyPoints);
         moduleGroup = helpers.getModuleGroupName(page.labels);
         progress = page.progress == null ? 0. : parseInt(page.progress);
         calcStoryPoints = storyPoints * progress / 100.;
         var teamNameP = helpers.getTeamName(page.labels);
-        if(teamNameP != "" && teamNameP != "--") {
+        if (teamNameP != "" && teamNameP != "--") {
             teamName = teamNameP;
         }
     }
@@ -130,7 +130,7 @@ function putDataPoint(moduledata, module, page, count) {
             break;
         }
     }
-    if(!moduled) {
+    if (!moduled) {
         moduled = {
             key: module.key,
             name: module.summary,
@@ -164,23 +164,23 @@ function putDataPoint(moduledata, module, page, count) {
 
     moduled.reportedSP += calcStoryPoints;
     moduled.summarySP += storyPoints;
-    if(storyPoints > 30) {
+    if (storyPoints > 30) {
         moduled.xxl = true;
     }
-    moduled.progress = moduled.summarySP > 0. ? moduled.reportedSP*100/moduled.summarySP : 0.;
+    moduled.progress = moduled.summarySP > 0. ? moduled.reportedSP * 100 / moduled.summarySP : 0.;
     moduled.pagescount = count;
 
-    if(page) {
+    if (page) {
         moduled.hasblockers |= page.status == STATUS.BLOCKED.name | false;
         moduled.hasdeferred |= page.status == STATUS.DEFERRED.name | false;
 
         var moduleStatus = statusList.getStatusByName(moduled.status);
         var newStatus = statusList.getStatusByName(helpers.updateStatus(page));
 
-        if(newStatus.weight < moduleStatus.weight){
+        if (newStatus.weight < moduleStatus.weight) {
             moduled.status = newStatus.name;
         }
-        if(isParentPage) {
+        if (isParentPage) {
             moduled.testingProgress.push(page.testingProgress ? parseFloat(page.testingProgress) : 0.);
             moduled.acceptanceStatus.push(page.acceptanceStatus);
         }
@@ -191,26 +191,26 @@ function putDataPoint(moduledata, module, page, count) {
 
 function addCloudApp(module, page) {
     var status = page.status;
-    if(status == "Production") {
+    if (status == "Production") {
         status = STATUS.PRODUCTION.name;
     }
 
     var cloudApp = null;
     var cloudAppName = helpers.getCloudAppName(page.labels);
-    for(var i=0; i<module.cloudApps.length; i++) {
-        if(module.cloudApps[i].name == cloudAppName) {
+    for (var i = 0; i < module.cloudApps.length; i++) {
+        if (module.cloudApps[i].name == cloudAppName) {
             cloudApp = module.cloudApps[i].name;
             break;
         }
     }
-    if(!cloudApp) {
+    if (!cloudApp) {
         cloudApp = {
             name: cloudAppName,
             cloudAppStatus: status
         };
         module.cloudApps.push(cloudApp);
     }
-    if(helpers.isParentPage(page.labels)) {
+    if (helpers.isParentPage(page.labels)) {
         cloudApp.devFinishDate = page.devfinish;
         cloudApp.qaFinishDate = page.qafinish;
         cloudApp.acceptanceFinishDate = page.accfinish;
