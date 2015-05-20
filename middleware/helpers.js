@@ -117,6 +117,15 @@ exports.isActive = function(status, resolution) {
     resolution == RESOLUTION.CANCELED.name));
 };
 
+exports.isResolved = function(page) {
+    return page.status == STATUS.RESOLVED.name ||
+    page.status == STATUS.CLOSED.name ||
+    page.status == STATUS.PRODUCTION.name ||
+    page.status == STATUS.PMREVIEW.name ||
+    page.status == STATUS.LAREADY.name ||
+    page.status == STATUS.ACCEPTED.name;
+};
+
 exports.updateStatus = function(page) {
     var newStatus = page.status;
     if(page.status == STATUS.CLOSED.name && (

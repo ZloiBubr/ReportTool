@@ -100,7 +100,16 @@ function parsePages(callback) {
         {
             data: [],
             name: "Projected burn core"
-        }],
+        },
+        {
+            data: [],
+            name: "Actual burn QA"
+        },
+        {
+            data: [],
+            name: "Projected burn QA"
+        }
+    ],
         
         distribution: new Distribution()
     };
@@ -152,6 +161,14 @@ function parsePages(callback) {
                                                     }
                                                 }
                                                 putDataPoint(velocity, "Actual burn core", lastTime, calcStoryPoints, "");
+                                                
+                                                if(helpers.isResolved(page) && !_.isNull(page.qaFinished) && !_.isUndefined(page.qaFinished)) {
+                                                    var qaDate = new Date(Date.parse(page.qaFinished));
+                                                    qaDate.setHours(12,0,0,0);
+                                                    var qaTime = qaDate.getTime();
+                                                    
+                                                    putDataPoint(velocity, "Actual burn QA", qaTime, storyPoints, "");
+                                                }
                                                 if(module.duedate != null) {
                                                     var dueDate = new Date(Date.parse(module.duedate));
                                                     dueDate.setHours(12, 0, 0, 0);
@@ -190,19 +207,21 @@ function parsePages(callback) {
             var time = date.getTime();
             putDataPoint(velocity, "Planned burn core", time, 0.0);
             SortData(velocity);
-            AddProjection(maximumBurnCore, velocity);
+            AddProjection(false, maximumBurnCore, velocity);
+            AddProjection(true, maximumBurnCore, velocity);
             SumData(maximumBurnCore, velocity);
-            AdjustProjection(velocity);
+            AdjustProjection(false, velocity);
+            AdjustProjection(true, velocity);
             AddPageStatuses(cloudAppsMap, velocity);
             callback(velocity);
         }
     ]);
 }
 
-function AdjustProjection(velocity) {
+function AdjustProjection(qa, velocity) {
     var lastValue = 0.0;
-    var actualName = "Actual burn core";
-    var projectedName = "Projected burn core";
+    var actualName = qa ? "Actual burn QA" : "Actual burn core";
+    var projectedName = qa ? "Projected burn QA" : "Projected burn core";
 
     for (var k = 0; k < velocity.data.length; k++) {
         var burn = velocity.data[k];
@@ -213,7 +232,7 @@ function AdjustProjection(velocity) {
     }
 
     for (var k = 0; k < velocity.data.length; k++) {
-        var burn = velocity.data[k];
+        burn = velocity.data[k];
         if(burn.name == projectedName) {
             for (var l = 0; l < burn.data.length-1; l++) {
                 var delta = burn.data[l].y - burn.data[l+1].y;
@@ -243,9 +262,9 @@ function AdjustProjection(velocity) {
     }
 }
 
-function AddProjection(maximumBurn, velocity) {
-    var actualName = "Actual burn core";
-    var projectedName = "Projected burn core";
+function AddProjection(qa, maximumBurn, velocity) {
+    var actualName = qa ? "Actual burn QA" : "Actual burn core";
+    var projectedName = qa ? "Projected burn QA" : "Projected burn core";
     var monthAgo = new Date(Date.now());
     monthAgo.setMonth(monthAgo.getMonth()-3);
     var monthAgoMsc = monthAgo.getTime();
@@ -279,10 +298,10 @@ function AddProjection(maximumBurn, velocity) {
 }
 
 function SumData(maximumBurn, velocity) {
-    var burnsList = ["Planned burn core", "Actual burn core"];
+    var burnsList = ["Planned burn core", "Actual burn core", "Actual burn QA"];
     for (var k = 0; k < velocity.data.length; k++) {
         var burn = velocity.data[k];
-        if(burn.name != burnsList[0] && burn.name != burnsList[1]) {
+        if(burn.name != burnsList[0] && burn.name != burnsList[1] && burn.name != burnsList[2]) {
             continue;
         }
         for (var l = 0; l < burn.data.length - 1; l++) {
@@ -290,8 +309,8 @@ function SumData(maximumBurn, velocity) {
         }
     }
     for (var k = 0; k < velocity.data.length; k++) {
-        var burn = velocity.data[k];
-        if(burn.name != burnsList[0] && burn.name != burnsList[1]) {
+        burn = velocity.data[k];
+        if(burn.name != burnsList[0] && burn.name != burnsList[1] && burn.name != burnsList[2]) {
             continue;
         }
         for (var l = 0; l < burn.data.length; l++) {
@@ -302,14 +321,13 @@ function SumData(maximumBurn, velocity) {
 }
 
 function SortData(velocity) {
-    for (var k = 0; k < velocity.data.length; k++) {
-        var burn = velocity.data[k];
+    _.each(velocity.data, function(burn) {
         burn.data.sort(function (a, b) {
             a = new Date(a.x);
             b = new Date(b.x);
             return a > b ? 1 : a < b ? -1 : 0;
         });
-    }
+    }) ;
 }
 
 function AddPageStatuses(cloudAppsMap, velocity) {
