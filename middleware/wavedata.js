@@ -13,11 +13,11 @@ var STATUS = require('../public/jsc/models/statusList').STATUS;
 
 exports.getData = function (req, res) {
 
-    cache.getData("waveData",function(setterCallback){
+    cache.getData("waveData", function (setterCallback) {
         parsePages(function (data) {
             setterCallback(data);
         });
-    }, function(value){res.json(value);});
+    }, function (value) { res.json(value); });
 };
 
 function CloudAppData() {
@@ -30,31 +30,31 @@ function parsePages(callback) {
 
     async.series([
         function (callback) {
-            Module.find({}).exec(function(err, modules) {
+            Module.find({}).exec(function (err, modules) {
                 async.series([
-                        async.eachSeries(modules, function(module, callback) {
-                                Page.find({epicKey: module.key}).exec(function (err, pages) {
-                                    if(pages != null && pages.length > 0) {
-                                        async.eachSeries(pages, function(page, callback) {
-                                                if(helpers.isActive(page.status, page.resolution)) {
-                                                    putDataPoint(cloudappdata, module, page);
-                                                }
-                                                callback();
-                                            },
-                                            function() {
-                                                callback();
-                                            });
+                    async.eachSeries(modules, function (module, callback) {
+                        Page.find({ epicKey: module.key }).exec(function (err, pages) {
+                            if (pages != null && pages.length > 0) {
+                                async.eachSeries(pages, function (page, callback) {
+                                    if (helpers.isActive(page.status, page.resolution)) {
+                                        putDataPoint(cloudappdata, module, page);
                                     }
-                                    else {
+                                    callback();
+                                },
+                                    function () {
                                         callback();
-                                    }
-                                });
-                            },
-                            function() {
+                                    });
+                            }
+                            else {
                                 callback();
-                            })
-                    ],
-                    function() {
+                            }
+                        });
+                    },
+                        function () {
+                            callback();
+                        })
+                ],
+                    function () {
                         callback();
                     });
             });
@@ -72,41 +72,37 @@ function parsePages(callback) {
 }
 
 function updateChecklistsProgress(cloudappdata) {
-    for(var i=0; i<cloudappdata.cloudApp.length; i++) {
+    for (var i = 0; i < cloudappdata.cloudApp.length; i++) {
         var item = cloudappdata.cloudApp[i];
         var created = 0;
         var total = 0;
-        for(var j=0; j<item.checklistsProgress.length; j++) {
-            if(item.checklistsProgress[j] == true) {
+        for (var j = 0; j < item.checklistsProgress.length; j++) {
+            if (item.checklistsProgress[j] == true) {
                 created++;
             }
             total++;
         }
-        cloudappdata.cloudApp[i].checklistsProgress = created*100 / total;
+        cloudappdata.cloudApp[i].checklistsProgress = created * 100 / total;
     }
 }
 
 function putDataPoint(cloudAppData, module, page) {
-    var initUri = "https://jira.epam.com/jira/issues/?jql=project = PLEX-UXC and issuetype = Story and labels in ('";
+    var initUri = "https://jira.epam.com/jira/issues/?jql=project = PLEX-UXC AND issuetype = Story AND labels in ('";
     var acceptanceUri = "https://jira.epam.com/jira/browse/" + page.acceptanceKey;
-
-    if(!helpers.isActive(page.status, page.resolution)) {
-        return;
-    }
 
     var labels = module._doc.labels != null ? module._doc.labels : "";
 
     var teamName = helpers.getTeamName(page.labels);
-    if(teamName == "" || teamName == "--") {
+    if (teamName == "" || teamName == "--") {
         var tname = helpers.getTeamName(labels);
-        if(tname != "--") {
+        if (tname != "--") {
             teamName = tname;
         }
     }
     var streamName = helpers.getStreamName(page.labels);
-    if(streamName == "" || streamName == "--") {
+    if (streamName == "" || streamName == "--") {
         var sname = helpers.getStreamName(labels);
-        if(sname != "--") {
+        if (sname != "--") {
             streamName = sname;
         }
     }
@@ -125,7 +121,7 @@ function putDataPoint(cloudAppData, module, page) {
 
     var storyPoints = page.storyPoints == null ? 0. : parseFloat(page.storyPoints);
     var progress = page.progress == null ? 0. : parseInt(page.progress);
-    if(progress == 1.) {
+    if (progress == 1.) {
         progress = 0.;
     }
     var calcStoryPoints = storyPoints * progress / 100.;
@@ -133,25 +129,25 @@ function putDataPoint(cloudAppData, module, page) {
     var status = helpers.updateStatus(page);
     var fullUri = initUri + "CloudApp_" + cloudAppName + "') AND 'Epic Link' = " + module.key;
     var cloudApp;
-    for(var i=0; i<cloudAppData.cloudApp.length; i++) {
-        if(cloudAppData.cloudApp[i].name == cloudAppName &&
-        cloudAppData.cloudApp[i].moduleGroupName == moduleGroupName &&
-        cloudAppData.cloudApp[i].moduleName == module.summary &&
-        cloudAppData.cloudApp[i].fixVersions == fixVersions) {
+    for (var i = 0; i < cloudAppData.cloudApp.length; i++) {
+        if (cloudAppData.cloudApp[i].name == cloudAppName &&
+            cloudAppData.cloudApp[i].moduleGroupName == moduleGroupName &&
+            cloudAppData.cloudApp[i].moduleName == module.summary &&
+            cloudAppData.cloudApp[i].fixVersions == fixVersions) {
             cloudApp = cloudAppData.cloudApp[i];
             cloudApp.reportedSP += calcStoryPoints;
             cloudApp.summarySP += storyPoints;
-            if(storyPoints > 30) {
+            if (storyPoints > 30) {
                 cloudApp.xxl = true;
             }
-            cloudApp.progress = cloudApp.reportedSP*100./cloudApp.summarySP;
+            cloudApp.progress = cloudApp.reportedSP * 100. / cloudApp.summarySP;
             cloudApp.pages++;
             cloudApp.devTimeSpent += timeSpent.devTimeSpent;
             cloudApp.qaTimeSpent += timeSpent.qaTimeSpent;
             cloudApp.checklistsProgress.push(page.checklistCreated);
             cloudApp.teamName = teamName;
             cloudApp.streamName = streamName;
-            if(isParentPage) {
+            if (isParentPage) {
                 cloudApp.testingProgress = page.testingProgress;
                 cloudApp.devfinish = page.devfinish;
                 cloudApp.qafinish = page.qafinish;
@@ -161,30 +157,22 @@ function putDataPoint(cloudAppData, module, page) {
                 cloudApp.lafinish = page.lafinish;
                 cloudApp.acceptanceUri = acceptanceUri;
                 cloudApp.acceptanceAssignee = page.acceptanceAssignee;
-                cloudApp.status = status;
             }
 
             var found = false;
-            for(var j=0; j<cloudApp.assignees.length; j++) {
-                if(cloudApp.assignees[j] == page.assignee) {
+            for (var j = 0; j < cloudApp.assignees.length; j++) {
+                if (cloudApp.assignees[j] == page.assignee) {
                     found = true;
                     break;
                 }
             }
-            if(!found) {
+            if (!found) {
                 cloudApp.assignees.push(page.assignee);
-            }
-
-            var cloudAppStatus = statusList.getStatusByName(cloudApp.status);
-            var pageStatus = statusList.getStatusByName(status);
-
-            if(pageStatus.weight < cloudAppStatus.weight){
-                cloudApp.status = status;
             }
         }
     }
 
-    if(!cloudApp) {
+    if (!cloudApp) {
         cloudApp = {
             progress: progress,
             reportedSP: calcStoryPoints,
@@ -210,8 +198,8 @@ function putDataPoint(cloudAppData, module, page) {
             checklistsProgress: [page.checklistCreated],
             acceptanceUri: acceptanceUri,
             acceptanceAssignee: page.acceptanceAssignee
-    };
-        if(isParentPage) {
+        };
+        if (isParentPage) {
             cloudApp.testingProgress = page.testingProgress;
             cloudApp.devfinish = page.devfinish;
             cloudApp.qafinish = page.qafinish;
@@ -221,8 +209,13 @@ function putDataPoint(cloudAppData, module, page) {
             cloudApp.lafinish = page.lafinish;
             cloudApp.acceptanceUri = acceptanceUri;
             cloudApp.acceptanceAssignee = page.acceptanceAssignee;
-            cloudApp.status = status;
         }
         cloudAppData.cloudApp.push(cloudApp);
+    }
+    var cloudAppStatus = statusList.getStatusByName(cloudApp.status);
+    var pageStatus = statusList.getStatusByName(status);
+
+    if (pageStatus.weight < cloudAppStatus.weight) {
+        cloudApp.status = status;
     }
 }
