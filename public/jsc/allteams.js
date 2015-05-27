@@ -10,18 +10,12 @@ function Teams() {
                 "Andrei Osipau2",
                 "Dzianis Arlouski",
                 "Iryna Kucharenka1",
-                "Mark Varabyou",
-                "Pavel Kastsiuk",
                 "Raman But-Husaim",
-                "Siarhei Abrazhevich",
-                "Siarhei Tkachenka",
                 "Aliaksandr Koush",
                 "Artsiom Rusak",
-                "Raman Ivanou",
                 "Aliaksandr Lukyanchyk",
                 "Nicolay Kostroma",
                 "Valentina Napolnova",
-                "Aliaksey Rahatka",
                 "Volha Viktarava",
                 "Artsiom Kazlou"
             ],
@@ -248,6 +242,13 @@ exports.OldDevelopers = function oldDevelopers(name) {
     name == "Allaberdi Hojayev" ||
     name == "Eugen Surovets" ||
     name == "Andrei Lysenka" ||
+    name == "Aliaksey Rahatka" ||
+    name == "Mark Varabyou" ||
+    name == "Pavel Kastsiuk" ||
+    name == "Raman Ivanou" ||
+    name == "Siarhei Abrazhevich" ||
+    name == "Siarhei Tkachenka" ||
+
 
     name == undefined);
 
