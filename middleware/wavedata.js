@@ -215,7 +215,10 @@ function putDataPoint(cloudAppData, module, page) {
     var cloudAppStatus = statusList.getStatusByName(cloudApp.status);
     var pageStatus = statusList.getStatusByName(status);
 
-    if (pageStatus.weight < cloudAppStatus.weight) {
+    if (pageStatus.weight < cloudAppStatus.weight ||
+        (isParentPage &&
+        (status == STATUS.LAREADY.name ||
+        status == STATUS.PMREVIEW.name))) {
         cloudApp.status = status;
     }
 }
