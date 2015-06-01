@@ -197,7 +197,8 @@ function putDataPoint(cloudAppData, module, page) {
             testingProgress: isParentPage ? page.testingProgress : 0.,
             checklistsProgress: [page.checklistCreated],
             acceptanceUri: acceptanceUri,
-            acceptanceAssignee: page.acceptanceAssignee
+            acceptanceAssignee: page.acceptanceAssignee,
+            acceptanceLabels: ""
         };
         if (isParentPage) {
             cloudApp.testingProgress = page.testingProgress;
@@ -220,5 +221,9 @@ function putDataPoint(cloudAppData, module, page) {
         (status == STATUS.LAREADY.name ||
         status == STATUS.PMREVIEW.name))) {
         cloudApp.status = status;
+    }
+    
+    if(page.acceptanceLabels) {
+        cloudApp.acceptanceLabels += page.acceptanceLabels;
     }
 }

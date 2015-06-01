@@ -11,6 +11,7 @@ var schema = new Schema({
     resolution:             { type: String },
     reporter:               { type: String },
     labels:                 { type: String },
+    acceptanceLabels:       { type: String },
     assignee:               { type: String },
     blockers:               { type: String },
     progress:               { type: String },

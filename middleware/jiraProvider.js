@@ -492,6 +492,7 @@ function mapDates(page, subtaskObj) {
     page.acceptanceStatus = subtaskObj.fields.status.name;
     page.acceptanceKey = subtaskObj.key;
     page.acceptanceAssignee = subtaskObj.fields.assignee ? subtaskObj.fields.assignee.name : "";
+    page.acceptanceLabels = subtaskObj.fields.labels;
 }
 
 function mapSubtsks(story, page) {

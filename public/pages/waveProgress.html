@@ -64,6 +64,7 @@
                     <div><select style="width: 150px" ng-model="filteredTeam" ng-options="team.name as team.name for team in allTeams" ng-change="filterTeam()"></select>Team</div>
                     <div><select style="width: 150px" ng-model="filteredStream" ng-options="team.name as team.name for team in allStreams" ng-change="filterModule()"></select>Stream</div>
                 </li>
+                <li class="list-group-item list-group-item-info"><div class="checkbox"><label><input type="checkbox" ng-model="salesDemoPath" ng-change="processWithRowSpans(true)"> Sales Demo Path Only</label></div></li>
                 <li class="list-group-item list-group-item-info"><div class="checkbox"><label><input type="checkbox" ng-model="detailedView" ng-change="processWithRowSpans(true)"> Detailed View</label></div></li>
                 <li class="list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.deferred.isChecked" ng-change="processWithRowSpans(true)"> Deferred</label><span class="badge pull-right">{{total.deferred.count}}</span></div></li>
                 <li class="list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.open.isChecked" ng-change="processWithRowSpans(true)"> Open</label> <span class="badge pull-right">{{total.open.count}}</span></div></li>
