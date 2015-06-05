@@ -34,7 +34,7 @@ exports.getFullJiraIssue = function(jira, issueKey, jiraIssue, LogProgress, call
 };
 
 exports.updateWorklogForJiraIssue = function(jira, jiraIssue, LogProgress, callback) {
-    if (jiraIssue.issue && jiraIssue.issue.fields.worklog && jiraIssue.issue.fields.worklog.total > 20) {
+    if (jiraIssue.issue && jiraIssue.issue.fields && jiraIssue.issue.fields.worklog && jiraIssue.issue.fields.worklog.total > 20) {
         var counter = 3;
         async.whilst(
             function() {
