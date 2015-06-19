@@ -13,6 +13,7 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
         $scope.showStreams = false;
         $scope.detailedView = false;
         $scope.salesDemoPath = false;
+        $scope.blockedVP = false;
     };
 
     $scope.reInit = function () {
@@ -283,6 +284,9 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
             if(addCards && $scope.salesDemoPath && cloudAppItem.acceptanceLabels.indexOf("InSalesDemoPath") < 0) {
                 return;
             }
+            if(addCards && $scope.blockedVP && cloudAppItem.acceptanceLabels.indexOf("InSalesDemoPath") < 0) {
+                return;
+            }
             var issueEntity = $scope.total.getStatusByName(cloudAppItem.status);
             if (issueEntity.isChecked) {
                 $scope.total.pages += cloudAppItem.pages;
@@ -350,6 +354,7 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
             cusfinish: cloudAppItem.cusfinish ? new Date(cloudAppItem.cusfinish).toDateString() : undefined,
             pmhfinish: cloudAppItem.pmhfinish ? new Date(cloudAppItem.pmhfinish).toDateString() : undefined,
             lafinish: cloudAppItem.lafinish ? new Date(cloudAppItem.lafinish).toDateString() : undefined,
+            blockedVP: cloudAppItem.acceptanceLabels.indexOf("InSalesDemoPath") > -1
         };
         return card;
     }
@@ -448,7 +453,8 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
             total_pmReview_isChecked: $scope.total.pmReview.isChecked,
             total_laReady_isChecked: $scope.total.laReady.isChecked,
             total_all_isChecked: $scope.total.all.isChecked,
-            salesDemoPath: $scope.salesDemoPath
+            salesDemoPath: $scope.salesDemoPath,
+            blockedVP: $scope.blockedVP
         };
         localStorageService.set('waveProgressController', storage);
     };
@@ -482,6 +488,7 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
                 $scope.total.laReady.isChecked = storage.total_laReady_isChecked;
                 $scope.total.all.isChecked = storage.total_all_isChecked;
                 $scope.salesDemoPath = storage.salesDemoPath;
+                $scope.blockedVP = storage.blockedVP;
             }
             catch (ex) {
                 console.error(ex);

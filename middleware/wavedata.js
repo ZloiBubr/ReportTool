@@ -33,7 +33,7 @@ function parsePages(callback) {
             Module.find({}).exec(function (err, modules) {
                 async.series([
                     async.eachSeries(modules, function (module, callback) {
-                        Page.find({ epicKey: module.key }).exec(function (err, pages) {
+                        Page.find({ epicKey: module.key }, function (err, pages) {
                             if (pages != null && pages.length > 0) {
                                 async.eachSeries(pages, function (page, callback) {
                                     if (helpers.isActive(page.status, page.resolution)) {

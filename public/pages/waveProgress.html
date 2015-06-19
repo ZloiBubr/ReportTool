@@ -20,6 +20,9 @@
                         <img width="16" height="16" alt="XXL" src="img/xxl.png" /> Has XXL or XXXL pages
                     </div>
                     <div>
+                        <img width="16" height="16" alt="XXL" src="img/triangle.svg" /> Blocked by VP Screen
+                    </div>
+                    <div>
                         Development %
                         <div class="progress card-progress">
                             <div class="progress-bar progress-bar-success progress-bar-striped"
@@ -64,6 +67,7 @@
                     <div><select style="width: 150px" ng-model="filteredTeam" ng-options="team.name as team.name for team in allTeams" ng-change="filterTeam()"></select>Team</div>
                     <div><select style="width: 150px" ng-model="filteredStream" ng-options="team.name as team.name for team in allStreams" ng-change="filterModule()"></select>Stream</div>
                 </li>
+                <li class="list-group-item list-group-item-info"><div class="checkbox"><label><input type="checkbox" ng-model="blockedVP" ng-change="processWithRowSpans(true)"> Blocked by VP Screens</label></div></li>
                 <li class="list-group-item list-group-item-info"><div class="checkbox"><label><input type="checkbox" ng-model="salesDemoPath" ng-change="processWithRowSpans(true)"> Sales Demo Path Only</label></div></li>
                 <li class="list-group-item list-group-item-info"><div class="checkbox"><label><input type="checkbox" ng-model="detailedView" ng-change="processWithRowSpans(true)"> Detailed View</label></div></li>
                 <li class="list-group-item"><div class="checkbox"><label><input type="checkbox" ng-model="total.deferred.isChecked" ng-change="processWithRowSpans(true)"> Deferred</label><span class="badge pull-right">{{total.deferred.count}}</span></div></li>
@@ -174,6 +178,7 @@
                                     <img class="card-icon" title="Blocked" ng-show="card.status == exports.STATUS.BLOCKED.name" width="20" height="20" alt="Conf" src="img/ban.png"/>
                                     <img class="card-icon" title="Deferred" ng-show="card.status == exports.STATUS.DEFERRED.name" width="20" height="20" alt="Conf" src="img/deffered.png"/>
                                     <img class="card-icon" title="Has XXL or XXXL pages" ng-show="card.xxl" width="20" height="20" alt="Conf" src="img/xxl.png"/>
+                                    <img class="card-icon" title="Blcoked by VP screen" ng-show="card.blockedVP" width="20" height="20" alt="Conf" src="img/triangle.svg"/>
                                     <div class="card-size" title="Story Points">{{card.summarySP | number : 0}}</div>
                                     <div class="card-pages" title="Pages">{{card.pages | number : 0}}</div>
                                     <div class="card-acceptance" title="Acceptance Task"><a href="{{card.acceptanceUri}}">A</a></div>

@@ -137,7 +137,7 @@ function parsePages(callback) {
                                     callback();
                                     return;
                                 }
-                                Page.find({epicKey: module.key}).exec(function (err, pages) {
+                                Page.find({epicKey: module.key}, function (err, pages) {
                                     if(pages != null && pages.length > 0) {
                                         async.eachSeries(pages, function(page, callback) {
                                                 if(page.automationType || !helpers.isActive(page.status, page.resolution)) {
