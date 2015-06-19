@@ -284,7 +284,7 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
             if(addCards && $scope.salesDemoPath && cloudAppItem.acceptanceLabels.indexOf("InSalesDemoPath") < 0) {
                 return;
             }
-            if(addCards && $scope.blockedVP && cloudAppItem.acceptanceLabels.indexOf("InSalesDemoPath") < 0) {
+            if(addCards && $scope.blockedVP && cloudAppItem.acceptanceLabels.indexOf("HandoffBlockedByVP") < 0) {
                 return;
             }
             var issueEntity = $scope.total.getStatusByName(cloudAppItem.status);
@@ -354,7 +354,7 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
             cusfinish: cloudAppItem.cusfinish ? new Date(cloudAppItem.cusfinish).toDateString() : undefined,
             pmhfinish: cloudAppItem.pmhfinish ? new Date(cloudAppItem.pmhfinish).toDateString() : undefined,
             lafinish: cloudAppItem.lafinish ? new Date(cloudAppItem.lafinish).toDateString() : undefined,
-            blockedVP: cloudAppItem.acceptanceLabels.indexOf("InSalesDemoPath") > -1
+            blockedVP: cloudAppItem.acceptanceLabels.indexOf("HandoffBlockedByVP") > -1
         };
         return card;
     }
