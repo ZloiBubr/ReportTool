@@ -117,7 +117,7 @@ function parsePages(callback) {
     var maximumBurnCore = 0.0;
     async.series([
         function (callback) {
-            SizeChange.find({}).exec(function(err, sizeChanges) {
+            SizeChange.find({}, function(err, sizeChanges) {
                 velocity.sizeChanges = sizeChanges;
                 velocity.sizeChanges.sort(function (a, b) {
                     a = new Date(a.date);
@@ -129,77 +129,73 @@ function parsePages(callback) {
             });
         },
         function (callback) {
-            Module.find({}).exec(function(err, modules) {
+            Module.find({}, function(err, modules) {
                 var modulesAdded = [];
-                async.series([
-                        async.eachSeries(modules, function(module, callback) {
-                                if(!versionHelper.isCoreVersion(module.fixVersions)) {
-                                    callback();
-                                    return;
-                                }
-                                Page.find({epicKey: module.key}, function (err, pages) {
-                                    if(pages != null && pages.length > 0) {
-                                        async.eachSeries(pages, function(page, callback) {
-                                                if(page.automationType || !helpers.isActive(page.status, page.resolution)) {
-                                                    callback();
-                                                    return;
-                                                }
-                                                var storyPoints = page.storyPoints != null ? parseFloat(page.storyPoints) : 0.;
-                                                var progress = page.progress != null ? parseFloat(page.progress) : 0.;
-                                                var calcStoryPoints = storyPoints * progress / 100;
-                                                maximumBurnCore += storyPoints;
+                async.eachSeries(modules, function(module, callback) {
+                        if(!versionHelper.isCoreVersion(module.fixVersions)) {
+                            callback();
+                            return;
+                        }
+                        Page.find({epicKey: module.key}, function (err, pages) {
+                            if(pages != null && pages.length > 0) {
+                                async.eachSeries(pages, function(page, callback) {
+                                        if(page.automationType || !helpers.isActive(page.status, page.resolution)) {
+                                            callback();
+                                            return;
+                                        }
+                                        var storyPoints = page.storyPoints != null ? parseFloat(page.storyPoints) : 0.;
+                                        var progress = page.progress != null ? parseFloat(page.progress) : 0.;
+                                        var calcStoryPoints = storyPoints * progress / 100;
+                                        maximumBurnCore += storyPoints;
 
-                                                var status = helpers.updateStatus(page);
+                                        var status = helpers.updateStatus(page);
 
-                                                var lastTime = (new Date(2014,1,1)).getTime();
-                                                for (var j = 0; j < page.progressHistory.length; j++) {
-                                                    var date = new Date(Date.parse(page.progressHistory[j].dateChanged))
-                                                    date.setHours(12, 0, 0, 0);
-                                                    var time = date.getTime();
-                                                    if(lastTime < time) {
-                                                        lastTime = time;
-                                                    }
-                                                }
-                                                putDataPoint(velocity, "Actual burn core", lastTime, calcStoryPoints, "");
-                                                
-                                                if(helpers.isResolved(page) && !_.isNull(page.qaFinished) && !_.isUndefined(page.qaFinished)) {
-                                                    var qaDate = new Date(Date.parse(page.qaFinished));
-                                                    qaDate.setHours(12,0,0,0);
-                                                    var qaTime = qaDate.getTime();
-                                                    
-                                                    putDataPoint(velocity, "Actual burn QA", qaTime, storyPoints, "");
-                                                }
-                                                if(module.duedate != null) {
-                                                    var dueDate = new Date(Date.parse(module.duedate));
-                                                    dueDate.setHours(12, 0, 0, 0);
-                                                    var dueTime = dueDate.getTime();
-                                                    var tooltip = "";
-                                                    if(modulesAdded.indexOf(module.summary) < 0) {
-                                                        tooltip = module.summary;
-                                                        modulesAdded.push(module.summary);
-                                                    }
-                                                    putDataPoint(velocity, "Planned burn core", dueTime, storyPoints, tooltip);
-                                                }
-                                                addStackedData(cloudAppsMap, page, status, storyPoints);
-                                                callback();
-                                            },
-                                            function(err) {
-                                                callback();
+                                        var lastTime = (new Date(2014,1,1)).getTime();
+                                        for (var j = 0; j < page.progressHistory.length; j++) {
+                                            var date = new Date(Date.parse(page.progressHistory[j].dateChanged));
+                                            date.setHours(12, 0, 0, 0);
+                                            var time = date.getTime();
+                                            if(lastTime < time) {
+                                                lastTime = time;
                                             }
-                                        );
-                                    }
-                                    else {
+                                        }
+                                        putDataPoint(velocity, "Actual burn core", lastTime, calcStoryPoints, "");
+                                        
+                                        if(helpers.isResolved(page) && !_.isNull(page.qaFinished) && !_.isUndefined(page.qaFinished)) {
+                                            var qaDate = new Date(Date.parse(page.qaFinished));
+                                            qaDate.setHours(12,0,0,0);
+                                            var qaTime = qaDate.getTime();
+                                            
+                                            putDataPoint(velocity, "Actual burn QA", qaTime, storyPoints, "");
+                                        }
+                                        if(module.duedate != null) {
+                                            var dueDate = new Date(Date.parse(module.duedate));
+                                            dueDate.setHours(12, 0, 0, 0);
+                                            var dueTime = dueDate.getTime();
+                                            var tooltip = "";
+                                            if(modulesAdded.indexOf(module.summary) < 0) {
+                                                tooltip = module.summary;
+                                                modulesAdded.push(module.summary);
+                                            }
+                                            putDataPoint(velocity, "Planned burn core", dueTime, storyPoints, tooltip);
+                                        }
+                                        addStackedData(cloudAppsMap, page, status, storyPoints);
+                                        callback();
+                                    },
+                                    function(err) {
                                         callback();
                                     }
-                                });
-                            },
-                            function(err) {
+                                );
+                            }
+                            else {
                                 callback();
-                            })
-                    ],
-                    function(err) {
-                        callback();
-                    });
+                            }
+                        });
+                        },
+                        function(err) {
+                            callback();
+                        }
+                );
             });
         },
         function () {

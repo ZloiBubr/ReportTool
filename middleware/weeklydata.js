@@ -43,7 +43,7 @@ function parsePages(callback) {
         team.data = [];
     }
     //1. grab all pages
-    Page.find({}).exec(function (err, pages) {
+    Page.find({}, function (err, pages) {
         for (var i = 0; i < pages.length; i++) {
             var page = pages[i];
             var storyPoints = page.storyPoints == null ? 0 : parseFloat(page.storyPoints);

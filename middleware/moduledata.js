@@ -38,32 +38,26 @@ function parsePages(callback) {
 
     async.series([
         function (callback) {
-            Module.find({}).exec(function (err, modules) {
-                async.series([
-                    async.eachSeries(modules, function (module, callback) {
-                        var count = 0;
-                        Page.find({ epicKey: module.key }).exec(function (err, pages) {
-                            if (pages != null && pages.length > 0) {
-                                async.eachSeries(pages, function (page, callback) {
-                                    if (helpers.isActive(page.status, page.resolution)) {
-                                        putDataPoint(moduledata, module, page, ++count);
-                                    }
-                                    callback();
-                                },
-                                    function (err) {
-                                        callback();
-                                    });
-                            }
-                            else {
-                                putDataPoint(moduledata, module, null, count);
+            Module.find({}, function (err, modules) {
+                async.eachSeries(modules, function (module, callback) {
+                    var count = 0;
+                    Page.find({ epicKey: module.key }, function (err, pages) {
+                        if (pages != null && pages.length > 0) {
+                            async.eachSeries(pages, function (page, callback) {
+                                if (helpers.isActive(page.status, page.resolution)) {
+                                    putDataPoint(moduledata, module, page, ++count);
+                                }
                                 callback();
-                            }
-                        });
-                    },
-                        function (err) {
+                            },
+                                function (err) {
+                                    callback();
+                                });
+                        }
+                        else {
+                            putDataPoint(moduledata, module, null, count);
                             callback();
-                        })
-                ],
+                        }
+                    })},
                     function (err) {
                         callback();
                     });
