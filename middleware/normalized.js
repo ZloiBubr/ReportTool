@@ -35,6 +35,7 @@ function parsePages(callback) {
         function (callback) {
             Module.find({}).exec(function(err, modules) {
                 async.series([
+                    function (callback) {
                         async.eachSeries(modules, function(module, callback) {
                                 Page.find({epicKey: module.key}).exec(function (err, pages) {
                                     if(pages != null && pages.length > 0) {
@@ -54,10 +55,11 @@ function parsePages(callback) {
                             function() {
                                 callback();
                             })
-                    ],
-                    function() {
-                        callback();
-                    });
+                    }
+                ],
+                function() {
+                    callback();
+                });
             });
         },
         function () {
