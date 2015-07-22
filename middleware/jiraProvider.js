@@ -190,6 +190,7 @@ function Step1CollectIssueKeys(debugMode, fullUpdate, updateSpan, jira, issues, 
                 if (error) {
                     LogProgress("Collect issues error happened!", error);
                     callback(error);
+                    return;
                 }
                 if (jiraIssues != null) {
                     _.each(jiraIssues.issues, function (issue) {
