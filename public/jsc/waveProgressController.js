@@ -13,6 +13,7 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
         $scope.showStreams = false;
         $scope.detailedView = false;
         $scope.salesDemoPath = false;
+        $scope.expediteLA = false;
         $scope.blockedVP = false;
     };
 
@@ -284,6 +285,9 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
             if(addCards && $scope.salesDemoPath && cloudAppItem.acceptanceLabels.indexOf("InSalesDemoPath") < 0) {
                 return;
             }
+            if(addCards && $scope.expediteLA && cloudAppItem.acceptanceLabels.indexOf("ExpediteLA") < 0) {
+                return;
+            }
             if(addCards && $scope.blockedVP && cloudAppItem.acceptanceLabels.indexOf("HandoffBlockedByVP") < 0) {
                 return;
             }
@@ -454,6 +458,7 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
             total_laReady_isChecked: $scope.total.laReady.isChecked,
             total_all_isChecked: $scope.total.all.isChecked,
             salesDemoPath: $scope.salesDemoPath,
+            expediteLA: $scope.expediteLA,
             blockedVP: $scope.blockedVP
         };
         localStorageService.set('waveProgressController', storage);
@@ -488,6 +493,7 @@ function waveProgressController($scope, $resource, $window, $filter, localStorag
                 $scope.total.laReady.isChecked = storage.total_laReady_isChecked;
                 $scope.total.all.isChecked = storage.total_all_isChecked;
                 $scope.salesDemoPath = storage.salesDemoPath;
+                $scope.expediteLA = storage.expediteLA;
                 $scope.blockedVP = storage.blockedVP;
             }
             catch (ex) {
