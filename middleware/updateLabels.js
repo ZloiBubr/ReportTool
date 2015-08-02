@@ -69,6 +69,7 @@ function Step1CollectIssues(jira, params, callback) {
             jira.searchJira(params.jqlQuery, { fields: ["summary", "labels", "assignee", "priority", "customfield_10002"] }, function (error, issues) {
                 if (error) {
                     callback(error);
+                    return;
                 }
                 if (issues != null) {
                     async.eachSeries(issues.issues, function (issue, callback) {
