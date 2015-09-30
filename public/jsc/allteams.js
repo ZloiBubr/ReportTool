@@ -199,7 +199,9 @@ function Teams() {
                 "Viachaslau Naimovich",
                 "Vitali Sonchyk",
                 "Katsiaryna Kulbitskaya",
-                "Maryia Kashtanava"
+                "Maryia Kashtanava",
+				"Siarhei Kharchanka",
+				"Viktoryia Lazouskaya"
             ]
         }
     ];
