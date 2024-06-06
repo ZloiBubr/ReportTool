@@ -6,7 +6,7 @@ var leaderDictionary = {
 
     // SME AAA
     "AAA" : { SME: "AAA" },
-    // Glen Tillman guys
+    // AAA guys
     "BBB" : { SME: "AAA" },
     "CCC" : { SME: "AAA" },
     "DDD" : { SME: "AAA" },
@@ -14,9 +14,9 @@ var leaderDictionary = {
     "FFF" : { SME: "AAA" },
     "GGG" : { SME: "AAA" },
 
-    // SME Jon Demski
+    // SME TLS
     "KKK" : { SME: "KKK" },
-    // Jon Demski guys
+    // TLS guys
     "JJJ" : { SME: "KKK" },
 
 };
